@@ -2,7 +2,39 @@
   "permissions": {
     "allow": [
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "WebSearch",
+      "Bash(npm view *)",
+      "Bash(npm install *)",
+      "WebFetch(domain:tanstack.com)",
+      "WebFetch(domain:unpkg.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(curl -s \"https://api.github.com/repos/TanStack/router/contents/examples\")",
+      "Bash(curl *)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); [print\\(k\\) for k in d.get\\('exports',{}\\).keys\\(\\)]\")",
+      "Bash(node -e \"const p=require\\('./node_modules/@tanstack/react-start/package.json'\\); console.log\\(Object.keys\\(p.exports\\).join\\('\\\\n'\\)\\)\")",
+      "Bash(node -e \"const p=require\\('./node_modules/@tanstack/start-client-core/package.json'\\); console.log\\(Object.keys\\(p.exports\\).join\\('\\\\n'\\)\\)\")",
+      "Read(//c/tmp/**)",
+      "Bash(npx @tanstack/create-start@latest studypage-scaffold --template basic)",
+      "Bash(npx @tanstack/cli create studypage-scaffold)",
+      "Bash(node -e \"const p=require\\('./node_modules/@tanstack/react-start/package.json'\\); console.log\\(JSON.stringify\\(p.exports, null, 2\\)\\)\")",
+      "Bash(node -e \"const p=require\\('./node_modules/vinxi/package.json'\\); console.log\\(Object.keys\\(p.exports\\).join\\('\\\\n'\\)\\)\")",
+      "Bash(node *)",
+      "Bash(npx tsc *)",
+      "Bash(git *)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:www.npmjs.com)",
+      "Bash(pnpm dev *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/)",
+      "Bash(xargs grep -l \"defaultStreamHandler\")",
+      "Bash(xargs grep -l \"defineHandlerCallback\")",
+      "Bash(xargs grep -l \"defaultEntryPaths\")",
+      "Bash(npx vite *)",
+      "Bash(pkill -f \"vite\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(pkill -f \"node\")",
+      "Bash(tee /tmp/vite2.log)"
     ]
   }
 }
