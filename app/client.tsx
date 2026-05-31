@@ -1,8 +1,14 @@
 import { createRoot } from "react-dom/client";
-import { RouterProvider } from "@tanstack/react-router";
-import { getRouter } from "./router";
+import { StartClient } from "@tanstack/react-start/client";
 
-const router = getRouter();
-const rootEl = document.getElementById("root")!;
-const root = createRoot(rootEl);
-root.render(<RouterProvider router={router} />);
+console.log("[client] Starting hydration...");
+const rootEl = document.getElementById("root");
+console.log("[client] root element:", rootEl ? "found" : "missing");
+
+if (rootEl) {
+  const root = createRoot(rootEl);
+  root.render(<StartClient />);
+  console.log("[client] render called");
+} else {
+  console.error("[client] root element not found!");
+}

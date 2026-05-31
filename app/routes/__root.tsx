@@ -40,18 +40,35 @@ export const Route = createRootRoute({
   component: RootComponent,
 });
 
+const isServer = typeof window === "undefined";
+
+function RootDocument({ children }: { children: React.ReactNode }) {
+  if (isServer) {
+    return (
+      <html lang="zh-CN">
+        <head>
+          <HeadContent />
+        </head>
+        <body>
+          <div id="root">{children}</div>
+          <Scripts />
+        </body>
+      </html>
+    );
+  }
+  return (
+    <>
+      <HeadContent />
+      {children}
+      <Scripts />
+    </>
+  );
+}
+
 function RootComponent() {
   return (
-    <html lang="zh-CN">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        <div id="root">
-          <Outlet />
-        </div>
-        <Scripts />
-      </body>
-    </html>
+    <RootDocument>
+      <Outlet />
+    </RootDocument>
   );
 }
