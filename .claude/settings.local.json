@@ -34,7 +34,35 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173/)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/)",
       "Bash(pkill -f \"node\")",
-      "Bash(tee /tmp/vite2.log)"
+      "Bash(tee /tmp/vite2.log)",
+      "Bash(npm run *)",
+      "Bash(python3 -c ' *)",
+      "Bash(VITE_DEBUG=1 npx vite dev)",
+      "Bash(npx --yes pnpm install)",
+      "Bash(pnpm install *)",
+      "Bash(pkill -f \"vite dev\")",
+      "WebFetch(domain:localhost)",
+      "Bash(pnpm add *)",
+      "Bash(awk '{print $9}')",
+      "Bash(grep -oP '<script[^>]*>[^<]{0,200}')",
+      "Bash(curl -s http://localhost:5173/)",
+      "Read(//private/tmp/**)",
+      "Bash(tee /tmp/fullpage.html)",
+      "Read(//tmp/**)",
+      "Bash(xxd /tmp/full_response.txt)",
+      "Bash(timeout 10 bash -c 'curl -s http://localhost:5173/ 2>/dev/null')",
+      "Bash(tee /tmp/page_final.html)",
+      "Bash(hd)",
+      "Bash(curl -s http://localhost:5173/ > /tmp/page.html 2>/dev/null *)",
+      "Bash(xxd /tmp/page.html)",
+      "Bash(echo \"Server on: $\\(curl -s -o /dev/null -w '%{http_code}' http://localhost:5173/ \\)\")",
+      "Bash(echo \"Exit code: $?\")",
+      "Bash(npx tsx *)",
+      "Bash(echo \"API server: $\\(curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/ \\)\")",
+      "Bash(echo \"Upload test: $\\(curl -s -m 10 -X POST http://localhost:3000/api/upload -F 'content=test')"
+    ],
+    "additionalDirectories": [
+      "/private/tmp"
     ]
   }
 }

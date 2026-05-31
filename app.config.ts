@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
-import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import react from "@vitejs/plugin-react";
 import path from "path";
 
 export default defineConfig({
@@ -8,5 +8,11 @@ export default defineConfig({
       "~": path.resolve(__dirname, "app"),
     },
   },
-  plugins: [tanstackStart({ srcDirectory: "app" })],
+  plugins: [react()],
+  server: {
+    proxy: {
+      "/api": "http://localhost:3000",
+      "/p": "http://localhost:3000",
+    },
+  },
 });
