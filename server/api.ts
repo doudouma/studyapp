@@ -1,8 +1,7 @@
 /// <reference types="@cloudflare/workers-types" />
 import { Hono } from "hono";
-import { PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { nanoid } from "nanoid";
-import { r2, BUCKET, MAX_SIZE } from "./r2";
+import { getR2, BUCKET, MAX_SIZE } from "./r2";
 
 const api = new Hono<{
   Bindings: { BUCKET: R2Bucket };
@@ -33,6 +32,8 @@ async function putToStorage(
       httpMetadata: { contentType: "text/html; charset=utf-8" },
     });
   } else {
+    const { PutObjectCommand } = await import("@aws-sdk/client-s3");
+    const r2 = await getR2();
     await r2.send(
       new PutObjectCommand({
         Bucket: BUCKET,
@@ -53,8 +54,10 @@ async function getFromStorage(
     if (!obj) return null;
     return await obj.text();
   } else {
-    try {
-      const res = await r2.send(
+      try {
+        const { GetObjectCommand } = await import("@aws-sdk/client-s3");
+        const r2 = await getR2();
+        const res = await r2.send(
         new GetObjectCommand({ Bucket: BUCKET, Key: key })
       );
       return await res.Body!.transformToString();

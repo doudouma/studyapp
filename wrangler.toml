@@ -1,9 +1,9 @@
 name = "studypage"
-main = "server/worker.ts"
+main = "dist/server/server.js"
 compatibility_date = "2026-05-31"
 compatibility_flags = ["nodejs_compat_v2"]
 
-assets = { directory = "dist", binding = "ASSETS" }
+assets = { directory = "dist/client", binding = "ASSETS" }
 
 [[r2_buckets]]
 binding = "BUCKET"
