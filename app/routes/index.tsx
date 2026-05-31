@@ -67,7 +67,7 @@ function HomePage() {
         body: formData,
       });
 
-      const json = await res.json();
+      const json = await res.json() as { error?: string } & UploadResult;
       if (!res.ok) {
         throw new Error(json.error || "上传失败");
       }

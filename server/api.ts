@@ -1,9 +1,12 @@
+/// <reference types="@cloudflare/workers-types" />
 import { Hono } from "hono";
 import { PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { nanoid } from "nanoid";
 import { r2, BUCKET, MAX_SIZE } from "./r2";
 
-const api = new Hono();
+const api = new Hono<{
+  Bindings: { BUCKET: R2Bucket };
+}>();
 
 api.onError((err, c) => {
   console.error("API Error:", err);
@@ -18,6 +21,47 @@ function injectBanner(html: string): string {
   return html.includes("<body")
     ? html.replace(/<body([^>]*)>/i, `<body$1>${SECURITY_BANNER}`)
     : `${SECURITY_BANNER}${html}`;
+}
+
+async function putToStorage(
+  c: any,
+  key: string,
+  body: string
+) {
+  if (c.env?.BUCKET) {
+    await c.env.BUCKET.put(key, body, {
+      httpMetadata: { contentType: "text/html; charset=utf-8" },
+    });
+  } else {
+    await r2.send(
+      new PutObjectCommand({
+        Bucket: BUCKET,
+        Key: key,
+        Body: body,
+        ContentType: "text/html; charset=utf-8",
+      })
+    );
+  }
+}
+
+async function getFromStorage(
+  c: any,
+  key: string
+): Promise<string | null> {
+  if (c.env?.BUCKET) {
+    const obj = await c.env.BUCKET.get(key);
+    if (!obj) return null;
+    return await obj.text();
+  } else {
+    try {
+      const res = await r2.send(
+        new GetObjectCommand({ Bucket: BUCKET, Key: key })
+      );
+      return await res.Body!.transformToString();
+    } catch {
+      return null;
+    }
+  }
 }
 
 api.get("/robots.txt", (c) => {
@@ -44,14 +88,14 @@ api.post("/api/upload", async (c) => {
       return c.json({ error: "仅支持 .html 或 .zip 文件" }, 400);
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    if (buffer.length > MAX_SIZE) {
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    if (bytes.length > MAX_SIZE) {
       return c.json({ error: "文件大小不能超过 5MB" }, 413);
     }
 
     if (ext === ".zip") {
       const { unzipSync } = await import("fflate");
-      const files = unzipSync(new Uint8Array(buffer));
+      const files = unzipSync(bytes);
       const entries = Object.keys(files);
 
       let htmlFile = entries.find(
@@ -69,7 +113,7 @@ api.post("/api/upload", async (c) => {
 
       html = new TextDecoder().decode(files[htmlFile]);
     } else {
-      html = buffer.toString("utf-8");
+      html = new TextDecoder().decode(bytes);
     }
   } else if (typeof content === "string" && content.trim()) {
     if (new Blob([content]).size > MAX_SIZE) {
@@ -81,14 +125,7 @@ api.post("/api/upload", async (c) => {
   }
 
   const id = nanoid(7);
-  await r2.send(
-    new PutObjectCommand({
-      Bucket: BUCKET,
-      Key: `${id}.html`,
-      Body: html,
-      ContentType: "text/html; charset=utf-8",
-    })
-  );
+  await putToStorage(c, `${id}.html`, html);
 
   return c.json({
     url: `/p/${id}`,
@@ -102,23 +139,20 @@ api.get("/p/:id", async (c) => {
     return c.html(notFoundHtml(), 404);
   }
 
-  try {
-    const res = await r2.send(
-      new GetObjectCommand({ Bucket: BUCKET, Key: `${id}.html` })
-    );
-    const html = await res.Body!.transformToString();
-    const injected = injectBanner(html);
-
-    return new Response(injected, {
-      status: 200,
-      headers: {
-        "Content-Type": "text/html; charset=utf-8",
-        "Content-Security-Policy": "form-action 'none';",
-      },
-    });
-  } catch {
+  const html = await getFromStorage(c, `${id}.html`);
+  if (html === null) {
     return c.html(notFoundHtml(), 404);
   }
+
+  const injected = injectBanner(html);
+
+  return new Response(injected, {
+    status: 200,
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      "Content-Security-Policy": "form-action 'none';",
+    },
+  });
 });
 
 function notFoundHtml(): string {

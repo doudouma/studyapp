@@ -1,0 +1,14 @@
+name = "studypage"
+main = "server/worker.ts"
+compatibility_date = "2026-05-31"
+compatibility_flags = ["nodejs_compat_v2"]
+
+assets = { directory = "dist", binding = "ASSETS" }
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "studypage"
+
+[vars]
+R2_ACCOUNT_ID = "461422f5f136a7492f1acac1fdf69004"
+R2_BUCKET_NAME = "studypage"
