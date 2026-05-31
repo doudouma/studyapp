@@ -12,7 +12,8 @@
     "isolatedModules": true,
     "noEmit": true,
     "paths": {
-      "~/*": ["./app/*"]
+      "~/*": ["./app/*"],
+      "@/*": ["./app/*"]
     }
   },
   "include": ["app/**/*", "server/**/*", "app.config.ts", ".tanstack/**/*"]

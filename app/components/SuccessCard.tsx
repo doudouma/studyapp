@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { Card, CardContent } from "~/components/ui/card";
+import { Button } from "~/components/ui/button";
+import { cn } from "~/lib/utils";
 
 interface SuccessCardProps {
   url: string;
@@ -9,7 +12,10 @@ interface SuccessCardProps {
 export function SuccessCard({ url, expiresAt, onReset }: SuccessCardProps) {
   const [copied, setCopied] = useState(false);
 
-  const fullUrl = typeof window !== "undefined" ? `${window.location.origin}${url}` : url;
+  const fullUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}${url}`
+      : url;
 
   const handleCopy = async () => {
     try {
@@ -17,7 +23,6 @@ export function SuccessCard({ url, expiresAt, onReset }: SuccessCardProps) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Fallback
       const input = document.createElement("input");
       input.value = fullUrl;
       document.body.appendChild(input);
@@ -37,105 +42,42 @@ export function SuccessCard({ url, expiresAt, onReset }: SuccessCardProps) {
   });
 
   return (
-    <div style={styles.card}>
-      <div style={styles.icon}>✅</div>
-      <h2 style={styles.title}>发布成功！</h2>
-      <p style={styles.expiry}>将于 {expiryDate} 后自动销毁</p>
+    <Card className="w-full max-w-md text-center">
+      <CardContent className="flex flex-col items-center gap-4 pt-8 pb-8">
+        <span className="text-5xl">✅</span>
+        <h2 className="text-xl font-bold text-foreground">发布成功！</h2>
+        <p className="text-sm text-muted-foreground">
+          将于 {expiryDate} 后自动销毁
+        </p>
 
-      <div style={styles.urlBox}>
-        <input
-          style={styles.urlInput}
-          value={fullUrl}
-          readOnly
-          onClick={(e) => (e.target as HTMLInputElement).select()}
-        />
-        <button style={styles.copyBtn} onClick={handleCopy}>
-          {copied ? "已复制 ✓" : "复制链接"}
-        </button>
-      </div>
+        <div className="flex w-full gap-2">
+          <input
+            className={cn(
+              "flex-1 rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm font-mono text-foreground outline-none",
+              "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+            )}
+            value={fullUrl}
+            readOnly
+            onClick={(e) => (e.target as HTMLInputElement).select()}
+          />
+          <Button onClick={handleCopy} className="shrink-0">
+            {copied ? "已复制 ✓" : "复制链接"}
+          </Button>
+        </div>
 
-      <div style={styles.actions}>
-        <a href={url} target="_blank" rel="noopener noreferrer" style={styles.previewLink}>
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm font-semibold text-primary hover:underline"
+        >
           预览页面 →
         </a>
-      </div>
 
-      <button style={styles.resetBtn} onClick={onReset}>
-        继续发布
-      </button>
-    </div>
+        <Button variant="outline" onClick={onReset} className="mt-2">
+          继续发布
+        </Button>
+      </CardContent>
+    </Card>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  card: {
-    background: "#fff",
-    borderRadius: "16px",
-    padding: "2.5rem 2rem",
-    width: "100%",
-    maxWidth: "500px",
-    boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
-    textAlign: "center",
-    fontFamily: 'system-ui, -apple-system, sans-serif',
-  },
-  icon: {
-    fontSize: "3rem",
-    marginBottom: "0.5rem",
-  },
-  title: {
-    fontSize: "1.5rem",
-    fontWeight: 700,
-    margin: "0 0 0.25rem",
-    color: "#333",
-  },
-  expiry: {
-    fontSize: "0.9rem",
-    color: "#999",
-    margin: "0 0 1.5rem",
-  },
-  urlBox: {
-    display: "flex",
-    gap: "0.5rem",
-    marginBottom: "1.5rem",
-  },
-  urlInput: {
-    flex: 1,
-    padding: "0.75rem 1rem",
-    border: "1px solid #e0e0e0",
-    borderRadius: "8px",
-    fontSize: "0.9rem",
-    fontFamily: "monospace",
-    background: "#f8f8f8",
-    color: "#333",
-    outline: "none",
-  },
-  copyBtn: {
-    padding: "0.75rem 1.25rem",
-    background: "#667eea",
-    color: "#fff",
-    border: "none",
-    borderRadius: "8px",
-    fontSize: "0.9rem",
-    fontWeight: 600,
-    cursor: "pointer",
-    whiteSpace: "nowrap",
-  },
-  actions: {
-    marginBottom: "1rem",
-  },
-  previewLink: {
-    color: "#667eea",
-    textDecoration: "none",
-    fontWeight: 600,
-    fontSize: "0.95rem",
-  },
-  resetBtn: {
-    background: "none",
-    border: "1px solid #e0e0e0",
-    borderRadius: "8px",
-    padding: "0.75rem 2rem",
-    fontSize: "0.9rem",
-    color: "#666",
-    cursor: "pointer",
-  },
-};

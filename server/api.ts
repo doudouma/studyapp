@@ -5,6 +5,11 @@ import { r2, BUCKET, MAX_SIZE } from "./r2";
 
 const api = new Hono();
 
+api.onError((err, c) => {
+  console.error("API Error:", err);
+  return c.json({ error: err.message || "Internal Server Error" }, 500);
+});
+
 const ALLOWED_EXTENSIONS = [".html", ".htm", ".zip"];
 
 const SECURITY_BANNER = `<div style="position:fixed;top:0;left:0;right:0;z-index:99999;background:rgba(255,200,0,0.95);color:#333;padding:8px 16px;font-size:13px;text-align:center;font-family:system-ui,sans-serif;">⚠️ 安全提示：本页面由用户临时托管，请勿输入密码或任何敏感信息。</div>`;

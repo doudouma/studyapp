@@ -66,15 +66,16 @@ export function DropZone({ file, onFileSelect }: DropZoneProps) {
 
   if (file) {
     return (
-      <div style={styles.fileInfo}>
-        <div style={styles.fileIcon}>
-          {file.name.endsWith(".zip") ? "📦" : "📄"}
+      <div className="flex items-center gap-4 rounded-xl border border-border bg-muted/30 p-5">
+        <span className="text-2xl">{file.name.endsWith(".zip") ? "📦" : "📄"}</span>
+        <div className="flex-1 min-w-0">
+          <div className="truncate font-semibold text-sm text-foreground">{file.name}</div>
+          <div className="text-xs text-muted-foreground mt-0.5">{formatSize(file.size)}</div>
         </div>
-        <div style={styles.fileDetails}>
-          <div style={styles.fileName}>{file.name}</div>
-          <div style={styles.fileSize}>{formatSize(file.size)}</div>
-        </div>
-        <button style={styles.removeBtn} onClick={() => onFileSelect(null)}>
+        <button
+          className="inline-flex items-center justify-center rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          onClick={() => onFileSelect(null)}
+        >
           ✕
         </button>
       </div>
@@ -83,7 +84,11 @@ export function DropZone({ file, onFileSelect }: DropZoneProps) {
 
   return (
     <div
-      style={dragOver ? { ...styles.dropzone, ...styles.dropzoneActive } : styles.dropzone}
+      className={`flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-12 text-center cursor-pointer transition-all ${
+        dragOver
+          ? "border-primary bg-primary/5"
+          : "border-muted-foreground/25 bg-muted/20 hover:border-muted-foreground/40"
+      }`}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -93,76 +98,14 @@ export function DropZone({ file, onFileSelect }: DropZoneProps) {
         ref={inputRef}
         type="file"
         accept=".html,.htm,.zip"
-        style={{ display: "none" }}
+        className="hidden"
         onChange={handleInputChange}
       />
-      <div style={styles.dropIcon}>📁</div>
-      <div style={styles.dropText}>
+      <div className="text-4xl mb-3">📁</div>
+      <div className="text-sm text-foreground mb-1">
         拖拽 <strong>.html</strong> 或 <strong>.zip</strong> 文件到此处
       </div>
-      <div style={styles.dropSubtext}>或点击选择文件</div>
+      <div className="text-xs text-muted-foreground">或点击选择文件</div>
     </div>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  dropzone: {
-    border: "2px dashed #d0d0d0",
-    borderRadius: "12px",
-    padding: "3rem 2rem",
-    textAlign: "center",
-    cursor: "pointer",
-    transition: "all 0.2s",
-    background: "#fafafa",
-  },
-  dropzoneActive: {
-    borderColor: "#667eea",
-    background: "#f0f0ff",
-  },
-  dropIcon: {
-    fontSize: "2.5rem",
-    marginBottom: "0.75rem",
-  },
-  dropText: {
-    fontSize: "1rem",
-    color: "#333",
-    marginBottom: "0.25rem",
-  },
-  dropSubtext: {
-    fontSize: "0.85rem",
-    color: "#999",
-  },
-  fileInfo: {
-    display: "flex",
-    alignItems: "center",
-    gap: "1rem",
-    padding: "1.25rem",
-    border: "1px solid #e0e0e0",
-    borderRadius: "12px",
-    background: "#fafafa",
-  },
-  fileIcon: {
-    fontSize: "2rem",
-  },
-  fileDetails: {
-    flex: 1,
-  },
-  fileName: {
-    fontWeight: 600,
-    fontSize: "0.95rem",
-    color: "#333",
-  },
-  fileSize: {
-    fontSize: "0.8rem",
-    color: "#999",
-    marginTop: "2px",
-  },
-  removeBtn: {
-    background: "none",
-    border: "none",
-    fontSize: "1.2rem",
-    color: "#999",
-    cursor: "pointer",
-    padding: "0.5rem",
-  },
-};
