@@ -20,6 +20,15 @@ function injectBanner(html: string): string {
     : `${SECURITY_BANNER}${html}`;
 }
 
+api.get("/robots.txt", (c) => {
+  return c.text(`User-agent: *
+Allow: /
+Disallow: /p/
+
+Sitemap: https://studypage.app/sitemap.xml
+`);
+});
+
 api.post("/api/upload", async (c) => {
   const body = await c.req.parseBody();
 
@@ -115,13 +124,15 @@ api.get("/p/:id", async (c) => {
 function notFoundHtml(): string {
   return `<!DOCTYPE html>
 <html lang="zh-CN">
-<head><meta charset="utf-8"><title>404</title>
+<head><meta charset="utf-8"><meta name="robots" content="noindex"><title>404 - 页面不存在 | 码上钉</title>
+<meta name="description" content="该页面不存在或已过期（24小时自动销毁）。返回码上钉首页创建新的分享链接。">
 <style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:system-ui,sans-serif;background:#f5f5f5}</style>
 </head>
 <body>
 <div style="text-align:center">
 <h1 style="font-size:2rem;margin-bottom:0.5rem">404</h1>
 <p style="color:#666">页面不存在或已过期（24小时自动销毁）</p>
+<a href="/" style="display:inline-block;margin-top:1rem;padding:0.5rem 1.5rem;background:#667eea;color:#fff;text-decoration:none;border-radius:8px">返回首页</a>
 </div>
 </body></html>`;
 }

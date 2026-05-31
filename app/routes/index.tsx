@@ -7,6 +7,16 @@ import { Button } from "~/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    title: "码上钉 - 免费 HTML 托管与分享工具",
+    meta: [
+      {
+        name: "keywords",
+        content:
+          "HTML托管,代码分享,在线HTML,前端分享,网页托管,免费托管,学习工具,教育工具",
+      },
+    ],
+  }),
   component: HomePage,
 });
 

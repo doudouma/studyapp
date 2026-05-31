@@ -14,6 +14,7 @@ export default defineConfig({
     proxy: {
       "/api": "http://localhost:3000",
       "/p": "http://localhost:3000",
+      "/robots.txt": "http://localhost:3000",
     },
   },
 });
