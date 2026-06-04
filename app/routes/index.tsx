@@ -1,14 +1,17 @@
 import { useState } from "react";
 import { DropZone } from "~/components/DropZone";
 import { SuccessCard } from "~/components/SuccessCard";
+import { AuthBar } from "~/components/AuthBar";
+import { UserCenter } from "~/components/UserCenter";
 import { Card, CardContent } from "~/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/components/ui/tabs";
 import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
   head: () => ({
-    title: "码上钉 - 免费 HTML 托管与分享工具",
+    title: "100mini - 免费 HTML 托管与分享",
     meta: [
       {
         name: "keywords",
@@ -24,13 +27,17 @@ type TabMode = "paste" | "drop";
 
 interface UploadResult {
   url: string;
-  expiresAt: string;
+  expiresAt: string | null;
+  isPermanent?: boolean;
+  title?: string;
 }
 
 function HomePage() {
   const [mode, setMode] = useState<TabMode>("paste");
   const [htmlContent, setHtmlContent] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("general");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<UploadResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -61,6 +68,8 @@ function HomePage() {
       } else {
         return;
       }
+      formData.append("title", title);
+      formData.append("category", category);
 
       const res = await fetch("/api/upload", {
         method: "POST",
@@ -86,6 +95,7 @@ function HomePage() {
     setResult(null);
     setHtmlContent("");
     setFile(null);
+    setTitle("");
     setError(null);
   };
 
@@ -94,7 +104,8 @@ function HomePage() {
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-[#667eea] to-[#764ba2] p-8">
         <SuccessCard
           url={result.url}
-          expiresAt={result.expiresAt}
+          expiresAt={result.expiresAt || undefined}
+          isPermanent={result.isPermanent}
           onReset={handleReset}
         />
       </main>
@@ -102,15 +113,21 @@ function HomePage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-[#667eea] to-[#764ba2] p-8">
-      <header className="mb-8 text-center text-white">
-        <h1 className="text-4xl font-extrabold tracking-tight drop-shadow-lg">
-          码上钉
+    <main className="flex min-h-screen flex-col items-center bg-gradient-to-br from-[#667eea] to-[#764ba2] p-8">
+      <nav className="w-full max-w-xl flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-white drop-shadow-lg">
+          100mini
         </h1>
-        <p className="mt-2 text-lg opacity-90">
+        <AuthBar />
+      </nav>
+
+      <header className="mb-8 text-center text-white">
+        <p className="text-lg opacity-90">
           粘贴或拖拽 HTML，一键生成分享链接
         </p>
       </header>
+
+      <UserCenter />
 
       <Card className="w-full max-w-xl">
         <CardContent className="p-6">
@@ -171,7 +188,7 @@ function HomePage() {
       </Card>
 
       <p className="mt-6 text-sm text-white/70">
-        匿名上传 · 24小时后自动销毁 · 单文件最大 5MB
+        匿名上传 · 24小时自动销毁 · 登录后可免费长期保留 5 个页面
       </p>
     </main>
   );

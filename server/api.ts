@@ -1,11 +1,22 @@
 /// <reference types="@cloudflare/workers-types" />
 import { Hono } from "hono";
 import { nanoid } from "nanoid";
+import { count, eq, and, desc } from "drizzle-orm";
 import { getR2, BUCKET, MAX_SIZE } from "./r2";
+import { createDb } from "./db";
+import { page } from "./db/schema";
+
+type Variables = {
+  user: { id: string; name: string; email: string; image?: string } | null;
+  session: any;
+};
 
 const api = new Hono<{
-  Bindings: { BUCKET: R2Bucket };
+  Bindings: { BUCKET: R2Bucket; D1: D1Database };
+  Variables: Variables;
 }>();
+
+const FREE_PERMANENT_LIMIT = 5;
 
 api.onError((err, c) => {
   console.error("API Error:", err);
@@ -76,11 +87,91 @@ Sitemap: https://studypage.app/sitemap.xml
 `);
 });
 
-api.post("/api/upload", async (c) => {
-  const body = await c.req.parseBody();
+// Get current user + page count
+api.get("/api/me", async (c) => {
+  const user = c.get("user");
+  if (!user) {
+    return c.json({ user: null, pageCount: 0, limit: 0 });
+  }
 
+  const db = createDb(c.env.D1);
+  const result = await db.select({ count: count() }).from(page).where(eq(page.userId, user.id));
+  const pageCount = result[0]?.count ?? 0;
+
+  return c.json({
+    user,
+    pageCount,
+    limit: FREE_PERMANENT_LIMIT,
+  });
+});
+
+// List user's pages
+api.get("/api/pages", async (c) => {
+  const user = c.get("user");
+  if (!user) return c.json({ error: "未登录" }, 401);
+
+  const db = createDb(c.env.D1);
+  const pages = await db
+    .select({
+      id: page.id,
+      title: page.title,
+      category: page.category,
+      isPermanent: page.isPermanent,
+      createdAt: page.createdAt,
+      expiresAt: page.expiresAt,
+    })
+    .from(page)
+    .where(eq(page.userId, user.id))
+    .orderBy(desc(page.createdAt));
+
+  return c.json({ pages });
+});
+
+// Delete a page
+api.delete("/api/pages/:id", async (c) => {
+  const user = c.get("user");
+  if (!user) return c.json({ error: "未登录" }, 401);
+
+  const pageId = c.req.param("id");
+  const db = createDb(c.env.D1);
+
+  // Check ownership
+  const existing = await db.select().from(page).where(and(eq(page.id, pageId), eq(page.userId, user.id))).limit(1);
+  if (existing.length === 0) return c.json({ error: "页面不存在" }, 404);
+
+  // Delete from R2
+  await putToStorage(c, `${pageId}.html`, ""); // clear content
+  if (c.env?.BUCKET) {
+    await c.env.BUCKET.delete(`${pageId}.html`);
+  }
+
+  // Delete from D1
+  await db.delete(page).where(eq(page.id, pageId));
+
+  return c.json({ success: true });
+});
+
+api.post("/api/upload", async (c) => {
+  const user = c.get("user");
+
+  const body = await c.req.parseBody();
   const content = body.content;
   const file = body.file;
+  const title = (body.title as string) || "";
+  const category = (body.category as string) || "general";
+
+  // Check quota for logged-in users requesting permanent storage
+  const wantPermanent = !!user;
+  if (wantPermanent && user) {
+    const db = createDb(c.env.D1);
+    const result = await db.select({ count: count() }).from(page).where(eq(page.userId, user.id));
+    const pageCount = result[0]?.count ?? 0;
+    if (pageCount >= FREE_PERMANENT_LIMIT) {
+      return c.json({
+        error: `免费额度已用完（${FREE_PERMANENT_LIMIT}/${FREE_PERMANENT_LIMIT}），请删除旧页面后重试`,
+      }, 403);
+    }
+  }
 
   let html: string;
 
@@ -130,9 +221,29 @@ api.post("/api/upload", async (c) => {
   const id = nanoid(7);
   await putToStorage(c, `${id}.html`, html);
 
+  const now = Date.now();
+  const isPermanent = wantPermanent;
+  const expiresAt = isPermanent ? null : new Date(now + 24 * 60 * 60 * 1000).toISOString();
+
+  // Record in D1 if user is logged in
+  if (user) {
+    const db = createDb(c.env.D1);
+    await db.insert(page).values({
+      id,
+      userId: user.id,
+      title: title || "未命名",
+      category,
+      isPermanent: true,
+      createdAt: new Date(now),
+      expiresAt: null,
+    });
+  }
+
   return c.json({
     url: `/p/${id}`,
-    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    expiresAt,
+    isPermanent,
+    title,
   });
 });
 
@@ -161,8 +272,8 @@ api.get("/p/:id", async (c) => {
 function notFoundHtml(): string {
   return `<!DOCTYPE html>
 <html lang="zh-CN">
-<head><meta charset="utf-8"><meta name="robots" content="noindex"><title>404 - 页面不存在 | 码上钉</title>
-<meta name="description" content="该页面不存在或已过期（24小时自动销毁）。返回码上钉首页创建新的分享链接。">
+<head><meta charset="utf-8"><meta name="robots" content="noindex"><title>404 - 页面不存在 | 100mini</title>
+<meta name="description" content="该页面不存在或已过期（24小时自动销毁）。返回100mini首页创建新的分享链接。">
 <style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:system-ui,sans-serif;background:#f5f5f5}</style>
 </head>
 <body>

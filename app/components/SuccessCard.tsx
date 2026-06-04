@@ -5,11 +5,12 @@ import { cn } from "~/lib/utils";
 
 interface SuccessCardProps {
   url: string;
-  expiresAt: string;
+  expiresAt?: string;
+  isPermanent?: boolean;
   onReset: () => void;
 }
 
-export function SuccessCard({ url, expiresAt, onReset }: SuccessCardProps) {
+export function SuccessCard({ url, expiresAt, isPermanent, onReset }: SuccessCardProps) {
   const [copied, setCopied] = useState(false);
 
   const fullUrl =
@@ -34,12 +35,12 @@ export function SuccessCard({ url, expiresAt, onReset }: SuccessCardProps) {
     }
   };
 
-  const expiryDate = new Date(expiresAt).toLocaleString("zh-CN", {
+  const expiryDate = expiresAt ? new Date(expiresAt).toLocaleString("zh-CN", {
     month: "numeric",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-  });
+  }) : null;
 
   return (
     <Card className="w-full max-w-md text-center">
@@ -47,7 +48,7 @@ export function SuccessCard({ url, expiresAt, onReset }: SuccessCardProps) {
         <span className="text-5xl">✅</span>
         <h2 className="text-xl font-bold text-foreground">发布成功！</h2>
         <p className="text-sm text-muted-foreground">
-          将于 {expiryDate} 后自动销毁
+          {isPermanent ? "永久保留" : `将于 ${expiryDate} 后自动销毁`}
         </p>
 
         <div className="flex w-full gap-2">
