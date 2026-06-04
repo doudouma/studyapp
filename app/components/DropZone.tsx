@@ -1,4 +1,5 @@
 import { useRef, useState, useCallback } from "react";
+import { Upload, FileText, Archive, X } from "lucide-react";
 
 interface DropZoneProps {
   file: File | null;
@@ -67,7 +68,9 @@ export function DropZone({ file, onFileSelect }: DropZoneProps) {
   if (file) {
     return (
       <div className="flex items-center gap-4 rounded-xl border border-border bg-muted/30 p-5">
-        <span className="text-2xl">{file.name.endsWith(".zip") ? "📦" : "📄"}</span>
+        <div className="flex size-10 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+          {file.name.endsWith(".zip") ? <Archive className="size-5" /> : <FileText className="size-5" />}
+        </div>
         <div className="flex-1 min-w-0">
           <div className="truncate font-semibold text-sm text-foreground">{file.name}</div>
           <div className="text-xs text-muted-foreground mt-0.5">{formatSize(file.size)}</div>
@@ -76,7 +79,7 @@ export function DropZone({ file, onFileSelect }: DropZoneProps) {
           className="inline-flex items-center justify-center rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
           onClick={() => onFileSelect(null)}
         >
-          ✕
+          <X className="size-4" />
         </button>
       </div>
     );
@@ -101,7 +104,9 @@ export function DropZone({ file, onFileSelect }: DropZoneProps) {
         className="hidden"
         onChange={handleInputChange}
       />
-      <div className="text-4xl mb-3">📁</div>
+      <div className="flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
+        <Upload className="size-6" />
+      </div>
       <div className="text-sm text-foreground mb-1">
         拖拽 <strong>.html</strong> 或 <strong>.zip</strong> 文件到此处
       </div>
