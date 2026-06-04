@@ -92,7 +92,7 @@ function HomePage() {
 
   if (result) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center bg-background p-8">
+      <main className="flex min-h-screen flex-col items-center justify-center p-8">
         <SuccessCard
           url={result.url}
           expiresAt={result.expiresAt}
@@ -103,7 +103,7 @@ function HomePage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-background p-8">
+    <main className="flex min-h-screen flex-col items-center justify-center p-8">
       <header className="mb-8 text-center">
         <div className="mb-3 flex justify-center">
           <div className="inline-flex size-12 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-xs">
