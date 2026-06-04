@@ -123,8 +123,19 @@
     }
   body {
     @apply bg-background text-foreground;
+    position: relative;
     }
   html {
     @apply font-sans;
     }
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle, hsl(0 0% 0% / 0.04) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+    z-index: -1;
 }
