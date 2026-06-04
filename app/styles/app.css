@@ -123,23 +123,21 @@
     }
   body {
     @apply bg-background text-foreground;
-    position: relative;
     }
   html {
     @apply font-sans;
     }
 }
-
 body::before {
     content: '';
     position: fixed;
     inset: 0;
-    background-image: radial-gradient(circle, oklch(0.556 0 0 / 0.12) 1px, transparent 1px);
+    background-image: radial-gradient(circle, oklch(0.556 0 0 / 0.32) 1px, transparent 1px);
     background-size: 20px 20px;
     pointer-events: none;
     z-index: -1;
 }
 
 .dark body::before {
-    background-image: radial-gradient(circle, oklch(0.708 0 0 / 0.15) 1px, transparent 1px);
+    background-image: radial-gradient(circle, oklch(0.708 0 0 / 0.35) 1px, transparent 1px);
 }
