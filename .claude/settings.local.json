@@ -69,7 +69,22 @@
       "Bash(lsof -ti:5175)",
       "Bash(echo \"Dev server PID: $!\")",
       "Bash(xargs kill)",
-      "Bash(npm prune *)"
+      "Bash(npm prune *)",
+      "Bash(pnpm ls *)",
+      "Bash(pnpm build *)",
+      "Bash(kill %1)",
+      "Bash(wait)",
+      "Bash(xargs grep \"@noble/ciphers\")",
+      "Bash(npm pack *)",
+      "Bash(npm info *)",
+      "Bash(tar xzf *)",
+      "Bash(rm -rf package noble-ciphers-2.1.1.tgz)",
+      "Bash(xargs grep \"@noble/hashes\")",
+      "Bash(ls package/esm/hkdf.js)",
+      "Bash(ls package/hkdf.js)",
+      "Bash(rm -rf package noble-hashes-2.0.1.tgz)",
+      "Bash(npx drizzle-kit *)",
+      "Bash(npx wrangler *)"
     ],
     "additionalDirectories": [
       "/private/tmp",

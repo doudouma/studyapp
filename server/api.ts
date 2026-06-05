@@ -12,7 +12,7 @@ type Variables = {
 };
 
 const api = new Hono<{
-  Bindings: { BUCKET: R2Bucket; D1: D1Database };
+  Bindings: { BUCKET?: R2Bucket; D1?: D1Database };
   Variables: Variables;
 }>();
 
@@ -90,8 +90,8 @@ Sitemap: https://studypage.app/sitemap.xml
 // Get current user + page count
 api.get("/api/me", async (c) => {
   const user = c.get("user");
-  if (!user) {
-    return c.json({ user: null, pageCount: 0, limit: 0 });
+  if (!user || !c.env.D1) {
+    return c.json({ user: user ?? null, pageCount: 0, limit: 0 });
   }
 
   const db = createDb(c.env.D1);
@@ -108,7 +108,7 @@ api.get("/api/me", async (c) => {
 // List user's pages
 api.get("/api/pages", async (c) => {
   const user = c.get("user");
-  if (!user) return c.json({ error: "未登录" }, 401);
+  if (!user || !c.env.D1) return c.json({ error: "未登录" }, 401);
 
   const db = createDb(c.env.D1);
   const pages = await db

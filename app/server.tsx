@@ -5,25 +5,62 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 
 type Bindings = {
-  BUCKET: R2Bucket;
-  D1: D1Database;
-  BETTER_AUTH_URL: string;
-  BETTER_AUTH_SECRET: string;
+  BUCKET?: R2Bucket;
+  D1?: D1Database;
+  BETTER_AUTH_URL?: string;
+  BETTER_AUTH_SECRET?: string;
+  BETTER_AUTH_API_KEY?: string;
 };
+
+// In Vite dev mode, c.env is undefined — use getPlatformProxy for local D1/R2
+let devProxy: any = null;
+async function getDevBindings() {
+  if (!devProxy) {
+    const { getPlatformProxy } = await import("wrangler");
+    devProxy = await getPlatformProxy();
+  }
+  return devProxy;
+}
 
 const startHandler = createStartHandler(defaultStreamHandler);
 
 const app = new Hono<{ Bindings: Bindings; Variables: { user: any; session: any } }>();
 
+// Inject local Cloudflare bindings in dev mode
+app.use("*", async (c, next) => {
+  if (!c.env?.D1) {
+    try {
+      const proxy = await getDevBindings();
+      c.env = { ...c.env, D1: proxy.env.D1, BUCKET: proxy.env.BUCKET } as any;
+    } catch (err) {
+      console.warn("Local bindings not available:", (err as Error).message);
+    }
+  }
+  return next();
+});
+
 // CORS for auth endpoints
 app.use("/api/auth/*", cors({
-  origin: ["https://www.100mini.com", "http://localhost:3000", "http://localhost:5173"],
+  origin: ["https://www.100mini.com", "http://localhost:3000", "http://localhost:5173", "http://localhost:5174"],
   credentials: true,
 }));
 
-// Better Auth handler
+// Cache auth instances by baseURL
+const authCache = new Map<string, ReturnType<typeof createAuth>>();
+function getAuth(env: any, requestURL?: string) {
+  const baseURL = requestURL ? new URL(requestURL).origin : (env?.BETTER_AUTH_URL || "");
+  if (!authCache.has(baseURL)) {
+    authCache.set(baseURL, createAuth(env, requestURL));
+  }
+  return authCache.get(baseURL)!;
+}
+
+// Better Auth handler (only if D1 is available)
 app.all("/api/auth/*", async (c) => {
-  const auth = createAuth(c.env as any);
+  const auth = getAuth(c.env ?? {}, c.req.url);
+  if (!auth) {
+    return c.json({ error: "auth not available" }, 503);
+  }
   return auth.handler(c.req.raw);
 });
 
@@ -32,7 +69,12 @@ app.use("/api/*", async (c, next) => {
   // Skip auth routes (already handled above)
   if (c.req.path.startsWith("/api/auth")) return next();
 
-  const auth = createAuth(c.env as any);
+  const auth = getAuth(c.env ?? {}, c.req.url);
+  if (!auth) {
+    c.set("user", null);
+    c.set("session", null);
+    return next();
+  }
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
   c.set("user", session?.user ?? null);
   c.set("session", session?.session ?? null);

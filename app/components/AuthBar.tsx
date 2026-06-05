@@ -49,14 +49,16 @@ export function AuthBar() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-white/80 hover:text-white hover:bg-white/10"
-        >
-          登录 / 注册
-        </Button>
+      <DialogTrigger
+        render={
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-white/80 hover:text-white hover:bg-white/10"
+          />
+        }
+      >
+        登录 / 注册
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

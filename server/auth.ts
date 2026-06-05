@@ -1,29 +1,42 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { dash } from "@better-auth/infra";
 import { createDb } from "./db";
 import * as schema from "./db/schema";
 
 export function createAuth(env: {
-  D1: D1Database;
-  BETTER_AUTH_URL: string;
-  BETTER_AUTH_SECRET: string;
-}) {
+  D1?: D1Database;
+  BETTER_AUTH_URL?: string;
+  BETTER_AUTH_SECRET?: string;
+  BETTER_AUTH_API_KEY?: string;
+}, requestURL?: string) {
+  if (!env.D1) {
+    return null;
+  }
+
   const db = createDb(env.D1);
+
+  // Use request origin in dev, env var in production
+  const baseURL = requestURL
+    ? new URL(requestURL).origin
+    : env.BETTER_AUTH_URL || "http://localhost:5174";
 
   return betterAuth({
     database: drizzleAdapter(db, {
       provider: "sqlite",
       schema,
     }),
-    baseURL: env.BETTER_AUTH_URL,
-    secret: env.BETTER_AUTH_SECRET,
+    baseURL,
+    secret: env.BETTER_AUTH_SECRET || "dev-secret",
     basePath: "/api/auth",
     appName: "100mini",
     socialProviders: {},
-    // Email & password auth for Phase 2 (simpler than WeChat)
     emailAndPassword: {
       enabled: true,
       autoSignIn: true,
     },
+    plugins: [
+      dash(),
+    ],
   });
 }
