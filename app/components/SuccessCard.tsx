@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card, CardContent } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
+import { CheckCircle2, ExternalLink } from "lucide-react";
 
 interface SuccessCardProps {
   url: string;
@@ -45,7 +46,9 @@ export function SuccessCard({ url, expiresAt, isPermanent, onReset }: SuccessCar
   return (
     <Card className="w-full max-w-md text-center">
       <CardContent className="flex flex-col items-center gap-4 pt-8 pb-8">
-        <span className="text-5xl">✅</span>
+        <div className="flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <CheckCircle2 className="size-8" />
+        </div>
         <h2 className="text-xl font-bold text-foreground">发布成功！</h2>
         <p className="text-sm text-muted-foreground">
           {isPermanent ? "永久保留" : `将于 ${expiryDate} 后自动销毁`}
@@ -70,9 +73,9 @@ export function SuccessCard({ url, expiresAt, isPermanent, onReset }: SuccessCar
           href={url}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-sm font-semibold text-primary hover:underline"
+          className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
         >
-          预览页面 →
+          预览页面 <ExternalLink className="size-3.5" />
         </a>
 
         <Button variant="outline" onClick={onReset} className="mt-2">

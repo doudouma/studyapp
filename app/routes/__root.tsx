@@ -15,8 +15,8 @@ export const Route = createRootRoute({
           "码上钉是一款免费的 HTML 在线托管工具。粘贴或拖拽 HTML/CSS/JS 代码，一键生成分享链接，24 小时自动销毁。",
       },
       { name: "robots", content: "index, follow" },
-      { name: "theme-color", content: "#667eea" },
-      { name: "color-scheme", content: "light" },
+      { name: "theme-color", content: "#ffffff" },
+      { name: "color-scheme", content: "light dark" },
       { property: "og:type", content: "website" },
       { property: "og:title", content: "码上钉 - 免费 HTML 托管与分享工具" },
       {

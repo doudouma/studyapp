@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Code2 } from "lucide-react";
 import { DropZone } from "~/components/DropZone";
 import { SuccessCard } from "~/components/SuccessCard";
 import { AuthBar } from "~/components/AuthBar";
@@ -101,7 +102,7 @@ function HomePage() {
 
   if (result) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-[#667eea] to-[#764ba2] p-8">
+      <main className="flex min-h-screen flex-col items-center justify-center p-8">
         <SuccessCard
           url={result.url}
           expiresAt={result.expiresAt || undefined}
@@ -113,16 +114,17 @@ function HomePage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center bg-gradient-to-br from-[#667eea] to-[#764ba2] p-8">
-      <nav className="w-full max-w-xl flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-white drop-shadow-lg">
-          100mini
+    <main className="flex min-h-screen flex-col items-center justify-center p-8">
+      <header className="mb-8 text-center">
+        <div className="mb-3 flex justify-center">
+          <div className="inline-flex size-12 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-xs">
+            <Code2 className="size-6" />
+          </div>
+        </div>
+        <h1 className="text-3xl font-semibold tracking-tight text-foreground">
+          码上钉
         </h1>
-        <AuthBar />
-      </nav>
-
-      <header className="mb-8 text-center text-white">
-        <p className="text-lg opacity-90">
+        <p className="mt-2 text-muted-foreground">
           粘贴或拖拽 HTML，一键生成分享链接
         </p>
       </header>
@@ -139,7 +141,7 @@ function HomePage() {
               if (v === "drop") setHtmlContent("");
             }}
           >
-            <TabsList className="mb-6">
+            <TabsList variant="line" className="mb-6">
               <TabsTrigger value="paste">粘贴代码</TabsTrigger>
               <TabsTrigger value="drop">上传文件</TabsTrigger>
             </TabsList>
@@ -178,7 +180,7 @@ function HomePage() {
           )}
 
           <Button
-            className="w-full bg-gradient-to-r from-[#667eea] to-[#764ba2] hover:from-[#5a6fd6] hover:to-[#6a4292] text-white shadow-lg"
+            className="w-full"
             disabled={!canSubmit || loading}
             onClick={handleSubmit}
           >
@@ -187,8 +189,8 @@ function HomePage() {
         </CardContent>
       </Card>
 
-      <p className="mt-6 text-sm text-white/70">
-        匿名上传 · 24小时自动销毁 · 登录后可免费长期保留 5 个页面
+      <p className="mt-6 text-sm text-muted-foreground">
+        匿名上传 · 24小时后自动销毁 · 单文件最大 5MB
       </p>
     </main>
   );
