@@ -115,6 +115,10 @@ function HomePage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-8">
+      <div className="fixed top-4 right-4 z-50">
+        <AuthBar />
+      </div>
+
       <header className="mb-8 text-center">
         <div className="mb-3 flex justify-center">
           <div className="inline-flex size-12 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-xs">

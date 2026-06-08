@@ -34,11 +34,10 @@ export function AuthBar() {
   if (user) {
     return (
       <div className="flex items-center gap-3">
-        <span className="text-sm text-white/80">{user.name}</span>
+        <span className="text-sm text-muted-foreground">{user.name}</span>
         <Button
           variant="ghost"
           size="sm"
-          className="text-white/70 hover:text-white hover:bg-white/10"
           onClick={handleLogout}
         >
           退出
@@ -54,7 +53,6 @@ export function AuthBar() {
           <Button
             variant="ghost"
             size="sm"
-            className="text-white/80 hover:text-white hover:bg-white/10"
           />
         }
       >
