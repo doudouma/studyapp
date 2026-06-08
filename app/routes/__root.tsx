@@ -37,10 +37,23 @@ export const Route = createRootRoute({
       { rel: "canonical", href: "https://studypage.app/" },
     ],
   }),
+  notFoundComponent: NotFound,
   component: RootComponent,
 });
 
 const isServer = typeof window === "undefined";
+
+function NotFound() {
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center p-8 text-center">
+      <h1 className="text-4xl font-bold text-foreground">404</h1>
+      <p className="mt-2 text-muted-foreground">页面不存在</p>
+      <a href="/" className="mt-4 text-sm text-primary hover:underline">
+        返回首页
+      </a>
+    </main>
+  );
+}
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   if (isServer) {
