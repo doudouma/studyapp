@@ -3,6 +3,18 @@ import { Code2, Search, Bell, Settings, LogOut } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { authClient } from "~/lib/auth-client";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "~/components/ui/tabs";
 
 interface User {
   id: string;
@@ -11,14 +23,115 @@ interface User {
   image?: string;
 }
 
-interface HomeHeaderProps {
-  user: User;
+interface AppNavProps {
+  user: User | null;
 }
 
-export function HomeHeader({ user }: HomeHeaderProps) {
+function LoginForm({ onSuccess }: { onSuccess: () => void }) {
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    const form = new FormData(e.currentTarget);
+    const email = form.get("email") as string;
+    const password = form.get("password") as string;
+
+    try {
+      const result = await authClient.signIn.email({ email, password });
+      if (result?.error) {
+        setError(result.error.message || "登录失败");
+      } else {
+        onSuccess();
+        window.location.reload();
+      }
+    } catch {
+      setError("网络错误，请重试");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    const form = new FormData(e.currentTarget);
+    const email = form.get("email") as string;
+    const password = form.get("password") as string;
+    const name = form.get("name") as string;
+
+    try {
+      const result = await authClient.signUp.email({ email, password, name });
+      if (result?.error) {
+        setError(result.error.message || "注册失败");
+      } else {
+        onSuccess();
+        window.location.reload();
+      }
+    } catch {
+      setError("网络错误，请重试");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Tabs defaultValue="signin" className="w-full">
+      <TabsList className="w-full">
+        <TabsTrigger value="signin" className="flex-1">
+          登录
+        </TabsTrigger>
+        <TabsTrigger value="signup" className="flex-1">
+          注册
+        </TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="signin">
+        <form onSubmit={handleSignIn} className="space-y-4 mt-4">
+          <Input name="email" type="email" placeholder="邮箱" required />
+          <Input
+            name="password"
+            type="password"
+            placeholder="密码"
+            required
+          />
+          {error && <p className="text-sm text-destructive">{error}</p>}
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "登录中..." : "登录"}
+          </Button>
+        </form>
+      </TabsContent>
+
+      <TabsContent value="signup">
+        <form onSubmit={handleSignUp} className="space-y-4 mt-4">
+          <Input name="name" placeholder="昵称" required />
+          <Input name="email" type="email" placeholder="邮箱" required />
+          <Input
+            name="password"
+            type="password"
+            placeholder="密码（至少 8 位）"
+            required
+            minLength={8}
+          />
+          {error && <p className="text-sm text-destructive">{error}</p>}
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "注册中..." : "注册"}
+          </Button>
+        </form>
+      </TabsContent>
+    </Tabs>
+  );
+}
+
+export function AppNav({ user }: AppNavProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const avatarFallback = user.name?.charAt(0).toUpperCase() || "U";
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -36,6 +149,41 @@ export function HomeHeader({ user }: HomeHeaderProps) {
     window.location.reload();
   };
 
+  const avatarFallback = user?.name?.charAt(0).toUpperCase() || "U";
+
+  // ========== 未登录模式 ==========
+  if (!user) {
+    return (
+      <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+        <nav className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
+          <div className="flex items-center gap-2">
+            <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <Code2 className="size-5" />
+            </div>
+            <span className="text-xl font-bold tracking-tight">100mini</span>
+          </div>
+
+          <Dialog open={authOpen} onOpenChange={setAuthOpen}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setAuthOpen(true)}
+            >
+              登录 / 注册
+            </Button>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>登录 100mini</DialogTitle>
+              </DialogHeader>
+              <LoginForm onSuccess={() => setAuthOpen(false)} />
+            </DialogContent>
+          </Dialog>
+        </nav>
+      </header>
+    );
+  }
+
+  // ========== 已登录模式 ==========
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
       <nav className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
@@ -53,12 +201,6 @@ export function HomeHeader({ user }: HomeHeaderProps) {
               className="border-b-2 border-primary pb-0.5 text-sm font-semibold text-primary"
             >
               首页
-            </a>
-            <a
-              href="#my-pages"
-              className="text-sm text-muted-foreground transition-colors hover:text-primary"
-            >
-              我的链接
             </a>
           </div>
         </div>
