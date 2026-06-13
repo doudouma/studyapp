@@ -1,6 +1,5 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { dash } from "@better-auth/infra";
 import { createDb } from "./db";
 import * as schema from "./db/schema";
 
@@ -35,8 +34,5 @@ export function createAuth(env: {
       enabled: true,
       autoSignIn: true,
     },
-    plugins: [
-      dash(),
-    ],
   });
 }

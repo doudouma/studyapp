@@ -122,14 +122,18 @@ function HomePage() {
 
   if (result) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center p-8">
-        <SuccessCard
-          url={result.url}
-          expiresAt={result.expiresAt || undefined}
-          isPermanent={result.isPermanent}
-          onReset={handleReset}
-        />
-      </main>
+      <div className="flex min-h-screen flex-col">
+        <AppNav user={user} />
+        <main className="flex flex-1 flex-col items-center justify-center p-8">
+          <SuccessCard
+            url={result.url}
+            expiresAt={result.expiresAt || undefined}
+            isPermanent={result.isPermanent}
+            onReset={handleReset}
+          />
+        </main>
+        <AppFooter />
+      </div>
     );
   }
 
@@ -138,7 +142,8 @@ function HomePage() {
     return (
       <div className="flex min-h-screen flex-col">
         <AppNav user={null} />
-        <main className="flex flex-1 flex-col items-center justify-center p-8">
+        <main className="flex-1">
+          <section className="flex flex-col items-center justify-center p-8">
           <header className="mb-8 text-center">
           <div className="mb-3 flex justify-center">
             <div className="inline-flex size-12 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-xs">
@@ -211,10 +216,15 @@ function HomePage() {
           </CardContent>
         </Card>
 
-        <p className="mt-6 text-sm text-muted-foreground">
-          匿名上传 · 24小时后自动销毁 · 单文件最大 5MB
-        </p>
+          <p className="mt-6 text-sm text-muted-foreground">
+            匿名上传 · 24小时后自动销毁 · 单文件最大 5MB
+          </p>
+        </section>
+
+          <StatsSection />
       </main>
+
+      <AppFooter />
     </div>
     );
   }
