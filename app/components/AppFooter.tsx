@@ -12,13 +12,13 @@ export function AppFooter() {
     <footer className="w-full border-t border-border bg-background">
       <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-4 px-6 py-4 md:flex-row">
         <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
+          <a href="/" className="flex items-center gap-2">
             <Code2 className="size-4 text-primary" />
             <span className="text-sm font-bold text-primary">100mini</span>
             <p className="text-xs text-muted-foreground">
             &copy; 2026 100mini. All rights reserved.
           </p>
-          </div>
+          </a>
           
         </div>
         <div className="flex flex-wrap justify-center gap-6">
