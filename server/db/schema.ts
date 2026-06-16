@@ -60,6 +60,7 @@ export const page = sqliteTable("page", {
   title: text("title").default(""),
   category: text("category").default("general"),
   isPermanent: integer("is_permanent", { mode: "boolean" }).notNull().default(false),
+  viewCount: integer("view_count").notNull().default(0),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
   expiresAt: integer("expires_at", { mode: "timestamp" }),
 });

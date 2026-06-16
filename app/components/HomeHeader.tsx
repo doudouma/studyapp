@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { Link, useLocation } from "@tanstack/react-router";
 import { Code2, Search, Bell, Settings, LogOut } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -25,6 +26,27 @@ interface User {
 
 interface AppNavProps {
   user: User | null;
+}
+
+function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
+  const location = useLocation();
+  const isActive =
+    href === "/"
+      ? location.pathname === "/"
+      : location.pathname.startsWith(href);
+
+  return (
+    <Link
+      to={href}
+      className={
+        isActive
+          ? "border-b-2 border-primary pb-0.5 text-sm font-semibold text-primary"
+          : "text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+      }
+    >
+      {children}
+    </Link>
+  );
 }
 
 function LoginForm({ onSuccess }: { onSuccess: () => void }) {
@@ -156,12 +178,12 @@ export function AppNav({ user }: AppNavProps) {
     return (
       <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
         <nav className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
-          <a href="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <Code2 className="size-5" />
             </div>
             <span className="text-xl font-bold tracking-tight">100mini</span>
-          </a>
+          </Link>
 
           <Dialog open={authOpen} onOpenChange={setAuthOpen}>
             <Button
@@ -189,19 +211,15 @@ export function AppNav({ user }: AppNavProps) {
       <nav className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
         {/* Left: Logo + Nav links */}
         <div className="flex items-center gap-6">
-          <a href="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <Code2 className="size-5" />
             </div>
             <span className="text-xl font-bold tracking-tight">100mini</span>
-          </a>
+          </Link>
           <div className="hidden items-center gap-4 md:flex">
-            <a
-              href="/"
-              className="border-b-2 border-primary pb-0.5 text-sm font-semibold text-primary"
-            >
-              首页
-            </a>
+            <NavLink href="/">首页</NavLink>
+            <NavLink href="/links">我的链接</NavLink>
           </div>
         </div>
 

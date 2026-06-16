@@ -1,7 +1,7 @@
 /// <reference types="@cloudflare/workers-types" />
 import { Hono } from "hono";
 import { nanoid } from "nanoid";
-import { count, eq, and, desc } from "drizzle-orm";
+import { count, eq, and, desc, sql } from "drizzle-orm";
 import { getR2, BUCKET, MAX_SIZE } from "./r2";
 import { createDb } from "./db";
 import { page } from "./db/schema";
@@ -111,12 +111,20 @@ api.get("/api/pages", async (c) => {
   if (!user || !c.env.D1) return c.json({ error: "未登录" }, 401);
 
   const db = createDb(c.env.D1);
+
+  const [totalResult] = await db
+    .select({ count: count() })
+    .from(page)
+    .where(eq(page.userId, user.id));
+  const total = totalResult?.count ?? 0;
+
   const pages = await db
     .select({
       id: page.id,
       title: page.title,
       category: page.category,
       isPermanent: page.isPermanent,
+      viewCount: page.viewCount,
       createdAt: page.createdAt,
       expiresAt: page.expiresAt,
     })
@@ -124,7 +132,7 @@ api.get("/api/pages", async (c) => {
     .where(eq(page.userId, user.id))
     .orderBy(desc(page.createdAt));
 
-  return c.json({ pages });
+  return c.json({ pages, total, limit: FREE_PERMANENT_LIMIT });
 });
 
 // Delete a page
@@ -256,6 +264,12 @@ api.get("/p/:id", async (c) => {
   const html = await getFromStorage(c, `${id}.html`);
   if (html === null) {
     return c.html(notFoundHtml(), 404);
+  }
+
+  // Increment view count if the page is tracked in D1
+  if (c.env?.D1) {
+    const db = createDb(c.env.D1);
+    await db.update(page).set({ viewCount: sql`view_count + 1` }).where(eq(page.id, id));
   }
 
   const injected = injectBanner(html);
