@@ -68,7 +68,7 @@ export function SquareGrid({ items }: SquareGridProps) {
             target="_blank"
             className="relative block overflow-hidden"
           >
-            <div className="relative" style={{ aspectRatio: "4/3" }}>
+            <div className="relative" style={{ aspectRatio: "3/4" }}>
               <iframe
                 src={`/p/${item.id}`}
                 className="absolute inset-0 w-full h-full pointer-events-none"

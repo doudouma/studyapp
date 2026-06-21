@@ -233,12 +233,12 @@ export function AppNav({ user }: AppNavProps) {
               placeholder="搜索页面..."
             />
           </div>
-          <Button variant="ghost" size="icon" className="size-9">
+          {/* <Button variant="ghost" size="icon" className="size-9">
             <Bell className="size-4" />
           </Button>
           <Button variant="ghost" size="icon" className="size-9">
             <Settings className="size-4" />
-          </Button>
+          </Button> */}
           <div className="relative" ref={menuRef}>
             <button
               className="flex size-8 items-center justify-center rounded-full bg-primary font-bold text-xs text-primary-foreground cursor-pointer overflow-hidden"
