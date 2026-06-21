@@ -4,10 +4,10 @@ import { nanoid } from "nanoid";
 import { count, eq, and, desc, sql } from "drizzle-orm";
 import { getR2, BUCKET, MAX_SIZE } from "./r2";
 import { createDb } from "./db";
-import { page, user } from "./db/schema";
+import { page, user, membership } from "./db/schema";
 
 type Variables = {
-  user: { id: string; name: string; email: string; image?: string } | null;
+  user: { id: string; name: string; email: string; image?: string; role?: string } | null;
   session: any;
 };
 
@@ -22,6 +22,15 @@ api.onError((err, c) => {
   console.error("API Error:", err);
   return c.json({ error: err.message || "Internal Server Error" }, 500);
 });
+
+// Admin middleware
+const requireAdmin = (c: any, next: any) => {
+  const user = c.get("user");
+  if (!user || user.role !== "admin") {
+    return c.json({ error: "无权访问" }, 403);
+  }
+  return next();
+};
 
 const ALLOWED_EXTENSIONS = [".html", ".htm", ".zip"];
 
@@ -99,6 +108,130 @@ api.get("/api/me", async (c) => {
     pageCount,
     limit: FREE_PERMANENT_LIMIT,
   });
+});
+
+// Admin: List all users (with membership status)
+api.get("/api/admin/users", requireAdmin, async (c) => {
+  if (!c.env.D1) return c.json({ error: "database unavailable" }, 503);
+
+  const db = createDb(c.env.D1);
+  const page = Math.max(1, parseInt(c.req.query("page") || "1", 10) || 1);
+  const pageSize = Math.min(100, Math.max(1, parseInt(c.req.query("pageSize") || "20", 10) || 20));
+  const offset = (page - 1) * pageSize;
+
+  const [totalResult] = await db.select({ count: count() }).from(user);
+  const total = totalResult?.count ?? 0;
+
+  const users = await db
+    .select({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      createdAt: user.createdAt,
+      membershipId: membership.id,
+      membershipStartedAt: membership.startedAt,
+      membershipExpiresAt: membership.expiresAt,
+    })
+    .from(user)
+    .leftJoin(membership, eq(membership.userId, user.id))
+    .orderBy(desc(user.createdAt))
+    .limit(pageSize)
+    .offset(offset);
+
+  const now = Date.now();
+  const result = users.map((u) => ({
+    id: u.id,
+    name: u.name,
+    email: u.email,
+    role: u.role,
+    createdAt: u.createdAt,
+    membership: u.membershipId
+      ? {
+          expiresAt: u.membershipExpiresAt,
+          isActive: u.membershipExpiresAt && new Date(u.membershipExpiresAt).getTime() > now ? true : false,
+          startedAt: u.membershipStartedAt,
+        }
+      : null,
+  }));
+
+  return c.json({ users: result, total, page, pageSize });
+});
+
+// Admin: Set user membership
+api.post("/api/admin/users/:id/membership", requireAdmin, async (c) => {
+  if (!c.env.D1) return c.json({ error: "database unavailable" }, 503);
+
+  const admin = c.get("user");
+  const userId = c.req.param("id");
+  const body = await c.req.json();
+  const durationMonths = body.durationMonths;
+
+  if (![1, 3, 6, 12].includes(durationMonths)) {
+    return c.json({ error: "时长仅支持 1、3、6、12 个月" }, 400);
+  }
+
+  const db = createDb(c.env.D1);
+
+  const [existingUser] = await db.select().from(user).where(eq(user.id, userId)).limit(1);
+  if (!existingUser) {
+    return c.json({ error: "用户不存在" }, 404);
+  }
+
+  const now = new Date();
+  const expiresAt = new Date(now);
+  expiresAt.setMonth(expiresAt.getMonth() + durationMonths);
+
+  const existingMembership = await db
+    .select()
+    .from(membership)
+    .where(eq(membership.userId, userId))
+    .limit(1);
+
+  if (existingMembership.length > 0) {
+    await db
+      .update(membership)
+      .set({
+        expiresAt,
+        adminId: admin!.id,
+        updatedAt: now,
+      })
+      .where(eq(membership.userId, userId));
+  } else {
+    await db.insert(membership).values({
+      id: nanoid(7),
+      userId,
+      adminId: admin!.id,
+      startedAt: now,
+      expiresAt,
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
+
+  return c.json({ success: true, expiresAt: expiresAt.getTime() });
+});
+
+// Admin: Remove user membership
+api.delete("/api/admin/users/:id/membership", requireAdmin, async (c) => {
+  if (!c.env.D1) return c.json({ error: "database unavailable" }, 503);
+
+  const userId = c.req.param("id");
+  const db = createDb(c.env.D1);
+
+  const existing = await db
+    .select()
+    .from(membership)
+    .where(eq(membership.userId, userId))
+    .limit(1);
+
+  if (existing.length === 0) {
+    return c.json({ error: "该用户不是会员" }, 404);
+  }
+
+  await db.delete(membership).where(eq(membership.userId, userId));
+
+  return c.json({ success: true, message: "会员已取消" });
 });
 
 // List user's pages

@@ -8,6 +8,7 @@ export const user = sqliteTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: integer("email_verified", { mode: "boolean" }).notNull().default(false),
   image: text("image"),
+  role: text("role").notNull().default("user"),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
 });
@@ -66,4 +67,17 @@ export const page = sqliteTable("page", {
   previewPath: text("preview_path"),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
   expiresAt: integer("expires_at", { mode: "timestamp" }),
+});
+
+export const membership = sqliteTable("membership", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" })
+    .unique(),
+  adminId: text("admin_id").references(() => user.id, { onDelete: "set null" }),
+  startedAt: integer("started_at", { mode: "timestamp" }).notNull(),
+  expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
 });

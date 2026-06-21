@@ -22,6 +22,7 @@ interface User {
   name: string;
   email: string;
   image?: string;
+  role?: string;
 }
 
 interface AppNavProps {
@@ -221,6 +222,9 @@ export function AppNav({ user }: AppNavProps) {
             <NavLink href="/">首页</NavLink>
             <NavLink href="/square">广场</NavLink>
             <NavLink href="/links">我的链接</NavLink>
+            {user.role === "admin" && (
+              <NavLink href="/admin">管理后台</NavLink>
+            )}
           </div>
         </div>
 
@@ -259,6 +263,16 @@ export function AppNav({ user }: AppNavProps) {
                 <div className="border-b px-3 py-2 text-sm text-muted-foreground">
                   {user.name}
                 </div>
+                {user.role === "admin" && (
+                  <a
+                    href="/admin"
+                    className="flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-muted"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <Settings className="size-4" />
+                    管理后台
+                  </a>
+                )}
                 <button
                   className="flex w-full items-center gap-2 rounded-b-lg px-3 py-2 text-sm transition-colors hover:bg-muted"
                   onClick={handleLogout}

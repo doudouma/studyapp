@@ -34,5 +34,15 @@ export function createAuth(env: {
       enabled: true,
       autoSignIn: true,
     },
+    user: {
+      additionalFields: {
+        role: {
+          type: "string",
+          required: false,
+          defaultValue: "user",
+          input: false,
+        },
+      },
+    },
   });
 }
