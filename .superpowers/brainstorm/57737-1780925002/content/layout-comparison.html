@@ -1,0 +1,105 @@
+<h2>登录状态首页改造方案</h2>
+<p class="subtitle">当前 design（未登录） vs 目标 design（已登录，参考 home-login.html）</p>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">当前 · 未登录状态</div>
+    <div class="mockup-body" style="text-align:left;padding:16px;font-size:13px;">
+      <div class="mock-nav" style="margin-bottom:12px;">[AuthBar 登录按钮]</div>
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-size:20px;font-weight:600;">码上钉</div>
+        <div style="color:#888;font-size:12px;">粘贴或拖拽 HTML，一键生成分享链接</div>
+      </div>
+      <div style="border:1px solid #ddd;border-radius:8px;padding:12px;">
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <span style="padding:4px 12px;background:#eee;border-radius:4px;">粘贴代码</span>
+          <span style="padding:4px 12px;border-radius:4px;color:#888;">上传文件</span>
+        </div>
+        <div class="placeholder" style="height:120px;">粘贴 HTML 代码...</div>
+      </div>
+      <div style="margin-top:12px;">
+        <button class="mock-button" style="width:100%;">发布</button>
+      </div>
+      <div style="margin-top:12px;text-align:center;color:#888;font-size:11px;">匿名上传 · 24小时后自动销毁 · 单文件最大 5MB</div>
+    </div>
+  </div>
+
+  <div class="mockup">
+    <div class="mockup-header">目标 · 已登录状态（参考 home-login）</div>
+    <div class="mockup-body" style="text-align:left;padding:0;font-size:13px;">
+      <div class="mock-nav" style="padding:12px 16px;display:flex;justify-content:space-between;border-bottom:1px solid #eee;">
+        <div><strong>100mini</strong> &nbsp; 首页 &nbsp; 我的链接</div>
+        <div>🔍 &nbsp; 🔔 &nbsp; ⚙️ &nbsp; [头像]</div>
+      </div>
+      <div style="padding:20px 16px;text-align:center;">
+        <div style="font-size:22px;font-weight:700;">Instantly share your HTML</div>
+        <div style="color:#888;font-size:13px;margin-top:8px;">The fastest way to preview and share HTML.</div>
+      </div>
+      <div style="padding:0 16px 20px;">
+        <div style="border:2px dashed #ddd;border-radius:12px;padding:24px;text-align:center;">
+          <div style="font-size:36px;">📄</div>
+          <div style="font-weight:600;">Drop HTML or paste code</div>
+          <div style="color:#888;font-size:12px;">Up to 5MB per file</div>
+        </div>
+        <div style="margin-top:12px;">
+          <div><label>标题</label><input class="mock-input" placeholder="输入标题..." style="width:100%;"></div>
+          <div style="margin-top:8px;">
+            <label>类型</label>
+            <select class="mock-input" style="width:100%;">
+              <option>选择类型...</option>
+            </select>
+          </div>
+          <div style="margin-top:8px;">
+            <label>标签</label>
+            <input class="mock-input" placeholder="输入标签，按回车添加" style="width:100%;">
+          </div>
+        </div>
+        <button class="mock-button" style="width:100%;margin-top:12px;">发布并分享</button>
+      </div>
+      <div style="background:#f5f5f5;padding:16px;display:flex;justify-content:space-around;border-top:1px solid #eee;">
+        <div style="text-align:center;"><div>⚡</div><div style="font-weight:600;font-size:12px;">Instant Preview</div></div>
+        <div style="text-align:center;"><div>🔒</div><div style="font-weight:600;font-size:12px;">Encrypted Storage</div></div>
+        <div style="text-align:center;"><div>📱</div><div style="font-weight:600;font-size:12px;">Easy Access</div></div>
+      </div>
+      <div style="padding:12px 16px;border-top:1px solid #eee;display:flex;justify-content:center;gap:16px;font-size:11px;color:#888;">
+        Privacy · Terms · Help · Contact
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>我先确认几个要点</h3>
+  <p class="subtitle">在我设计之前，想先了解一下你的想法 👇</p>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="keep-branding" onclick="toggleSelect(this)">
+    <div class="letter">Q1</div>
+    <div class="content">
+      <h3>品牌名称：保持 "100mini / 码上钉"</h3>
+      <p>已登录后使用当前品牌，但采用 home-login 的布局风格（顶部导航、搜索、丰富表单等）</p>
+    </div>
+  </div>
+  <div class="option" data-choice="studyhub-brand" onclick="toggleSelect(this)">
+    <div class="letter">Q2</div>
+    <div class="content">
+      <h3>品牌名称：改为 "StudyHub"</h3>
+      <p>完全按 home-login.html 的风格来，品牌也换成 StudyHub</p>
+    </div>
+  </div>
+  <div class="option" data-choice="keep-function" onclick="toggleSelect(this)">
+    <div class="letter">Q3</div>
+    <div class="content">
+      <h3>功能保持不变：HTML 代码分享</h3>
+      <p>已登录后还是贴 HTML/上传 .html，但用 home-login 的布局把表单做丰富（标题、类型、标签）</p>
+    </div>
+  </div>
+  <div class="option" data-choice="other" onclick="toggleSelect(this)">
+    <div class="letter">Q4</div>
+    <div class="content">
+      <h3>有其他想法</h3>
+      <p>我在终端里告诉你更多细节</p>
+    </div>
+  </div>
+</div>

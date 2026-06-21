@@ -8,6 +8,20 @@
       "when": 1780562077628,
       "tag": "0000_cold_dormammu",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1781616395834,
+      "tag": "0001_windy_firelord",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1781617817220,
+      "tag": "0002_fancy_alice",
+      "breakpoints": true
     }
   ]
 }

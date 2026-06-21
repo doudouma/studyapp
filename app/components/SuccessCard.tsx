@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
@@ -13,6 +13,7 @@ interface SuccessCardProps {
 
 export function SuccessCard({ url, expiresAt, isPermanent, onReset }: SuccessCardProps) {
   const [copied, setCopied] = useState(false);
+  const [qrDataUrl, setQrDataUrl] = useState("");
 
   const fullUrl =
     typeof window !== "undefined"
@@ -36,6 +37,14 @@ export function SuccessCard({ url, expiresAt, isPermanent, onReset }: SuccessCar
     }
   };
 
+  useEffect(() => {
+    import("qrcode/lib/browser.js").then((QRCode) => {
+      QRCode.toString(fullUrl, { type: "svg", width: 160, margin: 2 }).then(
+        setQrDataUrl
+      );
+    });
+  }, [fullUrl]);
+
   const expiryDate = expiresAt ? new Date(expiresAt).toLocaleString("zh-CN", {
     month: "numeric",
     day: "numeric",
@@ -53,6 +62,15 @@ export function SuccessCard({ url, expiresAt, isPermanent, onReset }: SuccessCar
         <p className="text-sm text-muted-foreground">
           {isPermanent ? "永久保留" : `将于 ${expiryDate} 后自动销毁`}
         </p>
+
+        {qrDataUrl && (
+          <div className="size-40 rounded-xl border border-border bg-white flex items-center justify-center overflow-hidden">
+            <div
+              className="[&>svg]:block"
+              dangerouslySetInnerHTML={{ __html: qrDataUrl }}
+            />
+          </div>
+        )}
 
         <div className="flex w-full gap-2">
           <input

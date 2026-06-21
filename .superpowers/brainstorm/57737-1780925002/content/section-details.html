@@ -1,0 +1,63 @@
+<h2>登录后页面布局 — 细化确认</h2>
+<p class="subtitle">home-login.html 的各个 section，哪些要、哪些不要？</p>
+
+<div class="section">
+  <h3>建议方案</h3>
+  <p class="subtitle">完全保留现有功能（粘贴代码 / 上传文件 tab），但已登录时穿 home-login 的"外衣"</p>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="full" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>全套改造</h3>
+      <p>顶部导航栏（logo + 首页/我的链接 + 搜索 + 通知 + 设置 + 头像）<br>
+      ↓<br>
+      Hero 区域 + 丰富上传表单（标题、类型、标签 + paste/drop tab）<br>
+      ↓<br>
+      三个统计数据卡片（Instant Preview / Encrypted Storage / Easy Access）<br>
+      ↓<br>
+      完整页脚</p>
+    </div>
+  </div>
+  <div class="option" data-choice="minimal" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>轻量改造</h3>
+      <p>顶部导航栏（logo + 首页/我的链接 + 搜索 + 头像）<br>
+      ↓<br>
+      保持现有 Hero 和上传区域，布局调宽<br>
+      ↓<br>
+      不要统计区和页脚</p>
+    </div>
+  </div>
+  <div class="option" data-choice="custom" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>自定义</h3>
+      <p>我在终端告诉你具体要哪些</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top:24px;">
+  <h3>关于 "我的链接"</h3>
+  <p class="subtitle">当前 UserCenter 展示在 Hero 下方，建议改为在导航栏点击"我的链接"后展开/跳转</p>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="nav-open" onclick="toggleSelect(this)">
+    <div class="letter">1</div>
+    <div class="content">
+      <h3>导航点击打开</h3>
+      <p>点击"我的链接"在页面主体区域展示 UserCenter 内容，或跳转到 /my-pages</p>
+    </div>
+  </div>
+  <div class="option" data-choice="inline" onclick="toggleSelect(this)">
+    <div class="letter">2</div>
+    <div class="content">
+      <h3>保持当前内联位置</h3>
+      <p>UserCenter 仍在 Hero 下方展示，"我的链接"导航指向该区域</p>
+    </div>
+  </div>
+</div>

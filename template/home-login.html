@@ -1,0 +1,253 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>StudyHub - Instantly share your study materials</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-background": "#0b1c30",
+                        "on-surface": "#0b1c30",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#004395",
+                        "tertiary-container": "#c49f00",
+                        "tertiary": "#735c00",
+                        "on-surface-variant": "#3c4a42",
+                        "primary": "#006c49",
+                        "surface-container-low": "#eff4ff",
+                        "on-tertiary-fixed-variant": "#574500",
+                        "surface-variant": "#d3e4fe",
+                        "secondary-fixed": "#d8e2ff",
+                        "surface-bright": "#f8f9ff",
+                        "background": "#f8f9ff",
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "secondary": "#0058be",
+                        "tertiary-fixed": "#ffe083",
+                        "on-primary-fixed": "#002113",
+                        "surface-tint": "#006c49",
+                        "outline": "#6c7a71",
+                        "on-primary-fixed-variant": "#005236",
+                        "on-secondary-container": "#fefcff",
+                        "on-tertiary-fixed": "#231b00",
+                        "inverse-surface": "#213145",
+                        "surface-container-high": "#dce9ff",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#eec200",
+                        "primary-container": "#10b981",
+                        "inverse-on-surface": "#eaf1ff",
+                        "surface": "#f8f9ff",
+                        "primary-fixed-dim": "#4edea3",
+                        "secondary-container": "#2170e4",
+                        "error-container": "#ffdad6",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#bbcabf",
+                        "on-primary-container": "#00422b",
+                        "primary-fixed": "#6ffbbe",
+                        "surface-container": "#e5eeff",
+                        "on-tertiary-container": "#463800",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#4edea3",
+                        "surface-dim": "#cbdbf5",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-secondary-fixed": "#001a42",
+                        "secondary-fixed-dim": "#adc6ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-md": "16px",
+                        "gutter": "16px",
+                        "container-padding": "24px",
+                        "stack-lg": "32px",
+                        "stack-sm": "8px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", {"lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "26px", "fontWeight": "400"}],
+                        "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "30px", "fontWeight": "400"}],
+                        "headline-md": ["30px", {"lineHeight": "38px", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .drag-over {
+            border-color: #10b981 !important;
+            background-color: #f0fdf4 !important;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-x-hidden">
+<!-- TopNavBar -->
+<header class="w-full top-0 sticky bg-surface-container-lowest z-50 border-b border-outline-variant">
+<nav class="flex justify-between items-center h-16 px-container-padding w-full max-w-[1440px] mx-auto">
+<div class="flex items-center gap-stack-lg">
+<span class="text-headline-sm font-bold text-primary cursor-pointer">StudyHub</span>
+<div class="hidden md:flex items-center gap-stack-md">
+<a class="text-primary font-bold border-b-2 border-primary pb-1 text-body-md" href="#">首页<br></a>
+<a class="text-on-surface-variant hover:text-primary transition-colors text-body-md" href="#">我的链接&nbsp; &nbsp;</a>
+</div>
+</div>
+<div class="flex items-center gap-stack-md">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-body-md focus:outline-none focus:border-primary w-64" placeholder="Search notes..." type="text">
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:opacity-80">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:opacity-80">settings</button>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container text-xs font-bold cursor-pointer overflow-hidden">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVRwY3bxVHJZyRPOyA-LM76QWxf2TUPVxhVQNfSQ4P7oB6eYLRUn6ZB6alAYMC81HYBxDXamFkjNuZ_nvxI-BpSmaK3FeeY4Qb5rHS9hwloGCWVqaIAW3aSzyBaX52IwQhJFn0GNC-PHDvEcD7Iud_Logm5X8KCScim1JrjGPuFafKS_UVPKRME7C57SSATlx3N0tMXrar3-vblj8brZmyQME6Anim1Qw-FfLUira7Qq1YH-GZ0Neq6RXQ7S5_syhGF2YwC_0fLsYg">
+</div>
+</div>
+</nav>
+</header>
+<main class="min-h-screen flex flex-col items-center">
+<!-- Hero Section -->
+<section class="w-full max-w-[1440px] px-container-padding py-stack-lg flex flex-col items-center text-center">
+<div class="mt-stack-lg mb-stack-md">
+<h1 class="font-display-lg text-display-lg text-on-surface max-w-2xl mx-auto">
+                    Instantly share your study materials
+                </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-stack-sm max-w-xl mx-auto">
+                    The fastest way for students to preview and share notes, slides, and study guides. Just upload and get a shareable URL in seconds.
+                </p>
+</div>
+<!-- Main Interaction Area -->
+<div class="w-full max-w-4xl mt-stack-lg grid grid-cols-1 md:grid-cols-12 gap-stack-md mx-auto">
+<!-- Document Preview Area (8 columns) -->
+
+<!-- Action & Upload Area (4 columns) -->
+<div class="md:col-span-6 md:col-start-4 flex flex-col gap-stack-md">
+<!-- Drop Zone -->
+<div class="flex-1 bg-surface-container-lowest border-2 border-dashed border-outline-variant rounded-xl flex flex-col items-center justify-center p-stack-lg cursor-pointer transition-all hover:bg-surface-container-low group" id="drop-zone">
+<span class="material-symbols-outlined text-[48px] text-on-surface-variant group-hover:text-primary group-hover:scale-110 transition-transform mb-stack-sm">upload_file</span>
+<p class="font-body-md text-on-surface font-semibold">Drop PDF or DOCX</p>
+<p class="text-label-md text-on-surface-variant mt-1">Up to 25MB per file</p>
+<input accept=".pdf,.doc,.docx" class="hidden" id="file-input" type="file">
+</div><div class="flex flex-col gap-stack-md mt-stack-md"><div class="flex flex-col gap-1"><label class="text-label-md font-semibold text-on-surface">标题&nbsp;</label><input class="w-full px-stack-md py-2 bg-surface-container-low border border-outline-variant rounded-lg text-body-md focus:outline-none focus:border-primary" placeholder="输入资料标题..." type="text"></div><div class="flex flex-col gap-1"><label class="text-label-md font-semibold text-on-surface">类型&nbsp;</label><select class="w-full px-stack-md py-2 bg-surface-container-low border border-outline-variant rounded-lg text-body-md focus:outline-none focus:border-primary appearance-none cursor-pointer"><option value="">选择资料类型...</option><option value="notes">笔记 (Notes)</option><option value="slides">课件 (Slides)</option><option value="exam">试卷 (Exam)</option><option value="other">其他 (Other)</option></select></div><div class="flex flex-col gap-1"></div><div class="flex flex-col gap-1"><label class="text-label-md font-semibold text-on-surface">标签 (Tags) <span class="font-normal text-on-surface-variant">(可选)</span></label><input class="w-full px-stack-md py-2 bg-surface-container-low border border-outline-variant rounded-lg text-body-md focus:outline-none focus:border-primary" placeholder="输入标签，按回车添加" type="text"><div class="flex flex-wrap gap-2 mt-2"><span class="px-2 py-1 bg-primary-container text-on-primary-container text-xs rounded-full">数学</span><span class="px-2 py-1 bg-primary-container text-on-primary-container text-xs rounded-full">复习资料</span></div></div><div class="flex items-center gap-stack-sm cursor-pointer"><input class="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary" id="share-community" type="checkbox"><label class="text-body-md text-on-surface cursor-pointer" for="share-community">分享到广场</label></div></div>
+<!-- CTA Button -->
+<button class="w-full bg-primary-container text-on-primary-container py-4 px-stack-md rounded-xl font-headline-sm flex items-center justify-center gap-stack-sm hover:brightness-105 active:scale-95 transition-all shadow-md" id="publish-btn"><span class="material-symbols-outlined">share</span>
+发布并分享</button>
+<!-- Info Card -->
+
+</div>
+</div>
+</section>
+<!-- Stats / Proof Section -->
+<section class="w-full bg-surface-container-low py-stack-lg mt-stack-lg">
+<div class="max-w-[1440px] mx-auto px-container-padding grid grid-cols-1 md:grid-cols-3 gap-stack-lg">
+<div class="flex flex-col items-center text-center">
+<span class="material-symbols-outlined text-primary text-[32px] mb-stack-sm">bolt</span>
+<h4 class="font-headline-sm">Instant Preview</h4>
+<p class="text-on-surface-variant mt-1">High-fidelity rendering for all your documents.</p>
+</div>
+<div class="flex flex-col items-center text-center">
+<span class="material-symbols-outlined text-primary text-[32px] mb-stack-sm">lock</span>
+<h4 class="font-headline-sm">Encrypted Storage</h4>
+<p class="text-on-surface-variant mt-1">Your materials are stored securely and privately.</p>
+</div>
+<div class="flex flex-col items-center text-center">
+<span class="material-symbols-outlined text-primary text-[32px] mb-stack-sm">qr_code</span>
+<h4 class="font-headline-sm">Easy Access</h4>
+<p class="text-on-surface-variant mt-1">Share via link or QR code for mobile viewing.</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full bg-surface-container-lowest border-t border-outline-variant mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center py-stack-lg px-container-padding max-w-[1440px] mx-auto w-full">
+<div class="flex flex-col gap-1 mb-stack-md md:mb-0">
+<span class="text-label-md font-bold text-primary">StudyHub</span>
+<p class="text-on-surface-variant text-body-md">© 2024 StudyHub Inc. All rights reserved.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-stack-lg">
+<a class="text-on-surface-variant hover:text-primary transition-colors text-body-md" href="#">Privacy</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors text-body-md" href="#">Terms</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors text-body-md" href="#">Help Center</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors text-body-md" href="#">Contact</a>
+</div>
+</div>
+</footer>
+<script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const publishBtn = document.getElementById('publish-btn');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, e => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.add('drag-over'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.remove('drag-over'), false);
+        });
+
+        dropZone.addEventListener('drop', e => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) handleFileUpload(files[0]);
+        }, false);
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', e => {
+            if (e.target.files.length > 0) handleFileUpload(e.target.files[0]);
+        });
+
+        function handleFileUpload(file) {
+            // Simulated upload logic
+            alert(`File "${file.name}" selected for sharing!`);
+        }
+
+        publishBtn.addEventListener('click', () => {
+            publishBtn.innerHTML = `<span class="material-symbols-outlined animate-spin">sync</span> Sharing...`;
+            publishBtn.disabled = true;
+            setTimeout(() => {
+                alert('Study material shared successfully!');
+                publishBtn.innerHTML = `<span class="material-symbols-outlined">share</span> Share Study Guide`;
+                publishBtn.disabled = false;
+            }, 1500);
+        });
+    </script>
+
+
+
+
+
+
+
+
+</body></html>

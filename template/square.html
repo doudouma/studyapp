@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Explore - StudyHub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "on-background": "#0b1c30",
+                "on-surface": "#0b1c30",
+                "on-error": "#ffffff",
+                "on-secondary-fixed-variant": "#004395",
+                "tertiary-container": "#c49f00",
+                "tertiary": "#735c00",
+                "on-surface-variant": "#3c4a42",
+                "primary": "#006c49",
+                "surface-container-low": "#eff4ff",
+                "on-tertiary-fixed-variant": "#574500",
+                "surface-variant": "#d3e4fe",
+                "secondary-fixed": "#d8e2ff",
+                "surface-bright": "#f8f9ff",
+                "background": "#f8f9ff",
+                "on-tertiary": "#ffffff",
+                "on-primary": "#ffffff",
+                "error": "#ba1a1a",
+                "secondary": "#0058be",
+                "tertiary-fixed": "#ffe083",
+                "on-primary-fixed": "#002113",
+                "surface-tint": "#006c49",
+                "outline": "#6c7a71",
+                "on-primary-fixed-variant": "#005236",
+                "on-secondary-container": "#fefcff",
+                "on-tertiary-fixed": "#231b00",
+                "inverse-surface": "#213145",
+                "surface-container-high": "#dce9ff",
+                "on-secondary": "#ffffff",
+                "tertiary-fixed-dim": "#eec200",
+                "primary-container": "#10b981",
+                "inverse-on-surface": "#eaf1ff",
+                "surface": "#f8f9ff",
+                "primary-fixed-dim": "#4edea3",
+                "secondary-container": "#2170e4",
+                "error-container": "#ffdad6",
+                "surface-container-lowest": "#ffffff",
+                "outline-variant": "#bbcabf",
+                "on-primary-container": "#00422b",
+                "primary-fixed": "#6ffbbe",
+                "surface-container": "#e5eeff",
+                "on-tertiary-container": "#463800",
+                "on-error-container": "#93000a",
+                "inverse-primary": "#4edea3",
+                "surface-dim": "#cbdbf5",
+                "surface-container-highest": "#d3e4fe",
+                "on-secondary-fixed": "#001a42",
+                "secondary-fixed-dim": "#adc6ff"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.5rem",
+                "lg": "0.75rem",
+                "xl": "1rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "stack-md": "16px",
+                "gutter": "16px",
+                "container-padding": "24px",
+                "stack-lg": "32px",
+                "stack-sm": "8px",
+                "unit": "8px"
+            },
+            "fontFamily": {
+                "display-lg": ["Inter"],
+                "body-md": ["Inter"],
+                "headline-sm": ["Inter"],
+                "display-lg-mobile": ["Inter"],
+                "body-lg": ["Inter"],
+                "headline-md": ["Inter"],
+                "label-md": ["Inter"]
+            },
+            "fontSize": {
+                "display-lg": ["48px", {"lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "body-md": ["16px", {"lineHeight": "26px", "fontWeight": "400"}],
+                "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "body-lg": ["18px", {"lineHeight": "30px", "fontWeight": "400"}],
+                "headline-md": ["30px", {"lineHeight": "38px", "fontWeight": "600"}],
+                "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .masonry-grid {
+            columns: 1;
+            gap: 1.5rem;
+        }
+        @media (min-width: 640px) { .masonry-grid { columns: 2; } }
+        @media (min-width: 1024px) { .masonry-grid { columns: 3; } }
+        @media (min-width: 1280px) { .masonry-grid { columns: 4; } }
+        
+        .masonry-item {
+            break-inside: avoid;
+            margin-bottom: 1.5rem;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 4px;
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #bbcabf;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen">
+<!-- TopNavBar -->
+<nav class="bg-surface-container-lowest dark:bg-inverse-surface w-full top-0 sticky z-50 border-b border-outline-variant dark:border-outline">
+<div class="flex justify-between items-center h-16 px-container-padding w-full max-w-[1440px] mx-auto">
+<div class="flex items-center gap-stack-lg">
+<span class="text-headline-sm font-bold text-primary dark:text-primary-fixed-dim">StudyHub</span>
+<div class="hidden md:flex items-center gap-stack-md">
+<a class="font-body-md text-on-surface-variant dark:text-surface-variant hover:text-primary transition-colors cursor-pointer" href="#">Home</a>
+<a class="font-body-md text-primary dark:text-primary-fixed-dim font-bold border-b-2 border-primary pb-1 cursor-pointer" href="#">My Notes</a>
+<a class="font-body-md text-on-surface-variant dark:text-surface-variant hover:text-primary transition-colors cursor-pointer" href="#">Explore</a>
+</div>
+</div>
+<div class="flex-1 max-w-xl px-stack-lg hidden lg:block">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg py-2 pl-10 pr-4 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-body-md" placeholder="Search study guides, flashcards, or topics..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-stack-md">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">settings</button>
+<img alt="User Profile" class="w-8 h-8 rounded-full border border-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8IxVvwihoKTtuf3ZFBFUMuYCUUtU0jPenlGozfOWxgs71T9Qo4UCk3LKZSfNo-3-8w9s6gyNOz5vPa7Hd-Xwqu5Lq3QQhXLHCDcTEv6pSN851uPjf1yI-loogEngEjDBgVG8L0kZzKoRJT9sba3JoaqmwakfjMFwAn9RcyxXdFW2ze0W-0p6WtD6uItLq7OoyvIpH2VnysC2qbxjNj8v0JiVPs9MRKC51mVoPo7Xoc_W_k79P3i55mK-rHBode-YuzDLKvAQaCH6I"/>
+</div>
+</div>
+</nav>
+<div class="flex max-w-[1440px] mx-auto">
+<!-- Main Content -->
+<main class="flex-1 min-w-0 p-container-padding">
+<!-- Header & Filter -->
+<section class="mb-stack-lg">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-stack-md mb-stack-lg">
+<div>
+<h1 class="text-display-lg-mobile md:text-headline-md text-on-surface mb-stack-sm">Student Knowledge Hub</h1>
+<p class="text-on-surface-variant font-body-md">Empowering academic growth through community sharing and expert study methods.</p>
+</div>
+<button class="bg-primary text-on-primary py-2 px-6 rounded-lg font-label-md hover:bg-primary-container transition-colors shadow-sm flex items-center gap-unit">
+<span class="material-symbols-outlined text-[20px]">add</span>
+Share Material
+</button>
+</div>
+<!-- Horizontal Category Navigation -->
+<div class="flex items-center gap-4 mb-stack-lg border-b border-outline-variant pb-stack-sm overflow-x-auto custom-scrollbar whitespace-nowrap">
+<button class="px-4 py-2 rounded-full bg-primary text-on-primary font-label-md text-sm transition-all">All Resources</button>
+<button class="px-4 py-2 rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-high font-label-md text-sm transition-all">Study Methods</button>
+<button class="px-4 py-2 rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-high font-label-md text-sm transition-all">Mathematics</button>
+<button class="px-4 py-2 rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-high font-label-md text-sm transition-all">Science</button>
+<button class="px-4 py-2 rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-high font-label-md text-sm transition-all">History</button>
+<button class="px-4 py-2 rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-high font-label-md text-sm transition-all">Templates</button>
+<button class="px-4 py-2 rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-high font-label-md text-sm transition-all">Computer Science</button>
+<button class="px-4 py-2 rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-high font-label-md text-sm transition-all">Arts &amp; Humanities</button>
+</div>
+<!-- Masonry Grid (Expanded) -->
+<div class="flex flex-col gap-stack-lg">
+<div class="masonry-grid">
+<!-- Item 1: Study Method -->
+<article class="masonry-item bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden group hover:shadow-lg transition-all duration-300">
+<div class="relative overflow-hidden aspect-[4/3]">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAW6vfk543b5E8KF2SghzT-NNGLxa4pSd5ibIe3hJJOgciQ9RVb1mG9nr_uawkim8xXNHPSXl9VKbzKbtzYCtksC78yDl87IgEOXMg_cWv8DcrDKbRxevczA-QhWgQvkikLsKfN4xeFAYOuxV8-2WLr8jl8HP4smd3cfSRbxTEnKeOzNgBIR5CTuC3Uij16vOjolDWd-ppjEKpmMoJZpAUlolj_LTTzex4bBBtRh-AULaUTS43ygP7wVp718jggiLd9cJScyDmKdGoP"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-stack-md">
+<button class="bg-primary text-on-primary w-full py-2 rounded font-label-md flex items-center justify-center gap-unit">
+<span class="material-symbols-outlined text-sm">visibility</span> View Method
+</button>
+</div>
+</div>
+<div class="p-stack-md">
+<span class="inline-block px-2 py-0.5 rounded bg-primary-container text-on-primary-container text-[10px] font-bold mb-1 uppercase tracking-wider">Study Methods</span>
+<h3 class="text-headline-sm text-on-surface mb-stack-sm truncate">Optimized Pomodoro Guide</h3>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-stack-sm">
+<img alt="Avatar" class="w-6 h-6 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAx4V_j6WeB7A6q2epo6YP_0Lsqpc4q3xJAM1M-gym6n5rq714COC5oUkgPyyjxeLSmtfT-ArXJtZ7tonncNncXnJNbhQ1HNYv2u_MzSiKBxGzdLn8Wm7AFxGZmpwJMD4MHzsw_5uYZOKcqIoAwQblnArLeNO5GOxs6IlQc6n0POCIeYb1MljxNOrmMIc0pe6Cm3GX3EQ27uA__8eiXC90pgyPxqcKxp0oMiqq8yLEMAqDAZo9GZN2yNRVfEiY698MYjOEpEONQjanl"/>
+<span class="text-label-md text-on-surface-variant">James D.</span>
+</div>
+<div class="flex items-center gap-stack-md text-on-surface-variant opacity-80">
+<span class="flex items-center gap-unit text-[12px]"><span class="material-symbols-outlined text-[16px]">favorite</span> 1.2k</span>
+<span class="flex items-center gap-unit text-[12px]"><span class="material-symbols-outlined text-[16px]">school</span> 45</span>
+</div>
+</div>
+</div>
+</article>
+<!-- Item 2: Learning Material -->
+<article class="masonry-item bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden group hover:shadow-lg transition-all duration-300">
+<div class="relative overflow-hidden aspect-[3/4]">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkBxJBgIOtRV3QEXikLRiB8WWdiLRObg-on_72dD8AbUfpXtBP72F06W4iw8b2oJJQTR3jpVcRhJJoBew55RSR0yNS0mNw3UrO5qrx-UTMnixbVHqronbJsju5JDeoOjQVEP8O9WMsLOJZzHHEVQmAbeb9DHb80T2ntHFFAoiIkOnSND_M60ye5l90PFrn8VmVkdpnZWli27CG7DE8ea50PSwomf04vpGZzVAipXPxgxrgly1CMeVbzvmus8yTBGyv2BD1xC4EjiJB"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-stack-md">
+<button class="bg-primary text-on-primary w-full py-2 rounded font-label-md flex items-center justify-center gap-unit">
+<span class="material-symbols-outlined text-sm">download</span> Download PDF
+</button>
+</div>
+</div>
+<div class="p-stack-md">
+<span class="inline-block px-2 py-0.5 rounded bg-primary-container text-on-primary-container text-[10px] font-bold mb-1 uppercase tracking-wider">Science</span>
+<h3 class="text-headline-sm text-on-surface mb-stack-sm truncate">Organic Chemistry Visuals</h3>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-stack-sm">
+<img alt="Avatar" class="w-6 h-6 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDv-QDEVmLg0PIsZek1reWhysrQJ7tLPcyaY0bJcrulmEQAx2wd39lfycD5VCqXHukn5xzPKaE44975CZ32hZYQFPwg4jTnSCin3lqqp_6N0GtHnf7rOl4_Hokg2OQqPywiG7iAeiMshL0Y3X97s3eRPJsr2PEhVmFvcyUFq2IEOFnLrt0RWXmCmXwTODYG2Kpg0wEeQcQ_wHtpDoKAG1hXik-NAgPzSFhEIaTlzEXEkWcoRWE5s7sGNm8P5xr-DDpZVY8gqNTJuvvr"/>
+<span class="text-label-md text-on-surface-variant">Anna M.</span>
+</div>
+<div class="flex items-center gap-stack-md text-on-surface-variant opacity-80">
+<span class="flex items-center gap-unit text-[12px]"><span class="material-symbols-outlined text-[16px]">favorite</span> 2.8k</span>
+<span class="flex items-center gap-unit text-[12px]"><span class="material-symbols-outlined text-[16px]">visibility</span> 15k</span>
+</div>
+</div>
+</div>
+</article>
+<!-- Item 3: Educational Template -->
+<article class="masonry-item bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden group hover:shadow-lg transition-all duration-300">
+<div class="relative overflow-hidden aspect-video">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAx8iSASkEskcwuVyUroMlPSMnXHEswH2Rmd6y3jKjyLb5ws_2bgHdS268cxria6TD0pwd5JoMmsbrK2h5w1cbKZ86oI-hEWCJKpXSJ-KX8B9ScxOScD3nvavlHC4aZmMPC6E9-Fr1pSOtfE_p4J1NzSJjemgoeZ6vbTm1dYaex1LvvfSMXug9AS2oejvOznjatyMLQIqQJqCvDwHYb81dXUfUYrqEw0Rnftu3GppqI6KLVG0QTW5o1kL1dcdVdqWXjfBlKIO_z2Ibg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-stack-md">
+<button class="bg-primary text-on-primary w-full py-2 rounded font-label-md flex items-center justify-center gap-unit">
+<span class="material-symbols-outlined text-sm">content_copy</span> Duplicate Template
+</button>
+</div>
+</div>
+<div class="p-stack-md">
+<span class="inline-block px-2 py-0.5 rounded bg-primary-container text-on-primary-container text-[10px] font-bold mb-1 uppercase tracking-wider">Templates</span>
+<h3 class="text-headline-sm text-on-surface mb-stack-sm truncate">Semester Hub Template</h3>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-stack-sm">
+<img alt="Avatar" class="w-6 h-6 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBauSk5suSaGpu-DGvj7xegZt5lZ_uogr2LLEqOSIHcZtcNzBI9PSHsT83sbZ90D8gIPk0fvcKt-qHF7eeXxgrMtf5eXDWd1fWyKWlTu6eLNkEmGIDXLG3FgvXaPj7JwsC93HxuY82YK4IFcruXYwECS8AgAyrGuO0ikoYkaycYXeB_eHjXaAil9RvPFDhNpFOfzSGHMMn8rKqCss_ai3N85ObFi68rw7pRQmzo30u2lhXHyWjrXVZb0e8KmkFW7AmcsucboyvLpFkq"/>
+<span class="text-label-md text-on-surface-variant">Sam K.</span>
+</div>
+<div class="flex items-center gap-stack-md text-on-surface-variant opacity-80">
+<span class="flex items-center gap-unit text-[12px]"><span class="material-symbols-outlined text-[16px]">favorite</span> 5.1k</span>
+<span class="flex items-center gap-unit text-[12px]"><span class="material-symbols-outlined text-[16px]">bookmark</span> 890</span>
+</div>
+</div>
+</div>
+</article>
+<!-- Item 4: Study Method -->
+<article class="masonry-item bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden group hover:shadow-lg transition-all duration-300">
+<div class="relative overflow-hidden aspect-[4/5]">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCICO-8JfBGWOe-aI6gYciBOvz1Jzk-pFLWQk232R4g8KOhIeU__gGuZ6r6XfyOBNvVuJgqn1Wjpbgh_xUll4lonPxO8RbWt6K5b1p47W0PHdL-vHkcW6KFR8O9FihNRbOr6lf41VaVUGiBBQepCSRUqGxkcEQhDkQDJSXLK-NkJ9Mag4mYW9-22esayBeneqAI4NTNr89FQb91f-KQxDzYXk3vp1u0O4FpngMyixi0gmiK4j2MvgRO4brx09pVGoBnyAvRuVCW9h2m"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-stack-md">
+<button class="bg-primary text-on-primary w-full py-2 rounded font-label-md flex items-center justify-center gap-unit">
+<span class="material-symbols-outlined text-sm">visibility</span> Master Recall
+</button>
+</div>
+</div>
+<div class="p-stack-md">
+<span class="inline-block px-2 py-0.5 rounded bg-primary-container text-on-primary-container text-[10px] font-bold mb-1 uppercase tracking-wider">Methods</span>
+<h3 class="text-headline-sm text-on-surface mb-stack-sm truncate">Mastering Spaced Repetition</h3>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-stack-sm">
+<img alt="Avatar" class="w-6 h-6 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrFfrWXF16XVwO3fk3ysklFG_SRlNE9aDBmmZw4uJztjxXKxMBe2BowYm0Vvr_KFoIvQQA_g7UcyLlIWv39-AUITVtxlu7lYZNWxJ4mGyyiIy8WpcfgrBKT6Gif12xeOUCgagAf9NsPXjDIdlLNHGW1ulcA2fiQ6C0V1kN4Ta6ZCRrUCeBfy-pt8EX6MB4ixsbcAQlfRZfTtzEtUtIX6My0icdMVJ5m24Kuw66x3nH9XRWrBHuJ1qJnN79D6Xucq5yA617lqjPA27q"/>
+<span class="text-label-md text-on-surface-variant">Leo H.</span>
+</div>
+<div class="flex items-center gap-stack-md text-on-surface-variant opacity-80">
+<span class="flex items-center gap-unit text-[12px]"><span class="material-symbols-outlined text-[16px]">favorite</span> 920</span>
+<span class="flex items-center gap-unit text-[12px]"><span class="material-symbols-outlined text-[16px]">visibility</span> 6.2k</span>
+</div>
+</div>
+</div>
+</article>
+<!-- Item 5: Learning Material -->
+<article class="masonry-item bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden group hover:shadow-lg transition-all duration-300">
+<div class="relative overflow-hidden aspect-[1/1]">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYiIU012JI9Gquk0-a48ISkkWv-zKnnUs4T0NuEyYOjljgjRhbblp5By51VTTl68Nh3kjcX0S9LoAUP__ixxnyUR5Wi5ihdwEuSfET_yRWpZ0UJXEuxp9CsrjCGAoLExr2SXDFNzGLxZkTdgrUDzpbmZ1s-kkLHpaD2ykGNFBsZfCcIhiwGcViG9sTgLDls8U1cQQTrZPU8VEp4on2xGGAWpYjP6nlxSmDZWgCPrj6ORnoxEcqBnSavcp_CcTMVvDdCxiKAnnkbcRh"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-stack-md">
+<button class="bg-primary text-on-primary w-full py-2 rounded font-label-md flex items-center justify-center gap-unit">
+<span class="material-symbols-outlined text-sm">visibility</span> View Guide
+</button>
+</div>
+</div>
+<div class="p-stack-md">
+<span class="inline-block px-2 py-0.5 rounded bg-primary-container text-on-primary-container text-[10px] font-bold mb-1 uppercase tracking-wider">History</span>
+<h3 class="text-headline-sm text-on-surface mb-stack-sm truncate">History Timeline Master</h3>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-stack-sm">
+<img alt="Avatar" class="w-6 h-6 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJK6UJRAd8mf6rZHy-Gnuq_Q6836c2Ll8IAsN4vDKgDVWLfxvUh8dKT9e2hnz3zqAM8SKVGqRyU4ihGvxhTMGnAZktEYaEgIvYp-FUBZJ5d42t2gZmsg3e9kFe6IfR5iqxBmDANhcQM7PGX4q5r_joRNrtIhDbbqgVSCyRxvupobwxHB59-nZ0_yWRXkDlX8tE3wfUPDaEEu9J0wDo34-BVrlWcz36dKU67g5MNy5mcUR5EBUNnoRze2_t-Oon4_PzkSaWwaUfDWky"/>
+<span class="text-label-md text-on-surface-variant">Eric H.</span>
+</div>
+<div class="flex items-center gap-stack-md text-on-surface-variant opacity-80">
+<span class="flex items-center gap-unit text-[12px]"><span class="material-symbols-outlined text-[16px]">favorite</span> 3.4k</span>
+<span class="flex items-center gap-unit text-[12px]"><span class="material-symbols-outlined text-[16px]">visibility</span> 22k</span>
+</div>
+</div>
+</div>
+</article>
+<!-- Item 6: Educational Template -->
+<article class="masonry-item bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden group hover:shadow-lg transition-all duration-300">
+<div class="relative overflow-hidden aspect-[4/3]">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkcScXD2VpBS7rxywNHFSlpXetIGnYKdC9FjBU5OKY9y95awZuUcGQPX95haWed0EbyldawI34pbNW29LmJ8ZzrTQZwmbUrRYIPFt-hiaJ68NYOLNdwxiuCqmsFvGqcNesrGo7wymt1k0H1jTBlYsGOB254_DQnNL4kcWNDpGM0jiRXeUdQKT-IMJ7kq8MA0oaVIuJvrGGyIu7NpVHxnFSffL0vMKzdhx5vuW5mwBdCpI2slI7ZJkyWyUWSTYBHujxzy_kXUc9wuGp"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-stack-md">
+<button class="bg-primary text-on-primary w-full py-2 rounded font-label-md flex items-center justify-center gap-unit">
+<span class="material-symbols-outlined text-sm">visibility</span> Preview Deck
+</button>
+</div>
+</div>
+<div class="p-stack-md">
+<span class="inline-block px-2 py-0.5 rounded bg-primary-container text-on-primary-container text-[10px] font-bold mb-1 uppercase tracking-wider">Templates</span>
+<h3 class="text-headline-sm text-on-surface mb-stack-sm truncate">Universal Flashcard Kit</h3>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-stack-sm">
+<img alt="Avatar" class="w-6 h-6 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSmpFS5aW8sd9AAaCVoKKxPX3Bw_D6daFA59Ld57NmpREFlbQioiLueQGp_yBF0Y6swPPOD65VH5kio4vSAvh5nwMYD3Ko9Jl9WTSmZ9DQzprZIRCAMWcPF9SfOKpnyUl248GcVnQlaHSS57loxkk4q-IFKA-tDyk5hLSAU4MgUNokH3-M2NhET6ja5QJyrUbhRfnsUGi28Z2yhMMLN_Wmc6Mi-zPMPHYjm39so9It4xPKfiTWvnSpzoJ8Oryp5rDAJBo6nTDKVRzy"/>
+<span class="text-label-md text-on-surface-variant">Tina R.</span>
+</div>
+<div class="flex items-center gap-stack-md text-on-surface-variant opacity-80">
+<span class="flex items-center gap-unit text-[12px]"><span class="material-symbols-outlined text-[16px]">favorite</span> 1.5k</span>
+<span class="flex items-center gap-unit text-[12px]"><span class="material-symbols-outlined text-[16px]">visibility</span> 7.9k</span>
+</div>
+</div>
+</div>
+</article>
+</div>
+</div>
+<!-- Load More -->
+<div class="flex justify-center py-stack-lg">
+<button class="px-8 py-3 border border-outline-variant text-primary font-label-md rounded-lg hover:bg-surface-container-low transition-all active:scale-95">
+                    Explore More Resources
+                </button>
+</div>
+</section>
+</main>
+</div>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest dark:bg-inverse-surface w-full border-t border-outline-variant dark:border-outline mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center py-stack-lg px-container-padding max-w-[1440px] mx-auto">
+<div class="flex flex-col items-center md:items-start gap-stack-sm mb-stack-lg md:mb-0">
+<span class="text-label-md font-bold text-primary">StudyHub</span>
+<p class="text-on-surface-variant dark:text-surface-variant font-body-md">© 2024 StudyHub. Cultivating minds together.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-stack-lg">
+<a class="text-on-surface-variant dark:text-surface-variant font-body-md hover:text-primary transition-colors cursor-pointer" href="#">Safety Guidelines</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-body-md hover:text-primary transition-colors cursor-pointer" href="#">Resource Licensing</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-body-md hover:text-primary transition-colors cursor-pointer" href="#">Community Forum</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-body-md hover:text-primary transition-colors cursor-pointer" href="#">Contact</a>
+</div>
+</div>
+</footer>
+<!-- Mobile Navigation Bar -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-surface border-t border-outline-variant px-6 py-3 flex justify-between items-center z-50">
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px]">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="text-[10px]">Explore</span>
+</a>
+<button class="bg-primary text-on-primary p-2 rounded-full -mt-10 shadow-lg border-4 border-background">
+<span class="material-symbols-outlined">add</span>
+</button>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="text-[10px]">Library</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px]">Account</span>
+</a>
+</nav>
+<script>
+    // Interaction logic for category filters
+    const categoryButtons = document.querySelectorAll('.overflow-x-auto button');
+    categoryButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            categoryButtons.forEach(b => {
+                b.classList.remove('bg-primary', 'text-on-primary');
+                b.classList.add('bg-surface-container', 'text-on-surface-variant');
+            });
+            btn.classList.add('bg-primary', 'text-on-primary');
+            btn.classList.remove('bg-surface-container', 'text-on-surface-variant');
+        });
+    });
+
+    // Search bar interaction
+    const searchInput = document.querySelector('input[type="text"]');
+    if (searchInput) {
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('ring-2', 'ring-primary/20');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('ring-2', 'ring-primary/20');
+        });
+    }
+</script>
+</body></html>

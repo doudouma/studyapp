@@ -1,10 +1,10 @@
 /// <reference types="@cloudflare/workers-types" />
 import { Hono } from "hono";
 import { nanoid } from "nanoid";
-import { count, eq, and, desc } from "drizzle-orm";
+import { count, eq, and, desc, sql } from "drizzle-orm";
 import { getR2, BUCKET, MAX_SIZE } from "./r2";
 import { createDb } from "./db";
-import { page } from "./db/schema";
+import { page, user } from "./db/schema";
 
 type Variables = {
   user: { id: string; name: string; email: string; image?: string } | null;
@@ -25,12 +25,8 @@ api.onError((err, c) => {
 
 const ALLOWED_EXTENSIONS = [".html", ".htm", ".zip"];
 
-const SECURITY_BANNER = `<div style="position:fixed;top:0;left:0;right:0;z-index:99999;background:rgba(255,200,0,0.95);color:#333;padding:8px 16px;font-size:13px;text-align:center;font-family:system-ui,sans-serif;">⚠️ 安全提示：本页面由用户临时托管，请勿输入密码或任何敏感信息。</div>`;
-
 function injectBanner(html: string): string {
-  return html.includes("<body")
-    ? html.replace(/<body([^>]*)>/i, `<body$1>${SECURITY_BANNER}`)
-    : `${SECURITY_BANNER}${html}`;
+  return html;
 }
 
 async function putToStorage(
@@ -111,12 +107,20 @@ api.get("/api/pages", async (c) => {
   if (!user || !c.env.D1) return c.json({ error: "未登录" }, 401);
 
   const db = createDb(c.env.D1);
+
+  const [totalResult] = await db
+    .select({ count: count() })
+    .from(page)
+    .where(eq(page.userId, user.id));
+  const total = totalResult?.count ?? 0;
+
   const pages = await db
     .select({
       id: page.id,
       title: page.title,
       category: page.category,
       isPermanent: page.isPermanent,
+      viewCount: page.viewCount,
       createdAt: page.createdAt,
       expiresAt: page.expiresAt,
     })
@@ -124,7 +128,7 @@ api.get("/api/pages", async (c) => {
     .where(eq(page.userId, user.id))
     .orderBy(desc(page.createdAt));
 
-  return c.json({ pages });
+  return c.json({ pages, total, limit: FREE_PERMANENT_LIMIT });
 });
 
 // Delete a page
@@ -159,6 +163,7 @@ api.post("/api/upload", async (c) => {
   const file = body.file;
   const title = (body.title as string) || "";
   const category = (body.category as string) || "general";
+  const shareToSquare = body.shareToSquare === "true";
 
   // Check quota for logged-in users requesting permanent storage
   const wantPermanent = !!user;
@@ -233,7 +238,9 @@ api.post("/api/upload", async (c) => {
       userId: user?.id ?? null,
       title: title || "未命名",
       category,
-      isPermanent,
+      isPermanent: true,
+      isSharedToSquare: shareToSquare,
+      sharedAt: shareToSquare ? new Date(now) : null,
       createdAt: new Date(now),
       expiresAt,
     });
@@ -245,7 +252,50 @@ api.post("/api/upload", async (c) => {
     expiresAt: expiresAt?.toISOString() ?? null,
     isPermanent,
     title,
+    isSharedToSquare: shareToSquare,
   });
+});
+
+// Unshare from square
+api.delete("/api/pages/:id/square", async (c) => {
+  const user = c.get("user");
+  if (!user) return c.json({ error: "未登录" }, 401);
+
+  const pageId = c.req.param("id");
+  const db = createDb(c.env.D1);
+
+  const existing = await db.select().from(page).where(and(eq(page.id, pageId), eq(page.userId, user.id))).limit(1);
+  if (existing.length === 0) return c.json({ error: "页面不存在" }, 404);
+
+  await db.update(page).set({
+    isSharedToSquare: false,
+    sharedAt: null,
+  }).where(eq(page.id, pageId));
+
+  return c.json({ success: true });
+});
+
+// List pages shared to square (public)
+api.get("/api/square", async (c) => {
+  const db = c.env.D1 ? createDb(c.env.D1) : null;
+  if (!db) return c.json({ items: [] });
+
+  const items = await db
+    .select({
+      id: page.id,
+      title: page.title,
+      category: page.category,
+      viewCount: page.viewCount,
+      sharedAt: page.sharedAt,
+      userName: user.name,
+      userImage: user.image,
+    })
+    .from(page)
+    .leftJoin(user, eq(page.userId, user.id))
+    .where(eq(page.isSharedToSquare, true))
+    .orderBy(desc(page.sharedAt));
+
+  return c.json({ items });
 });
 
 api.get("/p/:id", async (c) => {
@@ -275,6 +325,12 @@ api.get("/p/:id", async (c) => {
   const html = await getFromStorage(c, `${id}.html`);
   if (html === null) {
     return c.html(notFoundHtml(), 404);
+  }
+
+  // Increment view count if the page is tracked in D1
+  if (c.env?.D1) {
+    const db = createDb(c.env.D1);
+    await db.update(page).set({ viewCount: sql`view_count + 1` }).where(eq(page.id, id));
   }
 
   const injected = injectBanner(html);
