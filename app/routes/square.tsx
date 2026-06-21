@@ -1,10 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { Globe } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { SquareGrid } from "~/components/SquareGrid";
 import { authClient } from "~/lib/auth-client";
+
+// Module-level cache — persists across route mounts
+let cachedItems: SquareItem[] | null = null;
+let cacheAge = 0;
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 export const Route = createFileRoute("/square")({
   head: () => ({
@@ -24,7 +29,6 @@ interface SquareItem {
   title: string;
   category: string;
   viewCount: number;
-  previewPath: string | null;
   sharedAt: number;
   userName: string | null;
   userImage: string | null;
@@ -45,9 +49,10 @@ const CATEGORIES = [
 
 function SquarePage() {
   const [user, setUser] = useState<any>(null);
-  const [items, setItems] = useState<SquareItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [items, setItems] = useState<SquareItem[]>(cachedItems ?? []);
+  const [loading, setLoading] = useState(!cachedItems);
   const [activeCategory, setActiveCategory] = useState("");
+  const fetchedRef = useRef(false);
 
   useEffect(() => {
     authClient.getSession().then((session: any) => {
@@ -60,16 +65,25 @@ function SquarePage() {
     try {
       const res = await fetch("/api/square");
       const json = await res.json();
-      setItems(json.items || []);
+      const data = json.items || [];
+      cachedItems = data;
+      cacheAge = Date.now();
+      setItems(data);
     } catch {
-      setItems([]);
+      if (!cachedItems) setItems([]);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchSquare();
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
+    if (!cachedItems || Date.now() - cacheAge > CACHE_TTL) {
+      fetchSquare();
+    } else {
+      setLoading(false);
+    }
   }, []);
 
   const filtered = activeCategory

@@ -295,7 +295,9 @@ api.get("/api/square", async (c) => {
     .where(eq(page.isSharedToSquare, true))
     .orderBy(desc(page.sharedAt));
 
-  return c.json({ items });
+  return c.json({ items }, 200, {
+    "Cache-Control": "public, max-age=300, s-maxage=300",
+  });
 });
 
 api.get("/p/:id", async (c) => {

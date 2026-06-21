@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { FileText, ExternalLink, Copy, Trash2, Loader2 } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { FileText, ExternalLink, Copy, Trash2, Loader2, QrCode } from "lucide-react";
 import { Button } from "~/components/ui/button";
 
 interface PageLink {
@@ -37,9 +37,44 @@ function formatDate(ts: number): string {
   return `${y}年${m}月${day}日`;
 }
 
+function QrPopover({ pageId, onClose }: { pageId: string; onClose: () => void }) {
+  const [qrSvg, setQrSvg] = useState("");
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const url = `${window.location.origin}/p/${pageId}`;
+    import("qrcode/lib/browser.js").then((QRCode) => {
+      QRCode.toString(url, { type: "svg", width: 160, margin: 2 }).then(setQrSvg);
+    });
+  }, [pageId]);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [onClose]);
+
+  return (
+    <div
+      ref={ref}
+      className="absolute right-0 top-10 z-50 rounded-lg border border-border bg-card p-3 shadow-lg"
+    >
+      {qrSvg && (
+        <div
+          className="size-36 [&>svg]:block [&>svg]:size-full"
+          dangerouslySetInnerHTML={{ __html: qrSvg }}
+        />
+      )}
+    </div>
+  );
+}
+
 export function LinksTable({ pages, total, limit, onDelete }: LinksTableProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [qrId, setQrId] = useState<string | null>(null);
 
   const handleCopy = async (id: string) => {
     const url = `${window.location.origin}/p/${id}`;
@@ -148,7 +183,19 @@ export function LinksTable({ pages, total, limit, onDelete }: LinksTableProps) {
                   </span>
                 </td>
                 <td className="px-6 py-5">
-                  <div className="flex justify-end gap-1">
+                  <div className="flex justify-end gap-1 relative">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-8"
+                      title="二维码"
+                      onClick={() => setQrId(qrId === pg.id ? null : pg.id)}
+                    >
+                      <QrCode className="size-4" />
+                    </Button>
+                    {qrId === pg.id && (
+                      <QrPopover pageId={pg.id} onClose={() => setQrId(null)} />
+                    )}
                     <Button
                       variant="ghost"
                       size="icon"
