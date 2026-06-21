@@ -219,6 +219,7 @@ export function AppNav({ user }: AppNavProps) {
           </Link>
           <div className="hidden items-center gap-4 md:flex">
             <NavLink href="/">首页</NavLink>
+            <NavLink href="/square">广场</NavLink>
             <NavLink href="/links">我的链接</NavLink>
           </div>
         </div>

@@ -29,10 +29,12 @@ export const Route = createFileRoute("/")({
 type TabMode = "paste" | "drop";
 
 interface UploadResult {
+  id?: string;
   url: string;
   expiresAt: string | null;
   isPermanent?: boolean;
   title?: string;
+  isSharedToSquare?: boolean;
 }
 
 function HomePage() {

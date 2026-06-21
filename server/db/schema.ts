@@ -61,6 +61,9 @@ export const page = sqliteTable("page", {
   category: text("category").default("general"),
   isPermanent: integer("is_permanent", { mode: "boolean" }).notNull().default(false),
   viewCount: integer("view_count").notNull().default(0),
+  isSharedToSquare: integer("is_shared_to_square", { mode: "boolean" }).notNull().default(false),
+  sharedAt: integer("shared_at", { mode: "timestamp" }),
+  previewPath: text("preview_path"),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
   expiresAt: integer("expires_at", { mode: "timestamp" }),
 });

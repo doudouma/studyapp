@@ -4,7 +4,7 @@ import { nanoid } from "nanoid";
 import { count, eq, and, desc, sql } from "drizzle-orm";
 import { getR2, BUCKET, MAX_SIZE } from "./r2";
 import { createDb } from "./db";
-import { page } from "./db/schema";
+import { page, user } from "./db/schema";
 
 type Variables = {
   user: { id: string; name: string; email: string; image?: string } | null;
@@ -167,6 +167,7 @@ api.post("/api/upload", async (c) => {
   const file = body.file;
   const title = (body.title as string) || "";
   const category = (body.category as string) || "general";
+  const shareToSquare = body.shareToSquare === "true";
 
   // Check quota for logged-in users requesting permanent storage
   const wantPermanent = !!user;
@@ -242,17 +243,63 @@ api.post("/api/upload", async (c) => {
       title: title || "未命名",
       category,
       isPermanent: true,
+      isSharedToSquare: shareToSquare,
+      sharedAt: shareToSquare ? new Date(now) : null,
       createdAt: new Date(now),
       expiresAt: null,
     });
   }
 
   return c.json({
+    id,
     url: `/p/${id}`,
     expiresAt,
     isPermanent,
     title,
+    isSharedToSquare: shareToSquare,
   });
+});
+
+// Unshare from square
+api.delete("/api/pages/:id/square", async (c) => {
+  const user = c.get("user");
+  if (!user) return c.json({ error: "未登录" }, 401);
+
+  const pageId = c.req.param("id");
+  const db = createDb(c.env.D1);
+
+  const existing = await db.select().from(page).where(and(eq(page.id, pageId), eq(page.userId, user.id))).limit(1);
+  if (existing.length === 0) return c.json({ error: "页面不存在" }, 404);
+
+  await db.update(page).set({
+    isSharedToSquare: false,
+    sharedAt: null,
+  }).where(eq(page.id, pageId));
+
+  return c.json({ success: true });
+});
+
+// List pages shared to square (public)
+api.get("/api/square", async (c) => {
+  const db = c.env.D1 ? createDb(c.env.D1) : null;
+  if (!db) return c.json({ items: [] });
+
+  const items = await db
+    .select({
+      id: page.id,
+      title: page.title,
+      category: page.category,
+      viewCount: page.viewCount,
+      sharedAt: page.sharedAt,
+      userName: user.name,
+      userImage: user.image,
+    })
+    .from(page)
+    .leftJoin(user, eq(page.userId, user.id))
+    .where(eq(page.isSharedToSquare, true))
+    .orderBy(desc(page.sharedAt));
+
+  return c.json({ items });
 });
 
 api.get("/p/:id", async (c) => {
