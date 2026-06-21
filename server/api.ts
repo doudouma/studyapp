@@ -223,25 +223,26 @@ api.post("/api/upload", async (c) => {
 
   const now = Date.now();
   const isPermanent = wantPermanent;
-  const expiresAt = isPermanent ? null : new Date(now + 24 * 60 * 60 * 1000).toISOString();
+  const expiresAt = isPermanent ? null : new Date(now + 24 * 60 * 60 * 1000);
 
-  // Record in D1 if user is logged in
-  if (user) {
+  // Always record in D1
+  if (c.env.D1) {
     const db = createDb(c.env.D1);
     await db.insert(page).values({
       id,
-      userId: user.id,
+      userId: user?.id ?? null,
       title: title || "未命名",
       category,
-      isPermanent: true,
+      isPermanent,
       createdAt: new Date(now),
-      expiresAt: null,
+      expiresAt,
     });
   }
 
   return c.json({
+    id,
     url: `/p/${id}`,
-    expiresAt,
+    expiresAt: expiresAt?.toISOString() ?? null,
     isPermanent,
     title,
   });
@@ -251,6 +252,24 @@ api.get("/p/:id", async (c) => {
   const id = c.req.param("id");
   if (!/^[a-zA-Z0-9_-]{7}$/.test(id)) {
     return c.html(notFoundHtml(), 404);
+  }
+
+  // Check expiration from D1
+  if (c.env.D1) {
+    const db = createDb(c.env.D1);
+    const record = await db.select().from(page).where(eq(page.id, id)).limit(1);
+    if (record.length > 0) {
+      const p = record[0];
+      if (p.expiresAt && new Date(p.expiresAt) < new Date()) {
+        // Expired — clean up
+        await putToStorage(c, `${id}.html`, "");
+        if (c.env?.BUCKET) {
+          await c.env.BUCKET.delete(`${id}.html`);
+        }
+        await db.delete(page).where(eq(page.id, id));
+        return c.html(notFoundHtml(), 404);
+      }
+    }
   }
 
   const html = await getFromStorage(c, `${id}.html`);
