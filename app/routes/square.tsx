@@ -1,21 +1,10 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Globe } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { SquareGrid } from "~/components/SquareGrid";
 import { authClient } from "~/lib/auth-client";
-
-// Module-level cache — persists across route mounts
-let cachedItems: SquareItem[] | null = null;
-let cacheAge = 0;
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-
-// Allow external cache invalidation (used by admin page after page deletion)
-(window as any).__invalidateSquareCache = () => {
-  cachedItems = null;
-  cacheAge = 0;
-};
 
 export const Route = createFileRoute("/square")({
   validateSearch: (search: Record<string, string | undefined>) => ({
@@ -37,6 +26,7 @@ interface SquareItem {
   id: string;
   title: string;
   category: string;
+  tags: string;
   viewCount: number;
   sharedAt: number;
   userName: string | null;
@@ -59,11 +49,10 @@ const CATEGORIES = [
 function SquarePage() {
   const { q } = Route.useSearch();
   const [user, setUser] = useState<any>(null);
-  const [items, setItems] = useState<SquareItem[]>(cachedItems ?? []);
-  const [loading, setLoading] = useState(!cachedItems);
+  const [items, setItems] = useState<SquareItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("");
   const [searchQuery, setSearchQuery] = useState(q);
-  const fetchedRef = useRef(false);
 
   useEffect(() => {
     authClient.getSession().then((session: any) => {
@@ -71,36 +60,22 @@ function SquarePage() {
     });
   }, []);
 
-  const fetchSquare = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/square");
-      const json = await res.json();
-      const data = json.items || [];
-      cachedItems = data;
-      cacheAge = Date.now();
-      setItems(data);
-    } catch {
-      if (!cachedItems) setItems([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    if (fetchedRef.current) return;
-    fetchedRef.current = true;
-    if (!cachedItems || Date.now() - cacheAge > CACHE_TTL) {
-      fetchSquare();
-    } else {
-      setLoading(false);
-    }
+    (async () => {
+      try {
+        const res = await fetch(`/api/square?_=${Date.now()}`);
+        const json = await res.json();
+        setItems(json.items || []);
+      } catch {
+        // keep existing items on error
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
   const filtered = items.filter((i) => {
-    // Category filter
     if (activeCategory && i.category !== activeCategory) return false;
-    // Search query filter
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       const matchTitle = i.title.toLowerCase().includes(q);
@@ -120,7 +95,7 @@ function SquarePage() {
       />
 
       <main className="flex-1">
-        <div className="mx-auto max-w-7xl px-6 pt-10 pb-12">
+        <div className="mx-auto max-w-360 px-6 pt-10 pb-12">
           {/* Header */}
           <div className="mb-6">
             <div className="flex items-center gap-2">
@@ -151,7 +126,7 @@ function SquarePage() {
 
           {/* Grid */}
           {loading ? (
-            <div className="columns-1 gap-6 sm:columns-2 lg:columns-3 xl:columns-4">
+            <div className="columns-1 gap-6 sm:columns-2 lg:columns-4">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div
                   key={i}

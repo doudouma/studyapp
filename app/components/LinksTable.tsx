@@ -246,11 +246,15 @@ export function LinksTable({ pages, total, limit, onDelete }: LinksTableProps) {
       <div className="border-t border-border bg-muted/20 px-6 py-3">
         <p className="text-xs text-muted-foreground">
           显示 {pages.length} / {total} 个链接
-          {limit > 0 && (
+          {limit > 0 ? (
             <span className="ml-1">
               · 已使用 {total}/{limit}
             </span>
-          )}
+          ) : limit === -1 ? (
+            <span className="ml-1">
+              · 已使用 {total}（会员无限制）
+            </span>
+          ) : null}
         </p>
       </div>
     </div>

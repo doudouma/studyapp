@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Shield, Globe, Trash2 } from "lucide-react";
+import { Shield, Trash2 } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { Button } from "~/components/ui/button";
@@ -159,8 +159,6 @@ function AdminPage() {
       if (!res.ok) throw new Error("删除失败");
       setDeletePage(null);
       fetchPages(pagesPage);
-      // Invalidate square cache so deleted page disappears immediately
-      (window as any).__invalidateSquareCache?.();
     } catch (err) {
       alert(err instanceof Error ? err.message : "删除失败");
     } finally {

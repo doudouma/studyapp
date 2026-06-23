@@ -103,10 +103,18 @@ api.get("/api/me", async (c) => {
   const result = await db.select({ count: count() }).from(page).where(eq(page.userId, user.id));
   const pageCount = result[0]?.count ?? 0;
 
+  // Check membership
+  let isMember = false;
+  const memberRows = await c.env.D1.prepare(
+    "SELECT expires_at FROM membership WHERE user_id = ?"
+  ).bind(user.id).all<{ expires_at: number }>();
+  isMember = memberRows.results.length > 0 &&
+    Number(memberRows.results[0].expires_at) > Date.now();
+
   return c.json({
     user,
     pageCount,
-    limit: FREE_PERMANENT_LIMIT,
+    limit: isMember ? -1 : FREE_PERMANENT_LIMIT,
   });
 });
 
@@ -259,6 +267,7 @@ api.get("/api/admin/pages", requireAdmin, async (c) => {
       id: page.id,
       title: page.title,
       category: page.category,
+      tags: page.tags,
       viewCount: page.viewCount,
       isSharedToSquare: page.isSharedToSquare,
       createdAt: page.createdAt,
@@ -358,19 +367,32 @@ api.post("/api/upload", async (c) => {
   const content = body.content;
   const file = body.file;
   const title = (body.title as string) || "";
+  const tags = (body.tags as string) || "";
   const category = (body.category as string) || "general";
   const shareToSquare = body.shareToSquare === "true";
 
   // Check quota for logged-in users requesting permanent storage
   const wantPermanent = !!user;
   if (wantPermanent && user) {
-    const db = createDb(c.env.D1);
-    const result = await db.select({ count: count() }).from(page).where(eq(page.userId, user.id));
-    const pageCount = result[0]?.count ?? 0;
-    if (pageCount >= FREE_PERMANENT_LIMIT) {
-      return c.json({
-        error: `免费额度已用完（${FREE_PERMANENT_LIMIT}/${FREE_PERMANENT_LIMIT}），请删除旧页面后重试`,
-      }, 403);
+    // Members have no upload limit
+    let isMember = false;
+    if (c.env.D1) {
+      const memberRows = await c.env.D1.prepare(
+        "SELECT expires_at FROM membership WHERE user_id = ?"
+      ).bind(user.id).all<{ expires_at: number }>();
+      isMember = memberRows.results.length > 0 &&
+        Number(memberRows.results[0].expires_at) > Date.now();
+    }
+
+    if (!isMember) {
+      const db = createDb(c.env.D1);
+      const result = await db.select({ count: count() }).from(page).where(eq(page.userId, user.id));
+      const pageCount = result[0]?.count ?? 0;
+      if (pageCount >= FREE_PERMANENT_LIMIT) {
+        return c.json({
+          error: `免费额度已用完（${FREE_PERMANENT_LIMIT}/${FREE_PERMANENT_LIMIT}），请删除旧页面后重试`,
+        }, 403);
+      }
     }
   }
 
@@ -434,6 +456,7 @@ api.post("/api/upload", async (c) => {
       userId: user?.id ?? null,
       title: title || "未命名",
       category,
+      tags,
       isPermanent: true,
       isSharedToSquare: shareToSquare,
       sharedAt: shareToSquare ? new Date(now) : null,
@@ -481,6 +504,7 @@ api.get("/api/square", async (c) => {
       id: page.id,
       title: page.title,
       category: page.category,
+      tags: page.tags,
       viewCount: page.viewCount,
       sharedAt: page.sharedAt,
       userName: user.name,
@@ -491,9 +515,7 @@ api.get("/api/square", async (c) => {
     .where(eq(page.isSharedToSquare, true))
     .orderBy(desc(page.sharedAt));
 
-  return c.json({ items }, 200, {
-    "Cache-Control": "public, max-age=300, s-maxage=300",
-  });
+  return c.json({ items });
 });
 
 api.get("/p/:id", async (c) => {

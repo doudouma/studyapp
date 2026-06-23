@@ -4,6 +4,7 @@ interface SquareItem {
   id: string;
   title: string;
   category: string;
+  tags: string;
   viewCount: number;
   sharedAt: number;
   userName: string | null;
@@ -56,7 +57,7 @@ export function SquareGrid({ items }: SquareGridProps) {
   }
 
   return (
-    <div className="columns-1 gap-6 sm:columns-2 lg:columns-3 xl:columns-4">
+    <div className="columns-1 gap-6 sm:columns-2 lg:columns-4">
       {items.map((item) => (
         <article
           key={item.id}
@@ -87,11 +88,21 @@ export function SquareGrid({ items }: SquareGridProps) {
 
           {/* Info */}
           <div className="p-4">
-            <span
-              className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold mb-2 uppercase tracking-wider ${getCategoryColor(item.category)}`}
-            >
-              {CATEGORY_LABELS[item.category] || item.category}
-            </span>
+            <div className="flex flex-wrap items-center gap-1.5 mb-2">
+              <span
+                className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${getCategoryColor(item.category)}`}
+              >
+                {CATEGORY_LABELS[item.category] || item.category}
+              </span>
+              {item.tags && item.tags.split(",").filter(Boolean).map((tag) => (
+                <span
+                  key={tag}
+                  className="inline-block px-2 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground"
+                >
+                  {tag.trim()}
+                </span>
+              ))}
+            </div>
             <h3 className="text-base font-semibold text-foreground truncate">
               {item.title || "未命名"}
             </h3>

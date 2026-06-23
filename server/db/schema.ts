@@ -60,6 +60,7 @@ export const page = sqliteTable("page", {
   userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
   title: text("title").default(""),
   category: text("category").default("general"),
+  tags: text("tags").default(""),
   isPermanent: integer("is_permanent", { mode: "boolean" }).notNull().default(false),
   viewCount: integer("view_count").notNull().default(0),
   isSharedToSquare: integer("is_shared_to_square", { mode: "boolean" }).notNull().default(false),
