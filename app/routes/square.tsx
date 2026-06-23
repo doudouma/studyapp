@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Globe } from "lucide-react";
+import { Globe, Search } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { SquareGrid } from "~/components/SquareGrid";
+import { Input } from "~/components/ui/input";
 import { authClient } from "~/lib/auth-client";
 
 // Module-level cache — persists across route mounts
@@ -34,6 +35,10 @@ interface SquareItem {
   userImage: string | null;
 }
 
+interface SquareResponse {
+  items: SquareItem[];
+}
+
 const CATEGORIES = [
   { key: "", label: "全部" },
   { key: "chinese", label: "语文" },
@@ -52,6 +57,7 @@ function SquarePage() {
   const [items, setItems] = useState<SquareItem[]>(cachedItems ?? []);
   const [loading, setLoading] = useState(!cachedItems);
   const [activeCategory, setActiveCategory] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const fetchedRef = useRef(false);
 
   useEffect(() => {
@@ -86,9 +92,19 @@ function SquarePage() {
     }
   }, []);
 
-  const filtered = activeCategory
-    ? items.filter((i) => i.category === activeCategory)
-    : items;
+  const filtered = items.filter((i) => {
+    // Category filter
+    if (activeCategory && i.category !== activeCategory) return false;
+    // Search query filter
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const matchTitle = i.title.toLowerCase().includes(q);
+      const matchUser = i.userName?.toLowerCase().includes(q) ?? false;
+      const matchCategory = i.category.toLowerCase().includes(q);
+      if (!matchTitle && !matchUser && !matchCategory) return false;
+    }
+    return true;
+  });
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -105,6 +121,17 @@ function SquarePage() {
             <p className="mt-1 text-sm text-muted-foreground">
               发现来自社区的 HTML 分享页面
             </p>
+          </div>
+
+          {/* Search */}
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              className="h-10 w-full pl-9 text-sm"
+              placeholder="搜索标题、作者或分类..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
 
           {/* Category filter */}
