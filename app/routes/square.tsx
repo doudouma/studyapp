@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Globe, Search } from "lucide-react";
+import { Globe } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { SquareGrid } from "~/components/SquareGrid";
-import { Input } from "~/components/ui/input";
 import { authClient } from "~/lib/auth-client";
 
 // Module-level cache — persists across route mounts
@@ -121,17 +120,6 @@ function SquarePage() {
             <p className="mt-1 text-sm text-muted-foreground">
               发现来自社区的 HTML 分享页面
             </p>
-          </div>
-
-          {/* Search */}
-          <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              className="h-10 w-full pl-9 text-sm"
-              placeholder="搜索标题、作者或分类..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
           </div>
 
           {/* Category filter */}
