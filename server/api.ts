@@ -234,6 +234,69 @@ api.delete("/api/admin/users/:id/membership", requireAdmin, async (c) => {
   return c.json({ success: true, message: "会员已取消" });
 });
 
+// Admin: List all pages (with user info)
+api.get("/api/admin/pages", requireAdmin, async (c) => {
+  if (!c.env.D1) return c.json({ error: "database unavailable" }, 503);
+
+  const db = createDb(c.env.D1);
+  const pageParam = parseInt(c.req.query("page") || "1", 10);
+  const pageSize = Math.min(100, Math.max(1, parseInt(c.req.query("pageSize") || "20", 10) || 20));
+  const offset = (pageParam - 1) * pageSize;
+  const scope = c.req.query("scope") || "all";
+
+  // Count
+  let total = 0;
+  if (scope === "square") {
+    const [r] = await db.select({ count: count() }).from(page).where(eq(page.isSharedToSquare, true));
+    total = r?.count ?? 0;
+  } else {
+    const [r] = await db.select({ count: count() }).from(page);
+    total = r?.count ?? 0;
+  }
+
+  const items = await db
+    .select({
+      id: page.id,
+      title: page.title,
+      category: page.category,
+      viewCount: page.viewCount,
+      isSharedToSquare: page.isSharedToSquare,
+      createdAt: page.createdAt,
+      expiresAt: page.expiresAt,
+      userName: user.name,
+      userEmail: user.email,
+      userId: user.id,
+    })
+    .from(page)
+    .leftJoin(user, eq(page.userId, user.id))
+    .where(scope === "square" ? eq(page.isSharedToSquare, true) : undefined as any)
+    .orderBy(desc(page.createdAt))
+    .limit(pageSize)
+    .offset(offset);
+
+  return c.json({ items, total, page: pageParam, pageSize });
+});
+
+// Admin: Delete any page (no ownership check)
+api.delete("/api/admin/pages/:id", requireAdmin, async (c) => {
+  const pageId = c.req.param("id");
+  const db = createDb(c.env.D1);
+
+  const existing = await db.select().from(page).where(eq(page.id, pageId)).limit(1);
+  if (existing.length === 0) return c.json({ error: "页面不存在" }, 404);
+
+  // Delete from R2
+  await putToStorage(c, `${pageId}.html`, "");
+  if (c.env?.BUCKET) {
+    await c.env.BUCKET.delete(`${pageId}.html`);
+  }
+
+  // Delete from D1
+  await db.delete(page).where(eq(page.id, pageId));
+
+  return c.json({ success: true });
+});
+
 // List user's pages
 api.get("/api/pages", async (c) => {
   const user = c.get("user");

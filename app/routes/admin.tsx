@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Shield } from "lucide-react";
+import { Shield, Globe, Trash2 } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { Button } from "~/components/ui/button";
@@ -45,17 +45,44 @@ interface AdminUsersResponse {
   pageSize: number;
 }
 
+interface AdminPageData {
+  id: string;
+  title: string;
+  category: string;
+  viewCount: number;
+  isSharedToSquare: boolean;
+  createdAt: number;
+  userName: string | null;
+  userEmail: string | null;
+}
+
+interface AdminPagesResponse {
+  items: AdminPageData[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
 type DurationOption = 1 | 3 | 6 | 12;
 
 function AdminPage() {
   const navigate = useNavigate();
+  const [tab, setTab] = useState<"users" | "pages">("users");
   const [user, setUser] = useState<any>(null);
   const [authLoading, setAuthLoading] = useState(true);
+
+  // User list state
   const [users, setUsers] = useState<UserData[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Page list state
+  const [pages, setPages] = useState<AdminPageData[]>([]);
+  const [pagesTotal, setPagesTotal] = useState(0);
+  const [pagesPage, setPagesPage] = useState(1);
+  const [pagesLoading, setPagesLoading] = useState(false);
 
   // Membership dialog state
   const [membershipUser, setMembershipUser] = useState<UserData | null>(null);
@@ -65,6 +92,10 @@ function AdminPage() {
   // Cancel dialog state
   const [cancelUser, setCancelUser] = useState<UserData | null>(null);
   const [cancelLoading, setCancelLoading] = useState(false);
+
+  // Delete page dialog
+  const [deletePage, setDeletePage] = useState<AdminPageData | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const pageSize = 20;
 
@@ -99,9 +130,41 @@ function AdminPage() {
 
   useEffect(() => {
     if (!authLoading && user?.role === "admin") {
-      fetchUsers(1);
+      if (tab === "users") fetchUsers(1);
+      else fetchPages(1);
     }
-  }, [authLoading]);
+  }, [authLoading, tab]);
+
+  const fetchPages = async (p: number) => {
+    setPagesLoading(true);
+    try {
+      const res = await fetch(`/api/admin/pages?page=${p}&pageSize=${pageSize}&scope=all`);
+      if (!res.ok) throw new Error("加载失败");
+      const data: AdminPagesResponse = await res.json();
+      setPages(data.items);
+      setPagesTotal(data.total);
+      setPagesPage(data.page);
+    } catch {
+      // ignore
+    } finally {
+      setPagesLoading(false);
+    }
+  };
+
+  const handleDeletePage = async () => {
+    if (!deletePage) return;
+    setDeleteLoading(true);
+    try {
+      const res = await fetch(`/api/admin/pages/${deletePage.id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("删除失败");
+      setDeletePage(null);
+      fetchPages(pagesPage);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "删除失败");
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
 
   const handleSetMembership = async () => {
     if (!membershipUser) return;
@@ -160,20 +223,42 @@ function AdminPage() {
       <main className="flex-1 bg-muted/30">
         <div className="mx-auto max-w-5xl px-6 pt-10 pb-12">
           {/* Header */}
-          <div className="mb-8 flex items-end justify-between">
+          <div className="mb-6 flex items-end justify-between">
             <div>
               <div className="flex items-center gap-2">
                 <Shield className="size-6 text-primary" />
                 <h1 className="text-2xl font-bold text-foreground">管理后台</h1>
               </div>
-              <p className="mt-1 text-sm text-muted-foreground">
-                管理所有用户和会员身份
-              </p>
             </div>
           </div>
 
-          {/* User Table */}
-          {loading ? (
+          {/* Tab toggle */}
+          <div className="mb-6 flex items-center gap-2 border-b border-border pb-3">
+            <button
+              onClick={() => setTab("users")}
+              className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-all ${
+                tab === "users"
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              用户管理
+            </button>
+            <button
+              onClick={() => setTab("pages")}
+              className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-all ${
+                tab === "pages"
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              页面管理
+            </button>
+          </div>
+
+          {/* ===== User Management ===== */}
+          {tab === "users" && (
+            loading ? (
             <div className="rounded-xl border border-border bg-card p-12">
               <p className="text-center text-muted-foreground">加载中...</p>
             </div>
@@ -215,17 +300,11 @@ function AdminPage() {
                         </td>
                         <td className="px-4 py-3">
                           {u.membership?.isActive ? (
-                            <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                              有效会员
-                            </span>
+                            <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">有效会员</span>
                           ) : u.membership && !u.membership.isActive ? (
-                            <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900/30 dark:text-red-400">
-                              已过期
-                            </span>
+                            <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">已过期</span>
                           ) : (
-                            <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400">
-                              非会员
-                            </span>
+                            <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">非会员</span>
                           )}
                         </td>
                         <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">
@@ -233,61 +312,91 @@ function AdminPage() {
                         </td>
                         <td className="px-4 py-3 text-right">
                           {u.membership?.isActive ? (
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => setCancelUser(u)}
-                            >
-                              取消会员
-                            </Button>
+                            <Button variant="destructive" size="sm" onClick={() => setCancelUser(u)}>取消会员</Button>
                           ) : (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => { setMembershipUser(u); setSelectedDuration(3); }}
-                            >
-                              设置会员
-                            </Button>
+                            <Button variant="outline" size="sm" onClick={() => { setMembershipUser(u); setSelectedDuration(3); }}>设置会员</Button>
                           )}
                         </td>
                       </tr>
                     ))}
                     {users.length === 0 && (
                       <tr>
-                        <td colSpan={7} className="px-4 py-12 text-center text-muted-foreground">
-                          暂无用户数据
-                        </td>
+                        <td colSpan={7} className="px-4 py-12 text-center text-muted-foreground">暂无用户数据</td>
                       </tr>
                     )}
                   </tbody>
                 </table>
               </div>
-
-              {/* Pagination */}
               {totalPages > 1 && (
                 <div className="mt-4 flex items-center justify-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={page <= 1}
-                    onClick={() => fetchUsers(page - 1)}
-                  >
-                    上一页
-                  </Button>
-                  <span className="text-sm text-muted-foreground">
-                    {page} / {totalPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={page >= totalPages}
-                    onClick={() => fetchUsers(page + 1)}
-                  >
-                    下一页
-                  </Button>
+                  <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => fetchUsers(page - 1)}>上一页</Button>
+                  <span className="text-sm text-muted-foreground">{page} / {totalPages}</span>
+                  <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => fetchUsers(page + 1)}>下一页</Button>
                 </div>
               )}
             </>
+          ))}
+
+          {/* ===== Page Management ===== */}
+          {tab === "pages" && (
+            pagesLoading ? (
+              <div className="rounded-xl border border-border bg-card p-12">
+                <p className="text-center text-muted-foreground">加载中...</p>
+              </div>
+            ) : (
+              <>
+                <div className="overflow-x-auto rounded-xl border border-border bg-card">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border bg-muted/50">
+                        <th className="px-4 py-3 text-left font-medium text-muted-foreground">标题</th>
+                        <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden md:table-cell">作者</th>
+                        <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden sm:table-cell">分类</th>
+                        <th className="px-4 py-3 text-left font-medium text-muted-foreground">浏览</th>
+                        <th className="px-4 py-3 text-left font-medium text-muted-foreground">广场</th>
+                        <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden md:table-cell">创建时间</th>
+                        <th className="px-4 py-3 text-right font-medium text-muted-foreground">操作</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pages.map((p) => (
+                        <tr key={p.id} className="border-b border-border last:border-0 hover:bg-muted/30">
+                          <td className="px-4 py-3 font-medium max-w-[200px] truncate">{p.title || "未命名"}</td>
+                          <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">{p.userName || p.userEmail || "匿名"}</td>
+                          <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">{p.category}</td>
+                          <td className="px-4 py-3 text-muted-foreground">{p.viewCount}</td>
+                          <td className="px-4 py-3">
+                            {p.isSharedToSquare ? (
+                              <span className="text-xs font-medium text-green-600">已分享</span>
+                            ) : (
+                              <span className="text-xs text-muted-foreground">-</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">{formatDate(p.createdAt)}</td>
+                          <td className="px-4 py-3 text-right">
+                            <Button variant="destructive" size="sm" onClick={() => setDeletePage(p)}>
+                              <Trash2 className="size-3.5" />
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                      {pages.length === 0 && (
+                        <tr>
+                          <td colSpan={7} className="px-4 py-12 text-center text-muted-foreground">暂无页面数据</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                {pagesTotal > pageSize && (
+                  <div className="mt-4 flex items-center justify-center gap-2">
+                    <Button variant="outline" size="sm" disabled={pagesPage <= 1} onClick={() => fetchPages(pagesPage - 1)}>上一页</Button>
+                    <span className="text-sm text-muted-foreground">{pagesPage} / {Math.ceil(pagesTotal / pageSize)}</span>
+                    <Button variant="outline" size="sm" disabled={pagesPage >= Math.ceil(pagesTotal / pageSize)} onClick={() => fetchPages(pagesPage + 1)}>下一页</Button>
+                  </div>
+                )}
+              </>
+            )
           )}
         </div>
       </main>
@@ -346,6 +455,24 @@ function AdminPage() {
               onClick={handleCancelMembership}
             >
               {cancelLoading ? "取消中..." : "确认取消"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Page Confirmation Dialog */}
+      <Dialog open={!!deletePage} onOpenChange={(open) => !open && setDeletePage(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>删除页面</DialogTitle>
+            <DialogDescription>
+              确定删除 "{deletePage?.title || "未命名"}"？此操作不可撤销，页面将从广场移除。
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-2 justify-end pt-2">
+            <Button variant="outline" onClick={() => setDeletePage(null)}>返回</Button>
+            <Button variant="destructive" disabled={deleteLoading} onClick={handleDeletePage}>
+              {deleteLoading ? "删除中..." : "确认删除"}
             </Button>
           </div>
         </DialogContent>
