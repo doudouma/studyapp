@@ -157,7 +157,7 @@ function AdminPage() {
     <div className="flex min-h-screen flex-col">
       <AppNav user={user} />
 
-      <main className="flex-1">
+      <main className="flex-1 bg-muted/30">
         <div className="mx-auto max-w-5xl px-6 pt-10 pb-12">
           {/* Header */}
           <div className="mb-8 flex items-end justify-between">
