@@ -27,6 +27,8 @@ interface User {
 
 interface AppNavProps {
   user: User | null;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
 }
 
 function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
@@ -151,7 +153,7 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
   );
 }
 
-export function AppNav({ user }: AppNavProps) {
+export function AppNav({ user, searchQuery, onSearchChange }: AppNavProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -235,6 +237,8 @@ export function AppNav({ user }: AppNavProps) {
             <Input
               className="h-9 w-48 bg-muted pl-9 text-sm lg:w-64"
               placeholder="搜索页面..."
+              value={searchQuery ?? ""}
+              onChange={(e) => onSearchChange?.(e.target.value)}
             />
           </div>
           {/* <Button variant="ghost" size="icon" className="size-9">

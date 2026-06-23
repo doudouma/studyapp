@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Globe, Search } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
@@ -33,10 +33,6 @@ interface SquareItem {
   sharedAt: number;
   userName: string | null;
   userImage: string | null;
-}
-
-interface SquareResponse {
-  items: SquareItem[];
 }
 
 const CATEGORIES = [
@@ -108,7 +104,11 @@ function SquarePage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <AppNav user={user} />
+      <AppNav
+        user={user}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+      />
 
       <main className="flex-1">
         <div className="mx-auto max-w-7xl px-6 pt-10 pb-12">
