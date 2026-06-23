@@ -11,6 +11,12 @@ let cachedItems: SquareItem[] | null = null;
 let cacheAge = 0;
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
+// Allow external cache invalidation (used by admin page after page deletion)
+(window as any).__invalidateSquareCache = () => {
+  cachedItems = null;
+  cacheAge = 0;
+};
+
 export const Route = createFileRoute("/square")({
   validateSearch: (search: Record<string, string | undefined>) => ({
     q: search.q || "",

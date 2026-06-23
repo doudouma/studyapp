@@ -159,6 +159,8 @@ function AdminPage() {
       if (!res.ok) throw new Error("删除失败");
       setDeletePage(null);
       fetchPages(pagesPage);
+      // Invalidate square cache so deleted page disappears immediately
+      (window as any).__invalidateSquareCache?.();
     } catch (err) {
       alert(err instanceof Error ? err.message : "删除失败");
     } finally {
