@@ -12,6 +12,9 @@ let cacheAge = 0;
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 export const Route = createFileRoute("/square")({
+  validateSearch: (search: Record<string, string | undefined>) => ({
+    q: search.q || "",
+  }),
   head: () => ({
     title: "链接广场 - 100mini",
     meta: [
@@ -48,11 +51,12 @@ const CATEGORIES = [
 ];
 
 function SquarePage() {
+  const { q } = Route.useSearch();
   const [user, setUser] = useState<any>(null);
   const [items, setItems] = useState<SquareItem[]>(cachedItems ?? []);
   const [loading, setLoading] = useState(!cachedItems);
   const [activeCategory, setActiveCategory] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(q);
   const fetchedRef = useRef(false);
 
   useEffect(() => {

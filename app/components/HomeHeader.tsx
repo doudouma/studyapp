@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Link, useLocation } from "@tanstack/react-router";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { Code2, Search, Bell, Settings, LogOut } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -156,7 +156,11 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
 export function AppNav({ user, searchQuery, onSearchChange }: AppNavProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
+  const [localSearch, setLocalSearch] = useState("");
   const menuRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isOnSquare = location.pathname.startsWith("/square");
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -167,6 +171,24 @@ export function AppNav({ user, searchQuery, onSearchChange }: AppNavProps) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Search value = from square page (when on square) or local state
+  const searchValue = isOnSquare ? (searchQuery ?? "") : localSearch;
+
+  const handleSearchChange = (value: string) => {
+    if (isOnSquare) {
+      onSearchChange?.(value);
+    } else {
+      setLocalSearch(value);
+    }
+  };
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !isOnSquare && searchValue.trim()) {
+      navigate({ to: "/square", search: { q: searchValue.trim() } });
+      setLocalSearch("");
+    }
+  };
 
   const handleLogout = async () => {
     setMenuOpen(false);
@@ -237,8 +259,9 @@ export function AppNav({ user, searchQuery, onSearchChange }: AppNavProps) {
             <Input
               className="h-9 w-48 bg-muted pl-9 text-sm lg:w-64"
               placeholder="搜索页面..."
-              value={searchQuery ?? ""}
-              onChange={(e) => onSearchChange?.(e.target.value)}
+              value={searchValue}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              onKeyDown={handleSearchKeyDown}
             />
           </div>
           {/* <Button variant="ghost" size="icon" className="size-9">
