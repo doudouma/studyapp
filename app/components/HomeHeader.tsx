@@ -157,6 +157,8 @@ export function AppNav({ user, searchQuery, onSearchChange }: AppNavProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [localSearch, setLocalSearch] = useState("");
+  const [isMember, setIsMember] = useState(false);
+  const [membershipExpiresAt, setMembershipExpiresAt] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
@@ -171,6 +173,19 @@ export function AppNav({ user, searchQuery, onSearchChange }: AppNavProps) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Fetch membership info when logged in
+  useEffect(() => {
+    if (user) {
+      fetch("/api/me")
+        .then((r) => r.json() as Promise<{ isMember?: boolean; membershipExpiresAt?: string | null }>)
+        .then((data) => {
+          setIsMember(data.isMember ?? false);
+          setMembershipExpiresAt(data.membershipExpiresAt ?? null);
+        })
+        .catch(() => {});
+    }
+  }, [user]);
 
   // Search value = from square page (when on square) or local state
   const searchValue = isOnSquare ? (searchQuery ?? "") : localSearch;
@@ -286,9 +301,23 @@ export function AppNav({ user, searchQuery, onSearchChange }: AppNavProps) {
               )}
             </button>
             {menuOpen && (
-              <div className="absolute right-0 top-10 z-50 w-44 rounded-lg border border-border bg-popover shadow-lg">
+              <div className="absolute right-0 top-10 z-50 w-52 rounded-lg border border-border bg-popover shadow-lg">
                 <div className="border-b px-3 py-2 text-sm text-muted-foreground">
                   {user.name}
+                </div>
+                <div className="border-b px-3 py-2">
+                  {isMember ? (
+                    <div className="flex items-center gap-1.5">
+                      <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                        🏆 会员
+                      </span>
+                      <span className="text-[11px] text-muted-foreground">
+                        到期 {membershipExpiresAt ? new Date(membershipExpiresAt).toLocaleDateString("zh-CN") : ""}
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">普通用户</span>
+                  )}
                 </div>
                 {user.role === "admin" && (
                   <a

@@ -105,15 +105,21 @@ api.get("/api/me", async (c) => {
 
   // Check membership
   let isMember = false;
+  let membershipExpiresAt: string | null = null;
   const memberRows = await c.env.D1.prepare(
     "SELECT expires_at FROM membership WHERE user_id = ?"
   ).bind(user.id).all<{ expires_at: number }>();
-  isMember = memberRows.results.length > 0 &&
-    Number(memberRows.results[0].expires_at) * 1000 > Date.now();
+  if (memberRows.results.length > 0) {
+    const expiresAtNum = Number(memberRows.results[0].expires_at) * 1000;
+    isMember = expiresAtNum > Date.now();
+    membershipExpiresAt = isMember ? new Date(expiresAtNum).toISOString() : null;
+  }
 
   return c.json({
     user,
     pageCount,
+    isMember,
+    membershipExpiresAt,
     limit: isMember ? -1 : FREE_PERMANENT_LIMIT,
   });
 });
