@@ -109,7 +109,7 @@ api.get("/api/me", async (c) => {
     "SELECT expires_at FROM membership WHERE user_id = ?"
   ).bind(user.id).all<{ expires_at: number }>();
   isMember = memberRows.results.length > 0 &&
-    Number(memberRows.results[0].expires_at) > Date.now();
+    Number(memberRows.results[0].expires_at) * 1000 > Date.now();
 
   return c.json({
     user,
@@ -333,7 +333,18 @@ api.get("/api/pages", async (c) => {
     .where(eq(page.userId, user.id))
     .orderBy(desc(page.createdAt));
 
-  return c.json({ pages, total, limit: FREE_PERMANENT_LIMIT });
+  // Check membership for limit
+  let limit = FREE_PERMANENT_LIMIT;
+  if (c.env.D1) {
+    const memberRows = await c.env.D1.prepare(
+      "SELECT expires_at FROM membership WHERE user_id = ?"
+    ).bind(user.id).all<{ expires_at: number }>();
+    if (memberRows.results.length > 0 && Number(memberRows.results[0].expires_at) * 1000 > Date.now()) {
+      limit = -1;
+    }
+  }
+
+  return c.json({ pages, total, limit });
 });
 
 // Delete a page
@@ -381,7 +392,7 @@ api.post("/api/upload", async (c) => {
         "SELECT expires_at FROM membership WHERE user_id = ?"
       ).bind(user.id).all<{ expires_at: number }>();
       isMember = memberRows.results.length > 0 &&
-        Number(memberRows.results[0].expires_at) > Date.now();
+        Number(memberRows.results[0].expires_at) * 1000 > Date.now();
     }
 
     if (!isMember) {

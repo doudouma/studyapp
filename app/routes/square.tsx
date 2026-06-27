@@ -126,11 +126,11 @@ function SquarePage() {
 
           {/* Grid */}
           {loading ? (
-            <div className="columns-1 gap-6 sm:columns-2 lg:columns-4">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div
                   key={i}
-                  className="mb-6 break-inside-avoid rounded-xl border border-border bg-card overflow-hidden"
+                  className="rounded-xl border border-border bg-card overflow-hidden"
                 >
                   <div className="aspect-[4/3] animate-pulse bg-muted" />
                   <div className="p-4 space-y-2">

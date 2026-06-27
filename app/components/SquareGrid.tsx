@@ -57,11 +57,11 @@ export function SquareGrid({ items }: SquareGridProps) {
   }
 
   return (
-    <div className="columns-1 gap-6 sm:columns-2 lg:columns-4">
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {items.map((item) => (
         <article
           key={item.id}
-          className="mb-6 break-inside-avoid rounded-xl border border-border bg-card overflow-hidden group hover:shadow-lg transition-all duration-300"
+          className="rounded-xl border border-border bg-card overflow-hidden group hover:shadow-lg transition-all duration-300"
         >
           {/* HTML preview via iframe */}
           <a
