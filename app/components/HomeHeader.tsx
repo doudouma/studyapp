@@ -226,6 +226,7 @@ export function AppNav({ user, searchQuery, onSearchChange }: AppNavProps) {
               <span className="text-xl font-bold tracking-tight">100mini</span>
             </Link>
             <div className="hidden items-center gap-4 md:flex">
+              <NavLink href="/">首页</NavLink>
               <NavLink href="/square">广场</NavLink>
             </div>
           </div>
