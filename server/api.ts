@@ -504,9 +504,9 @@ api.post("/api/upload-thumbnail", async (c) => {
     return c.json({ error: "缺少参数" }, 400);
   }
 
-  // Validate image type
-  if (!thumbnail.type.startsWith("image/")) {
-    return c.json({ error: "仅支持图片文件" }, 400);
+  // Validate image type — must be WebP from SnapDOM
+  if (thumbnail.type !== "image/webp") {
+    return c.json({ error: "仅支持 WebP 格式的缩略图" }, 400);
   }
 
   // Validate file size (max 2MB)

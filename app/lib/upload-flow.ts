@@ -10,28 +10,28 @@ const TIMEOUT_MS = 8000;
  * Creates a hidden iframe to render the page, captures with SnapDOM,
  * then uploads the WebP to the server.
  */
-export async function captureAndUploadThumbnail(pageId: string) {
+export async function captureAndUploadThumbnail(pageId: string): Promise<void> {
   const iframe = document.createElement("iframe");
   iframe.src = `/p/${pageId}`;
   iframe.style.display = "none";
   document.body.appendChild(iframe);
 
-  const timeoutId = setTimeout(() => {
-    cleanup(iframe);
-  }, TIMEOUT_MS);
+  return new Promise<void>((resolve, reject) => {
+    const timeoutId = setTimeout(() => {
+      cleanup(iframe);
+      reject(new Error("Thumbnail capture timed out"));
+    }, TIMEOUT_MS);
 
-  return new Promise<void>((resolve) => {
     iframe.addEventListener("load", async () => {
       clearTimeout(timeoutId);
 
-      // Wait a bit for styles/fonts to settle
-      await delay(600);
-
       try {
+        // Wait a bit for styles/fonts to settle
+        await delay(600);
+
         const doc = iframe.contentDocument;
         if (!doc || !doc.body) {
-          resolve();
-          return;
+          throw new Error("Iframe content not available");
         }
 
         const blob = await snapdom.toWebp(doc.body, {
@@ -41,11 +41,11 @@ export async function captureAndUploadThumbnail(pageId: string) {
         });
 
         await uploadThumbnail(pageId, blob);
-      } catch {
-        // Silently fail — thumbnail is optional
+        resolve();
+      } catch (err) {
+        reject(err);
       } finally {
         cleanup(iframe);
-        resolve();
       }
     });
   });
@@ -68,7 +68,7 @@ async function uploadThumbnail(pageId: string, blob: Blob) {
   });
 
   if (!res.ok) {
-    console.warn("Thumbnail upload failed:", await res.text());
+    throw new Error(`Thumbnail upload failed: ${await res.text()}`);
   }
 }
 

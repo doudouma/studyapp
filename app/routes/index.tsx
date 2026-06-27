@@ -29,7 +29,7 @@ export const Route = createFileRoute("/")({
 type TabMode = "paste" | "drop";
 
 interface UploadResult {
-  id?: string;
+  id: string;
   url: string;
   expiresAt: string | null;
   isPermanent?: boolean;
@@ -131,7 +131,7 @@ function HomePage() {
             url={result.url}
             expiresAt={result.expiresAt || undefined}
             isPermanent={result.isPermanent}
-            pageId={result.id!}
+            pageId={result.id}
             onReset={handleReset}
           />
         </main>
