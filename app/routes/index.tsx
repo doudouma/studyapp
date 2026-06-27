@@ -154,7 +154,7 @@ function HomePage() {
             </div>
           </div>
           <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-            码上钉
+            100mini
           </h1>
           <p className="mt-2 text-muted-foreground">
             粘贴或拖拽 HTML，一键生成分享链接
