@@ -8,10 +8,11 @@ interface SuccessCardProps {
   url: string;
   expiresAt?: string;
   isPermanent?: boolean;
+  pageId?: string;
   onReset: () => void;
 }
 
-export function SuccessCard({ url, expiresAt, isPermanent, onReset }: SuccessCardProps) {
+export function SuccessCard({ url, expiresAt, isPermanent, pageId, onReset }: SuccessCardProps) {
   const [copied, setCopied] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState("");
 
