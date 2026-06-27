@@ -14,7 +14,7 @@ import { authClient } from "~/lib/auth-client";
 
 export const Route = createFileRoute("/")({
   head: () => ({
-    title: "100mini - 免费 HTML 托管与分享",
+    title: "100mini - 把你的 HTML 变成分享链接",
     meta: [
       {
         name: "keywords",
@@ -154,7 +154,7 @@ function HomePage() {
             </div>
           </div>
           <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-            100mini
+            免费·快速·生成属于你的mini站
           </h1>
           <p className="mt-2 text-muted-foreground">
             粘贴或拖拽 HTML，一键生成分享链接
@@ -240,10 +240,10 @@ function HomePage() {
       <main className="flex-1">
         <section className="mx-auto max-w-5xl px-6 pt-12 pb-8 text-center">
           <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-            一键分享你的 HTML
+            让知识，拥有自己的页面
           </h1>
           <p className="mt-3 text-lg text-muted-foreground">
-            粘贴代码或上传文件，30 秒生成分享链接
+            粘贴或上传，30 秒生成你的 mini 站
           </p>
         </section>
 
