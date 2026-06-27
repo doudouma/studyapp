@@ -131,6 +131,7 @@ function HomePage() {
             url={result.url}
             expiresAt={result.expiresAt || undefined}
             isPermanent={result.isPermanent}
+            pageId={result.id!}
             onReset={handleReset}
           />
         </main>

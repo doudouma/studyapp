@@ -1,19 +1,24 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
-import { CheckCircle2, ExternalLink } from "lucide-react";
+import { CheckCircle2, ExternalLink, ImageIcon } from "lucide-react";
+import { captureAndUploadThumbnail } from "~/lib/upload-flow";
 
 interface SuccessCardProps {
   url: string;
   expiresAt?: string;
   isPermanent?: boolean;
+  pageId: string;
   onReset: () => void;
 }
 
-export function SuccessCard({ url, expiresAt, isPermanent, onReset }: SuccessCardProps) {
+export function SuccessCard({ url, expiresAt, isPermanent, pageId, onReset }: SuccessCardProps) {
   const [copied, setCopied] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState("");
+  const [thumbnailReady, setThumbnailReady] = useState(false);
+  const [thumbnailFailed, setThumbnailFailed] = useState(false);
+  const capturedRef = useRef(false);
 
   const fullUrl =
     typeof window !== "undefined"
@@ -45,6 +50,16 @@ export function SuccessCard({ url, expiresAt, isPermanent, onReset }: SuccessCar
     });
   }, [fullUrl]);
 
+  // Trigger thumbnail capture on mount (once)
+  useEffect(() => {
+    if (capturedRef.current) return;
+    capturedRef.current = true;
+
+    captureAndUploadThumbnail(pageId)
+      .then(() => setThumbnailReady(true))
+      .catch(() => setThumbnailFailed(true));
+  }, [pageId]);
+
   const expiryDate = expiresAt ? new Date(expiresAt).toLocaleString("zh-CN", {
     month: "numeric",
     day: "numeric",
@@ -62,6 +77,25 @@ export function SuccessCard({ url, expiresAt, isPermanent, onReset }: SuccessCar
         <p className="text-sm text-muted-foreground">
           {isPermanent ? "永久保留" : `将于 ${expiryDate} 后自动销毁`}
         </p>
+
+        {/* Thumbnail status */}
+        {!thumbnailReady && !thumbnailFailed && (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="size-3 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
+            正在生成缩略图...
+          </div>
+        )}
+        {thumbnailReady && (
+          <div className="flex items-center gap-1.5 text-xs text-green-600">
+            <ImageIcon className="size-3.5" />
+            缩略图已生成
+          </div>
+        )}
+        {thumbnailFailed && (
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            缩略图生成失败，使用默认预览
+          </div>
+        )}
 
         {qrDataUrl && (
           <div className="size-40 rounded-xl border border-border bg-white flex items-center justify-center overflow-hidden">
