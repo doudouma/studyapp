@@ -52,7 +52,7 @@ function HomePage() {
   const [htmlContent, setHtmlContent] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState("general");
   const [tags, setTags] = useState("");
   const [shareToSquare, setShareToSquare] = useState(false);
   const [loading, setLoading] = useState(false);

@@ -379,7 +379,7 @@ api.post("/api/upload", async (c) => {
   const file = body.file;
   const title = (body.title as string) || "";
   const tags = (body.tags as string) || "";
-  const category = (body.category as string) || "";
+  const category = (body.category as string) || "general";
   const shareToSquare = body.shareToSquare === "true";
 
   // Check quota for logged-in users requesting permanent storage
