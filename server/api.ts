@@ -486,6 +486,95 @@ api.post("/api/upload", async (c) => {
   });
 });
 
+// Upload thumbnail for a page
+api.post("/api/upload-thumbnail", async (c) => {
+  const user = c.get("user");
+  if (!user) return c.json({ error: "未登录" }, 401);
+
+  const body = await c.req.parseBody();
+  const pageId = body.pageId as string;
+  const thumbnail = body.thumbnail as File | null;
+
+  if (!pageId || !thumbnail) {
+    return c.json({ error: "缺少参数" }, 400);
+  }
+
+  // Validate image type
+  if (!thumbnail.type.startsWith("image/")) {
+    return c.json({ error: "仅支持图片文件" }, 400);
+  }
+
+  // Validate page ownership
+  const db = createDb(c.env.D1);
+  const existing = await db
+    .select()
+    .from(page)
+    .where(and(eq(page.id, pageId), eq(page.userId, user.id)))
+    .limit(1);
+  if (existing.length === 0) {
+    return c.json({ error: "页面不存在" }, 404);
+  }
+
+  // Upload thumbnail to R2
+  const key = `thumbnails/${pageId}.webp`;
+  const buffer = await thumbnail.arrayBuffer();
+
+  if (c.env?.BUCKET) {
+    await c.env.BUCKET.put(key, buffer, {
+      httpMetadata: { contentType: "image/webp" },
+    });
+  } else {
+    const { PutObjectCommand } = await import("@aws-sdk/client-s3");
+    const r2 = await getR2();
+    await r2.send(
+      new PutObjectCommand({
+        Bucket: BUCKET,
+        Key: key,
+        Body: new Uint8Array(buffer),
+        ContentType: "image/webp",
+      })
+    );
+  }
+
+  // Update DB
+  await db.update(page).set({ previewPath: key }).where(eq(page.id, pageId));
+
+  return c.json({ success: true, previewPath: key });
+});
+
+// Serve thumbnail
+api.get("/thumbnails/:id", async (c) => {
+  const id = c.req.param("id");
+  if (!/^[a-zA-Z0-9_-]{7}$/.test(id)) {
+    return c.json({ error: "invalid id" }, 404);
+  }
+
+  const key = `thumbnails/${id}.webp`;
+
+  if (c.env?.BUCKET) {
+    const obj = await c.env.BUCKET.get(key);
+    if (!obj) return c.json({ error: "not found" }, 404);
+    const headers = new Headers();
+    headers.set("Content-Type", "image/webp");
+    headers.set("Cache-Control", "public, max-age=86400");
+    return new Response(obj.body, { headers });
+  } else {
+    try {
+      const { GetObjectCommand } = await import("@aws-sdk/client-s3");
+      const r2 = await getR2();
+      const res = await r2.send(
+        new GetObjectCommand({ Bucket: BUCKET, Key: key })
+      );
+      const headers = new Headers();
+      headers.set("Content-Type", "image/webp");
+      headers.set("Cache-Control", "public, max-age=86400");
+      return new Response(res.Body as ReadableStream, { headers });
+    } catch {
+      return c.json({ error: "not found" }, 404);
+    }
+  }
+});
+
 // Unshare from square
 api.delete("/api/pages/:id/square", async (c) => {
   const user = c.get("user");
