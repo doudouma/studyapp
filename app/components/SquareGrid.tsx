@@ -16,6 +16,7 @@ interface SquareGridProps {
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
+  general: "通用",
   chinese: "语文",
   math: "数学",
   english: "英语",
