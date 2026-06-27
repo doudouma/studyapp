@@ -157,7 +157,7 @@ function HomePage() {
             免费·快速·生成属于你的mini站
           </h1>
           <p className="mt-2 text-muted-foreground">
-            粘贴或拖拽 HTML，一键生成分享链接
+            粘贴或上传，30 秒生成你的 mini 站
           </p>
         </header>
 
@@ -240,7 +240,7 @@ function HomePage() {
       <main className="flex-1">
         <section className="mx-auto max-w-5xl px-6 pt-12 pb-8 text-center">
           <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-            让知识，拥有自己的页面
+            免费·快速·生成属于你的mini站
           </h1>
           <p className="mt-3 text-lg text-muted-foreground">
             粘贴或上传，30 秒生成你的 mini 站
