@@ -2,7 +2,7 @@
 import { Hono } from "hono";
 import { nanoid } from "nanoid";
 import { count, eq, and, desc, sql } from "drizzle-orm";
-import { getR2, BUCKET, MAX_SIZE } from "./r2";
+import { MAX_SIZE } from "./r2";
 import { createDb } from "./db";
 import { page, user, membership } from "./db/schema";
 
@@ -48,17 +48,6 @@ async function putToStorage(
     await c.env.BUCKET.put(key, body, {
       httpMetadata: { contentType: "text/html; charset=utf-8" },
     });
-  } else {
-    const { PutObjectCommand } = await import("@aws-sdk/client-s3");
-    const r2 = await getR2();
-    await r2.send(
-      new PutObjectCommand({
-        Bucket: BUCKET,
-        Key: key,
-        Body: body,
-        ContentType: "text/html; charset=utf-8",
-      })
-    );
   }
 }
 
@@ -70,18 +59,8 @@ async function getFromStorage(
     const obj = await c.env.BUCKET.get(key);
     if (!obj) return null;
     return await obj.text();
-  } else {
-      try {
-        const { GetObjectCommand } = await import("@aws-sdk/client-s3");
-        const r2 = await getR2();
-        const res = await r2.send(
-        new GetObjectCommand({ Bucket: BUCKET, Key: key })
-      );
-      return await res.Body!.transformToString();
-    } catch {
-      return null;
-    }
   }
+  return null;
 }
 
 api.get("/robots.txt", (c) => {
@@ -539,17 +518,6 @@ api.post("/api/upload-thumbnail", async (c) => {
     await c.env.BUCKET.put(key, buffer, {
       httpMetadata: { contentType: "image/webp" },
     });
-  } else {
-    const { PutObjectCommand } = await import("@aws-sdk/client-s3");
-    const r2 = await getR2();
-    await r2.send(
-      new PutObjectCommand({
-        Bucket: BUCKET,
-        Key: key,
-        Body: new Uint8Array(buffer),
-        ContentType: "image/webp",
-      })
-    );
   }
 
   // Update DB
@@ -574,20 +542,6 @@ api.get("/thumbnails/:id", async (c) => {
     headers.set("Content-Type", "image/webp");
     headers.set("Cache-Control", "public, max-age=86400");
     return new Response(obj.body, { headers });
-  } else {
-    try {
-      const { GetObjectCommand } = await import("@aws-sdk/client-s3");
-      const r2 = await getR2();
-      const res = await r2.send(
-        new GetObjectCommand({ Bucket: BUCKET, Key: key })
-      );
-      const headers = new Headers();
-      headers.set("Content-Type", "image/webp");
-      headers.set("Cache-Control", "public, max-age=86400");
-      return new Response(res.Body as ReadableStream, { headers });
-    } catch {
-      return c.json({ error: "not found" }, 404);
-    }
   }
 });
 

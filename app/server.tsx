@@ -13,11 +13,14 @@ type Bindings = {
 };
 
 // In Vite dev mode, c.env is undefined — use getPlatformProxy for local D1/R2
+// Note: `wrangler` is NOT available in production Workers, so this must
+// use a dynamic import with a variable to prevent esbuild from bundling it
 let devProxy: any = null;
+const WRANGLER_MODULE = "wrangler";
 async function getDevBindings() {
   if (!devProxy) {
-    const { getPlatformProxy } = await import("wrangler");
-    devProxy = await getPlatformProxy();
+    const mod = await import(WRANGLER_MODULE);
+    devProxy = await mod.getPlatformProxy();
   }
   return devProxy;
 }
