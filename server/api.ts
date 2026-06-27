@@ -17,6 +17,7 @@ const api = new Hono<{
 }>();
 
 const FREE_PERMANENT_LIMIT = 5;
+const MAX_THUMBNAIL_SIZE = 2 * 1024 * 1024; // 2MB
 
 api.onError((err, c) => {
   console.error("API Error:", err);
@@ -502,6 +503,11 @@ api.post("/api/upload-thumbnail", async (c) => {
   // Validate image type
   if (!thumbnail.type.startsWith("image/")) {
     return c.json({ error: "仅支持图片文件" }, 400);
+  }
+
+  // Validate file size (max 2MB)
+  if (thumbnail.size > MAX_THUMBNAIL_SIZE) {
+    return c.json({ error: "缩略图大小不能超过 2MB" }, 413);
   }
 
   // Validate page ownership
