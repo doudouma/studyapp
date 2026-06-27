@@ -329,6 +329,7 @@ api.get("/api/pages", async (c) => {
       viewCount: page.viewCount,
       createdAt: page.createdAt,
       expiresAt: page.expiresAt,
+      previewPath: page.previewPath,
     })
     .from(page)
     .where(eq(page.userId, user.id))
@@ -484,6 +485,7 @@ api.post("/api/upload", async (c) => {
     isPermanent,
     title,
     isSharedToSquare: shareToSquare,
+    previewPath: null,
   });
 });
 
@@ -613,6 +615,7 @@ api.get("/api/square", async (c) => {
       tags: page.tags,
       viewCount: page.viewCount,
       sharedAt: page.sharedAt,
+      previewPath: page.previewPath,
       userName: user.name,
       userImage: user.image,
     })
