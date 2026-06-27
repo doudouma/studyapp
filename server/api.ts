@@ -281,7 +281,6 @@ api.delete("/api/admin/pages/:id", requireAdmin, async (c) => {
   if (existing.length === 0) return c.json({ error: "页面不存在" }, 404);
 
   // Delete from R2
-  await putToStorage(c, `${pageId}.html`, "");
   if (c.env?.BUCKET) {
     await c.env.BUCKET.delete(`${pageId}.html`);
     await c.env.BUCKET.delete(`thumbnails/${pageId}.webp`);
@@ -348,7 +347,6 @@ api.delete("/api/pages/:id", async (c) => {
   if (existing.length === 0) return c.json({ error: "页面不存在" }, 404);
 
   // Delete from R2
-  await putToStorage(c, `${pageId}.html`, ""); // clear content
   if (c.env?.BUCKET) {
     await c.env.BUCKET.delete(`${pageId}.html`);
     await c.env.BUCKET.delete(`thumbnails/${pageId}.webp`);
@@ -603,9 +601,9 @@ api.get("/p/:id", async (c) => {
       const p = record[0];
       if (p.expiresAt && new Date(p.expiresAt) < new Date()) {
         // Expired — clean up
-        await putToStorage(c, `${id}.html`, "");
         if (c.env?.BUCKET) {
           await c.env.BUCKET.delete(`${id}.html`);
+          await c.env.BUCKET.delete(`thumbnails/${id}.webp`);
         }
         await db.delete(page).where(eq(page.id, id));
         return c.html(notFoundHtml(), 404);
