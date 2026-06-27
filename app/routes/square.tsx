@@ -29,6 +29,7 @@ interface SquareItem {
   tags: string;
   viewCount: number;
   sharedAt: number;
+  previewPath: string | null;
   userName: string | null;
   userImage: string | null;
 }

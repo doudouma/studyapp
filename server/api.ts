@@ -17,6 +17,7 @@ const api = new Hono<{
 }>();
 
 const FREE_PERMANENT_LIMIT = 5;
+const MAX_THUMBNAIL_SIZE = 2 * 1024 * 1024; // 2MB
 
 api.onError((err, c) => {
   console.error("API Error:", err);
@@ -304,6 +305,7 @@ api.delete("/api/admin/pages/:id", requireAdmin, async (c) => {
   await putToStorage(c, `${pageId}.html`, "");
   if (c.env?.BUCKET) {
     await c.env.BUCKET.delete(`${pageId}.html`);
+    await c.env.BUCKET.delete(`thumbnails/${pageId}.webp`);
   }
 
   // Delete from D1
@@ -334,6 +336,7 @@ api.get("/api/pages", async (c) => {
       viewCount: page.viewCount,
       createdAt: page.createdAt,
       expiresAt: page.expiresAt,
+      previewPath: page.previewPath,
     })
     .from(page)
     .where(eq(page.userId, user.id))
@@ -369,6 +372,7 @@ api.delete("/api/pages/:id", async (c) => {
   await putToStorage(c, `${pageId}.html`, ""); // clear content
   if (c.env?.BUCKET) {
     await c.env.BUCKET.delete(`${pageId}.html`);
+    await c.env.BUCKET.delete(`thumbnails/${pageId}.webp`);
   }
 
   // Delete from D1
@@ -489,7 +493,102 @@ api.post("/api/upload", async (c) => {
     isPermanent,
     title,
     isSharedToSquare: shareToSquare,
+    previewPath: null,
   });
+});
+
+// Upload thumbnail for a page
+api.post("/api/upload-thumbnail", async (c) => {
+  const user = c.get("user");
+  if (!user) return c.json({ error: "未登录" }, 401);
+
+  const body = await c.req.parseBody();
+  const pageId = body.pageId as string;
+  const thumbnail = body.thumbnail as File | null;
+
+  if (!pageId || !thumbnail) {
+    return c.json({ error: "缺少参数" }, 400);
+  }
+
+  // Validate image type — must be WebP from SnapDOM
+  if (thumbnail.type !== "image/webp") {
+    return c.json({ error: "仅支持 WebP 格式的缩略图" }, 400);
+  }
+
+  // Validate file size (max 2MB)
+  if (thumbnail.size > MAX_THUMBNAIL_SIZE) {
+    return c.json({ error: "缩略图大小不能超过 2MB" }, 413);
+  }
+
+  // Validate page ownership
+  const db = createDb(c.env.D1);
+  const existing = await db
+    .select()
+    .from(page)
+    .where(and(eq(page.id, pageId), eq(page.userId, user.id)))
+    .limit(1);
+  if (existing.length === 0) {
+    return c.json({ error: "页面不存在" }, 404);
+  }
+
+  // Upload thumbnail to R2
+  const key = `thumbnails/${pageId}.webp`;
+  const buffer = await thumbnail.arrayBuffer();
+
+  if (c.env?.BUCKET) {
+    await c.env.BUCKET.put(key, buffer, {
+      httpMetadata: { contentType: "image/webp" },
+    });
+  } else {
+    const { PutObjectCommand } = await import("@aws-sdk/client-s3");
+    const r2 = await getR2();
+    await r2.send(
+      new PutObjectCommand({
+        Bucket: BUCKET,
+        Key: key,
+        Body: new Uint8Array(buffer),
+        ContentType: "image/webp",
+      })
+    );
+  }
+
+  // Update DB
+  await db.update(page).set({ previewPath: key }).where(eq(page.id, pageId));
+
+  return c.json({ success: true, previewPath: key });
+});
+
+// Serve thumbnail
+api.get("/thumbnails/:id", async (c) => {
+  const id = c.req.param("id");
+  if (!/^[a-zA-Z0-9_-]{7}$/.test(id)) {
+    return c.json({ error: "invalid id" }, 404);
+  }
+
+  const key = `thumbnails/${id}.webp`;
+
+  if (c.env?.BUCKET) {
+    const obj = await c.env.BUCKET.get(key);
+    if (!obj) return c.json({ error: "not found" }, 404);
+    const headers = new Headers();
+    headers.set("Content-Type", "image/webp");
+    headers.set("Cache-Control", "public, max-age=86400");
+    return new Response(obj.body, { headers });
+  } else {
+    try {
+      const { GetObjectCommand } = await import("@aws-sdk/client-s3");
+      const r2 = await getR2();
+      const res = await r2.send(
+        new GetObjectCommand({ Bucket: BUCKET, Key: key })
+      );
+      const headers = new Headers();
+      headers.set("Content-Type", "image/webp");
+      headers.set("Cache-Control", "public, max-age=86400");
+      return new Response(res.Body as ReadableStream, { headers });
+    } catch {
+      return c.json({ error: "not found" }, 404);
+    }
+  }
 });
 
 // Unshare from square
@@ -524,6 +623,7 @@ api.get("/api/square", async (c) => {
       tags: page.tags,
       viewCount: page.viewCount,
       sharedAt: page.sharedAt,
+      previewPath: page.previewPath,
       userName: user.name,
       userImage: user.image,
     })

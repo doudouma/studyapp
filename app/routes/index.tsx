@@ -29,7 +29,7 @@ export const Route = createFileRoute("/")({
 type TabMode = "paste" | "drop";
 
 interface UploadResult {
-  id?: string;
+  id: string;
   url: string;
   expiresAt: string | null;
   isPermanent?: boolean;
