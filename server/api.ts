@@ -299,6 +299,7 @@ api.delete("/api/admin/pages/:id", requireAdmin, async (c) => {
   await putToStorage(c, `${pageId}.html`, "");
   if (c.env?.BUCKET) {
     await c.env.BUCKET.delete(`${pageId}.html`);
+    await c.env.BUCKET.delete(`thumbnails/${pageId}.webp`);
   }
 
   // Delete from D1
@@ -365,6 +366,7 @@ api.delete("/api/pages/:id", async (c) => {
   await putToStorage(c, `${pageId}.html`, ""); // clear content
   if (c.env?.BUCKET) {
     await c.env.BUCKET.delete(`${pageId}.html`);
+    await c.env.BUCKET.delete(`thumbnails/${pageId}.webp`);
   }
 
   // Delete from D1
