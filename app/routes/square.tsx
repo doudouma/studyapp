@@ -98,26 +98,26 @@ function SquarePage() {
       <main className="flex-1">
         <div className="mx-auto max-w-360 px-6 pt-10 pb-12">
           {/* Header */}
-          <div className="mb-6">
+          <div className="mb-8">
             <div className="flex items-center gap-2">
-              <Globe className="size-6 text-primary" />
-              <h1 className="text-2xl font-bold text-foreground">链接广场</h1>
+              <Globe className="size-6 text-[#006c49] dark:text-[#4edea3]" />
+              <h1 className="text-2xl font-bold text-foreground">学习广场</h1>
             </div>
-            <p className="mt-1 text-sm text-muted-foreground">
-              发现来自社区的 HTML 分享页面
+            <p className="mt-1.5 text-base text-muted-foreground">
+              发现来自社区的学习页面与互动工具
             </p>
           </div>
 
           {/* Category filter */}
-          <div className="mb-8 flex items-center gap-2 overflow-x-auto border-b border-border pb-3">
+          <div className="mb-8 flex items-center gap-2 overflow-x-auto border-b border-[#d3e4fe] dark:border-[#3c4a42] pb-3">
             {CATEGORIES.map((cat) => (
               <button
                 key={cat.key}
                 onClick={() => setActiveCategory(cat.key)}
                 className={`whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
                   activeCategory === cat.key
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    ? "bg-[#006c49] text-white dark:bg-[#4edea3] dark:text-[#002113]"
+                    : "bg-[#e5eeff] text-[#3c4a42] dark:bg-[#1e314a] dark:text-[#8f9e95] hover:bg-[#dce9ff] dark:hover:bg-[#213145]"
                 }`}
               >
                 {cat.label}
@@ -131,13 +131,13 @@ function SquarePage() {
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div
                   key={i}
-                  className="rounded-xl border border-border bg-card overflow-hidden"
+                  className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] overflow-hidden"
                 >
-                  <div className="aspect-[4/3] animate-pulse bg-muted" />
+                  <div className="aspect-[4/3] animate-pulse bg-[#e5eeff] dark:bg-[#1e314a]" />
                   <div className="p-4 space-y-2">
-                    <div className="h-3 w-16 animate-pulse rounded bg-muted" />
-                    <div className="h-5 w-3/4 animate-pulse rounded bg-muted" />
-                    <div className="h-3 w-1/2 animate-pulse rounded bg-muted" />
+                    <div className="h-3 w-16 animate-pulse rounded-full bg-[#e5eeff] dark:bg-[#1e314a]" />
+                    <div className="h-5 w-3/4 animate-pulse rounded bg-[#e5eeff] dark:bg-[#1e314a]" />
+                    <div className="h-3 w-1/2 animate-pulse rounded bg-[#e5eeff] dark:bg-[#1e314a]" />
                   </div>
                 </div>
               ))}

@@ -69,11 +69,11 @@ export function SuccessCard({ url, expiresAt, isPermanent, pageId, onReset }: Su
 
   return (
     <Card className="w-full max-w-md text-center">
-      <CardContent className="flex flex-col items-center gap-4 pt-8 pb-8">
-        <div className="flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary">
-          <CheckCircle2 className="size-8" />
+      <CardContent className="flex flex-col items-center gap-5 pt-10 pb-10">
+        <div className="flex size-16 items-center justify-center rounded-2xl bg-[#006c49]/10 dark:bg-[#4edea3]/10">
+          <CheckCircle2 className="size-8 text-[#006c49] dark:text-[#4edea3]" />
         </div>
-        <h2 className="text-xl font-bold text-foreground">发布成功！</h2>
+        <h2 className="text-2xl font-bold text-foreground">发布成功！</h2>
         <p className="text-sm text-muted-foreground">
           {isPermanent ? "永久保留" : `将于 ${expiryDate} 后自动销毁`}
         </p>
@@ -98,7 +98,7 @@ export function SuccessCard({ url, expiresAt, isPermanent, pageId, onReset }: Su
         )}
 
         {qrDataUrl && (
-          <div className="size-40 rounded-xl border border-border bg-white flex items-center justify-center overflow-hidden">
+          <div className="size-40 rounded-2xl border border-[#d3e4fe] dark:border-[#3c4a42] bg-white dark:bg-[#15243b] flex items-center justify-center overflow-hidden">
             <div
               className="[&>svg]:block"
               dangerouslySetInnerHTML={{ __html: qrDataUrl }}
@@ -109,8 +109,8 @@ export function SuccessCard({ url, expiresAt, isPermanent, pageId, onReset }: Su
         <div className="flex w-full gap-2">
           <input
             className={cn(
-              "flex-1 rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm font-mono text-foreground outline-none",
-              "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+              "flex-1 rounded-lg border-2 border-[#bbcabf] dark:border-[#3c4a42] bg-[#e5eeff]/30 dark:bg-[#1e314a]/30 px-3 py-2 text-sm font-mono text-foreground outline-none",
+              "focus-visible:border-[#0058be] focus-visible:ring-3 focus-visible:ring-[#0058be]/30"
             )}
             value={fullUrl}
             readOnly
@@ -125,7 +125,7 @@ export function SuccessCard({ url, expiresAt, isPermanent, pageId, onReset }: Su
           href={url}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
+          className="inline-flex items-center gap-1 text-sm font-semibold text-[#0058be] dark:text-[#adc6ff] hover:underline"
         >
           预览页面 <ExternalLink className="size-3.5" />
         </a>

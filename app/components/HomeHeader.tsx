@@ -216,16 +216,16 @@ export function AppNav({ user, searchQuery, onSearchChange }: AppNavProps) {
   // ========== 未登录模式 ==========
   if (!user) {
     return (
-      <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+      <header className="sticky top-0 z-50 w-full border-b border-[#d3e4fe] dark:border-[#3c4a42] bg-white/95 dark:bg-[#0b1c30]/95 backdrop-blur supports-backdrop-filter:bg-background/60">
         <nav className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
           <div className="flex items-center gap-6">
             <Link to="/" className="flex items-center gap-2">
-              <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <div className="flex size-9 items-center justify-center rounded-xl bg-[#006c49] text-white dark:bg-[#4edea3] dark:text-[#002113]">
                 <Code2 className="size-5" />
               </div>
               <span className="text-xl font-bold tracking-tight">100mini</span>
             </Link>
-            <div className="hidden items-center gap-4 md:flex">
+            <div className="hidden items-center gap-6 md:flex">
               <NavLink href="/">首页</NavLink>
               <NavLink href="/square">广场</NavLink>
             </div>
@@ -253,17 +253,17 @@ export function AppNav({ user, searchQuery, onSearchChange }: AppNavProps) {
 
   // ========== 已登录模式 ==========
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-[#d3e4fe] dark:border-[#3c4a42] bg-white/95 dark:bg-[#0b1c30]/95 backdrop-blur supports-backdrop-filter:bg-background/60">
       <nav className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
         {/* Left: Logo + Nav links */}
         <div className="flex items-center gap-6">
           <Link to="/" className="flex items-center gap-2">
-            <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <div className="flex size-9 items-center justify-center rounded-xl bg-[#006c49] text-white dark:bg-[#4edea3] dark:text-[#002113]">
               <Code2 className="size-5" />
             </div>
             <span className="text-xl font-bold tracking-tight">100mini</span>
           </Link>
-          <div className="hidden items-center gap-4 md:flex">
+          <div className="hidden items-center gap-6 md:flex">
             <NavLink href="/">首页</NavLink>
             <NavLink href="/square">广场</NavLink>
             <NavLink href="/links">我的链接</NavLink>

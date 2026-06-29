@@ -116,17 +116,17 @@ export function LinksTable({ pages, total, limit, onDelete }: LinksTableProps) {
   // Empty state
   if (pages.length === 0) {
     return (
-      <div className="rounded-xl border border-border bg-card p-12 text-center">
-        <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-full bg-primary/10">
-          <FileText className="size-6 text-primary" />
+      <div className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] p-14 text-center">
+        <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-[#006c49]/10 dark:bg-[#4edea3]/10">
+          <FileText className="size-6 text-[#006c49] dark:text-[#4edea3]" />
         </div>
         <h3 className="text-lg font-semibold text-foreground">还没有创建链接</h3>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-1.5 text-sm text-muted-foreground">
           上传你的第一个 HTML 页面，链接就会出现在这里
         </p>
         <a
           href="/"
-          className="mt-4 inline-flex h-9 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          className="mt-5 inline-flex h-10 items-center justify-center rounded-xl bg-[#006c49] px-5 text-sm font-medium text-white shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)] transition-colors hover:bg-[#006c49]/90 dark:bg-[#4edea3] dark:text-[#002113] dark:hover:bg-[#4edea3]/90"
         >
           去上传
         </a>
@@ -135,7 +135,7 @@ export function LinksTable({ pages, total, limit, onDelete }: LinksTableProps) {
   }
 
   return (
-    <div className="rounded-xl border border-border bg-card overflow-hidden">
+    <div className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-left">
           <thead>

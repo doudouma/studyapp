@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
-import { Code2 } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { ArrowDown, Code2, Clock, Infinity, Tags, Share2, List, Crown, LogIn } from "lucide-react";
 import { DropZone } from "~/components/DropZone";
 import { SuccessCard } from "~/components/SuccessCard";
 import { AppNav } from "~/components/HomeHeader";
 import { StatsSection } from "~/components/StatsSection";
+import { GuideSection } from "~/components/GuideSection";
 import { AppFooter } from "~/components/AppFooter";
 import { Card, CardContent } from "~/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/components/ui/tabs";
@@ -14,12 +15,12 @@ import { authClient } from "~/lib/auth-client";
 
 export const Route = createFileRoute("/")({
   head: () => ({
-    title: "100mini - 把你的 HTML 变成分享链接",
+    title: "100mini - 学习页面快闪托管与分享",
     meta: [
       {
         name: "keywords",
         content:
-          "HTML托管,代码分享,在线HTML,前端分享,网页托管,免费托管,学习工具,教育工具",
+          "HTML托管,学习页面,快闪托管,网页分享,免费托管,学习工具,教育工具,师生互动,静态网页",
       },
     ],
   }),
@@ -37,9 +38,221 @@ interface UploadResult {
   isSharedToSquare?: boolean;
 }
 
+function UploadForm({
+  mode,
+  setMode,
+  htmlContent,
+  setHtmlContent,
+  file,
+  setFile,
+  title,
+  setTitle,
+  category,
+  setCategory,
+  tags,
+  setTags,
+  shareToSquare,
+  setShareToSquare,
+  loading,
+  error,
+  handleSubmit,
+  contentSize,
+  formatSize,
+  canSubmit,
+  user,
+}: {
+  mode: TabMode;
+  setMode: (v: TabMode) => void;
+  htmlContent: string;
+  setHtmlContent: (v: string) => void;
+  file: File | null;
+  setFile: (v: File | null) => void;
+  title: string;
+  setTitle: (v: string) => void;
+  category: string;
+  setCategory: (v: string) => void;
+  tags: string;
+  setTags: (v: string) => void;
+  shareToSquare: boolean;
+  setShareToSquare: (v: boolean) => void;
+  loading: boolean;
+  error: string | null;
+  handleSubmit: () => void;
+  contentSize: number;
+  formatSize: (bytes: number) => string;
+  canSubmit: boolean;
+  user: any;
+}) {
+  return (
+    <Card className="w-full max-w-xl">
+      <CardContent className="p-6">
+        <Tabs
+          value={mode}
+          onValueChange={(v) => {
+            setMode(v as TabMode);
+            if (v === "paste") setFile(null);
+            if (v === "drop") setHtmlContent("");
+          }}
+        >
+          <TabsList variant="line" className="mb-6">
+            <TabsTrigger value="paste">粘贴代码</TabsTrigger>
+            <TabsTrigger value="drop">上传文件</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="paste" className="min-h-[300px] flex flex-col">
+            <textarea
+              className="w-full flex-1 rounded-lg border border-border bg-background p-4 text-sm font-mono outline-none resize-y leading-relaxed focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+              placeholder="在此粘贴你的 HTML/CSS/JS 代码..."
+              value={htmlContent}
+              onChange={(e) => setHtmlContent(e.target.value)}
+              spellCheck={false}
+            />
+          </TabsContent>
+
+          <TabsContent value="drop" className="min-h-[300px]">
+            <DropZone file={file} onFileSelect={setFile} />
+          </TabsContent>
+        </Tabs>
+
+        <div className="mt-2 mb-2 flex justify-end">
+          <span
+            className={`text-xs ${
+              contentSize > 5 * 1024 * 1024
+                ? "text-destructive"
+                : "text-muted-foreground"
+            }`}
+          >
+            {formatSize(contentSize)} / 5 MB
+          </span>
+        </div>
+
+        {user && (
+          <>
+            <div className="mb-3">
+              <label className="text-sm font-medium text-foreground">
+                标题{" "}
+                <span className="font-normal text-muted-foreground">
+                  (可选)
+                </span>
+              </label>
+              <Input
+                className="mt-1"
+                placeholder="输入页面标题..."
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="text-sm font-medium text-foreground">类型</label>
+              <select
+                className="mt-1 flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                <option value="chinese">语文</option>
+                <option value="math">数学</option>
+                <option value="english">英语</option>
+                <option value="physics">物理</option>
+                <option value="chemistry">化学</option>
+                <option value="history">历史</option>
+                <option value="biology">生物</option>
+                <option value="geography">地理</option>
+                <option value="other">其他</option>
+              </select>
+            </div>
+
+            <div className="mb-3">
+              <label className="text-sm font-medium text-foreground">
+                标签{" "}
+                <span className="font-normal text-muted-foreground">
+                  (可选，逗号分隔)
+                </span>
+              </label>
+              <Input
+                className="mt-1"
+                placeholder="例如: HTML, 笔记, 课件"
+                value={tags}
+                onChange={(e) => setTags(e.target.value)}
+              />
+            </div>
+
+            <label className="mb-3 flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                className="size-4 rounded border-border accent-primary"
+                checked={shareToSquare}
+                onChange={(e) => setShareToSquare(e.target.checked)}
+              />
+              <span className="text-sm text-foreground">分享到广场</span>
+            </label>
+          </>
+        )}
+
+        {!user && (
+          <div className="mb-5 rounded-2xl border border-[#c49f00]/20 bg-[#c49f00]/5 dark:border-[#eec200]/20 dark:bg-[#eec200]/5 p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <Crown className="size-4 text-[#c49f00] dark:text-[#eec200]" />
+              <span className="text-xs font-semibold text-[#735c00] dark:text-[#eec200] tracking-wide uppercase">
+                登录后解锁更多
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+              <div className="flex items-center gap-2">
+                <Clock className="size-3.5 text-[#c49f00] dark:text-[#eec200]" />
+                <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">24h 自动销毁</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Infinity className="size-3.5 text-[#006c49] dark:text-[#4edea3]" />
+                <span className="text-xs text-[#006c49] dark:text-[#4edea3] font-medium">永久保留</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">无标题/分类</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Tags className="size-3.5 text-[#006c49] dark:text-[#4edea3]" />
+                <span className="text-xs text-[#006c49] dark:text-[#4edea3] font-medium">标题·分类·标签</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">不可分享到广场</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Share2 className="size-3.5 text-[#006c49] dark:text-[#4edea3]" />
+                <span className="text-xs text-[#006c49] dark:text-[#4edea3] font-medium">分享到学习广场</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">无法管理链接</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <List className="size-3.5 text-[#006c49] dark:text-[#4edea3]" />
+                <span className="text-xs text-[#006c49] dark:text-[#4edea3] font-medium">管理你的所有链接</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {error && (
+          <div className="mb-4 rounded-lg bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            {error}
+          </div>
+        )}
+
+        <Button
+          className="w-full gap-2 py-6 text-base"
+          disabled={!canSubmit || loading}
+          onClick={handleSubmit}
+        >
+          {loading ? "发布中..." : "发布页面"}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
 function HomePage() {
   const [user, setUser] = useState<any>(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const uploadRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     authClient.getSession().then((session: any) => {
@@ -120,6 +333,10 @@ function HomePage() {
     setError(null);
   };
 
+  const scrollToUpload = () => {
+    uploadRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   if (authLoading) return null;
 
   if (result) {
@@ -140,243 +357,85 @@ function HomePage() {
     );
   }
 
-  // ========== 未登录状态 — 统一导航条 + 居中内容 ==========
-  if (!user) {
-    return (
-      <div className="flex min-h-screen flex-col">
-        <AppNav user={null} />
-        <main className="flex-1">
-          <section className="flex flex-col items-center justify-center p-8">
-          <header className="mb-8 text-center">
-          <div className="mb-3 flex justify-center">
-            <div className="inline-flex size-12 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-xs">
-              <Code2 className="size-6" />
-            </div>
-          </div>
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-            免费·快速·生成属于你的mini站
-          </h1>
-          <p className="mt-2 text-muted-foreground">
-            粘贴或上传，30 秒生成你的 mini 站
-          </p>
-        </header>
-
-        <Card className="w-full max-w-xl">
-          <CardContent className="p-6">
-            <Tabs
-              value={mode}
-              onValueChange={(v) => {
-                setMode(v as TabMode);
-                if (v === "paste") setFile(null);
-                if (v === "drop") setHtmlContent("");
-              }}
-            >
-              <TabsList variant="line" className="mb-6">
-                <TabsTrigger value="paste">粘贴代码</TabsTrigger>
-                <TabsTrigger value="drop">上传文件</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="paste" className="min-h-[300px] flex flex-col">
-                <textarea
-                  className="w-full flex-1 rounded-lg border border-border bg-background p-4 text-sm font-mono outline-none resize-y leading-relaxed focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-                  placeholder="在此粘贴你的 HTML/CSS/JS 代码..."
-                  value={htmlContent}
-                  onChange={(e) => setHtmlContent(e.target.value)}
-                  spellCheck={false}
-                />
-              </TabsContent>
-
-              <TabsContent value="drop" className="min-h-[300px]">
-                <DropZone file={file} onFileSelect={setFile} />
-              </TabsContent>
-            </Tabs>
-
-            <div className="mt-2 mb-2 flex justify-end">
-              <span
-                className={`text-xs ${
-                  contentSize > 5 * 1024 * 1024
-                    ? "text-destructive"
-                    : "text-muted-foreground"
-                }`}
-              >
-                {formatSize(contentSize)} / 5 MB
-              </span>
-            </div>
-
-            {error && (
-              <div className="mb-4 rounded-lg bg-destructive/10 px-4 py-3 text-sm text-destructive">
-                {error}
-              </div>
-            )}
-
-            <Button
-              className="w-full py-6 text-base"
-              disabled={!canSubmit || loading}
-              onClick={handleSubmit}
-            >
-              {loading ? "发布中..." : "发布页面"}
-            </Button>
-          </CardContent>
-        </Card>
-
-          <p className="mt-6 text-sm text-muted-foreground">
-            匿名上传 · 24小时后自动销毁 · 单文件最大 5MB
-          </p>
-        </section>
-
-          <StatsSection />
-      </main>
-
-      <AppFooter />
-    </div>
-    );
-  }
-
-  // ========== 已登录状态 — 丰富布局 ==========
   return (
     <div className="flex min-h-screen flex-col">
       <AppNav user={user} />
-
       <main className="flex-1">
-        <section className="mx-auto max-w-5xl px-6 pt-12 pb-8 text-center">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-            免费·快速·生成属于你的mini站
-          </h1>
-          <p className="mt-3 text-lg text-muted-foreground">
-            粘贴或上传，30 秒生成你的 mini 站
-          </p>
+        {/* Hero */}
+        <section className="relative overflow-hidden bg-gradient-to-b from-[#006c49]/10 via-[#006c49]/[0.02] to-background dark:from-[#4edea3]/10 dark:via-[#4edea3]/[0.02] dark:to-background pb-12 pt-20 md:pt-28">
+          <div className="mx-auto max-w-4xl px-6 text-center">
+            <div className="mb-5 flex justify-center">
+              <div className="inline-flex size-16 items-center justify-center rounded-2xl bg-[#006c49] text-white dark:bg-[#4edea3] dark:text-[#002113] shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)]">
+                <Code2 className="size-8" />
+              </div>
+            </div>
+            <h1 className="text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-[52px] lg:leading-[1.15]">
+              学习页面快闪托管
+            </h1>
+            <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground leading-relaxed md:text-xl">
+              粘贴或上传你的互动学习单页，30秒生成分享链接。
+              零成本、免注册、24小时自动销毁。
+            </p>
+            <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+              <Button
+                size="lg"
+                className="gap-2 h-11 px-6 text-base rounded-xl"
+                onClick={scrollToUpload}
+              >
+                开始上传
+                <ArrowDown className="size-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                className="text-base h-11 px-6 rounded-xl"
+                onClick={() => window.location.href = "/square"}
+              >
+                浏览学习广场
+              </Button>
+            </div>
+          </div>
         </section>
 
-        <section className="mx-auto max-w-2xl px-6 pb-8">
-          <Card>
-            <CardContent className="p-6">
-              <Tabs
-                value={mode}
-                onValueChange={(v) => {
-                  setMode(v as TabMode);
-                  if (v === "paste") setFile(null);
-                  if (v === "drop") setHtmlContent("");
-                }}
-              >
-                <TabsList variant="line" className="mb-6">
-                  <TabsTrigger value="paste">粘贴代码</TabsTrigger>
-                  <TabsTrigger value="drop">上传文件</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="paste" className="min-h-[300px] flex flex-col">
-                  <textarea
-                    className="w-full flex-1 rounded-lg border border-border bg-background p-4 text-sm font-mono outline-none resize-y leading-relaxed focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-                    placeholder="在此粘贴你的 HTML/CSS/JS 代码..."
-                    value={htmlContent}
-                    onChange={(e) => setHtmlContent(e.target.value)}
-                    spellCheck={false}
-                  />
-                </TabsContent>
-
-                <TabsContent value="drop" className="min-h-[300px]">
-                  <DropZone file={file} onFileSelect={setFile} />
-                </TabsContent>
-              </Tabs>
-
-              <div className="mt-2 mb-2 flex justify-end">
-                <span
-                  className={`text-xs ${
-                    contentSize > 5 * 1024 * 1024
-                      ? "text-destructive"
-                      : "text-muted-foreground"
-                  }`}
-                >
-                  {formatSize(contentSize)} / 5 MB
-                </span>
-              </div>
-
-              {/* 已登录额外字段：标题 */}
-              <div className="mb-3">
-                <label className="text-sm font-medium text-foreground">
-                  标题{" "}
-                  <span className="font-normal text-muted-foreground">
-                    (可选)
-                  </span>
-                </label>
-                <Input
-                  className="mt-1"
-                  placeholder="输入页面标题..."
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                />
-              </div>
-
-              {/* 已登录额外字段：类型 */}
-              <div className="mb-3">
-                <label className="text-sm font-medium text-foreground">
-                  类型
-                </label>
-                <select
-                  className="mt-1 flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                >
-                  <option value="chinese">语文</option>
-                  <option value="math">数学</option>
-                  <option value="english">英语</option>
-                  <option value="physics">物理</option>
-                  <option value="chemistry">化学</option>
-                  <option value="history">历史</option>
-                  <option value="biology">生物</option>
-                  <option value="geography">地理</option>
-                  <option value="other">其他</option>
-                </select>
-              </div>
-
-              {/* 已登录额外字段：标签 */}
-              <div className="mb-3">
-                <label className="text-sm font-medium text-foreground">
-                  标签{" "}
-                  <span className="font-normal text-muted-foreground">
-                    (可选，逗号分隔)
-                  </span>
-                </label>
-                <Input
-                  className="mt-1"
-                  placeholder="例如: HTML, 笔记, 课件"
-                  value={tags}
-                  onChange={(e) => setTags(e.target.value)}
-                />
-              </div>
-
-              {/* 已登录：分享到广场 */}
-              <label className="mb-3 flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="size-4 rounded border-border accent-primary"
-                  checked={shareToSquare}
-                  onChange={(e) => setShareToSquare(e.target.checked)}
-                />
-                <span className="text-sm text-foreground">
-                  分享到广场
-                </span>
-              </label>
-
-              {error && (
-                <div className="mb-4 rounded-lg bg-destructive/10 px-4 py-3 text-sm text-destructive">
-                  {error}
-                </div>
-              )}
-
-              <Button
-                className="w-full gap-2 py-6 text-base"
-                disabled={!canSubmit || loading}
-                onClick={handleSubmit}
-              >
-                {loading ? "发布中..." : "发布页面"}
-              </Button>
-            </CardContent>
-          </Card>
+        {/* Upload area */}
+        <section
+          ref={uploadRef}
+          className="scroll-mt-24 mx-auto max-w-2xl px-6 pb-8 -mt-8 relative z-10"
+        >
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold tracking-tight">上传你的页面</h2>
+            <p className="mt-2 text-base text-muted-foreground">
+              支持 HTML 代码粘贴或 .html/.zip 文件上传
+            </p>
+          </div>
+          <UploadForm
+            mode={mode}
+            setMode={setMode}
+            htmlContent={htmlContent}
+            setHtmlContent={setHtmlContent}
+            file={file}
+            setFile={setFile}
+            title={title}
+            setTitle={setTitle}
+            category={category}
+            setCategory={setCategory}
+            tags={tags}
+            setTags={setTags}
+            shareToSquare={shareToSquare}
+            setShareToSquare={setShareToSquare}
+            loading={loading}
+            error={error}
+            handleSubmit={handleSubmit}
+            contentSize={contentSize}
+            formatSize={formatSize}
+            canSubmit={canSubmit}
+            user={user}
+          />
         </section>
 
         <StatsSection />
+        <GuideSection />
       </main>
-
       <AppFooter />
     </div>
   );

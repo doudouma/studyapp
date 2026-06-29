@@ -67,8 +67,8 @@ export function DropZone({ file, onFileSelect }: DropZoneProps) {
 
   if (file) {
     return (
-      <div className="flex items-center gap-4 rounded-xl border border-border bg-muted/30 p-5">
-        <div className="flex size-10 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+      <div className="flex items-center gap-4 rounded-xl border border-[#d3e4fe] dark:border-[#3c4a42] bg-[#e5eeff]/40 dark:bg-[#1e314a]/40 p-5">
+        <div className="flex size-11 items-center justify-center rounded-xl bg-[#006c49]/10 text-[#006c49] dark:bg-[#4edea3]/10 dark:text-[#4edea3]">
           {file.name.endsWith(".zip") ? <Archive className="size-5" /> : <FileText className="size-5" />}
         </div>
         <div className="flex-1 min-w-0">
@@ -76,7 +76,7 @@ export function DropZone({ file, onFileSelect }: DropZoneProps) {
           <div className="text-xs text-muted-foreground mt-0.5">{formatSize(file.size)}</div>
         </div>
         <button
-          className="inline-flex items-center justify-center rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          className="inline-flex items-center justify-center rounded-lg p-1.5 text-muted-foreground hover:bg-[#e5eeff] dark:hover:bg-[#1e314a] hover:text-foreground transition-colors"
           onClick={() => onFileSelect(null)}
         >
           <X className="size-4" />
@@ -87,10 +87,10 @@ export function DropZone({ file, onFileSelect }: DropZoneProps) {
 
   return (
     <div
-      className={`flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-12 text-center cursor-pointer transition-all ${
+      className={`flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-14 text-center cursor-pointer transition-all ${
         dragOver
-          ? "border-primary bg-primary/5"
-          : "border-muted-foreground/25 bg-muted/20 hover:border-muted-foreground/40"
+          ? "border-[#006c49] bg-[#006c49]/5 dark:border-[#4edea3] dark:bg-[#4edea3]/5"
+          : "border-[#bbcabf]/40 bg-[#e5eeff]/30 dark:border-[#3c4a42] dark:bg-[#1e314a]/30 hover:border-[#bbcabf]/60"
       }`}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
@@ -104,13 +104,13 @@ export function DropZone({ file, onFileSelect }: DropZoneProps) {
         className="hidden"
         onChange={handleInputChange}
       />
-      <div className="flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
-        <Upload className="size-6" />
+      <div className="flex size-14 items-center justify-center rounded-2xl bg-[#006c49]/10 text-[#006c49] dark:bg-[#4edea3]/10 dark:text-[#4edea3]">
+        <Upload className="size-7" />
       </div>
-      <div className="text-sm text-foreground mb-1">
+      <div className="mt-4 text-base text-foreground mb-1">
         拖拽 <strong>.html</strong> 或 <strong>.zip</strong> 文件到此处
       </div>
-      <div className="text-xs text-muted-foreground">或点击选择文件</div>
+      <div className="text-sm text-muted-foreground">或点击选择文件</div>
     </div>
   );
 }

@@ -80,8 +80,8 @@ function LinksPage() {
         <AppNav user={null} />
         <main className="flex flex-1 items-center justify-center p-8">
           <div className="text-center">
-            <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-full bg-primary/10">
-              <LinkIcon className="size-6 text-primary" />
+            <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-[#006c49]/10 dark:bg-[#4edea3]/10">
+              <LinkIcon className="size-6 text-[#006c49] dark:text-[#4edea3]" />
             </div>
             <h1 className="text-2xl font-bold text-foreground">我的链接</h1>
             <p className="mt-2 text-muted-foreground">
@@ -89,7 +89,7 @@ function LinksPage() {
             </p>
             <a
               href="/"
-              className="mt-4 inline-flex h-9 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+              className="mt-4 inline-flex h-10 items-center justify-center rounded-xl bg-[#006c49] px-5 text-sm font-medium text-white shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)] transition-colors hover:bg-[#006c49]/90 dark:bg-[#4edea3] dark:text-[#002113] dark:hover:bg-[#4edea3]/90"
             >
               返回首页登录
             </a>
@@ -110,16 +110,16 @@ function LinksPage() {
           <div className="mb-8 flex items-end justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <LinkIcon className="size-6 text-primary" />
+                <LinkIcon className="size-6 text-[#006c49] dark:text-[#4edea3]" />
                 <h1 className="text-2xl font-bold text-foreground">我的链接</h1>
               </div>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p className="mt-1.5 text-base text-muted-foreground">
                 管理你上传的所有 HTML 分享链接
               </p>
             </div>
             <Link
               to="/"
-              className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground shadow-xs transition-all hover:bg-primary/90 active:scale-95"
+              className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#006c49] px-5 text-sm font-medium text-white shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)] transition-all hover:bg-[#006c49]/90 active:shadow-[inset_0_-1px_0_rgba(0,0,0,0.2)] dark:bg-[#4edea3] dark:text-[#002113] dark:hover:bg-[#4edea3]/90"
             >
               发布新链接
             </Link>
@@ -127,24 +127,24 @@ function LinksPage() {
 
           {/* Content */}
           {loading ? (
-            <div className="rounded-xl border border-border bg-card p-12">
+            <div className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] p-12">
               <div className="space-y-4">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="flex items-center gap-4">
-                    <div className="size-10 animate-pulse rounded-lg bg-muted" />
+                    <div className="size-10 animate-pulse rounded-xl bg-[#e5eeff] dark:bg-[#1e314a]" />
                     <div className="flex-1 space-y-2">
-                      <div className="h-4 w-1/3 animate-pulse rounded bg-muted" />
-                      <div className="h-3 w-1/5 animate-pulse rounded bg-muted" />
+                      <div className="h-4 w-1/3 animate-pulse rounded bg-[#e5eeff] dark:bg-[#1e314a]" />
+                      <div className="h-3 w-1/5 animate-pulse rounded bg-[#e5eeff] dark:bg-[#1e314a]" />
                     </div>
                   </div>
                 ))}
               </div>
             </div>
           ) : error ? (
-            <div className="rounded-xl border border-border bg-card p-12 text-center">
+            <div className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] p-12 text-center">
               <p className="text-destructive">{error}</p>
               <button
-                className="mt-4 text-sm text-primary hover:underline"
+                className="mt-4 text-sm text-[#0058be] dark:text-[#adc6ff] hover:underline"
                 onClick={fetchPages}
               >
                 重试

@@ -220,25 +220,25 @@ function AdminPage() {
     <div className="flex min-h-screen flex-col">
       <AppNav user={user} />
 
-      <main className="flex-1 bg-muted/30">
+      <main className="flex-1 bg-[#eff4ff] dark:bg-[#1e314a]">
         <div className="mx-auto max-w-5xl px-6 pt-10 pb-12">
           {/* Header */}
-          <div className="mb-6 flex items-end justify-between">
+          <div className="mb-8 flex items-end justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <Shield className="size-6 text-primary" />
+                <Shield className="size-6 text-[#006c49] dark:text-[#4edea3]" />
                 <h1 className="text-2xl font-bold text-foreground">管理后台</h1>
               </div>
             </div>
           </div>
 
           {/* Tab toggle */}
-          <div className="mb-6 flex items-center gap-2 border-b border-border pb-3">
+          <div className="mb-6 flex items-center gap-2 border-b border-[#d3e4fe] dark:border-[#3c4a42] pb-3">
             <button
               onClick={() => setTab("users")}
               className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-all ${
                 tab === "users"
-                  ? "bg-primary text-primary-foreground"
+                  ? "bg-[#006c49] text-white dark:bg-[#4edea3] dark:text-[#002113]"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -248,7 +248,7 @@ function AdminPage() {
               onClick={() => setTab("pages")}
               className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-all ${
                 tab === "pages"
-                  ? "bg-primary text-primary-foreground"
+                  ? "bg-[#006c49] text-white dark:bg-[#4edea3] dark:text-[#002113]"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -259,14 +259,14 @@ function AdminPage() {
           {/* ===== User Management ===== */}
           {tab === "users" && (
             loading ? (
-            <div className="rounded-xl border border-border bg-card p-12">
+            <div className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] p-12">
               <p className="text-center text-muted-foreground">加载中...</p>
             </div>
           ) : error ? (
-            <div className="rounded-xl border border-border bg-card p-12 text-center">
+            <div className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] p-12 text-center">
               <p className="text-destructive">{error}</p>
               <button
-                className="mt-4 text-sm text-primary hover:underline"
+                className="mt-4 text-sm text-[#0058be] dark:text-[#adc6ff] hover:underline"
                 onClick={() => fetchUsers(page)}
               >
                 重试
@@ -274,37 +274,37 @@ function AdminPage() {
             </div>
           ) : (
             <>
-              <div className="overflow-x-auto rounded-xl border border-border bg-card">
+              <div className="overflow-x-auto rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b]">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-border bg-muted/50">
-                      <th className="px-4 py-3 text-left font-medium text-muted-foreground">用户</th>
-                      <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden md:table-cell">邮箱</th>
-                      <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden sm:table-cell">注册时间</th>
-                      <th className="px-4 py-3 text-left font-medium text-muted-foreground">角色</th>
-                      <th className="px-4 py-3 text-left font-medium text-muted-foreground">会员状态</th>
-                      <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden md:table-cell">过期时间</th>
-                      <th className="px-4 py-3 text-right font-medium text-muted-foreground">操作</th>
+                    <tr className="border-b border-[#d3e4fe] dark:border-[#3c4a42] bg-[#e5eeff]/30 dark:bg-[#1e314a]/30">
+                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">用户</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95] hidden md:table-cell">邮箱</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95] hidden sm:table-cell">注册时间</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">角色</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">会员状态</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95] hidden md:table-cell">过期时间</th>
+                      <th className="px-4 py-3 text-right font-medium text-[#3c4a42] dark:text-[#8f9e95]">操作</th>
                     </tr>
                   </thead>
                   <tbody>
                     {users.map((u) => (
-                      <tr key={u.id} className="border-b border-border last:border-0 hover:bg-muted/30">
+                      <tr key={u.id} className="border-b border-[#d3e4fe] dark:border-[#3c4a42] last:border-0 hover:bg-[#e5eeff]/20 dark:hover:bg-[#1e314a]/20">
                         <td className="px-4 py-3 font-medium">{u.name}</td>
                         <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">{u.email}</td>
                         <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">{formatDate(u.createdAt)}</td>
                         <td className="px-4 py-3">
-                          <span className={u.role === "admin" ? "text-primary font-semibold" : "text-muted-foreground"}>
+                          <span className={u.role === "admin" ? "text-[#006c49] dark:text-[#4edea3] font-semibold" : "text-muted-foreground"}>
                             {u.role === "admin" ? "管理员" : "用户"}
                           </span>
                         </td>
                         <td className="px-4 py-3">
                           {u.membership?.isActive ? (
-                            <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">有效会员</span>
+                            <span className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/20 dark:text-green-400">有效会员</span>
                           ) : u.membership && !u.membership.isActive ? (
-                            <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">已过期</span>
+                            <span className="inline-flex items-center rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-700 dark:bg-red-900/20 dark:text-red-400">已过期</span>
                           ) : (
-                            <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">非会员</span>
+                            <span className="inline-flex items-center rounded-full bg-gray-50 px-2.5 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400">非会员</span>
                           )}
                         </td>
                         <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">
@@ -340,34 +340,34 @@ function AdminPage() {
           {/* ===== Page Management ===== */}
           {tab === "pages" && (
             pagesLoading ? (
-              <div className="rounded-xl border border-border bg-card p-12">
+              <div className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] p-12">
                 <p className="text-center text-muted-foreground">加载中...</p>
               </div>
             ) : (
               <>
-                <div className="overflow-x-auto rounded-xl border border-border bg-card">
+                <div className="overflow-x-auto rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b]">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-border bg-muted/50">
-                        <th className="px-4 py-3 text-left font-medium text-muted-foreground">标题</th>
-                        <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden md:table-cell">作者</th>
-                        <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden sm:table-cell">分类</th>
-                        <th className="px-4 py-3 text-left font-medium text-muted-foreground">浏览</th>
-                        <th className="px-4 py-3 text-left font-medium text-muted-foreground">广场</th>
-                        <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden md:table-cell">创建时间</th>
-                        <th className="px-4 py-3 text-right font-medium text-muted-foreground">操作</th>
+                      <tr className="border-b border-[#d3e4fe] dark:border-[#3c4a42] bg-[#e5eeff]/30 dark:bg-[#1e314a]/30">
+                        <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">标题</th>
+                        <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95] hidden md:table-cell">作者</th>
+                        <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95] hidden sm:table-cell">分类</th>
+                        <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">浏览</th>
+                        <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">广场</th>
+                        <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95] hidden md:table-cell">创建时间</th>
+                        <th className="px-4 py-3 text-right font-medium text-[#3c4a42] dark:text-[#8f9e95]">操作</th>
                       </tr>
                     </thead>
                     <tbody>
                       {pages.map((p) => (
-                        <tr key={p.id} className="border-b border-border last:border-0 hover:bg-muted/30">
+                        <tr key={p.id} className="border-b border-[#d3e4fe] dark:border-[#3c4a42] last:border-0 hover:bg-[#e5eeff]/20 dark:hover:bg-[#1e314a]/20">
                           <td className="px-4 py-3 font-medium max-w-[200px] truncate">{p.title || "未命名"}</td>
                           <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">{p.userName || p.userEmail || "匿名"}</td>
                           <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">{p.category}</td>
                           <td className="px-4 py-3 text-muted-foreground">{p.viewCount}</td>
                           <td className="px-4 py-3">
                             {p.isSharedToSquare ? (
-                              <span className="text-xs font-medium text-green-600">已分享</span>
+                              <span className="text-xs font-medium text-green-600 dark:text-green-400">已分享</span>
                             ) : (
                               <span className="text-xs text-muted-foreground">-</span>
                             )}
