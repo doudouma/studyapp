@@ -71,7 +71,6 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
         setError(result.error.message || "登录失败");
       } else {
         onSuccess();
-        window.location.reload();
       }
     } catch {
       setError("网络错误，请重试");
@@ -96,7 +95,6 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
         setError(result.error.message || "注册失败");
       } else {
         onSuccess();
-        window.location.reload();
       }
     } catch {
       setError("网络错误，请重试");
@@ -208,7 +206,7 @@ export function AppNav({ user, searchQuery, onSearchChange }: AppNavProps) {
   const handleLogout = async () => {
     setMenuOpen(false);
     await authClient.signOut();
-    window.location.reload();
+    navigate({ to: "/" });
   };
 
   const avatarFallback = user?.name?.charAt(0).toUpperCase() || "U";
@@ -243,7 +241,7 @@ export function AppNav({ user, searchQuery, onSearchChange }: AppNavProps) {
               <DialogHeader>
                 <DialogTitle>登录 100mini</DialogTitle>
               </DialogHeader>
-              <LoginForm onSuccess={() => setAuthOpen(false)} />
+              <LoginForm onSuccess={() => { setAuthOpen(false); navigate({ to: "/" }); }} />
             </DialogContent>
           </Dialog>
         </nav>
@@ -326,14 +324,13 @@ export function AppNav({ user, searchQuery, onSearchChange }: AppNavProps) {
                   )}
                 </div>
                 {user.role === "admin" && (
-                  <a
-                    href="/admin"
-                    className="flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-muted"
-                    onClick={() => setMenuOpen(false)}
+                  <button
+                    className="flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-muted cursor-pointer"
+                    onClick={() => { setMenuOpen(false); navigate({ to: "/admin" }); }}
                   >
                     <Settings className="size-4" />
                     管理后台
-                  </a>
+                  </button>
                 )}
                 <button
                   className="flex w-full items-center gap-2 rounded-b-lg px-3 py-2 text-sm transition-colors hover:bg-muted"

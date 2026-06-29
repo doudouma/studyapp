@@ -1,4 +1,4 @@
-import { createRootRoute, HeadContent, Scripts, Outlet } from "@tanstack/react-router";
+import { createRootRoute, HeadContent, Scripts, Outlet, Link } from "@tanstack/react-router";
 import "~/styles/app.css";
 
 export const Route = createRootRoute({
@@ -48,9 +48,9 @@ function NotFound() {
     <main className="flex min-h-screen flex-col items-center justify-center p-8 text-center">
       <h1 className="text-4xl font-bold text-foreground">404</h1>
       <p className="mt-2 text-muted-foreground">页面不存在</p>
-      <a href="/" className="mt-4 text-sm text-primary hover:underline">
+      <Link to="/" className="mt-4 text-sm text-primary hover:underline">
         返回首页
-      </a>
+      </Link>
     </main>
   );
 }

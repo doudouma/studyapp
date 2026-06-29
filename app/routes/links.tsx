@@ -87,12 +87,12 @@ function LinksPage() {
             <p className="mt-2 text-muted-foreground">
               请登录后查看和管理你的链接
             </p>
-            <a
-              href="/"
+            <Link
+              to="/"
               className="mt-4 inline-flex h-10 items-center justify-center rounded-xl bg-[#006c49] px-5 text-sm font-medium text-white shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)] transition-colors hover:bg-[#006c49]/90 dark:bg-[#4edea3] dark:text-[#002113] dark:hover:bg-[#4edea3]/90"
             >
               返回首页登录
-            </a>
+            </Link>
           </div>
         </main>
         <AppFooter />

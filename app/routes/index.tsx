@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { ArrowDown, Code2, Clock, Infinity, Tags, Share2, List, Crown, LogIn } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 import { DropZone } from "~/components/DropZone";
 import { SuccessCard } from "~/components/SuccessCard";
 import { AppNav } from "~/components/HomeHeader";
@@ -250,6 +251,7 @@ function UploadForm({
 }
 
 function HomePage() {
+  const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const uploadRef = useRef<HTMLElement>(null);
@@ -389,7 +391,7 @@ function HomePage() {
                 variant="outline"
                 size="lg"
                 className="text-base h-11 px-6 rounded-xl"
-                onClick={() => window.location.href = "/square"}
+                onClick={() => navigate({ to: "/square" })}
               >
                 浏览学习广场
               </Button>

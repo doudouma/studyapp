@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "@tanstack/react-router";
 import { FileText, ExternalLink, Copy, Trash2, Loader2, QrCode } from "lucide-react";
 import { Button } from "~/components/ui/button";
 
@@ -124,12 +125,12 @@ export function LinksTable({ pages, total, limit, onDelete }: LinksTableProps) {
         <p className="mt-1.5 text-sm text-muted-foreground">
           上传你的第一个 HTML 页面，链接就会出现在这里
         </p>
-        <a
-          href="/"
+        <Link
+          to="/"
           className="mt-5 inline-flex h-10 items-center justify-center rounded-xl bg-[#006c49] px-5 text-sm font-medium text-white shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)] transition-colors hover:bg-[#006c49]/90 dark:bg-[#4edea3] dark:text-[#002113] dark:hover:bg-[#4edea3]/90"
         >
           去上传
-        </a>
+        </Link>
       </div>
     );
   }
