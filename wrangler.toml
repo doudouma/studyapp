@@ -4,7 +4,15 @@ compatibility_date = "2026-05-31"
 compatibility_flags = ["nodejs_compat_v2"]
 account_id = "461422f5f136a7492f1acac1fdf69004"
 
+workers_dev = true
+preview_urls = true
+
 assets = { directory = "dist/client", binding = "ASSETS" }
+
+routes = [
+  { pattern = "100mini.com", custom_domain = true },
+  { pattern = "www.100mini.com", custom_domain = true },
+]
 
 [[r2_buckets]]
 binding = "BUCKET"
