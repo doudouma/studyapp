@@ -99,13 +99,10 @@ export function GuideSection() {
             快速上手
           </h2>
           <div className="grid gap-10 md:grid-cols-3">
-            {steps.map((step, i) => {
+            {steps.map((step) => {
               const Icon = step.icon;
               return (
                 <div key={step.title} className="relative flex flex-col items-center text-center">
-                  <div className="mb-4 flex size-11 items-center justify-center rounded-full bg-[#006c49] text-base font-bold text-white dark:bg-[#4edea3] dark:text-[#002113] shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)]">
-                    {i + 1}
-                  </div>
                   <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-[#006c49]/10 text-[#006c49] dark:bg-[#4edea3]/10 dark:text-[#4edea3]">
                     <Icon className="size-7" />
                   </div>
