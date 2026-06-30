@@ -16,10 +16,10 @@ export function AppFooter() {
           <Link to="/" className="flex items-center gap-2">
             <Code2 className="size-4 text-[#006c49] dark:text-[#4edea3]" />
             <span className="text-sm font-bold text-[#006c49] dark:text-[#4edea3]">100mini</span>
-          </Link>
-          <p className="text-xs text-muted-foreground">
+             <p className="text-xs text-muted-foreground">
             每个人都能建的小网站
           </p>
+          </Link>
         </div>
         <div className="flex flex-wrap justify-center gap-6">
           {footerLinks.map((link) => (
