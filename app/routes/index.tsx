@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { ArrowDown, Code2, Clock, Infinity, Tags, Share2, List, Crown, LogIn } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { DropZone } from "~/components/DropZone";
@@ -12,7 +12,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/components/ui/tabs";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { createFileRoute } from "@tanstack/react-router";
-import { authClient } from "~/lib/auth-client";
+import { useAuth } from "~/lib/auth-context";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -252,16 +252,8 @@ function UploadForm({
 
 function HomePage() {
   const navigate = useNavigate();
-  const [user, setUser] = useState<any>(null);
-  const [authLoading, setAuthLoading] = useState(true);
+  const { user, authLoading } = useAuth();
   const uploadRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    authClient.getSession().then((session: any) => {
-      setUser(session?.data?.user ?? null);
-      setAuthLoading(false);
-    });
-  }, []);
 
   const [mode, setMode] = useState<TabMode>("paste");
   const [htmlContent, setHtmlContent] = useState("");
@@ -344,7 +336,7 @@ function HomePage() {
   if (result) {
     return (
       <div className="flex min-h-screen flex-col">
-        <AppNav user={user} />
+        <AppNav />
         <main className="flex flex-1 flex-col items-center justify-center p-8">
           <SuccessCard
             url={result.url}
@@ -361,7 +353,7 @@ function HomePage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <AppNav user={user} />
+      <AppNav />
       <main className="flex-1">
         {/* Hero */}
         <section className="relative overflow-hidden bg-gradient-to-b from-[#006c49]/10 via-[#006c49]/[0.02] to-background dark:from-[#4edea3]/10 dark:via-[#4edea3]/[0.02] dark:to-background pb-12 pt-20 md:pt-28">

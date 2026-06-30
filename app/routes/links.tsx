@@ -4,7 +4,7 @@ import { Link as LinkIcon } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { LinksTable } from "~/components/LinksTable";
-import { authClient } from "~/lib/auth-client";
+import { useAuth } from "~/lib/auth-context";
 
 export const Route = createFileRoute("/links")({
   head: () => ({
@@ -34,8 +34,7 @@ interface PagesResponse {
 }
 
 function LinksPage() {
-  const [user, setUser] = useState<any>(null);
-  const [authLoading, setAuthLoading] = useState(true);
+  const { user, authLoading } = useAuth();
   const [data, setData] = useState<PagesResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -59,17 +58,12 @@ function LinksPage() {
   };
 
   useEffect(() => {
-    authClient.getSession().then((session: any) => {
-      const currentUser = session?.data?.user ?? null;
-      setUser(currentUser);
-      setAuthLoading(false);
-      if (currentUser) {
-        fetchPages();
-      } else {
-        setLoading(false);
-      }
-    });
-  }, []);
+    if (user) {
+      fetchPages();
+    } else if (!authLoading) {
+      setLoading(false);
+    }
+  }, [user, authLoading]);
 
   if (authLoading) return null;
 
@@ -77,7 +71,7 @@ function LinksPage() {
   if (!user) {
     return (
       <div className="flex min-h-screen flex-col">
-        <AppNav user={null} />
+        <AppNav />
         <main className="flex flex-1 items-center justify-center p-8">
           <div className="text-center">
             <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-[#006c49]/10 dark:bg-[#4edea3]/10">
@@ -102,7 +96,7 @@ function LinksPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <AppNav user={user} />
+      <AppNav />
 
       <main className="flex-1">
         <div className="mx-auto max-w-5xl px-6 pt-10 pb-12">

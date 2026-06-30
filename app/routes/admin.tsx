@@ -4,7 +4,7 @@ import { Shield, Trash2 } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { Button } from "~/components/ui/button";
-import { authClient } from "~/lib/auth-client";
+import { useAuth } from "~/lib/auth-context";
 import {
   Dialog,
   DialogContent,
@@ -67,9 +67,8 @@ type DurationOption = 1 | 3 | 6 | 12;
 
 function AdminPage() {
   const navigate = useNavigate();
+  const { user, authLoading } = useAuth();
   const [tab, setTab] = useState<"users" | "pages">("users");
-  const [user, setUser] = useState<any>(null);
-  const [authLoading, setAuthLoading] = useState(true);
 
   // User list state
   const [users, setUsers] = useState<UserData[]>([]);
@@ -101,15 +100,12 @@ function AdminPage() {
 
   // Check auth and admin role
   useEffect(() => {
-    authClient.getSession().then((session: any) => {
-      const currentUser = session?.data?.user ?? null;
-      setUser(currentUser);
-      setAuthLoading(false);
-      if (!currentUser || currentUser.role !== "admin") {
+    if (!authLoading) {
+      if (!user || user.role !== "admin") {
         navigate({ to: "/" });
       }
-    });
-  }, []);
+    }
+  }, [user, authLoading]);
 
   const fetchUsers = async (p: number) => {
     setLoading(true);
@@ -218,7 +214,7 @@ function AdminPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <AppNav user={user} />
+      <AppNav />
 
       <main className="flex-1 bg-[#eff4ff] dark:bg-[#1e314a]">
         <div className="mx-auto max-w-5xl px-6 pt-10 pb-12">

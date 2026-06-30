@@ -1,4 +1,5 @@
 import { createRootRoute, HeadContent, Scripts, Outlet, Link } from "@tanstack/react-router";
+import { AuthProvider } from "~/lib/auth-context";
 import "~/styles/app.css";
 
 export const Route = createRootRoute({
@@ -81,7 +82,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   return (
     <RootDocument>
-      <Outlet />
+      <AuthProvider>
+        <Outlet />
+      </AuthProvider>
     </RootDocument>
   );
 }

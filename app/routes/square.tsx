@@ -4,7 +4,7 @@ import { Globe } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { SquareGrid } from "~/components/SquareGrid";
-import { authClient } from "~/lib/auth-client";
+import { useAuth } from "~/lib/auth-context";
 
 export const Route = createFileRoute("/square")({
   validateSearch: (search: Record<string, string | undefined>) => ({
@@ -49,17 +49,11 @@ const CATEGORIES = [
 
 function SquarePage() {
   const { q } = Route.useSearch();
-  const [user, setUser] = useState<any>(null);
+  const { user } = useAuth();
   const [items, setItems] = useState<SquareItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("");
   const [searchQuery, setSearchQuery] = useState(q);
-
-  useEffect(() => {
-    authClient.getSession().then((session: any) => {
-      setUser(session?.data?.user ?? null);
-    });
-  }, []);
 
   useEffect(() => {
     (async () => {
@@ -90,7 +84,6 @@ function SquarePage() {
   return (
     <div className="flex min-h-screen flex-col">
       <AppNav
-        user={user}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
       />

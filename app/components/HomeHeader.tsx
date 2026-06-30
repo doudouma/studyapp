@@ -4,6 +4,7 @@ import { Code2, Search, Bell, Settings, LogOut } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { authClient } from "~/lib/auth-client";
+import { useAuth } from "~/lib/auth-context";
 import {
   Dialog,
   DialogContent,
@@ -17,16 +18,7 @@ import {
   TabsTrigger,
 } from "~/components/ui/tabs";
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  image?: string;
-  role?: string;
-}
-
 interface AppNavProps {
-  user: User | null;
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
 }
@@ -151,7 +143,8 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
   );
 }
 
-export function AppNav({ user, searchQuery, onSearchChange }: AppNavProps) {
+export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
+  const { user, refreshAuth } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [localSearch, setLocalSearch] = useState("");
@@ -206,6 +199,7 @@ export function AppNav({ user, searchQuery, onSearchChange }: AppNavProps) {
   const handleLogout = async () => {
     setMenuOpen(false);
     await authClient.signOut();
+    refreshAuth();
     navigate({ to: "/" });
   };
 
@@ -241,7 +235,7 @@ export function AppNav({ user, searchQuery, onSearchChange }: AppNavProps) {
               <DialogHeader>
                 <DialogTitle>登录 100mini</DialogTitle>
               </DialogHeader>
-              <LoginForm onSuccess={() => { setAuthOpen(false); navigate({ to: "/" }); }} />
+              <LoginForm onSuccess={() => { setAuthOpen(false); refreshAuth(); navigate({ to: "/" }); }} />
             </DialogContent>
           </Dialog>
         </nav>
