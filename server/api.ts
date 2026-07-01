@@ -446,12 +446,12 @@ api.post("/api/upload", async (c) => {
   const isPermanent = wantPermanent;
   const expiresAt = isPermanent ? null : new Date(now + 24 * 60 * 60 * 1000);
 
-  // Always record in D1
-  if (c.env.D1) {
+  // Record in D1 only for logged-in users
+  if (user && c.env.D1) {
     const db = createDb(c.env.D1);
     await db.insert(page).values({
       id,
-      userId: user?.id ?? null,
+      userId: user.id,
       title: title || "未命名",
       category,
       tags,

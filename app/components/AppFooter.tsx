@@ -17,7 +17,7 @@ export function AppFooter() {
             <Code2 className="size-4 text-[#006c49] dark:text-[#4edea3]" />
             <span className="text-sm font-bold text-[#006c49] dark:text-[#4edea3]">100mini</span>
              <p className="text-xs text-muted-foreground">
-            每个人都能建的小网站
+            每个人都能建的mini站
           </p>
           </Link>
         </div>
