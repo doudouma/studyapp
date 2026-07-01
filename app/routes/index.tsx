@@ -345,6 +345,7 @@ function HomePage() {
             isPermanent={result.isPermanent}
             pageId={result.id}
             onReset={handleReset}
+            user={user}
           />
         </main>
         <AppFooter />

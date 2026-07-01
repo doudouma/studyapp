@@ -11,6 +11,7 @@ interface SuccessCardProps {
   isPermanent?: boolean;
   pageId: string;
   onReset: () => void;
+  user?: any;
 }
 
 export function SuccessCard({ url, expiresAt, isPermanent, pageId, onReset }: SuccessCardProps) {
@@ -50,15 +51,15 @@ export function SuccessCard({ url, expiresAt, isPermanent, pageId, onReset }: Su
     });
   }, [fullUrl]);
 
-  // Trigger thumbnail capture on mount (once)
+  // Trigger thumbnail capture on mount (once) — logged-in users only
   useEffect(() => {
-    if (capturedRef.current) return;
+    if (!user || capturedRef.current) return;
     capturedRef.current = true;
 
     captureAndUploadThumbnail(pageId)
       .then(() => setThumbnailReady(true))
       .catch(() => setThumbnailFailed(true));
-  }, [pageId]);
+  }, [pageId, user]);
 
   const expiryDate = expiresAt ? new Date(expiresAt).toLocaleString("zh-CN", {
     month: "numeric",
