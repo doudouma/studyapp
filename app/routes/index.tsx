@@ -360,11 +360,11 @@ function HomePage() {
         {/* Hero */}
         <section className="relative overflow-hidden bg-gradient-to-b from-[#006c49]/10 via-[#006c49]/[0.02] to-background dark:from-[#4edea3]/10 dark:via-[#4edea3]/[0.02] dark:to-background pb-12 pt-20 md:pt-28">
           <div className="mx-auto max-w-4xl px-6 text-center">
-            <div className="mb-5 flex justify-center">
+            {/* <div className="mb-5 flex justify-center">
               <div className="inline-flex size-16 items-center justify-center rounded-2xl bg-[#006c49] text-white dark:bg-[#4edea3] dark:text-[#002113] shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)]">
                 <Code2 className="size-8" />
               </div>
-            </div>
+            </div> */}
             <h1 className="text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-[52px] lg:leading-[1.15]">
               学习页面快闪托管
             </h1>
