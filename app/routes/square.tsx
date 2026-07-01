@@ -36,6 +36,7 @@ interface SquareItem {
 
 const CATEGORIES = [
   { key: "", label: "全部" },
+  { key: "general", label: "通用" },
   { key: "chinese", label: "语文" },
   { key: "math", label: "数学" },
   { key: "english", label: "英语" },

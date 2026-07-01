@@ -151,6 +151,7 @@ function UploadForm({
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
               >
+                <option value="general">通用</option>
                 <option value="chinese">语文</option>
                 <option value="math">数学</option>
                 <option value="english">英语</option>
