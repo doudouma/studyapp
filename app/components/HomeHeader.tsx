@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { Code2, Search, Bell, Settings, LogOut } from "lucide-react";
+import { Code2, Search, Bell, Settings, LogOut, Menu, X } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { authClient } from "~/lib/auth-client";
@@ -37,6 +37,28 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
         isActive
           ? "border-b-2 border-primary pb-0.5 text-sm font-semibold text-primary"
           : "text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+      }
+    >
+      {children}
+    </Link>
+  );
+}
+
+function MobileNavLink({ href, onClick, children }: { href: string; onClick: () => void; children: React.ReactNode }) {
+  const location = useLocation();
+  const isActive =
+    href === "/"
+      ? location.pathname === "/"
+      : location.pathname.startsWith(href);
+
+  return (
+    <Link
+      to={href}
+      onClick={onClick}
+      className={
+        isActive
+          ? "block rounded-lg bg-[#006c49]/10 dark:bg-[#4edea3]/10 px-4 py-2.5 text-sm font-semibold text-[#006c49] dark:text-[#4edea3]"
+          : "block rounded-lg px-4 py-2.5 text-sm font-medium text-muted-foreground hover:bg-[#e5eeff] dark:hover:bg-[#1e314a] transition-colors"
       }
     >
       {children}
@@ -147,6 +169,7 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
   const { user, refreshAuth } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [localSearch, setLocalSearch] = useState("");
   const [isMember, setIsMember] = useState(false);
   const [membershipExpiresAt, setMembershipExpiresAt] = useState<string | null>(null);
@@ -223,6 +246,13 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
             </div>
           </div>
 
+          <button
+            className="flex items-center justify-center size-9 md:hidden"
+            onClick={() => setMobileNavOpen(!mobileNavOpen)}
+            aria-label="菜单"
+          >
+            {mobileNavOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+          </button>
           <Dialog open={authOpen} onOpenChange={setAuthOpen}>
             <Button
               variant="ghost"
@@ -239,6 +269,14 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
             </DialogContent>
           </Dialog>
         </nav>
+        {mobileNavOpen && (
+          <div className="border-t border-[#d3e4fe] dark:border-[#3c4a42] bg-white dark:bg-[#0b1c30] md:hidden">
+            <div className="flex flex-col gap-1 px-6 py-4">
+              <MobileNavLink href="/" onClick={() => setMobileNavOpen(false)}>首页</MobileNavLink>
+              <MobileNavLink href="/square" onClick={() => setMobileNavOpen(false)}>广场</MobileNavLink>
+            </div>
+          </div>
+        )}
       </header>
     );
   }
@@ -267,6 +305,13 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
 
         {/* Right: Search + Icons + Avatar */}
         <div className="flex items-center gap-3">
+          <button
+            className="flex items-center justify-center size-9 md:hidden"
+            onClick={() => setMobileNavOpen(!mobileNavOpen)}
+            aria-label="菜单"
+          >
+            {mobileNavOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+          </button>
           <div className="relative hidden sm:block">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -338,6 +383,18 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
           </div>
         </div>
       </nav>
+      {mobileNavOpen && (
+        <div className="border-t border-[#d3e4fe] dark:border-[#3c4a42] bg-white dark:bg-[#0b1c30] md:hidden">
+          <div className="flex flex-col gap-1 px-6 py-4">
+            <MobileNavLink href="/" onClick={() => setMobileNavOpen(false)}>首页</MobileNavLink>
+            <MobileNavLink href="/square" onClick={() => setMobileNavOpen(false)}>广场</MobileNavLink>
+            <MobileNavLink href="/links" onClick={() => setMobileNavOpen(false)}>我的链接</MobileNavLink>
+            {user.role === "admin" && (
+              <MobileNavLink href="/admin" onClick={() => setMobileNavOpen(false)}>管理后台</MobileNavLink>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   );
 }
