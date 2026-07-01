@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { FileText, Eye } from "lucide-react";
 
 interface SquareItem {
@@ -28,6 +29,32 @@ const CATEGORY_LABELS: Record<string, string> = {
   geography: "地理",
   other: "其他",
 };
+
+function PreviewCell({ item }: { item: SquareItem }) {
+  const [showIframe, setShowIframe] = useState(false);
+
+  if (showIframe || !item.previewPath) {
+    return (
+      <iframe
+        src={`/p/${item.id}`}
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        sandbox="allow-scripts"
+        title={item.title}
+        loading="lazy"
+      />
+    );
+  }
+
+  return (
+    <img
+      src={`/thumbnails/${item.id}`}
+      alt={item.title}
+      className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-105"
+      loading="lazy"
+      onError={() => setShowIframe(true)}
+    />
+  );
+}
 
 function getCategoryColor(cat: string): string {
   const colors: Record<string, string> = {
@@ -72,22 +99,7 @@ export function SquareGrid({ items }: SquareGridProps) {
             className="relative block overflow-hidden"
           >
             <div className="relative overflow-hidden bg-muted" style={{ aspectRatio: "3/4" }}>
-              {item.previewPath ? (
-                <img
-                  src={`/thumbnails/${item.id}`}
-                  alt={item.title}
-                  className="absolute inset-0 w-full h-full object-cover opacity-0 animate-in fade-in duration-500 transition-transform group-hover:scale-105"
-                  loading="lazy"
-                />
-              ) : (
-                <iframe
-                  src={`/p/${item.id}`}
-                  className="absolute inset-0 w-full h-full pointer-events-none"
-                  sandbox="allow-scripts"
-                  title={item.title}
-                  loading="lazy"
-                />
-              )}
+              <PreviewCell item={item} />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4 z-10">
                 <span className="flex items-center gap-2 text-sm font-medium text-white">
                   <Eye className="size-4" />
