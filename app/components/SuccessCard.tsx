@@ -79,20 +79,20 @@ export function SuccessCard({ url, expiresAt, isPermanent, pageId, onReset, user
           {isPermanent ? "永久保留" : `将于 ${expiryDate} 后自动销毁`}
         </p>
 
-        {/* Thumbnail status */}
-        {!thumbnailReady && !thumbnailFailed && (
+        {/* Thumbnail status — logged-in users only */}
+        {user && !thumbnailReady && !thumbnailFailed && (
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <div className="size-3 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
             正在生成缩略图...
           </div>
         )}
-        {thumbnailReady && (
+        {user && thumbnailReady && (
           <div className="flex items-center gap-1.5 text-xs text-green-600">
             <ImageIcon className="size-3.5" />
             缩略图已生成
           </div>
         )}
-        {thumbnailFailed && (
+        {user && thumbnailFailed && (
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             缩略图生成失败，使用默认预览
           </div>
