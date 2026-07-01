@@ -14,7 +14,7 @@ interface SuccessCardProps {
   user?: any;
 }
 
-export function SuccessCard({ url, expiresAt, isPermanent, pageId, onReset }: SuccessCardProps) {
+export function SuccessCard({ url, expiresAt, isPermanent, pageId, onReset, user }: SuccessCardProps) {
   const [copied, setCopied] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState("");
   const [thumbnailReady, setThumbnailReady] = useState(false);
