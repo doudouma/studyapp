@@ -13,7 +13,12 @@ const TIMEOUT_MS = 8000;
 export async function captureAndUploadThumbnail(pageId: string): Promise<void> {
   const iframe = document.createElement("iframe");
   iframe.src = `/p/${pageId}`;
-  iframe.style.display = "none";
+  iframe.style.position = "absolute";
+  iframe.style.left = "-9999px";
+  iframe.style.top = "-9999px";
+  iframe.style.width = `${THUMBNAIL_WIDTH}px`;
+  iframe.style.height = "1px";
+  iframe.style.border = "none";
   document.body.appendChild(iframe);
 
   return new Promise<void>((resolve, reject) => {
@@ -43,6 +48,7 @@ export async function captureAndUploadThumbnail(pageId: string): Promise<void> {
         await uploadThumbnail(pageId, blob);
         resolve();
       } catch (err) {
+        console.warn("[thumbnail] capture failed:", err);
         reject(err);
       } finally {
         cleanup(iframe);
