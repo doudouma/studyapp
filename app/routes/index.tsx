@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ArrowDown, Code2, Clock, Infinity, Tags, Share2, List, Crown, LogIn } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { DropZone } from "~/components/DropZone";
@@ -332,9 +332,18 @@ function HomePage() {
     uploadRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // Anonymous users: redirect to uploaded page directly
+  useEffect(() => {
+    if (result && !user) {
+      window.location.href = result.url;
+    }
+  }, [result, user]);
+
   if (authLoading) return null;
 
-  if (result) {
+  if (result && !user) return null;
+
+  if (result && user) {
     return (
       <div className="flex min-h-screen flex-col">
         <AppNav />
