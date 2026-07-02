@@ -117,7 +117,7 @@ export function SquareGrid({ items }: SquareGridProps) {
               >
                 {CATEGORY_LABELS[item.category] || item.category}
               </span>
-              {item.tags && item.tags.split(",").filter(Boolean).map((tag) => (
+              {item.tags && item.tags.split(/[,，]+/).map((tag) => tag.trim()).filter(Boolean).map((tag) => (
                 <span
                   key={tag}
                   className="inline-block px-2 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground"

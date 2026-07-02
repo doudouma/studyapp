@@ -54,6 +54,7 @@ function SquarePage() {
   const [items, setItems] = useState<SquareItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("");
+  const [activeTag, setActiveTag] = useState("");
   const [searchQuery, setSearchQuery] = useState(q);
 
   useEffect(() => {
@@ -70,14 +71,26 @@ function SquarePage() {
     })();
   }, []);
 
+  const allTags = Array.from(
+    new Set(
+      items
+        .flatMap((i) => (i.tags ? i.tags.split(/[,，]+/).map((t) => t.trim()).filter(Boolean) : []))
+    )
+  ).sort();
+
   const filtered = items.filter((i) => {
     if (activeCategory && i.category !== activeCategory) return false;
+    if (activeTag) {
+      const itemTags = i.tags ? i.tags.split(/[,，]+/).map((t) => t.trim()) : [];
+      if (!itemTags.includes(activeTag)) return false;
+    }
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       const matchTitle = i.title.toLowerCase().includes(q);
       const matchUser = i.userName?.toLowerCase().includes(q) ?? false;
       const matchCategory = i.category.toLowerCase().includes(q);
-      if (!matchTitle && !matchUser && !matchCategory) return false;
+      const matchTags = i.tags?.toLowerCase().includes(q) ?? false;
+      if (!matchTitle && !matchUser && !matchCategory && !matchTags) return false;
     }
     return true;
   });
@@ -103,7 +116,7 @@ function SquarePage() {
           </div>
 
           {/* Category filter */}
-          <div className="mb-8 flex items-center gap-2 overflow-x-auto border-b border-[#d3e4fe] dark:border-[#3c4a42] pb-3">
+          <div className="mb-4 flex items-center gap-2 overflow-x-auto border-b border-[#d3e4fe] dark:border-[#3c4a42] pb-3">
             {CATEGORIES.map((cat) => (
               <button
                 key={cat.key}
@@ -118,6 +131,35 @@ function SquarePage() {
               </button>
             ))}
           </div>
+
+          {/* Tag filter */}
+          {allTags.length > 0 && (
+            <div className="mb-8 flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => setActiveTag("")}
+                className={`rounded-md px-2.5 py-1 text-xs font-medium transition-all ${
+                  activeTag === ""
+                    ? "bg-secondary text-secondary-foreground"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                }`}
+              >
+                全部标签
+              </button>
+              {allTags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => setActiveTag(activeTag === tag ? "" : tag)}
+                  className={`rounded-md px-2.5 py-1 text-xs font-medium transition-all ${
+                    activeTag === tag
+                      ? "bg-secondary text-secondary-foreground"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Grid */}
           {loading ? (

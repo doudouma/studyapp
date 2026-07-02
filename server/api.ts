@@ -365,7 +365,12 @@ api.post("/api/upload", async (c) => {
   const content = body.content;
   const file = body.file;
   const title = (body.title as string) || "";
-  const tags = (body.tags as string) || "";
+  const tags = ((body.tags as string) || "")
+    .split(/[,，\s]+/)
+    .map((t: string) => t.trim())
+    .filter(Boolean)
+    .filter((t: string, i: number, arr: string[]) => arr.indexOf(t) === i)
+    .join(",");
   const category = (body.category as string) || "general";
   const shareToSquare = body.shareToSquare === "true";
 

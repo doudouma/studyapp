@@ -11,6 +11,7 @@ import { Card, CardContent } from "~/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/components/ui/tabs";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
+import { TagInput } from "~/components/TagInput";
 import { createFileRoute } from "@tanstack/react-router";
 import { useAuth } from "~/lib/auth-context";
 
@@ -72,8 +73,8 @@ function UploadForm({
   setTitle: (v: string) => void;
   category: string;
   setCategory: (v: string) => void;
-  tags: string;
-  setTags: (v: string) => void;
+  tags: string[];
+  setTags: (v: string[]) => void;
   shareToSquare: boolean;
   setShareToSquare: (v: boolean) => void;
   loading: boolean;
@@ -168,14 +169,13 @@ function UploadForm({
               <label className="text-sm font-medium text-foreground">
                 标签{" "}
                 <span className="font-normal text-muted-foreground">
-                  (可选，逗号分隔)
+                  (可选，最多10个)
                 </span>
               </label>
-              <Input
-                className="mt-1"
-                placeholder="例如: HTML, 笔记, 课件"
-                value={tags}
-                onChange={(e) => setTags(e.target.value)}
+              <TagInput
+                tags={tags}
+                onChange={setTags}
+                placeholder="输入标签后按回车添加"
               />
             </div>
 
@@ -261,7 +261,7 @@ function HomePage() {
   const [file, setFile] = useState<File | null>(null);
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("general");
-  const [tags, setTags] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
   const [shareToSquare, setShareToSquare] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<UploadResult | null>(null);
@@ -295,7 +295,7 @@ function HomePage() {
       }
       formData.append("title", title);
       formData.append("category", category);
-      formData.append("tags", tags);
+      formData.append("tags", tags.join(","));
       formData.append("shareToSquare", String(shareToSquare));
 
       const res = await fetch("/api/upload", {
@@ -323,7 +323,7 @@ function HomePage() {
     setHtmlContent("");
     setFile(null);
     setTitle("");
-    setTags("");
+    setTags([]);
     setShareToSquare(false);
     setError(null);
   };
