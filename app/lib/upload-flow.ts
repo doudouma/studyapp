@@ -1,8 +1,7 @@
 import { snapdom } from "@zumer/snapdom";
 
 const THUMBNAIL_WIDTH = 400;
-const THUMBNAIL_SCALE = 2;
-const QUALITY = 0.8;
+const QUALITY = 0.45;
 const TIMEOUT_MS = 12000;
 
 export async function captureAndUploadThumbnail(pageId: string): Promise<void> {
@@ -12,7 +11,7 @@ export async function captureAndUploadThumbnail(pageId: string): Promise<void> {
   iframe.style.left = "-9999px";
   iframe.style.top = "-9999px";
   iframe.style.width = `${THUMBNAIL_WIDTH}px`;
-  iframe.style.height = "1px";
+  iframe.style.height = "800px";
   iframe.style.border = "none";
   document.body.appendChild(iframe);
 
@@ -25,7 +24,7 @@ export async function captureAndUploadThumbnail(pageId: string): Promise<void> {
     iframe.addEventListener("load", async () => {
       clearTimeout(timeoutId);
       try {
-        await delay(1000);
+        await delay(1500);
 
         const doc = iframe.contentDocument;
         if (!doc || !doc.body) {
@@ -34,7 +33,6 @@ export async function captureAndUploadThumbnail(pageId: string): Promise<void> {
 
         const blob = await snapdom.toBlob(doc.body, {
           width: THUMBNAIL_WIDTH,
-          scale: THUMBNAIL_SCALE,
           quality: QUALITY,
           type: "webp",
         });

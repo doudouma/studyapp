@@ -49,7 +49,7 @@ function PreviewCell({ item }: { item: SquareItem }) {
     <img
       src={`/thumbnails/${item.id}`}
       alt={item.title}
-      className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-105"
+      className="absolute inset-0 w-full h-full object-cover object-top transition-transform group-hover:scale-105"
       loading="lazy"
       onError={() => setShowIframe(true)}
     />
