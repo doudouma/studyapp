@@ -445,9 +445,22 @@ api.post("/api/upload", async (c) => {
   }
 
   const id = nanoid(7);
-  await putToStorage(c, `${id}.html`, html);
-
   const now = Date.now();
+  const isAnonymous = !user;
+
+  if (isAnonymous) {
+    // Store under tmp/ with creation timestamp for auto-cleanup
+    const key = `tmp/${id}.html`;
+    if (c.env?.BUCKET) {
+      await c.env.BUCKET.put(key, html, {
+        httpMetadata: { contentType: "text/html; charset=utf-8" },
+        customMetadata: { createdAt: String(now) },
+      });
+    }
+  } else {
+    await putToStorage(c, `${id}.html`, html);
+  }
+
   const isPermanent = wantPermanent;
   const expiresAt = isPermanent ? null : new Date(now + 24 * 60 * 60 * 1000);
 
@@ -598,14 +611,13 @@ api.get("/p/:id", async (c) => {
     return c.html(notFoundHtml(), 404);
   }
 
-  // Check expiration from D1
+  // Check expiration from D1 (logged-in user pages)
   if (c.env.D1) {
     const db = createDb(c.env.D1);
     const record = await db.select().from(page).where(eq(page.id, id)).limit(1);
     if (record.length > 0) {
       const p = record[0];
       if (p.expiresAt && new Date(p.expiresAt) < new Date()) {
-        // Expired — clean up
         if (c.env?.BUCKET) {
           await c.env.BUCKET.delete(`${id}.html`);
           await c.env.BUCKET.delete(`thumbnails/${id}.webp`);
@@ -616,16 +628,39 @@ api.get("/p/:id", async (c) => {
     }
   }
 
-  const html = await getFromStorage(c, `${id}.html`);
-  if (html === null) {
+  // Try regular path first, then tmp/ for anonymous uploads
+  const bucket = c.env?.BUCKET;
+  let obj = null;
+  let isTemp = false;
+
+  if (bucket) {
+    obj = await bucket.get(`${id}.html`);
+    if (!obj) {
+      obj = await bucket.get(`tmp/${id}.html`);
+      isTemp = true;
+    }
+  }
+
+  if (!obj) {
     return c.html(notFoundHtml(), 404);
   }
 
-  // Increment view count if the page is tracked in D1
-  if (c.env?.D1) {
-    const db = createDb(c.env.D1);
-    await db.update(page).set({ viewCount: sql`view_count + 1` }).where(eq(page.id, id));
+  // For temp files, check if expired (>24h)
+  if (isTemp) {
+    const createdAt = obj.customMetadata?.createdAt;
+    if (createdAt && Date.now() - Number(createdAt) > 24 * 60 * 60 * 1000) {
+      await bucket!.delete(`tmp/${id}.html`);
+      return c.html(notFoundHtml(), 404);
+    }
+  } else {
+    // Increment view count for tracked pages
+    if (c.env?.D1) {
+      const db = createDb(c.env.D1);
+      await db.update(page).set({ viewCount: sql`view_count + 1` }).where(eq(page.id, id));
+    }
   }
+
+  const html = await obj.text();
 
   const injected = injectBanner(html);
 
