@@ -1,26 +1,15 @@
 import { useState, useEffect } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useLoaderData } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { Globe } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { SquareGrid } from "~/components/SquareGrid";
 import { useAuth } from "~/lib/auth-context";
-
-export const Route = createFileRoute("/square")({
-  validateSearch: (search: Record<string, string | undefined>) => ({
-    q: search.q || "",
-  }),
-  head: () => ({
-    title: "链接广场 - 100mini",
-    meta: [
-      {
-        name: "description",
-        content: "发现和分享 HTML 学习资源与创意页面",
-      },
-    ],
-  }),
-  component: SquarePage,
-});
+import { createDb } from "~/../server/db";
+import { page, user } from "~/../server/db/schema";
+import { eq, desc } from "drizzle-orm";
 
 interface SquareItem {
   id: string;
@@ -33,6 +22,78 @@ interface SquareItem {
   userName: string | null;
   userImage: string | null;
 }
+
+const fetchSquareData = createServerFn().handler(async (): Promise<SquareItem[]> => {
+  const request = getRequest();
+  const env = (request as any)?.cloudflare?.env || (globalThis as any).__CF_ENV__;
+  
+  if (!env?.D1) {
+    return [];
+  }
+
+  const db = createDb(env.D1);
+  const items = await db
+    .select({
+      id: page.id,
+      title: page.title,
+      category: page.category,
+      tags: page.tags,
+      viewCount: page.viewCount,
+      sharedAt: page.sharedAt,
+      previewPath: page.previewPath,
+      userName: user.name,
+      userImage: user.image,
+    })
+    .from(page)
+    .leftJoin(user, eq(page.userId, user.id))
+    .where(eq(page.isSharedToSquare, true))
+    .orderBy(desc(page.sharedAt));
+
+  return items.map((item) => ({
+    ...item,
+    title: item.title || "",
+    category: item.category || "general",
+    tags: item.tags || "",
+    sharedAt: item.sharedAt ? new Date(item.sharedAt).getTime() : 0,
+  })) as SquareItem[];
+});
+
+export const Route = createFileRoute("/square")({
+  validateSearch: (search: Record<string, string | undefined>) => ({
+    q: search.q || "",
+  }),
+  loader: async () => {
+    const items = await fetchSquareData();
+    return { items };
+  },
+  head: () => ({
+    title: "学习广场 - 发现和分享 HTML 学习资源 | 100mini",
+    meta: [
+      {
+        name: "description",
+        content: "浏览社区分享的 HTML 学习页面、互动工具和创意作品。支持按学科、标签筛选，发现优质学习资源。",
+      },
+      { name: "keywords", content: "学习广场,HTML分享,学习资源,互动工具,教育页面,学科资源" },
+      { property: "og:type", content: "website" },
+      { property: "og:title", content: "学习广场 - 发现和分享 HTML 学习资源 | 100mini" },
+      {
+        property: "og:description",
+        content: "浏览社区分享的 HTML 学习页面、互动工具和创意作品。支持按学科、标签筛选。",
+      },
+      { property: "og:url", content: "https://100mini.com/square" },
+      { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "学习广场 - 发现和分享 HTML 学习资源 | 100mini" },
+      {
+        name: "twitter:description",
+        content: "浏览社区分享的 HTML 学习页面、互动工具和创意作品。",
+      },
+    ],
+    links: [
+      { rel: "canonical", href: "https://100mini.com/square" },
+    ],
+  }),
+  component: SquarePage,
+});
 
 const CATEGORIES = [
   { key: "", label: "全部" },
@@ -51,25 +112,15 @@ const CATEGORIES = [
 function SquarePage() {
   const { q } = Route.useSearch();
   const { user } = useAuth();
-  const [items, setItems] = useState<SquareItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { items: initialItems } = useLoaderData({ from: Route.id });
+  const [items, setItems] = useState<SquareItem[]>(initialItems);
   const [activeCategory, setActiveCategory] = useState("");
   const [activeTag, setActiveTag] = useState("");
   const [searchQuery, setSearchQuery] = useState(q);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetch(`/api/square?_=${Date.now()}`);
-        const json = await res.json();
-        setItems(json.items || []);
-      } catch {
-        // keep existing items on error
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+    setItems(initialItems);
+  }, [initialItems]);
 
   const allTags = Array.from(
     new Set(
@@ -162,25 +213,7 @@ function SquarePage() {
           )}
 
           {/* Grid */}
-          {loading ? (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div
-                  key={i}
-                  className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] overflow-hidden"
-                >
-                  <div className="aspect-[4/3] animate-pulse bg-[#e5eeff] dark:bg-[#1e314a]" />
-                  <div className="p-4 space-y-2">
-                    <div className="h-3 w-16 animate-pulse rounded-full bg-[#e5eeff] dark:bg-[#1e314a]" />
-                    <div className="h-5 w-3/4 animate-pulse rounded bg-[#e5eeff] dark:bg-[#1e314a]" />
-                    <div className="h-3 w-1/2 animate-pulse rounded bg-[#e5eeff] dark:bg-[#1e314a]" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <SquareGrid items={filtered} />
-          )}
+          <SquareGrid items={filtered} />
         </div>
       </main>
 

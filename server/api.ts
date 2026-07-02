@@ -35,8 +35,29 @@ const requireAdmin = (c: any, next: any) => {
 
 const ALLOWED_EXTENSIONS = [".html", ".htm", ".zip"];
 
-function injectBanner(html: string): string {
-  return html;
+function injectBanner(html: string, meta?: { title?: string; description?: string; url?: string }): string {
+  const seoTags = meta ? `
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="${escapeHtml(meta.title || "学习页面")} | 100mini">
+    <meta property="og:description" content="${escapeHtml(meta.description || "来自 100mini 的学习页面")}">
+    <meta property="og:url" content="${escapeHtml(meta.url || "")}">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="${escapeHtml(meta.title || "学习页面")} | 100mini">
+    <meta name="twitter:description" content="${escapeHtml(meta.description || "来自 100mini 的学习页面")}">
+    <link rel="canonical" href="${escapeHtml(meta.url || "")}">
+  ` : "";
+
+  return html.replace("</head>", `${seoTags}</head>`);
+}
+
+function escapeHtml(str: string): string {
+  return str.replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  }[c] || c));
 }
 
 async function putToStorage(
@@ -68,8 +89,48 @@ api.get("/robots.txt", (c) => {
 Allow: /
 Disallow: /p/
 
-Sitemap: https://studypage.app/sitemap.xml
+Sitemap: https://100mini.com/sitemap.xml
 `);
+});
+
+api.get("/sitemap.xml", async (c) => {
+  const baseUrl = "https://100mini.com";
+  const staticPages = [
+    { loc: "/", changefreq: "daily", priority: "1.0" },
+    { loc: "/square", changefreq: "hourly", priority: "0.9" },
+  ];
+
+  let dynamicPages: { id: string; sharedAt: Date | null }[] = [];
+  if (c.env.D1) {
+    const db = createDb(c.env.D1);
+    dynamicPages = await db
+      .select({ id: page.id, sharedAt: page.sharedAt })
+      .from(page)
+      .where(eq(page.isSharedToSquare, true))
+      .orderBy(desc(page.sharedAt))
+      .limit(1000);
+  }
+
+  const urls = [
+    ...staticPages.map((p) => `
+  <url>
+    <loc>${baseUrl}${p.loc}</loc>
+    <changefreq>${p.changefreq}</changefreq>
+    <priority>${p.priority}</priority>
+  </url>`),
+    ...dynamicPages.filter((p) => p.sharedAt).map((p) => `
+  <url>
+    <loc>${baseUrl}/p/${p.id}</loc>
+    <lastmod>${new Date(p.sharedAt!).toISOString().split("T")[0]}</lastmod>
+  </url>`),
+  ];
+
+  return c.text(
+    `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.join("")}
+</urlset>`,
+    { headers: { "Content-Type": "application/xml" } }
+  );
 });
 
 // Get current user + page count
@@ -622,12 +683,37 @@ api.get("/p/:id", async (c) => {
   }
 
   // Increment view count if the page is tracked in D1
+  let pageMeta: { title?: string; description?: string; url?: string } | undefined;
   if (c.env?.D1) {
     const db = createDb(c.env.D1);
+    const [record] = await db
+      .select({ title: page.title, category: page.category, tags: page.tags })
+      .from(page)
+      .where(eq(page.id, id))
+      .limit(1);
+
+    if (record) {
+      const categoryLabels: Record<string, string> = {
+        general: "通用", chinese: "语文", math: "数学", english: "英语",
+        physics: "物理", chemistry: "化学", history: "历史",
+        biology: "生物", geography: "地理", other: "其他",
+      };
+      const categoryLabel = categoryLabels[record.category] || "学习";
+      const description = record.tags
+        ? `${categoryLabel} - ${record.tags}`
+        : categoryLabel;
+
+      pageMeta = {
+        title: record.title || "学习页面",
+        description,
+        url: `https://100mini.com/p/${id}`,
+      };
+    }
+
     await db.update(page).set({ viewCount: sql`view_count + 1` }).where(eq(page.id, id));
   }
 
-  const injected = injectBanner(html);
+  const injected = injectBanner(html, pageMeta);
 
   return new Response(injected, {
     status: 200,
