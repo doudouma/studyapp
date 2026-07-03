@@ -740,6 +740,7 @@ api.get("/p/:id", async (c) => {
     await db.update(page).set({ viewCount: sql`view_count + 1` }).where(eq(page.id, id));
   }
 
+  const html = await obj.text();
   const injected = injectBanner(html, pageMeta);
 
   return new Response(injected, {
