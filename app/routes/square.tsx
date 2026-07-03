@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createFileRoute, useLoaderData } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
-import { Globe } from "lucide-react";
+import { Globe, Loader2 } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { SquareGrid } from "~/components/SquareGrid";
@@ -10,6 +10,8 @@ import { useAuth } from "~/lib/auth-context";
 import { createDb } from "~/../server/db";
 import { page, user } from "~/../server/db/schema";
 import { eq, desc } from "drizzle-orm";
+
+const PAGE_SIZE = 12;
 
 interface SquareItem {
   id: string;
@@ -23,48 +25,60 @@ interface SquareItem {
   userImage: string | null;
 }
 
-const fetchSquareData = createServerFn().handler(async (): Promise<SquareItem[]> => {
-  const request = getRequest();
-  const env = (request as any)?.cloudflare?.env || (globalThis as any).__CF_ENV__;
-  
-  if (!env?.D1) {
-    return [];
-  }
+interface SquareData {
+  items: SquareItem[];
+  hasMore: boolean;
+}
 
-  const db = createDb(env.D1);
-  const items = await db
-    .select({
-      id: page.id,
-      title: page.title,
-      category: page.category,
-      tags: page.tags,
-      viewCount: page.viewCount,
-      sharedAt: page.sharedAt,
-      previewPath: page.previewPath,
-      userName: user.name,
-      userImage: user.image,
-    })
-    .from(page)
-    .leftJoin(user, eq(page.userId, user.id))
-    .where(eq(page.isSharedToSquare, true))
-    .orderBy(desc(page.sharedAt));
+const fetchSquareData = createServerFn()
+  .inputValidator((input: unknown) => input as { offset: number })
+  .handler(async (ctx) => {
+    const { offset } = ctx.data;
+    const request = getRequest();
+    const env = (request as any)?.cloudflare?.env || (globalThis as any).__CF_ENV__;
 
-  return items.map((item) => ({
-    ...item,
-    title: item.title || "",
-    category: item.category || "general",
-    tags: item.tags || "",
-    sharedAt: item.sharedAt ? new Date(item.sharedAt).getTime() : 0,
-  })) as SquareItem[];
-});
+    if (!env?.D1) {
+      return { items: [], hasMore: false };
+    }
+
+    const db = createDb(env.D1);
+    const dbItems = await db
+      .select({
+        id: page.id,
+        title: page.title,
+        category: page.category,
+        tags: page.tags,
+        viewCount: page.viewCount,
+        sharedAt: page.sharedAt,
+        previewPath: page.previewPath,
+        userName: user.name,
+        userImage: user.image,
+      })
+      .from(page)
+      .leftJoin(user, eq(page.userId, user.id))
+      .where(eq(page.isSharedToSquare, true))
+      .orderBy(desc(page.sharedAt))
+      .limit(PAGE_SIZE + 1)
+      .offset(offset);
+
+    const hasMore = dbItems.length > PAGE_SIZE;
+    const items = dbItems.slice(0, PAGE_SIZE).map((item) => ({
+      ...item,
+      title: item.title || "",
+      category: item.category || "general",
+      tags: item.tags || "",
+      sharedAt: item.sharedAt ? new Date(item.sharedAt).getTime() : 0,
+    })) as SquareItem[];
+
+    return { items, hasMore };
+  });
 
 export const Route = createFileRoute("/square")({
   validateSearch: (search: Record<string, string | undefined>) => ({
     q: search.q || "",
   }),
   loader: async () => {
-    const items = await fetchSquareData();
-    return { items };
+    return fetchSquareData({ data: { offset: 0 } });
   },
   head: () => ({
     title: "学习广场 - 发现和分享 HTML 学习资源 | 100mini",
@@ -112,24 +126,65 @@ const CATEGORIES = [
 function SquarePage() {
   const { q } = Route.useSearch();
   const { user } = useAuth();
-  const { items: initialItems } = useLoaderData({ from: Route.id });
-  const [items, setItems] = useState<SquareItem[]>(initialItems);
+  const { items: initialItems, hasMore: initialHasMore } = useLoaderData({ from: Route.id });
+  const [allItems, setAllItems] = useState<SquareItem[]>(initialItems);
+  const [hasMore, setHasMore] = useState(initialHasMore);
+  const [loading, setLoading] = useState(false);
   const [activeCategory, setActiveCategory] = useState("");
   const [activeTag, setActiveTag] = useState("");
   const [searchQuery, setSearchQuery] = useState(q);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const allItemsRef = useRef(initialItems);
+  const hasMoreRef = useRef(initialHasMore);
+  const loadingRef = useRef(false);
 
   useEffect(() => {
-    setItems(initialItems);
-  }, [initialItems]);
+    setAllItems(initialItems);
+    allItemsRef.current = initialItems;
+    setHasMore(initialHasMore);
+    hasMoreRef.current = initialHasMore;
+  }, [initialItems, initialHasMore]);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      async ([entry]) => {
+        if (entry.isIntersecting && hasMoreRef.current && !loadingRef.current) {
+          loadingRef.current = true;
+          setLoading(true);
+          try {
+            const offset = allItemsRef.current.length;
+            const result = await fetchSquareData({ data: { offset } });
+            setAllItems((prev) => {
+              const next = [...prev, ...result.items];
+              allItemsRef.current = next;
+              return next;
+            });
+            setHasMore(result.hasMore);
+            hasMoreRef.current = result.hasMore;
+          } finally {
+            loadingRef.current = false;
+            setLoading(false);
+          }
+        }
+      },
+      { rootMargin: "400px" },
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, []);
 
   const allTags = Array.from(
     new Set(
-      items
+      allItems
         .flatMap((i) => (i.tags ? i.tags.split(/[,，]+/).map((t) => t.trim()).filter(Boolean) : []))
     )
   ).sort();
 
-  const filtered = items.filter((i) => {
+  const filtered = allItems.filter((i) => {
     if (activeCategory && i.category !== activeCategory) return false;
     if (activeTag) {
       const itemTags = i.tags ? i.tags.split(/[,，]+/).map((t) => t.trim()) : [];
@@ -214,6 +269,20 @@ function SquarePage() {
 
           {/* Grid */}
           <SquareGrid items={filtered} />
+
+          {/* Infinite scroll sentinel */}
+          <div ref={sentinelRef} className="h-4" />
+          {loading && (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="size-5 animate-spin text-muted-foreground" />
+              <span className="ml-2 text-sm text-muted-foreground">加载中...</span>
+            </div>
+          )}
+          {!hasMore && allItems.length > PAGE_SIZE && (
+            <p className="py-8 text-center text-sm text-muted-foreground">
+              已加载全部内容
+            </p>
+          )}
         </div>
       </main>
 
