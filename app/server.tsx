@@ -35,9 +35,12 @@ app.use("*", async (c, next) => {
     try {
       const proxy = await getDevBindings();
       c.env = { ...c.env, D1: proxy.env.D1, BUCKET: proxy.env.BUCKET } as any;
+      (globalThis as any).__CF_ENV__ = { D1: proxy.env.D1, BUCKET: proxy.env.BUCKET };
     } catch (err) {
       console.warn("Local bindings not available:", (err as Error).message);
     }
+  } else {
+    (globalThis as any).__CF_ENV__ = { D1: c.env.D1, BUCKET: c.env.BUCKET };
   }
   return next();
 });
