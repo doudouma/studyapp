@@ -49,7 +49,7 @@ function PreviewCell({ item }: { item: SquareItem }) {
     <img
       src={`/thumbnails/${item.id}`}
       alt={item.title}
-      className="absolute inset-0 w-full h-full object-contain transition-transform group-hover:scale-105"
+      className="absolute inset-0 w-full h-full object-cover object-top transition-transform group-hover:scale-105"
       loading="lazy"
       onError={() => setShowIframe(true)}
     />
@@ -98,7 +98,7 @@ export function SquareGrid({ items }: SquareGridProps) {
             target="_blank"
             className="relative block overflow-hidden"
           >
-            <div className="relative overflow-hidden bg-muted" style={{ aspectRatio: "2/3" }}>
+            <div className="relative overflow-hidden bg-muted" style={{ aspectRatio: "3/4" }}>
               <PreviewCell item={item} />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4 z-10">
                 <span className="flex items-center gap-2 text-sm font-medium text-white">

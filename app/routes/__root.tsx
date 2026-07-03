@@ -35,7 +35,7 @@ export const Route = createRootRoute({
       },
     ],
     links: [
-      { rel: "canonical", href: "https://100mini.com/" },
+      { rel: "canonical", href: "https://studypage.app/" },
     ],
   }),
   notFoundComponent: NotFound,
