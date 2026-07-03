@@ -364,7 +364,10 @@ api.post("/api/upload", async (c) => {
   const body = await c.req.parseBody();
   const content = body.content;
   const file = body.file;
-  const title = (body.title as string) || "";
+  const title = ((body.title as string) || "").trim();
+  if (!title) {
+    return c.json({ error: "标题不能为空" }, 400);
+  }
   const tags = ((body.tags as string) || "")
     .split(/[,，\s]+/)
     .map((t: string) => t.trim())

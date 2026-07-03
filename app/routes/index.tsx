@@ -132,10 +132,7 @@ function UploadForm({
           <>
             <div className="mb-3">
               <label className="text-sm font-medium text-foreground">
-                标题{" "}
-                <span className="font-normal text-muted-foreground">
-                  (可选)
-                </span>
+                标题 <span className="text-destructive">*</span>
               </label>
               <Input
                 className="mt-1"
@@ -277,7 +274,8 @@ function HomePage() {
   };
 
   const canSubmit =
-    mode === "paste" ? htmlContent.trim().length > 0 : file !== null;
+    (mode === "paste" ? htmlContent.trim().length > 0 : file !== null) &&
+    (!user || title.trim().length > 0);
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
