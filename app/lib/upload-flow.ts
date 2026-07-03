@@ -2,7 +2,7 @@ import { snapdom } from "@zumer/snapdom";
 
 const THUMBNAIL_WIDTH = 400;
 const THUMBNAIL_HEIGHT = 600;
-const THUMBNAIL_SCALE = 1.5;
+const THUMBNAIL_SCALE = 1;
 const QUALITY = 0.5;
 const TIMEOUT_MS = 12000;
 
