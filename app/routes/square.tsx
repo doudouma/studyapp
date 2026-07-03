@@ -67,7 +67,7 @@ const fetchSquareData = createServerFn()
       title: item.title || "",
       category: item.category || "general",
       tags: item.tags || "",
-      sharedAt: item.sharedAt ? new Date(item.sharedAt).getTime() : 0,
+      sharedAt: item.sharedAt ? item.sharedAt.getTime() : 0,
     })) as SquareItem[];
 
     return { items, hasMore };
@@ -125,7 +125,6 @@ const CATEGORIES = [
 
 function SquarePage() {
   const { q } = Route.useSearch();
-  const { user } = useAuth();
   const { items: initialItems, hasMore: initialHasMore } = useLoaderData({ from: Route.id });
   const [allItems, setAllItems] = useState<SquareItem[]>(initialItems);
   const [hasMore, setHasMore] = useState(initialHasMore);
