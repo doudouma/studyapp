@@ -112,7 +112,7 @@ function AdminPage() {
     setError(null);
     try {
       const res = await fetch(`/api/admin/users?page=${p}&pageSize=${pageSize}`);
-      if (!res.ok) throw new Error((await res.json()).error || "加载失败");
+      if (!res.ok) throw new Error(((await res.json()) as { error?: string }).error || "加载失败");
       const data: AdminUsersResponse = await res.json();
       setUsers(data.users);
       setTotal(data.total);
@@ -171,7 +171,7 @@ function AdminPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ durationMonths: selectedDuration }),
       });
-      if (!res.ok) throw new Error((await res.json()).error || "操作失败");
+      if (!res.ok) throw new Error(((await res.json()) as { error?: string }).error || "操作失败");
       setMembershipUser(null);
       fetchUsers(page);
     } catch (err) {
@@ -188,7 +188,7 @@ function AdminPage() {
       const res = await fetch(`/api/admin/users/${cancelUser.id}/membership`, {
         method: "DELETE",
       });
-      if (!res.ok) throw new Error((await res.json()).error || "操作失败");
+      if (!res.ok) throw new Error(((await res.json()) as { error?: string }).error || "操作失败");
       setCancelUser(null);
       fetchUsers(page);
     } catch (err) {

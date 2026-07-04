@@ -335,6 +335,7 @@ api.get("/api/admin/pages", requireAdmin, async (c) => {
 
 // Admin: Delete any page (no ownership check)
 api.delete("/api/admin/pages/:id", requireAdmin, async (c) => {
+  if (!c.env.D1) return c.json({ error: "database unavailable" }, 503);
   const pageId = c.req.param("id");
   const db = createDb(c.env.D1);
 
@@ -401,6 +402,7 @@ api.delete("/api/pages/:id", async (c) => {
   if (!user) return c.json({ error: "未登录" }, 401);
 
   const pageId = c.req.param("id");
+  if (!c.env.D1) return c.json({ error: "database unavailable" }, 503);
   const db = createDb(c.env.D1);
 
   // Check ownership
@@ -452,6 +454,7 @@ api.post("/api/upload", async (c) => {
     }
 
     if (!isMember) {
+      if (!c.env.D1) return c.json({ error: "database unavailable" }, 503);
       const db = createDb(c.env.D1);
       const result = await db.select({ count: count() }).from(page).where(eq(page.userId, user.id));
       const pageCount = result[0]?.count ?? 0;
@@ -580,6 +583,7 @@ api.post("/api/upload-thumbnail", async (c) => {
   }
 
   // Validate page ownership
+  if (!c.env.D1) return c.json({ error: "database unavailable" }, 503);
   const db = createDb(c.env.D1);
   const existing = await db
     .select()
@@ -631,6 +635,7 @@ api.delete("/api/pages/:id/square", async (c) => {
   if (!user) return c.json({ error: "未登录" }, 401);
 
   const pageId = c.req.param("id");
+  if (!c.env.D1) return c.json({ error: "database unavailable" }, 503);
   const db = createDb(c.env.D1);
 
   const existing = await db.select().from(page).where(and(eq(page.id, pageId), eq(page.userId, user.id))).limit(1);
@@ -725,7 +730,7 @@ api.get("/p/:id", async (c) => {
         physics: "物理", chemistry: "化学", history: "历史",
         biology: "生物", geography: "地理", other: "其他",
       };
-      const categoryLabel = categoryLabels[record.category] || "学习";
+      const categoryLabel = categoryLabels[record.category ?? "general"] || "学习";
       const description = record.tags
         ? `${categoryLabel} - ${record.tags}`
         : categoryLabel;

@@ -45,10 +45,10 @@ function LinksPage() {
     try {
       const res = await fetch("/api/pages");
       if (!res.ok) {
-        const json = await res.json();
+        const json = (await res.json()) as { error?: string };
         throw new Error(json.error || "加载失败");
       }
-      const json = await res.json();
+      const json = (await res.json()) as PagesResponse;
       setData(json);
     } catch (err) {
       setError(err instanceof Error ? err.message : "加载失败");

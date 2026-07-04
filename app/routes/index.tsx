@@ -383,7 +383,7 @@ function HomePage() {
                 variant="outline"
                 size="lg"
                 className="text-base h-11 px-6 rounded-xl"
-                onClick={() => navigate({ to: "/square" })}
+                onClick={() => navigate({ to: "/square", search: { q: "" } })}
               >
                 浏览学习广场
               </Button>
