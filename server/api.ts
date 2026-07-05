@@ -99,10 +99,14 @@ async function putToStorage(
 async function deletePageFromBucket(bucket: R2Bucket, id: string) {
   await bucket.delete(`${id}.html`);
   await bucket.delete(`thumbnails/${id}.webp`);
-  const listed = await bucket.list({ prefix: `${id}/` });
-  if (listed.objects.length > 0) {
-    await bucket.delete(listed.objects.map((o) => o.key));
-  }
+  let cursor: string | undefined;
+  do {
+    const listed = await bucket.list({ prefix: `${id}/`, cursor });
+    if (listed.objects.length > 0) {
+      await bucket.delete(listed.objects.map((o) => o.key));
+    }
+    cursor = listed.truncated ? listed.cursor : undefined;
+  } while (cursor);
 }
 
 async function getFromStorage(
@@ -830,7 +834,7 @@ api.get("/p/*", async (c) => {
   const bucket = c.env?.BUCKET;
   if (!bucket) return c.html(notFoundHtml(), 404);
 
-  if (path) {
+  if (path && path !== "index.html") {
     // Serving an asset file (e.g. data.json, image.png)
     let obj = await bucket.get(`${id}/${path}`);
     if (!obj) obj = await bucket.get(`tmp/${id}/${path}`);
@@ -840,7 +844,10 @@ api.get("/p/*", async (c) => {
     const mime = getMimeType(path);
     return new Response(buf, {
       status: 200,
-      headers: { "Content-Type": mime },
+      headers: {
+        "Content-Type": mime,
+        "Cache-Control": "public, max-age=31536000, immutable",
+      },
     });
   }
 
