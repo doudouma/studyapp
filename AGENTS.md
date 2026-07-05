@@ -74,3 +74,5 @@ drizzle/            # Drizzle Kit 迁移产物
 | `npm run build` | 生产构建 |
 | `npm run deploy` | 构建 + wrangler 部署 |
 | `npm run cf:preview` | Wrangler 本地预览 Worker |
+
+**重要：提交代码、部署等操作必须由用户确认后才执行，AI 不得自动执行。**
