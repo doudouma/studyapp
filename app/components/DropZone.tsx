@@ -102,7 +102,7 @@ export function DropZone({ file, onFileSelect, acceptZip = true }: DropZoneProps
       <input
         ref={inputRef}
         type="file"
-        accept=".html,.htm,.zip"
+        accept={acceptZip ? ".html,.htm,.zip" : ".html,.htm"}
         className="hidden"
         onChange={handleInputChange}
       />

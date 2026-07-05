@@ -549,11 +549,15 @@ api.patch("/api/pages/:id", async (c) => {
         await bucket.put(`${pageId}.html`, content, {
           httpMetadata: { contentType: "text/html; charset=utf-8" },
         });
-        // Clean up any existing ZIP format files
-        const listed = await bucket.list({ prefix: `${pageId}/` });
-        if (listed.objects.length > 0) {
-          await bucket.delete(listed.objects.map((o) => o.key));
-        }
+        // Clean up any existing ZIP format files (with pagination)
+        let cursor: string | undefined;
+        do {
+          const listed = await bucket.list({ prefix: `${pageId}/`, cursor });
+          if (listed.objects.length > 0) {
+            await bucket.delete(listed.objects.map((o) => o.key));
+          }
+          cursor = listed.truncated ? listed.cursor : undefined;
+        } while (cursor);
       }
     }
 
