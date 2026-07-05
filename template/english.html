@@ -1,0 +1,1762 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>题型闯关 · 词形词性转化 · 交互刷题</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            background: #f4f7fc;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .app {
+            max-width: 860px;
+            width: 100%;
+            background: #fff;
+            border-radius: 32px;
+            box-shadow: 0 20px 60px rgba(0, 20, 40, 0.12);
+            padding: 28px 30px 34px;
+            transition: all 0.2s;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px 20px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0b1b33;
+            letter-spacing: -0.3px;
+        }
+        .header h1 small {
+            font-weight: 500;
+            font-size: 14px;
+            color: #5b6f8c;
+            margin-left: 10px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+            font-size: 14px;
+            background: #f0f4fa;
+            padding: 6px 16px 6px 20px;
+            border-radius: 40px;
+            align-items: center;
+        }
+
+        .stats span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #1f334f;
+        }
+        .stats .num {
+            font-weight: 700;
+            color: #0b1b33;
+            min-width: 22px;
+        }
+        .stats .badge {
+            background: #dce4f0;
+            border-radius: 30px;
+            padding: 2px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #1f3a5f;
+        }
+        .stats .badge.error {
+            background: #fee9e7;
+            color: #b34033;
+        }
+
+        .progress-wrap {
+            width: 100%;
+            height: 5px;
+            background: #e6edf6;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #3b7bff, #6c9bff);
+            border-radius: 10px;
+            transition: width 0.35s ease;
+        }
+
+        .question-card {
+            background: #f9fbfe;
+            border-radius: 20px;
+            padding: 24px 26px 26px;
+            border: 1px solid #e9eef5;
+            margin-bottom: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .q-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: #5f748f;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+            gap: 6px 12px;
+        }
+        .q-meta .q-id {
+            font-weight: 600;
+            color: #1f334f;
+            background: #e6edf6;
+            padding: 0 12px;
+            border-radius: 30px;
+            line-height: 26px;
+        }
+        .q-meta .q-source {
+            background: #eef3fa;
+            padding: 0 14px;
+            border-radius: 30px;
+            line-height: 26px;
+        }
+
+        .q-text {
+            font-size: 18px;
+            line-height: 1.7;
+            color: #0b1b33;
+            margin-bottom: 16px;
+            word-break: break-word;
+        }
+        .q-text .blank-input {
+            display: inline-block;
+            width: 140px;
+            max-width: 70%;
+            border: none;
+            border-bottom: 2.5px dashed #7a93b8;
+            background: transparent;
+            font-size: 18px;
+            font-weight: 500;
+            color: #0b1b33;
+            padding: 0 4px;
+            transition: border-color 0.2s, background 0.15s;
+            outline: none;
+            font-family: inherit;
+        }
+        .q-text .blank-input:focus {
+            border-bottom-color: #3b7bff;
+            background: #eef4ff;
+            border-radius: 4px 4px 0 0;
+        }
+        .q-text .blank-input.correct {
+            border-bottom-color: #1f9d6a;
+            background: #e5f5ee;
+        }
+        .q-text .blank-input.wrong {
+            border-bottom-color: #d14c3c;
+            background: #fdeeeb;
+        }
+
+        .q-hint {
+            font-size: 14px;
+            color: #5f748f;
+            background: #edf2f9;
+            display: inline-block;
+            padding: 2px 16px;
+            border-radius: 40px;
+            margin-top: 4px;
+        }
+        .q-hint strong {
+            color: #1f3a5f;
+            font-weight: 600;
+        }
+
+        /* feedback */
+        .feedback {
+            margin-top: 16px;
+            padding: 12px 18px;
+            border-radius: 14px;
+            font-size: 15px;
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .feedback.show {
+            display: flex;
+        }
+        .feedback .fb-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .feedback.correct {
+            background: #e4f4ec;
+            color: #0f6e4a;
+            border: 1px solid #b7dfce;
+        }
+        .feedback.wrong {
+            background: #fdeeeb;
+            color: #aa3c2e;
+            border: 1px solid #f5d3cd;
+        }
+        .feedback .fb-answer {
+            font-weight: 700;
+            background: rgba(0, 0, 0, 0.05);
+            padding: 2px 14px;
+            border-radius: 30px;
+        }
+        .feedback .fb-explanation {
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 8px 14px;
+            border-radius: 10px;
+            margin-top: 2px;
+            line-height: 1.6;
+            color: #1f334f;
+        }
+        .feedback .fb-explanation strong {
+            color: #0b1b33;
+        }
+
+        /* actions */
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 14px;
+            margin-top: 6px;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .actions-left {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .actions-right {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border: none;
+            background: #eef3fa;
+            padding: 10px 22px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #1f334f;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+        }
+        .btn:active {
+            transform: scale(0.96);
+        }
+        .btn-primary {
+            background: #1f3a5f;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #142b47;
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-success {
+            background: #1f9d6a;
+            color: #fff;
+        }
+        .btn-success:hover {
+            background: #178358;
+        }
+        .btn-danger {
+            background: #d14c3c;
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background: #b33f31;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid #cbd7e8;
+        }
+        .btn-outline:hover {
+            background: #eef3fa;
+            border-color: #a0b5cf;
+        }
+        .btn-outline-secondary {
+            background: transparent;
+            border: 1.5px solid #cbd7e8;
+            color: #3d5779;
+        }
+        .btn-outline-secondary:hover {
+            background: #eef3fa;
+        }
+        .btn-sm {
+            padding: 6px 16px;
+            font-size: 13px;
+        }
+
+        /* modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(11, 27, 51, 0.5);
+            backdrop-filter: blur(6px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            z-index: 999;
+        }
+        .modal-overlay.open {
+            display: flex;
+        }
+        .modal {
+            background: #fff;
+            max-width: 700px;
+            width: 100%;
+            max-height: 80vh;
+            border-radius: 28px;
+            padding: 28px 30px 30px;
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .modal-header h2 {
+            font-size: 22px;
+            color: #0b1b33;
+        }
+        .modal-header h2 small {
+            font-weight: 400;
+            font-size: 15px;
+            color: #5f748f;
+            margin-left: 8px;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            line-height: 1;
+            color: #7a8fa8;
+            cursor: pointer;
+            padding: 0 8px;
+        }
+        .modal-close:hover {
+            color: #0b1b33;
+        }
+        .modal-body {
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 4px;
+        }
+        .modal-body::-webkit-scrollbar {
+            width: 6px;
+        }
+        .modal-body::-webkit-scrollbar-track {
+            background: #eef3fa;
+            border-radius: 10px;
+        }
+        .modal-body::-webkit-scrollbar-thumb {
+            background: #c2d2e6;
+            border-radius: 10px;
+        }
+
+        .error-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 14px;
+            background: #f9fbfe;
+            border-radius: 14px;
+            margin-bottom: 8px;
+            border: 1px solid #edf2f9;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .error-item .e-text {
+            font-size: 15px;
+            color: #0b1b33;
+            flex: 1;
+            min-width: 140px;
+        }
+        .error-item .e-answer {
+            font-weight: 600;
+            color: #1f9d6a;
+            background: #e4f4ec;
+            padding: 0 14px;
+            border-radius: 30px;
+            font-size: 14px;
+            line-height: 28px;
+            white-space: nowrap;
+        }
+        .error-item .e-index {
+            font-weight: 600;
+            color: #5f748f;
+            background: #eef3fa;
+            padding: 0 12px;
+            border-radius: 30px;
+            font-size: 13px;
+            line-height: 26px;
+        }
+        .empty-errors {
+            text-align: center;
+            padding: 40px 10px;
+            color: #5f748f;
+            font-size: 16px;
+        }
+        .empty-errors .icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .api-settings {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .api-panel {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .api-panel input {
+            border: 1.5px solid #cbd7e8;
+            border-radius: 30px;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+            width: 240px;
+            max-width: 50vw;
+            transition: border-color 0.2s;
+        }
+        .api-panel input:focus {
+            border-color: #3b7bff;
+        }
+        .api-status {
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .api-status.ok {
+            color: #1f9d6a;
+        }
+        .api-status.err {
+            color: #d14c3c;
+        }
+        .api-status.loading {
+            color: #5f748f;
+        }
+        .ai-loading {
+            display: none;
+            text-align: center;
+            padding: 30px 10px;
+            color: #5f748f;
+        }
+        .ai-loading.show {
+            display: block;
+        }
+        .ai-loading .spinner {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            border: 3px solid #e6edf6;
+            border-top-color: #3b7bff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin-bottom: 10px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .ai-result-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 600px) {
+            .app {
+                padding: 18px 14px 24px;
+            }
+            .header h1 {
+                font-size: 20px;
+            }
+            .stats {
+                font-size: 12px;
+                padding: 4px 12px;
+                gap: 10px;
+            }
+            .q-text {
+                font-size: 16px;
+            }
+            .q-text .blank-input {
+                font-size: 16px;
+                width: 110px;
+            }
+            .question-card {
+                padding: 18px 16px 20px;
+            }
+            .actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .actions-left,
+            .actions-right {
+                justify-content: center;
+            }
+            .btn {
+                padding: 8px 16px;
+                font-size: 13px;
+                justify-content: center;
+            }
+            .modal {
+                padding: 20px 16px;
+                max-height: 90vh;
+            }
+            .modal-header h2 {
+                font-size: 19px;
+            }
+            .error-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 6px;
+            }
+            .error-item .e-answer {
+                align-self: flex-start;
+            }
+        }
+        @media (max-width: 400px) {
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .stats {
+                justify-content: center;
+            }
+            .q-meta {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app" id="app">
+        <!-- header -->
+        <div class="header">
+            <h1>
+                📝 词形词性转化
+                <small>题型闯关 · 含近5年真题+模拟</small>
+            </h1>
+            <div class="stats" id="statsBar">
+                <span>📌 <span class="num" id="totalNum">0</span></span>
+                <span>✅ <span class="num" id="correctNum">0</span></span>
+                <span>❌ <span class="num" id="wrongNum">0</span></span>
+                <span class="badge" id="progressLabel">0 / 30</span>
+                <span class="badge error" id="errorBookBadge">📕 错题 0</span>
+                <span class="badge" id="aiBankBadge" style="display:none;">🤖 AI 题 0</span>
+            </div>
+        </div>
+
+        <!-- api settings -->
+        <div class="api-settings">
+            <button class="btn btn-sm btn-outline-secondary" id="apiSettingsBtn">🔑 API</button>
+            <div class="api-panel" id="apiPanel" style="display:none">
+                <input type="password" id="apiKeyInput" placeholder="DeepSeek API Key" />
+                <button class="btn btn-sm btn-primary" id="verifyApiBtn">验证</button>
+                <span class="api-status" id="apiStatus"></span>
+            </div>
+        </div>
+
+        <!-- progress -->
+        <div class="progress-wrap">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <!-- question card -->
+        <div class="question-card" id="questionCard">
+            <div class="q-meta">
+                <span class="q-id" id="qIdLabel">第 1 题</span>
+                <span class="q-source" id="qSourceLabel">基础题</span>
+            </div>
+            <div class="q-text" id="qTextContainer"></div>
+            <div class="q-hint" id="qHint">💡 提示词：<strong>excuse</strong></div>
+
+            <!-- feedback -->
+            <div class="feedback" id="feedback">
+                <div class="fb-row">
+                    <span id="fbIcon">✅</span>
+                    <span id="fbMessage">回答正确！</span>
+                    <span class="fb-answer" id="fbAnswer">答案：excuses</span>
+                </div>
+                <div class="fb-explanation" id="fbExplanation">解析：此处填名词作宾语。</div>
+            </div>
+
+            <!-- actions -->
+            <div class="actions">
+                <div class="actions-left">
+                    <button class="btn btn-primary" id="submitBtn">✏️ 提交答案</button>
+                    <button class="btn btn-success" id="nextBtn" disabled>➡️ 下一题</button>
+                </div>
+                <div class="actions-right">
+                    <button class="btn btn-outline-secondary btn-sm" id="resetBtn">🔄 重新练习</button>
+                    <button class="btn btn-outline btn-sm" id="errorBookBtn">📕 错题本</button>
+                    <button class="btn btn-outline btn-sm" id="aiBankBtn" style="display:none;">🤖 AI 题库</button>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top:10px;font-size:13px;color:#7a8fa8;text-align:center;border-top:1px solid #edf2f9;padding-top:14px;">
+            💡 每次随机抽取 <strong>30</strong> 道 · 错题自动收录 · 错题优先出现 · 提交后显示解析
+        </div>
+    </div>
+
+    <!-- ====== MODAL : 错题本 ====== -->
+    <div class="modal-overlay" id="errorBookModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modalTitle">📕 错题本</h2>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span id="modalSubtitle" style="font-size:14px;color:#5f748f;">0 道</span>
+                    <button class="modal-close" id="modalCloseBtn">✕</button>
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:12px;">
+                <button class="btn btn-sm" id="modalTabErrors" style="background:#1f3a5f;color:#fff;">📕 错题本</button>
+                <button class="btn btn-sm btn-outline-secondary" id="modalTabAi" style="display:none;">🤖 AI 题库</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="ai-loading" id="aiLoading">
+                <div class="spinner"></div>
+                <div>🤖 AI 正在根据错题生成新句子…</div>
+            </div>
+            <div class="ai-result-actions" id="aiResultActions" style="display:none;">
+                <button class="btn btn-success btn-sm" id="startAiRoundBtn">🚀 使用 AI 题目开始练习</button>
+                <button class="btn btn-outline-secondary btn-sm" id="discardAiBtn">取消</button>
+            </div>
+            <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">
+                <button class="btn btn-primary btn-sm" id="aiGenerateBtn">🤖 AI 错题生成</button>
+                <button class="btn btn-outline btn-sm" id="exportAiBtn" style="display:none;">📥 导出 JSON</button>
+                <button class="btn btn-danger btn-sm" id="clearErrorsBtn">🗑️ 清空错题本</button>
+                <button class="btn btn-outline-secondary btn-sm" id="clearAiBtn" style="display:none;">🗑️ 清空 AI 题</button>
+                <button class="btn btn-primary btn-sm" id="modalCloseBtn2">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ======================================================================
+        //  1. 题库数据 (110 道)  — 包含2019-2023五年真题 + 2024模拟新增
+        // ======================================================================
+        const QUESTION_BANK = [
+            // ---- 基础题 1~60 (含详细解析) ----
+            { id: 1, text: 'We should admit our mistakes bravely instead of making ______.', hint: 'excuse',
+                answer: 'excuses', source: '基础题',
+                explanation: '句意：我们应该勇敢承认我们的错误，而不是找借口。空处位于动词"making"后，填名词作宾语。excuse"借口"，可数名词，此处泛指各种借口，应用复数形式的 excuses。' },
+            { id: 2, text: 'We heard a ______ sound after a bright flash of lightning.', hint: 'frighten',
+                answer: 'frightening', source: '基础题',
+                explanation: '句意：在一道明亮的闪电之后，我们听到了一个可怕的声音。frighten"使害怕"，动词；空后 sound (声音) 是名词，指物，故用形容词 frightening"令人害怕的"修饰。' },
+            { id: 3, text: "I'm preparing for my grandma's ______ birthday party these days.", hint: 'ninety',
+                answer: 'ninetieth', source: '基础题',
+                explanation: '句意：这些天我正在为奶奶的九十岁生日派对做准备。空格处表示顺序，应用序数词，ninety"九十"，基数词，其序数词是 ninetieth"第九十"。' },
+            { id: 4, text: 'The kilometer is the biggest unit of ______ in the metric system.', hint: 'long',
+                answer: 'length', source: '基础题',
+                explanation: '句意：千米是公制计量单位中最大的长度单位。介词"of"后需接名词作宾语，long"长的"，形容词，其名词形式为 length，unit of length 意为"长度单位"，固定搭配。' },
+            { id: 5, text: 'It can be a problem if you are ______ of the hidden danger of using public Wi-Fi.',
+                hint: 'aware', answer: 'unaware', source: '基础题',
+                explanation: '句意：如果你没有意识到使用公共 Wi-Fi 的潜在危险，这可能是一个问题。根据"It can be a problem"可知，此处指没有意识到其潜在危险，会是一个问题，此处用 aware 的反义词 unaware。' },
+            { id: 6, text: 'In this way, everyone will be ready to help others and feel ______ with it.',
+                hint: 'satisfying', answer: 'satisfied', source: '基础题',
+                explanation: '句意：这样，每个人都愿意帮助别人，并对此感到满意。satisfy"使满意"为动词，satisfied"感到满意的"为形容词，根据"with"可知考查 feel satisfied with"对......感到满意"。' },
+            { id: 7, text: 'Sometimes, our classes are ______ into 10 groups for activities.', hint: 'divide',
+                answer: 'divided', source: '基础题',
+                explanation: '句意：有时候，我们班会被分成 10 个小组进行活动。主语"our classes"和动词"divide"之间是被动关系，需用一般现在时的被动语态，divide 的过去分词为 divided。' },
+            { id: 8, text: 'Professor Smith achieved a lot in his ______.', hint: 'forty', answer: 'forties',
+                source: '基础题',
+                explanation: '句意：史密斯教授在他四十多岁时取得了许多成就。"in one\'s+整十数的复数形式"表示"在某人几十多岁时"，是固定用法，forty 的复数形式是 forties。' },
+            { id: 9, text: 'Phil was so ______ that he looked at me straight in the eye.', hint: 'shock',
+                answer: 'shocked', source: '基础题',
+                explanation: '句意：菲尔如此震惊，以至于他直视着我的眼睛。shock"使震惊"，此处需要形容词作表语，描述人的感受用 shocked"感到震惊的"。' },
+            { id: 10, text: 'It is a ______ in America to eat turkey on Thanksgiving Day.', hint: 'traditional',
+                answer: 'tradition', source: '基础题',
+                explanation: '句意：在美国，感恩节吃火鸡是一个传统。traditional"传统的"，形容词，此处需要名词作表语，其名词形式是 tradition"传统"，空前有 a，用名词单数。' },
+            { id: 11, text: 'During the dancing contest, be calm; and more ______, be yourself.', hint: 'important',
+                answer: 'importantly', source: '基础题',
+                explanation: '句意：在舞蹈比赛中，保持冷静；更重要的是，做你自己。important"重要的"，形容词。空格处修饰整个句子，需用副词形式，more importantly 是固定表达，意为"更重要的是"。' },
+            { id: 12, text: 'It is clear that Sandra is very close to ______.', hint: 'dead', answer: 'death',
+                source: '基础题',
+                explanation: '句意：很明显，桑德拉离死亡很近了。dead"死的"，形容词。空格前有介词 to，此处需用名词形式作宾语。故填 death。' },
+            { id: 13, text: "Justin might not go with us. It ______ on how busy he is.", hint: 'independent',
+                answer: 'depends', source: '基础题',
+                explanation: '句意：贾斯汀可能不会和我们一起去。这取决于他有多忙。空格处需填入谓语动词，构成短语 depend on"取决于"。independent 是形容词，意为"独立的"，其动词形式为 depend。此处主语是"It"，时态为一般现在时，谓语动词需用第三人称单数形式。' },
+            { id: 14, text: 'Tony has gone to Australia and will stay there for more than two ______.', hint: 'month',
+                answer: 'months', source: '基础题',
+                explanation: '句意：托尼去了澳大利亚，将在那里停留两个多月。"month"是可数名词，意为"月"。根据"more than two"可知，此处需用复数形式 months。' },
+            { id: 15, text: 'My mobile phone is different from ______ in size and colour.', hint: 'she',
+                answer: 'hers', source: '基础题',
+                explanation: '句意：我的手机在大小和颜色上都和她的不一样。根据"My mobile phone is different from"可知，此处指与她的手机不同，空格后无名词，应填名词性物主代词 hers。' },
+            { id: 16, text: 'Johnathon became an officer in the army in his ______.', hint: 'twenty',
+                answer: 'twenties', source: '基础题',
+                explanation: '句意：Johnathon 在他二十多岁时成为一名军官。in one\'s+基数词复数表示"在某人几十岁的时候"，故填 twenties。' },
+            { id: 17, text: 'I have a number of ______ about the hotel room you\'ve given me.', hint: 'complain',
+                answer: 'complaints', source: '基础题',
+                explanation: '句意：我对你给我的旅馆房间有很多抱怨。a number of 表示"许多，大量"，后加名词复数。complain 动词，名词形式是 complaint，这里用复数形式 complaints。' },
+            { id: 18, text: 'Why were you ______ of the serious problem?', hint: 'aware', answer: 'unaware',
+                source: '基础题',
+                explanation: '句意：你为什么没有意识到这个严重的问题？根据"Why were you...of the serious problem?"以及提示词 aware 可知，这里需要用 aware 的反义词，表示"没意识到"，unaware 意为"未意识到的"符合语境。' },
+            { id: 19, text: 'Make sure the windows are closed and the door is ______ locked before you leave.',
+                hint: 'secure', answer: 'securely', source: '基础题',
+                explanation: '句意：在你离开之前，确认窗户是关着的并且门锁好了。根据"the door is......locked before you leave."可知，空格处应填副词修饰 locked。secure"安全的，可靠的"，形容词，其副词为 securely。' },
+            { id: 20, text: 'Students are taught to use common software, ______ Word, Excel and Web Design.',
+                hint: 'include', answer: 'including', source: '基础题',
+                explanation: '句意：学生们被教授使用常见软件，包括 Word、Excel 和网页设计相关工具。include"包含，包括"，动词，根据"Students are taught to use common software...Word, Excel and Web Design."可知，此处应用介词，表示补充举例，including"包含"，介词。' },
+            { id: 21, text: 'The Internet ______ people to order their food conveniently at home.', hint: 'able',
+                answer: 'enables', source: '基础题',
+                explanation: '句意：互联网使人们可以方便地在家里订餐。根据句子成分，空格处应填谓语动词；根据提示词"able"和句意可知，此处表达的是"能使做某事"，即 enable，且因本句是一般现在时，主语为"The Internet"，动词用第三人称单数。' },
+            { id: 22, text: 'The ______ sports meeting was held in Rose School in October, 2023.', hint: 'nine',
+                answer: 'ninth', source: '基础题',
+                explanation: '句意：第九届运动会于 2023 年 10 月在玫瑰学校举行。此处指"第九届运动会"，用序数词 ninth。' },
+            { id: 23, text: 'I think his invention is more creative than ______.', hint: 'you', answer: 'yours',
+                source: '基础题',
+                explanation: '句意：我认为他的发明比你的（发明）更有创意。根据"I think his invention is more creative than ..."可知，处需要填一个名词性物主代词，来指代"你的发明"，you 的名物代形式为 yours。' },
+            { id: 24, text: 'Frank had interviewed five ______ before he wrote a report on their lives.', hint: 'fish',
+                answer: 'fishermen', source: '基础题',
+                explanation: '句意：Frank 在写关于渔民生活的报告之前，已经采访了五名渔民。根据句意"Frank 在写关于他们的生活的报告之前，已经采访了五名___"可推出，此处要用 fish 的变形 fisherman 表示"渔民"；five 后接可数名词复数，fisherman 的复数形式是 fishermen。' },
+            { id: 25, text: 'Welcome to Shanghai! A wealth of ______ landmarks is ready to greet you.', hint: 'attraction',
+                answer: 'attractive', source: '基础题',
+                explanation: '句意：欢迎来到上海！大量有吸引力的地标正准备迎接您。空处修饰名词"landmarks"，填形容词，作定语。attraction"吸引力"，名词，形容词为 attractive"有吸引力的"。' },
+            { id: 26, text: 'The task was ______ difficult, but they tried to complete it on time.', hint: 'extreme',
+                answer: 'extremely', source: '基础题',
+                explanation: '句意：任务极其困难，但他们设法按时完成。空处修饰形容词"difficult"，填副词。extreme"极大的"，形容词，副词为 extremely"极度"。' },
+            { id: 27, text: 'The sunny days ______ us to go traveling to faraway places in autumn.', hint: 'able',
+                answer: 'enable', source: '基础题',
+                explanation: '句意：晴朗的日子使我们能够在秋天去遥远的地方旅行。根据句子结构，这里需要一个动词来连接主语"The sunny days"和宾语"us"，表示"使......能够"的意思。而"able"是一个形容词，意为"能够的"，其动词形式为"enable"，意为"使能够"，时态为一般现在时，主语是复数，动词用原形。' },
+            { id: 28, text: 'Doing housework can help students develop a sense of ______.', hint: 'responsible',
+                answer: 'responsibility', source: '基础题',
+                explanation: '句意：做家务可以帮助学生培养责任感。根据"Doing housework can help students develop a sense of...."可知，这里需要一个名词，a sense of...表示 "......的意识"，responsible 是形容词，表示"有责任的；负责的"，其名词形式是 responsibility，表示"责任；责任感"。' },
+            { id: 29, text: 'In this project, ______ thinking is necessary as well as team work among the group.',
+                hint: 'dependent', answer: 'independent', source: '基础题',
+                explanation: '句意：在这个项目中，除了团队合作外，独立思考也是必要的。根据"In this project,...thinking is necessary as well as team work among the group."可知，这里需要一个形容词来修饰"thinking"。depend 是动词，表示"依靠；依赖"，其形容词形式有"dependent"和"independent"。根据句子语境，在这个项目中，除了团队合作外，"独立思考" 也是必要的。' },
+            { id: 30, text: 'It was so windy that many ______ fell on the ground.', hint: 'leaf', answer: 'leaves',
+                source: '基础题',
+                explanation: '句意：风很大，许多树叶掉在地上。many 修饰可数名词复数形式，leaf 的复数是 leaves。' },
+            { id: 31, text: 'We will achieve success if we devote ______ to our work.', hint: 'we', answer: 'ourselves',
+                source: '基础题',
+                explanation: '句意：如果我们全身心投入工作，就会取得成功。devote oneself to为固定搭配，意为"全身心投入......"。故填 ourselves。' },
+            { id: 32, text: 'The ______ water we waste or pollute, the more we will have for tomorrow.', hint: 'little',
+                answer: 'less', source: '基础题',
+                explanation: '句意：我们浪费或污染的水越少，明天的水就越多。根据题干可知，本句考查固定句型："the+比较级，the+比较级，"意为"越......，就越......"，little 的比较级为 less。' },
+            { id: 33, text: 'The doctor told the patient to relax and ______ deeply before the medical examination.',
+                hint: 'breath', answer: 'breathe', source: '基础题',
+                explanation: '句意：医生告诉病人在体检前要放松，深呼吸。根据 deeply 副词修饰动词可知，空处应填动词；breath 对应的动词是 breathe，and 前后并列的动词词性应保持一致，由 to relax 可知，应用动词不定式，但是为避免重复，所以省略 to。' },
+            { id: 34, text: 'My sister has been ______ since she entered the university. She has made all the important decisions on her own.',
+                hint: 'dependent', answer: 'independent', source: '基础题',
+                explanation: '句意：我姐姐自从进入大学后就一直很独立。她所有重要的决定都是自己做的。空格前有 has been，需填入形容词作表语，用于描述姐姐的状态。dependent 是形容词，意为"依赖的"；结合后文"She has made all the important decisions on her own."可知，重大决定都是她自己做，所以此处需用其反义词 independent"独立的"。' },
+            { id: 35, text: "Tom's interest in painting comes ______ from his art teacher.", hint: 'main',
+                answer: 'mainly', source: '基础题',
+                explanation: '句意：汤姆对绘画的兴趣主要来自他的美术老师。main"主要的"，是形容词，此处修饰动词短语 comes from，用副词。' },
+            { id: 36, text: 'She prepared a lot for the competition and won the ______ prize.', hint: 'two',
+                answer: 'second', source: '基础题',
+                explanation: '句意：她为比赛做了充分准备，赢得了二等奖。空格前有定冠词 the，后接名词 prize，需填入序数词表示"第几名"。two 是基数词，其序数词为 second，表示"第二"，符合"the+序数词+名词"的结构。' },
+            { id: 37, text: 'The doctors tried their best to ______ the patient\'s life, but failed.', hint: 'safe',
+                answer: 'save', source: '基础题',
+                explanation: '句意：医生们尽最大努力挽救病人的生命，但失败了。空格前有 tried their best to，此处是 try one\'s best to do sth."尽某人最大努力做某事"，需填入动词原形。safe 是形容词，意为"安全的"，其对应的动词为 save"挽救"，符合"挽救生命"的语境。' },
+            { id: 38, text: 'George made the first movie in his ______. And it was a big hit.', hint: 'seventy',
+                answer: 'seventies', source: '基础题',
+                explanation: '句意：乔治在他七十多岁时拍摄了他的第一部电影，并且大获成功。seventy"七十"，基数词。in one\'s seventies 是固定短语，意为"在某人七十多岁时"，因此用复数形式。' },
+            { id: 39, text: 'It is the first time that I have completed a task by ______.', hint: 'I',
+                answer: 'myself', source: '基础题',
+                explanation: '句意：这是我第一次独自完成一项任务。根据"It is the first time that I have completed a task by..."及提示词可知，此处表达"独自"，英文表达为"by oneself"，I 的反身代词为 myself。' },
+            { id: 40, text: 'He had ______ supported the local team for 30 years.', hint: 'faith', answer: 'faithfully',
+                source: '基础题',
+                explanation: '句意：他忠实地支持当地球队已经 30 年了。根据句子结构，空格处需修饰谓语动词，需用副词形式 faithfully"忠实地"。' },
+            { id: 41, text: 'They ______ in capturing it through a trick that night.', hint: 'successful',
+                answer: 'succeeded', source: '基础题',
+                explanation: '句意：那天晚上他们通过一个计谋成功捕获了它。根据时间状语"that night"可知，句子时态是一般过去时，谓语动词需用过去式，succeed in doing sth."成功做某事"，是固定搭配，此处用 succeeded。' },
+            { id: 42, text: 'Laurent, 9, will become one of the ______ people to graduate from a university.',
+                hint: 'young', answer: 'youngest', source: '基础题',
+                explanation: '句意：9 岁的劳伦特将成为最年轻的大学毕业生之一。根据"one of the...people"及所给词可知，此处用 young 的最高级修饰名词 people，young 的最高级是 youngest。' },
+            { id: 43, text: 'He can correctly ______ a pack of cards in just 31.16 seconds.', hint: 'memory',
+                answer: 'memorize', source: '基础题',
+                explanation: '句意：他能在短短 31.16 秒内准确记住一副牌。memory"记忆"，名词。空格前有情态动词 can，此处需用动词原形作谓语。' },
+            { id: 44, text: "It's necessary to ______ on yourself to find ways to get rid of your bad habits.",
+                hint: 'independent', answer: 'depend', source: '基础题',
+                explanation: '句意：你有必要依靠自己找到摆脱坏习惯的方法。It\'s necessary to do sth."有必要做某事"，是固定句式，to 后需接动词原形；结合语境可知，此处指"找到摆脱坏习惯的方法"需"依靠自己"，此处用动词原形 depend，depend on"依靠"，是固定搭配。' },
+            { id: 45, text: 'Grandpa Li learns to use common software ______ word, excel and web design.',
+                hint: 'include', answer: 'including', source: '基础题',
+                explanation: '句意：李爷爷学习使用常用的软件，包括 word、excel 和网页设计。本句的谓语动词 learns to use，可知后面不能使用动词。include：包括，包含，及物动词；including：包括，包含，介词，用于列举事物前。' },
+            { id: 46, text: 'Our soldiers did not fire until the ______ were close enough.', hint: 'enemy',
+                answer: 'enemies', source: '基础题',
+                explanation: '句意：我们的士兵直到敌人足够接近才开火。根据句子结构以及空格前的定冠词 the 可知，空格所填词是名词，在句中作主语；根据空格后的 were 可知，空格上填名词复数，enemy 的复数形式为 enemies。' },
+            { id: 47, text: 'They were proud to say these paintings belonged to ______.', hint: 'they',
+                answer: 'themselves', source: '基础题',
+                explanation: '句意：他们自豪地说这些油画属于他们自己。主语 they 意为"他们"，是人称代词。belong to 意为"属于"，根据句意和语境可知，这些油画属于他们自己，表达"他们自己"，用反身代词，反身代词 themselves 在介词 to 后面作介词宾语。' },
+            { id: 48, text: "If you don't give up, you will ______ sooner or later.", hint: 'success',
+                answer: 'succeed', source: '基础题',
+                explanation: '句意：如果你不放弃，你迟早会成功的。success"成功"，名词，此处作谓语应用动词 succeed，时态为一般将来时，结构为"will do"，所以 succeed 应用动词原形。' },
+            { id: 49, text: 'The little girl began crying when she heard of the ______ of her puppy.', hint: 'die',
+                answer: 'death', source: '基础题',
+                explanation: '句意：当小女孩听到她的小狗死了以后，开始哭了起来。此处应填名词作宾语，die 的名词为 death"死亡"。' },
+            { id: 50, text: 'People in China celebrate ______ festivals in many special ways.', hint: 'tradition',
+                answer: 'traditional', source: '基础题',
+                explanation: '句意：中国人以许多特殊的方式庆祝传统节日。tradition"传统"，名词，此处应用形容词作定语修饰名词 festivals，故填 traditional。' },
+            { id: 51, text: 'Scientists say some animals will soon ______ because of the serious pollution.',
+                hint: 'appear', answer: 'disappear', source: '基础题',
+                explanation: '句意：科学家说，由于严重的污染，一些动物将很快消失。appear"出现"，根据"because of the serious pollution"可知由于严重的污染，一些动物将很快消失，应用 disappear"消失"，will 后跟动词原形。' },
+            { id: 52, text: 'A sudden noise made the children ______.', hint: 'frighten', answer: 'frightened',
+                source: '基础题',
+                explanation: '句意：一声突如其来的噪音让孩子们害怕起来。此处应填形容词作宾语补足语，frighten 的形容词且用来修饰人，应填 frightened。' },
+            { id: 53, text: 'The speech ______ talks about how to have a healthy diet.', hint: 'main',
+                answer: 'mainly', source: '基础题',
+                explanation: '句意：这个演讲主要谈论如何有健康的饮食。main"主要的"，形容词，修饰谓语"talks about"用副词形式，main 的副词形式为 mainly"主要地"。' },
+            { id: 54, text: "The whole family celebrated the baby's ______ day with joy and excitement.", hint: 'hundred',
+                answer: 'hundredth', source: '基础题',
+                explanation: '句意：全家人怀着喜悦和兴奋的心情庆祝宝宝的百天。根据"the baby\'s... day"可知，此处表示"第一百天"，用序数词形式，即"hundredth day"。' },
+            { id: 55, text: 'Through the works of art, Van Gogh leads us into his world of ______.', hint: 'imagine',
+                answer: 'imagination', source: '基础题',
+                explanation: '句意：通过艺术作品，梵高带领我们进入他的想象世界。根据"his world of"可知，此处需要一个名词来构成名词所有格，表示"他的......世界"。imagine"想象"，动词，其名词形式为 imagination。' },
+            { id: 56, text: 'He locked the heavy door and kept the key in his pocket to ensure it wouldn\'t get lost.',
+                hint: 'secure', answer: 'securely', source: '基础题',
+                explanation: '句意：他牢固地锁上了沉重的门，并把钥匙放在口袋里，以确保钥匙不会丢失。locked"锁"为动词，需副词修饰。secure"安全的，牢固的"为形容词，副词为 securely，意为"牢固地"。' },
+            { id: 57, text: 'Anyone using the equipment will be directly ______ for any damage or loss.',
+                hint: 'responsibility', answer: 'responsible', source: '基础题',
+                explanation: '句意：任何使用该设备的人都将对任何损坏或损失承担直接责任。根据"for any damage or loss"可知使用该设备的人都将对任何损坏或损失承担直接责任，作 be 动词的表语用形容词，responsibility"责任"，是名词，其形容词是 responsible"负责的"。' },
+            { id: 58, text: 'We find ourselves more ______ of our parents, whether economically or mentally.',
+                hint: 'dependent', answer: 'independent', source: '基础题',
+                explanation: '句意：我们发现自己在经济或精神上更加独立于父母。find sb. adj."发现某人......"，形容词作宾语补足语，根据"of our parents"可知此处是短语 independent of"独立于"，固定用法。' },
+            { id: 59, text: 'Inspired by heroic stories, he has dreamed of ______ in the army since childhood.',
+                hint: 'service', answer: 'serving', source: '基础题',
+                explanation: '句意：受到英雄故事的启发，他从小就梦想着在军队中服役。根据"Inspired by heroic stories, he has dreamed of...in the army since childhood."以及英文提示可知，此处表达的是"梦想在军队中服役"，dream of doing sth."梦想做某事"，而 service 是名词，其动词形式为 serve，意为"服役；服务"，因此应使用 serve 的动名词形式 serving。' },
+            { id: 60, text: 'To join the summer camp, there are various ______ like age limits and medical records.',
+                hint: 'require', answer: 'requirements', source: '基础题',
+                explanation: '句意：要参加夏令营，有各种各样的要求，比如年龄限制和医疗记录。空前的"various"意为"各种各样的"，后接可数名词复数，所给词"require"是动词，意为"要求"，其对应的名词形式是"requirement"，意为"要求、必要条件"，复数形式为"requirements"。' },
+
+            // ---- 2019-2023 上海中考真题 (61~100) ----
+            { id: 61, text: 'Michael has a habit of exercising for about 30 ______ every day.', hint: 'minute',
+                answer: 'minutes', source: '2023·真题',
+                explanation: '根据句意 "迈克尔有每天锻炼几分钟的习惯"，此处表示 "分钟"，应用 minutes。' },
+            { id: 62, text: 'There were various activities at the ______ China Folk Craft Fair.', hint: 'eight',
+                answer: 'eighth', source: '2023·真题',
+                explanation: '根据句意 "在中国民间工艺品博览会上有各种各样的活动"，此处表示 "第八届"，应用 eighth。' },
+            { id: 63, text: 'I designed the dress and made it all by ______ as well.', hint: 'me', answer: 'myself',
+                source: '2023·真题',
+                explanation: '根据句意 "我设计了这条裙子并且自己制作了它"，此处表示 "我自己"，应用 myself。' },
+            { id: 64, text: 'It was snowing ______ yet the couple still went to the concert.', hint: 'heavy',
+                answer: 'heavily', source: '2023·真题',
+                explanation: '根据句意 "正在下大雪，然而这对夫妇仍然去听了音乐会"，此处修饰动词用副词 heavily。' },
+            { id: 65, text: 'Tom called me to ______ for losing his temper yesterday.', hint: 'apology',
+                answer: 'apologize', source: '2023·真题',
+                explanation: '根据句意 "汤姆打电话给我为昨天发脾气而道歉"，此处应用动词形式 apologize。' },
+            { id: 66, text: "I'm looking for articles which are ______ for my study on birds.", hint: 'help',
+                answer: 'helpful', source: '2023·真题',
+                explanation: '根据句意 "我正在寻找对我研究鸟类有帮助的资料"，此处表示 "有帮助的"，应用 helpful。' },
+            { id: 67, text: 'Flying kites with friends gives Tina a feeling of great ______.', hint: 'happy',
+                answer: 'happiness', source: '2023·真题',
+                explanation: '根据句意 "和朋友一起放风筝给蒂娜一种极大的快乐感觉"，此处应用名词形式 happiness。' },
+            { id: 68, text: 'The famous painter showed her ______ talent for art at an early age.', hint: 'usual',
+                answer: 'unusual', source: '2023·真题',
+                explanation: '根据句意 "这位著名的画家在很小的时候就展示出了她不同寻常的艺术天赋"，此处表示 "不同寻常的"，应用 unusual。' },
+            { id: 69, text: 'There are many different ______ in that small garden.', hint: 'plant', answer: 'plants',
+                source: '2022·真题',
+                explanation: '句意：那个小花园里有许多不同的植物。plant"植物"，名词；many 修饰可数名词的复数，故用其复数形式。' },
+            { id: 70, text: 'Lily is reading the ______ story in the book about Chinese history.', hint: 'six',
+                answer: 'sixth', source: '2022·真题',
+                explanation: '句意：莉莉正在读关于中国历史的书中的第六个故事。six 是基数词，结合"the...story"可知此处应用序数词表示顺序，故填 sixth。' },
+            { id: 71, text: 'He learned how to make zongzi by ______ on the Dragon Boat Festival.', hint: 'he',
+                answer: 'himself', source: '2022·真题',
+                explanation: '句意：他在端午节自学包粽子。by oneself"独自"，主语是 He，反身代词用 himself。' },
+            { id: 72, text: 'These tips are ______ to improve your social skills. Why not take them?', hint: 'use',
+                answer: 'used', source: '2022·真题',
+                explanation: '句意：这些建议是用来提高你的社交技能的。为什么不采用呢？固定短语 be used to do sth"被用来做某事"。' },
+            { id: 73, text: 'More citizens agree to be green travelers so as to reduce air ______.', hint: 'pollute',
+                answer: 'pollution', source: '2022·真题',
+                explanation: '句意：更多的市民同意成为绿色旅行者，以减少空气污染。根据"reduce air"可知，此处是减少空气污染。pollution"污染"，不可数名词。' },
+            { id: 74, text: 'The journalist hoped to ______ the brave act of the fireman.', hint: 'reporter',
+                answer: 'report', source: '2022·真题',
+                explanation: '句意：新闻记者希望报道消防员的勇敢行为。reporter"记者"，名词。hope to do sth."希望做某事"，故空格处用动词原形 report"报道"。' },
+            { id: 75, text: 'With the help of his workmates, he was able to operate the machine ______.',
+                hint: 'correct', answer: 'correctly', source: '2022·真题',
+                explanation: '句意：在同事的帮助下，他能够正确地操作机器。correct"正确的"，形容词；此处用其副词形式 correctly，修饰动词 operate。' },
+            { id: 76, text: 'If you are ______ to get lost, calm down and look for possible help.', hint: 'lucky',
+                answer: 'unlucky', source: '2022·真题',
+                explanation: '句意：如果你不幸迷路，冷静下来，寻求可能的帮助。lucky"幸运的"，是形容词，根据"get lost"可知是指不幸的，unlucky 符合语境。' },
+            { id: 77, text: 'I live near my school. It takes me only ten ______ to walk there.', hint: 'minute',
+                answer: 'minutes', source: '2021·真题',
+                explanation: '句意：我住在学校附近。步行去那里只需要十分钟。minute 分钟，是名词，有数词 ten 修饰，用复数名词 minutes。' },
+            { id: 78, text: 'Lily and Mary have known each other for ______ years.', hint: 'seventh', answer: 'seven',
+                source: '2021·真题',
+                explanation: '句意：莉莉和玛丽互相认识七年了。seventh 第七，是序数词，修饰复数名词 years，用基数词 seven。' },
+            { id: 79, text: 'The Bund attracts many people with ______ beautiful night view.', hint: 'it',
+                answer: 'its', source: '2021·真题',
+                explanation: '句意：外滩以其美丽的夜景吸引了许多人。it 它，是主格形式，修饰名词短语 beautiful night view 可知，此处用形容词性物主代词 its。' },
+            { id: 80, text: 'The organization has set strict rules on the release of ______ chemicals.', hint: 'harm',
+                answer: 'harmful', source: '2021·真题',
+                explanation: '句意：该组织对有害化学物质的排放制定了严格的规定。harm 伤害，是名词，修饰名词 chemicals，用形容词 harmful。' },
+            { id: 81, text: "Without the glasses, he can't see the words on the blackboard ______.", hint: 'clear',
+                answer: 'clearly', source: '2021·真题',
+                explanation: '句意：没有眼镜，他看不清黑板上的字。空处修饰句中的动词 see，应用副词，clear 形容词，副词是 clearly。' },
+            { id: 82, text: 'Tony has made up his mind to be a soldier to ______ the country after graduation.',
+                hint: 'service', answer: 'service', source: '2021·真题',
+                explanation: '句意：托尼决心毕业后当兵报国。service 服务，动词；空前有 to，动词不定式作目的状语，所以此处用动词原形 service。' },
+            { id: 83, text: 'Shanghai Museum has a large ______ of works of art from home and abroad.', hint: 'collect',
+                answer: 'collection', source: '2021·真题',
+                explanation: '句意：上海博物馆收藏了大量的国内外艺术品。collect"收集"，动词；根据"a large...of"可知，空处应填入一个名词，collection"收藏品"，名词。' },
+            { id: 84, text: 'Some rainforests are likely to ______ if we don\'t take action to protect them.',
+                hint: 'appear', answer: 'disappear', source: '2021·真题',
+                explanation: '句意：如果我们不采取行动保护一些雨林，它们可能会消失。appear 出现，动词；根据"if we don\'t take action to protect them"可知，此处表示雨林可能会消失，disappear"消失"，动词；be likely to do sth.表示"可能会做某事"，此处应用动词原形。' },
+            { id: 85, text: 'Nowadays, many ______ have been used to work in dangerous situations.', hint: 'robot',
+                answer: 'robots', source: '2020·真题',
+                explanation: '句意：现在，许多机器人已经被用来在危险的情况下工作。many"许多"修饰可数名词 robot 的复数 robots"机器人"。' },
+            { id: 86, text: 'Uncle Andy tried ______ different jobs, and finally chose to be a lawyer.', hint: 'tenth',
+                answer: 'ten', source: '2020·真题',
+                explanation: '句意：安迪叔叔尝试了十种不同的工作，最后选择了当律师。tenth 第十，序数词。这里表示"十种不同的工作"，用基数词 ten。' },
+            { id: 87, text: 'The boy started to live in school and learn to manage time by ______.', hint: 'he',
+                answer: 'himself', source: '2020·真题',
+                explanation: '句意：这个男孩开始住校，学会自己管理时间。by oneself"独自，单独"，固定搭配；又根据主语 the boy 可知，用主格 he 的反身代词 himself"他自己"。' },
+            { id: 88, text: 'Lily asked her son to close the door ______ in order not to disturb others.', hint: 'soft',
+                answer: 'softly', source: '2020·真题',
+                explanation: '句意：莉莉叫儿子轻轻把门关上，以免打扰别人。副词修饰动词，空格在动宾短语 close the door 后面，故填 soft 的副词形式 softly。' },
+            { id: 89, text: 'On ______ days, leaves fall on the ground and the road looks beautiful.', hint: 'wind',
+                answer: 'windy', source: '2020·真题',
+                explanation: '句意：在刮风天，树叶落在地上，路看起来很美观。wind 风，名词；这里修饰名词 days 天，用形容词 windy 刮风的。' },
+            { id: 90, text: 'If you ______ red and yellow, what colour will you get?', hint: 'mixture', answer: 'mix',
+                source: '2020·真题',
+                explanation: '句意：如果你把红色和黄色混合，你会得到什么颜色？mixture 混合物，名词；句子缺少谓语动词，if 引导的条件状语从句，主句是一般将来时态，从句用一般现在时态；从句主语 you，第二人称，一般现在时态，谓语动词用原形 mix 混合。' },
+            { id: 91, text: 'Thanks to the ______ of the smart phone, it\'s convenient to take photos anytime.',
+                hint: 'invent', answer: 'invention', source: '2020·真题',
+                explanation: '句意：由于智能手机的发明，任何时候拍照都很方便。invent 发明，动词；这里是 the+名词+of 的结构，the invention of...的发明。' },
+            { id: 92, text: 'Sitting in front of the screen for too long is ______. It\'s bad for your eyes.',
+                hint: 'healthy', answer: 'unhealthy', source: '2020·真题',
+                explanation: '句意：长时间坐在屏幕前不利于健康。这对你的眼睛不好。空处需用形容词作表语，根据 It\'s bad for your eyes．可知，空处需用 healthy 对应的形容词 unhealthy"不健康的"。' },
+            { id: 93, text: 'Mr. Smith bought three ______ of local snacks for the exchange students.', hint: 'box',
+                answer: 'boxes', source: '2019·真题',
+                explanation: '句意：史密斯先生为交换生买了三盒当地小吃。Three+名词复数。box 的复数是 boxes。' },
+            { id: 94, text: 'On the ______ page of the book, there is an encouraging story.', hint: 'eight',
+                answer: 'eighth', source: '2019·真题',
+                explanation: '句意：在这本书的第八页，有一个令人鼓舞的故事。这里表示第几页用序数词，eight 的序数词是 eighth。' },
+            { id: 95, text: "Don't easily follow a fashion. Being ______ is the best rule.", hint: 'you',
+                answer: 'yourself', source: '2019·真题',
+                explanation: '句意：不要轻易跟随潮流。做你自己是最好的准则。这里是说做你自己，用反身代词，you 的反身代词是 yourself，意思是"你自己"。' },
+            { id: 96, text: 'Online libraries are ______ used for learning in the information age.', hint: 'wide',
+                answer: 'widely', source: '2019·真题',
+                explanation: '句意：网络图书馆在信息时代被广泛用于学习。这里是副词修饰动词，wide 的副词是 widely，意思是"宽广地"。' },
+            { id: 97, text: 'Finally, Jack achieved his goal and became the ______ of a company.', hint: 'own',
+                answer: 'owner', source: '2019·真题',
+                explanation: '句意：最后，杰克实现了他的目标，成为了一家公司的老板。The owner of a company 表示一个公司的老板。' },
+            { id: 98, text: 'The main purpose of the charity project is to offer help to ______ people.', hint: 'home',
+                answer: 'homeless', source: '2019·真题',
+                explanation: '句意：慈善项目的主要目的是帮助无家可归的人。homeless people 表示无家可归的人。' },
+            { id: 99, text: 'When Andy was ______ about his lost smart phone, his friend gave him a big hug.',
+                hint: 'happy', answer: 'unhappy', source: '2019·真题',
+                explanation: '句意：当安迪由于丢失智能手机不高兴时，他的朋友给了他一个大大的拥抱。根据下文 about his lost smart phone 可知上文是说不开心的。unhappy 的意思是"不开心的"。' },
+            { id: 100, text: 'Hard work pays off. I believe you will ______ your dream school.', hint: 'entrance',
+                answer: 'enter', source: '2019·真题',
+                explanation: '句意：努力工作是有回报的。我相信你会进入你梦想中的学校。Will+动词原形，entrance 名词，这里用动词，enter 意思是"进入"。' },
+
+            // ---- 新增 2024 模拟题 (101~110) ----
+            { id: 101, text: 'It is ______ for us to finish the work in two days.', hint: 'possible',
+                answer: 'impossible', source: '2024模拟',
+                explanation: '句意：对我们来说两天内完成这项工作是不可能的。根据句意应用否定形式，possible 的反义词为 impossible。' },
+            { id: 102, text: 'The ______ of the old building made us sad.', hint: 'destroy',
+                answer: 'destruction', source: '2024模拟',
+                explanation: '句意：旧建筑的毁坏让我们伤心。destroy 是动词，其名词形式为 destruction。' },
+            { id: 103, text: 'He is a famous ______ and has written many books.', hint: 'write',
+                answer: 'writer', source: '2024模拟',
+                explanation: '句意：他是一位著名的作家，写了许多书。write 是动词，其名词形式 writer 表示“作家”。' },
+            { id: 104, text: 'Please speak ______ so that everyone can hear you.', hint: 'loud',
+                answer: 'loudly', source: '2024模拟',
+                explanation: '句意：请大声说话，以便每个人都能听到你。修饰动词 speak 用副词 loudly。' },
+            { id: 105, text: 'The ______ of the mountain is 2000 meters.', hint: 'high',
+                answer: 'height', source: '2024模拟',
+                explanation: '句意：这座山的高度是 2000 米。high 是形容词，其名词形式为 height。' },
+            { id: 106, text: 'We should keep ______ when we are in danger.', hint: 'calmly',
+                answer: 'calm', source: '2024模拟',
+                explanation: '句意：当我们处于危险中时，我们应该保持冷静。keep 后接形容词作表语，calmly 是副词，形容词为 calm。' },
+            { id: 107, text: 'The ______ of the play was wonderful.', hint: 'perform',
+                answer: 'performance', source: '2024模拟',
+                explanation: '句意：这场演出的表演很精彩。perform 是动词，名词形式为 performance。' },
+            { id: 108, text: 'She is a ______ girl and always helps others.', hint: 'kindness',
+                answer: 'kind', source: '2024模拟',
+                explanation: '句意：她是一个善良的女孩，总是帮助别人。kindness 是名词，此处需形容词 kind 修饰 girl。' },
+            { id: 109, text: 'We all know the ______ of exercise.', hint: 'important',
+                answer: 'importance', source: '2024模拟',
+                explanation: '句意：我们都知道锻炼的重要性。important 是形容词，名词形式为 importance。' },
+            { id: 110, text: 'The ______ news made everyone excited.', hint: 'excite',
+                answer: 'exciting', source: '2024模拟',
+                explanation: '句意：这个令人兴奋的消息让每个人都激动。修饰 news（物）用形容词 exciting。' },
+        ];
+
+        // ======================================================================
+        //  2. 应用状态
+        // ======================================================================
+        const DEEPSEEK_URL = 'https://api.deepseek.com/v1/chat/completions';
+        let apiKey = localStorage.getItem('ds_api_key') || '';
+        let apiVerified = false;
+        let aiQuestions = [];
+
+        const state = {
+            allQuestions: QUESTION_BANK.slice(),
+            currentQuestions: [],
+            currentIndex: 0,
+            answered: false,
+            userInput: '',
+            errorIds: new Set(),
+            answeredCorrectIds: new Set(),
+            answeredWrongIds: new Set(),
+            correctCount: 0,
+            wrongCount: 0,
+            finished: false,
+        };
+
+        // ======================================================================
+        //  3. DOM 引用
+        // ======================================================================
+        const $ = (sel) => document.querySelector(sel);
+        const elTotalNum = $('#totalNum');
+        const elCorrectNum = $('#correctNum');
+        const elWrongNum = $('#wrongNum');
+        const elProgressLabel = $('#progressLabel');
+        const elErrorBookBadge = $('#errorBookBadge');
+        const elProgressBar = $('#progressBar');
+        const elQIdLabel = $('#qIdLabel');
+        const elQSourceLabel = $('#qSourceLabel');
+        const elQTextContainer = $('#qTextContainer');
+        const elQHint = $('#qHint');
+        const elFeedback = $('#feedback');
+        const elFbIcon = $('#fbIcon');
+        const elFbMessage = $('#fbMessage');
+        const elFbAnswer = $('#fbAnswer');
+        const elFbExplanation = $('#fbExplanation');
+        const elSubmitBtn = $('#submitBtn');
+        const elNextBtn = $('#nextBtn');
+        const elResetBtn = $('#resetBtn');
+        const elErrorBookBtn = $('#errorBookBtn');
+        const elModal = $('#errorBookModal');
+        const elModalClose = $('#modalCloseBtn');
+        const elModalClose2 = $('#modalCloseBtn2');
+        const elModalBody = $('#modalBody');
+        const elModalTitle = $('#modalTitle');
+        const elModalSubtitle = $('#modalSubtitle');
+        const elModalTabErrors = $('#modalTabErrors');
+        const elModalTabAi = $('#modalTabAi');
+        const elClearErrorsBtn = $('#clearErrorsBtn');
+        const elClearAiBtn = $('#clearAiBtn');
+        const elExportAiBtn = $('#exportAiBtn');
+        const elApiSettingsBtn = $('#apiSettingsBtn');
+        const elAiBankBtn = $('#aiBankBtn');
+        const elAiBankBadge = $('#aiBankBadge');
+        const elApiPanel = $('#apiPanel');
+        const elApiKeyInput = $('#apiKeyInput');
+        const elVerifyApiBtn = $('#verifyApiBtn');
+        const elApiStatus = $('#apiStatus');
+        const elAiGenerateBtn = $('#aiGenerateBtn');
+        const elAiLoading = $('#aiLoading');
+        const elAiResultActions = $('#aiResultActions');
+        const elStartAiRoundBtn = $('#startAiRoundBtn');
+        const elDiscardAiBtn = $('#discardAiBtn');
+
+        // ======================================================================
+        //  4. 核心逻辑
+        // ======================================================================
+
+        function shuffle(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function pickQuestions() {
+            const all = state.allQuestions;
+            const errorIds = Array.from(state.errorIds);
+            const errorQuestions = all.filter(q => errorIds.includes(q.id));
+            const nonErrorQuestions = all.filter(q => !errorIds.includes(q.id));
+            const maxErrors = Math.min(errorQuestions.length, 25);
+            const selectedErrors = shuffle(errorQuestions).slice(0, maxErrors);
+            const need = 30 - selectedErrors.length;
+            const selectedNonErrors = shuffle(nonErrorQuestions).slice(0, need);
+            let combined = [...selectedErrors, ...selectedNonErrors];
+            if (combined.length < 30) {
+                const extra = shuffle(all).filter(q => !combined.some(c => c.id === q.id));
+                combined = combined.concat(extra.slice(0, 30 - combined.length));
+            }
+            return shuffle(combined);
+        }
+
+        function renderQuestion() {
+            const qs = state.currentQuestions;
+            if (!qs.length || state.currentIndex >= qs.length) {
+                state.finished = true;
+                elQTextContainer.innerHTML =
+                    `<div style="text-align:center;padding:30px 0;color:#1f334f;font-size:18px;">🎉 恭喜你完成本轮练习！<br><span style="font-size:15px;color:#5f748f;">正确 ${state.correctCount} 题 · 错误 ${state.wrongCount} 题</span></div>`;
+                elQHint.style.display = 'none';
+                elFeedback.classList.remove('show');
+                elSubmitBtn.disabled = true;
+                elNextBtn.disabled = true;
+                elProgressLabel.textContent = `${qs.length} / ${qs.length}`;
+                elProgressBar.style.width = '100%';
+                return;
+            }
+
+            const q = qs[state.currentIndex];
+            const idx = state.currentIndex;
+            const total = qs.length;
+
+            elProgressLabel.textContent = `${idx + 1} / ${total}`;
+            elProgressBar.style.width = `${((idx + 1) / total) * 100}%`;
+
+            elQIdLabel.textContent = `第 ${idx + 1} 题`;
+            elQSourceLabel.textContent = q.source || '基础题';
+
+            const parts = q.text.split('______');
+            let html = '';
+            parts.forEach((part, i) => {
+                html += part;
+                if (i < parts.length - 1) {
+                    html +=
+                        `<input class="blank-input" id="blankInput" type="text" autocomplete="off" placeholder="填写" value="${state.userInput || ''}" />`;
+                }
+            });
+            elQTextContainer.innerHTML = html;
+
+            elQHint.innerHTML = `💡 提示词：<strong>${q.hint}</strong>`;
+            elQHint.style.display = 'block';
+
+            elFeedback.classList.remove('show', 'correct', 'wrong');
+            elSubmitBtn.disabled = false;
+            elNextBtn.disabled = true;
+            state.answered = false;
+            state.userInput = '';
+
+            const input = document.getElementById('blankInput');
+            if (input) {
+                input.value = '';
+                input.focus();
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleSubmit();
+                    }
+                });
+                input.addEventListener('input', (e) => {
+                    state.userInput = e.target.value;
+                });
+            }
+
+            updateStats();
+        }
+
+        function handleSubmit() {
+            if (state.answered || state.finished) return;
+            const qs = state.currentQuestions;
+            if (!qs.length || state.currentIndex >= qs.length) return;
+
+            const q = qs[state.currentIndex];
+            const input = document.getElementById('blankInput');
+            if (!input) return;
+            const userVal = input.value.trim();
+            if (userVal === '') {
+                elFeedback.className = 'feedback show wrong';
+                elFbIcon.textContent = '⚠️';
+                elFbMessage.textContent = '请先填写答案！';
+                elFbAnswer.textContent = '';
+                elFbExplanation.textContent = '';
+                return;
+            }
+
+            const isCorrect = userVal.toLowerCase() === q.answer.toLowerCase();
+            state.answered = true;
+            state.userInput = userVal;
+
+            if (isCorrect) {
+                state.correctCount++;
+                state.answeredCorrectIds.add(q.id);
+                if (state.errorIds.has(q.id)) {
+                    state.errorIds.delete(q.id);
+                }
+                elFeedback.className = 'feedback show correct';
+                elFbIcon.textContent = '✅';
+                elFbMessage.textContent = '回答正确！';
+                elFbAnswer.textContent = `答案：${q.answer}`;
+                input.classList.add('correct');
+                input.classList.remove('wrong');
+            } else {
+                state.wrongCount++;
+                state.answeredWrongIds.add(q.id);
+                state.errorIds.add(q.id);
+                elFeedback.className = 'feedback show wrong';
+                elFbIcon.textContent = '❌';
+                elFbMessage.textContent = '回答错误';
+                elFbAnswer.textContent = `正确答案：${q.answer}`;
+                input.classList.add('wrong');
+                input.classList.remove('correct');
+            }
+            elFbExplanation.textContent = `📖 解析：${q.explanation || '（无额外解析）'}`;
+
+            elSubmitBtn.disabled = true;
+            elNextBtn.disabled = false;
+            input.disabled = true;
+            updateStats();
+            updateErrorBadge();
+            saveErrors();
+        }
+
+        function goToNext() {
+            if (!state.answered && !state.finished) return;
+            state.currentIndex++;
+            state.userInput = '';
+            renderQuestion();
+            if (state.finished) {
+                elProgressLabel.textContent = `${state.currentQuestions.length} / ${state.currentQuestions.length}`;
+                elProgressBar.style.width = '100%';
+            }
+        }
+
+        function resetPractice() {
+            const newQuestions = pickQuestions();
+            state.currentQuestions = newQuestions;
+            state.currentIndex = 0;
+            state.answered = false;
+            state.userInput = '';
+            state.answeredCorrectIds = new Set();
+            state.answeredWrongIds = new Set();
+            state.correctCount = 0;
+            state.wrongCount = 0;
+            state.finished = false;
+            elSubmitBtn.disabled = false;
+            elNextBtn.disabled = true;
+            renderQuestion();
+            updateStats();
+            updateErrorBadge();
+        }
+
+        function updateStats() {
+            const total = state.currentQuestions.length || 0;
+            elTotalNum.textContent = total;
+            elCorrectNum.textContent = state.correctCount;
+            elWrongNum.textContent = state.wrongCount;
+            if (state.finished) {
+                elProgressLabel.textContent = `${total} / ${total}`;
+                elProgressBar.style.width = '100%';
+            } else {
+                const idx = state.currentIndex;
+                elProgressLabel.textContent = `${Math.min(idx + 1, total)} / ${total}`;
+            }
+        }
+
+        function updateErrorBadge() {
+            const count = state.errorIds.size;
+            elErrorBookBadge.textContent = `📕 错题 ${count}`;
+        }
+
+        function renderErrorBook() {
+            const ids = Array.from(state.errorIds);
+            elModalTitle.textContent = '📕 错题本';
+            elModalSubtitle.textContent = `${ids.length} 道`;
+            elModalTabErrors.style.background = '#1f3a5f';
+            elModalTabErrors.style.color = '#fff';
+            elModalTabAi.style.background = '';
+            elModalTabAi.style.color = '';
+            elAiGenerateBtn.style.display = '';
+            elClearErrorsBtn.style.display = '';
+            elClearAiBtn.style.display = 'none';
+            elExportAiBtn.style.display = 'none';
+            elAiResultActions.style.display = 'none';
+            if (ids.length === 0) {
+                elModalBody.innerHTML = `
+                    <div class="empty-errors">
+                        <span class="icon">🎉</span>
+                        错题本为空，继续保持！
+                    </div>
+                `;
+                return;
+            }
+            const errorItems = ids.map(id => state.allQuestions.find(q => q.id === id)).filter(Boolean);
+            let html = '';
+            errorItems.forEach((q, i) => {
+                html += `
+                    <div class="error-item">
+                        <span class="e-index">#${i + 1}</span>
+                        <span class="e-text">${q.text.replace('______', '_____')}</span>
+                        <span class="e-answer">✅ ${q.answer}</span>
+                    </div>
+                `;
+            });
+            elModalBody.innerHTML = html;
+        }
+
+        function renderAiBank() {
+            const items = loadAiQuestions();
+            elModalTitle.textContent = '🤖 AI 题库';
+            elModalSubtitle.textContent = `${items.length} 道`;
+            elModalTabErrors.style.background = '';
+            elModalTabErrors.style.color = '';
+            elModalTabAi.style.background = '#1f3a5f';
+            elModalTabAi.style.color = '#fff';
+            elAiGenerateBtn.style.display = 'none';
+            elClearErrorsBtn.style.display = 'none';
+            elClearAiBtn.style.display = '';
+            elExportAiBtn.style.display = '';
+            elAiResultActions.style.display = 'none';
+            if (items.length === 0) {
+                elModalBody.innerHTML = `
+                    <div class="empty-errors">
+                        <span class="icon">📭</span>
+                        暂无 AI 生成的题目
+                    </div>
+                `;
+                return;
+            }
+            let html = '';
+            items.forEach((q, i) => {
+                html += `
+                    <div class="error-item" style="border-color:#b7dfce;">
+                        <span class="e-index">#${i + 1}</span>
+                        <span class="e-text">${q.text.replace('______', '_____')}</span>
+                        <span class="e-answer">✅ ${q.answer}</span>
+                    </div>
+                `;
+            });
+            elModalBody.innerHTML = html;
+        }
+
+        function openErrorBook() {
+            renderErrorBook();
+            elModal.classList.add('open');
+        }
+
+        function openAiBank() {
+            renderAiBank();
+            elModal.classList.add('open');
+        }
+
+        function closeErrorBook() {
+            elModal.classList.remove('open');
+        }
+
+        function clearErrorBook() {
+            if (state.errorIds.size === 0) return;
+            if (confirm('确定要清空错题本吗？')) {
+                state.errorIds.clear();
+                updateErrorBadge();
+                saveErrors();
+                renderErrorBook();
+                closeErrorBook();
+                if (!state.finished) {
+                    renderQuestion();
+                    updateStats();
+                }
+            }
+        }
+
+        function saveErrors() {
+            try {
+                localStorage.setItem('errorBook_ids', JSON.stringify(Array.from(state.errorIds)));
+            } catch (_) { /* ignore */ }
+        }
+
+        function loadErrors() {
+            try {
+                const saved = localStorage.getItem('errorBook_ids');
+                if (saved) {
+                    const ids = JSON.parse(saved);
+                    if (Array.isArray(ids)) {
+                        ids.forEach(id => state.errorIds.add(id));
+                    }
+                }
+            } catch (_) { /* ignore */ }
+        }
+
+        function saveAiQuestions(items) {
+            try {
+                localStorage.setItem('ai_questions', JSON.stringify(items));
+            } catch (_) {}
+        }
+
+        function loadAiQuestions() {
+            try {
+                const saved = localStorage.getItem('ai_questions');
+                return saved ? JSON.parse(saved) : [];
+            } catch (_) { return []; }
+        }
+
+        function updateAiBankBadge() {
+            const items = loadAiQuestions();
+            if (items.length > 0) {
+                elAiBankBadge.style.display = '';
+                elAiBankBadge.textContent = `🤖 AI 题 ${items.length}`;
+                elAiBankBtn.style.display = '';
+                elModalTabAi.style.display = '';
+            } else {
+                elAiBankBadge.style.display = 'none';
+                elAiBankBtn.style.display = 'none';
+                elModalTabAi.style.display = 'none';
+            }
+        }
+
+        // ======================================================================
+        //  5. 事件绑定
+        // ======================================================================
+        elSubmitBtn.addEventListener('click', handleSubmit);
+        elNextBtn.addEventListener('click', goToNext);
+        elResetBtn.addEventListener('click', resetPractice);
+        elErrorBookBtn.addEventListener('click', openErrorBook);
+        elModalClose.addEventListener('click', closeErrorBook);
+        elModalClose2.addEventListener('click', closeErrorBook);
+        elModal.addEventListener('click', (e) => {
+            if (e.target === elModal) closeErrorBook();
+        });
+        elClearErrorsBtn.addEventListener('click', clearErrorBook);
+        elAiBankBtn.addEventListener('click', openAiBank);
+
+        elModalTabErrors.addEventListener('click', renderErrorBook);
+        elModalTabAi.addEventListener('click', renderAiBank);
+
+        elClearAiBtn.addEventListener('click', () => {
+            if (confirm('确定要清空所有 AI 生成的题目吗？')) {
+                saveAiQuestions([]);
+                updateAiBankBadge();
+                renderAiBank();
+            }
+        });
+
+        elExportAiBtn.addEventListener('click', () => {
+            const items = loadAiQuestions();
+            if (items.length === 0) return;
+            const json = JSON.stringify(items, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ai_questions_${new Date().toISOString().slice(0, 10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !state.answered && !state.finished) {
+                const input = document.getElementById('blankInput');
+                if (input && document.activeElement === input) {
+                    e.preventDefault();
+                    handleSubmit();
+                }
+            }
+            if (e.key === 'Enter' && state.answered && !state.finished) {
+                if (!elNextBtn.disabled) {
+                    elNextBtn.click();
+                }
+            }
+            if (e.key === 'Escape') {
+                closeErrorBook();
+            }
+        });
+
+        // ======================================================================
+        //  6. 初始化
+        // ======================================================================
+        async function tryVerifySavedKey() {
+            if (!apiKey) return;
+            try {
+                const ok = await verifyApiKey(apiKey);
+                apiVerified = ok;
+            } catch {
+                apiVerified = false;
+            }
+        }
+
+        function init() {
+            loadErrors();
+            updateAiBankBadge();
+            if (apiKey) {
+                tryVerifySavedKey().then(() => updateApiStatus());
+            }
+            state.currentQuestions = pickQuestions();
+            state.currentIndex = 0;
+            state.correctCount = 0;
+            state.wrongCount = 0;
+            state.finished = false;
+            state.answered = false;
+            state.userInput = '';
+            renderQuestion();
+            updateStats();
+            updateErrorBadge();
+            // 拦截错误集合变化以自动保存
+            const origAdd = state.errorIds.add;
+            const origDelete = state.errorIds.delete;
+            const origClear = state.errorIds.clear;
+            state.errorIds.add = function(val) {
+                const result = origAdd.call(this, val);
+                saveErrors();
+                return result;
+            };
+            state.errorIds.delete = function(val) {
+                const result = origDelete.call(this, val);
+                saveErrors();
+                return result;
+            };
+            state.errorIds.clear = function() {
+                const result = origClear.call(this);
+                saveErrors();
+                return result;
+            };
+        }
+
+        init();
+
+        // ======================================================================
+        //  7. DeepSeek AI 集成
+        // ======================================================================
+
+        async function verifyApiKey(key) {
+            const res = await fetch('https://api.deepseek.com/models', {
+                headers: { 'Authorization': `Bearer ${key}` }
+            });
+            return res.ok;
+        }
+
+        async function generateWithAI(errorWords) {
+            const prompt = `你是一名英语教师，正在出词形词性转化填空题。针对以下每个词根：${errorWords.join('、')}，各生成1道填空题，要求学生将词根变换为适当形式填入空白。
+
+严格按以下JSON格式返回（只返回合法JSON数组，不要其他文字）：
+{"text": "包含 ______ 空白的完整英文句子", "hint": "词根", "answer": "正确答案", "explanation": "简明中文解析，说明为什么填这个形式"}
+
+要求：
+- 句子地道自然，适合中学生水平
+- hint 保持为给出的词根
+- answer 为词根变换后的正确形式
+- explanation 用中文解释词性变化原因
+- 生成 ${errorWords.length} 个对象`;
+
+            const res = await fetch(DEEPSEEK_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: 'deepseek-chat',
+                    messages: [{ role: 'user', content: prompt }],
+                    temperature: 0.8,
+                    max_tokens: 4096,
+                })
+            });
+
+            if (!res.ok) {
+                const errText = await res.text();
+                throw new Error(`API 请求失败 (${res.status}): ${errText}`);
+            }
+
+            const data = await res.json();
+            const content = data.choices?.[0]?.message?.content;
+            if (!content) throw new Error('API 返回为空');
+
+            let questions;
+            try {
+                const cleaned = content.replace(/```(?:json)?\s*([\s\S]*?)```/g, '$1').trim();
+                questions = JSON.parse(cleaned);
+                if (!Array.isArray(questions)) throw new Error('非数组');
+            } catch {
+                throw new Error('无法解析 AI 返回的题目格式');
+            }
+
+            aiQuestions = questions.map((q, i) => ({
+                id: 2000 + i,
+                text: q.text,
+                hint: q.hint,
+                answer: q.answer,
+                source: '🤖 AI 生成',
+                explanation: q.explanation || 'AI 生成的练习题',
+            }));
+
+            // 自动保存到本地
+            const existing = loadAiQuestions();
+            const merged = [...existing, ...aiQuestions];
+            saveAiQuestions(merged);
+            updateAiBankBadge();
+
+            return aiQuestions;
+        }
+
+        // API 面板显示/隐藏
+        elApiSettingsBtn.addEventListener('click', () => {
+            const shown = elApiPanel.style.display !== 'none';
+            elApiPanel.style.display = shown ? 'none' : 'flex';
+            if (!shown) {
+                elApiKeyInput.value = apiKey;
+                elApiKeyInput.focus();
+                updateApiStatus();
+            }
+        });
+
+        // 验证 API Key
+        elVerifyApiBtn.addEventListener('click', async () => {
+            const key = elApiKeyInput.value.trim();
+            if (!key) {
+                elApiStatus.className = 'api-status err';
+                elApiStatus.textContent = '请输入 Key';
+                return;
+            }
+            elApiStatus.className = 'api-status loading';
+            elApiStatus.textContent = '验证中…';
+            elVerifyApiBtn.disabled = true;
+            try {
+                const ok = await verifyApiKey(key);
+                if (ok) {
+                    apiKey = key;
+                    apiVerified = true;
+                    localStorage.setItem('ds_api_key', key);
+                    elApiStatus.className = 'api-status ok';
+                    elApiStatus.textContent = '✅ 已验证';
+                } else {
+                    apiVerified = false;
+                    elApiStatus.className = 'api-status err';
+                    elApiStatus.textContent = '❌ Key 无效';
+                }
+            } catch {
+                apiVerified = false;
+                elApiStatus.className = 'api-status err';
+                elApiStatus.textContent = '❌ 网络错误';
+            } finally {
+                elVerifyApiBtn.disabled = false;
+            }
+        });
+
+        function updateApiStatus() {
+            if (apiVerified && apiKey) {
+                elApiStatus.className = 'api-status ok';
+                elApiStatus.textContent = '✅ 已连接';
+            } else if (apiKey) {
+                elApiStatus.className = 'api-status err';
+                elApiStatus.textContent = '❌ Key 未验证';
+            } else {
+                elApiStatus.className = '';
+                elApiStatus.textContent = '';
+            }
+        }
+
+        // AI 生成
+        elAiGenerateBtn.addEventListener('click', async () => {
+            if (!apiVerified || !apiKey) {
+                alert('请先点击 "🔑 API" 输入并验证 DeepSeek API Key');
+                elApiPanel.style.display = 'flex';
+                elApiKeyInput.focus();
+                return;
+            }
+
+            const errorIds = Array.from(state.errorIds);
+            if (errorIds.length === 0) {
+                alert('错题本为空，无需生成');
+                return;
+            }
+
+            const errorWords = errorIds
+                .map(id => state.allQuestions.find(q => q.id === id))
+                .filter(Boolean)
+                .map(q => q.hint);
+            const uniqueWords = [...new Set(errorWords)];
+
+            elAiLoading.classList.add('show');
+            elAiGenerateBtn.disabled = true;
+            elAiResultActions.style.display = 'none';
+
+            try {
+                const generated = await generateWithAI(uniqueWords);
+                let html = `<div style="font-size:14px;font-weight:600;color:#1f9d6a;margin-bottom:10px;">✅ AI 生成了 ${generated.length} 道新题目</div>`;
+                generated.forEach((q, i) => {
+                    html += `
+                        <div class="error-item" style="border-color:#b7dfce;">
+                            <span class="e-index">#${i + 1}</span>
+                            <span class="e-text">${q.text.replace('______', '_____')}</span>
+                            <span class="e-answer">✅ ${q.answer}</span>
+                        </div>
+                    `;
+                });
+                elModalBody.innerHTML = html;
+                elAiResultActions.style.display = 'flex';
+            } catch (err) {
+                elModalBody.innerHTML = `
+                    <div class="empty-errors">
+                        <span class="icon">😵</span>
+                        ${err.message}
+                    </div>
+                `;
+            } finally {
+                elAiLoading.classList.remove('show');
+                elAiGenerateBtn.disabled = false;
+            }
+        });
+
+        elStartAiRoundBtn.addEventListener('click', () => {
+            if (aiQuestions.length === 0) return;
+
+            const newBank = [...state.allQuestions, ...aiQuestions];
+            const origPick = pickQuestions;
+
+            state.allQuestions = newBank;
+            const newQuestions = pickQuestions();
+            state.currentQuestions = newQuestions;
+            state.currentIndex = 0;
+            state.answered = false;
+            state.userInput = '';
+            state.answeredCorrectIds = new Set();
+            state.answeredWrongIds = new Set();
+            state.correctCount = 0;
+            state.wrongCount = 0;
+            state.finished = false;
+            elSubmitBtn.disabled = false;
+            elNextBtn.disabled = true;
+
+            closeErrorBook();
+            renderQuestion();
+            updateStats();
+            updateErrorBadge();
+        });
+
+        elDiscardAiBtn.addEventListener('click', () => {
+            aiQuestions = [];
+            elAiResultActions.style.display = 'none';
+            renderErrorBook();
+        });
+    </script>
+</body>
+</html>
