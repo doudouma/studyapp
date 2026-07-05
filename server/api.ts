@@ -35,7 +35,28 @@ const requireAdmin = (c: any, next: any) => {
 
 const ALLOWED_EXTENSIONS = [".html", ".htm", ".zip"];
 
-function injectBanner(html: string, meta?: { title?: string; description?: string; url?: string }): string {
+function getMimeType(filename: string): string {
+  if (filename.endsWith(".html") || filename.endsWith(".htm")) return "text/html; charset=utf-8";
+  if (filename.endsWith(".json")) return "application/json; charset=utf-8";
+  if (filename.endsWith(".js")) return "application/javascript; charset=utf-8";
+  if (filename.endsWith(".css")) return "text/css; charset=utf-8";
+  if (filename.endsWith(".png")) return "image/png";
+  if (filename.endsWith(".jpg") || filename.endsWith(".jpeg")) return "image/jpeg";
+  if (filename.endsWith(".gif")) return "image/gif";
+  if (filename.endsWith(".svg")) return "image/svg+xml";
+  if (filename.endsWith(".webp")) return "image/webp";
+  if (filename.endsWith(".woff2")) return "font/woff2";
+  if (filename.endsWith(".woff")) return "font/woff";
+  if (filename.endsWith(".ttf")) return "font/ttf";
+  if (filename.endsWith(".mp3")) return "audio/mpeg";
+  if (filename.endsWith(".wav")) return "audio/wav";
+  if (filename.endsWith(".mp4")) return "video/mp4";
+  if (filename.endsWith(".pdf")) return "application/pdf";
+  return "application/octet-stream";
+}
+
+function injectBanner(html: string, meta?: { title?: string; description?: string; url?: string }, baseHref?: string): string {
+  const baseTag = baseHref ? `<base href="${escapeHtml(baseHref)}">` : "";
   const seoTags = meta ? `
     <meta property="og:type" content="website">
     <meta property="og:title" content="${escapeHtml(meta.title || "学习页面")} | 100mini">
@@ -47,7 +68,10 @@ function injectBanner(html: string, meta?: { title?: string; description?: strin
     <link rel="canonical" href="${escapeHtml(meta.url || "")}">
   ` : "";
 
-  return html.replace("</head>", `${seoTags}</head>`);
+  let result = html;
+  if (baseTag) result = result.replace("<head>", `<head>${baseTag}`);
+  if (seoTags) result = result.replace("</head>", `${seoTags}</head>`);
+  return result;
 }
 
 function escapeHtml(str: string): string {
@@ -69,6 +93,15 @@ async function putToStorage(
     await c.env.BUCKET.put(key, body, {
       httpMetadata: { contentType: "text/html; charset=utf-8" },
     });
+  }
+}
+
+async function deletePageFromBucket(bucket: R2Bucket, id: string) {
+  await bucket.delete(`${id}.html`);
+  await bucket.delete(`thumbnails/${id}.webp`);
+  const listed = await bucket.list({ prefix: `${id}/` });
+  if (listed.objects.length > 0) {
+    await bucket.delete(listed.objects.map((o) => o.key));
   }
 }
 
@@ -344,8 +377,7 @@ api.delete("/api/admin/pages/:id", requireAdmin, async (c) => {
 
   // Delete from R2
   if (c.env?.BUCKET) {
-    await c.env.BUCKET.delete(`${pageId}.html`);
-    await c.env.BUCKET.delete(`thumbnails/${pageId}.webp`);
+    await deletePageFromBucket(c.env.BUCKET, pageId);
   }
 
   // Delete from D1
@@ -412,8 +444,7 @@ api.delete("/api/pages/:id", async (c) => {
 
   // Delete from R2
   if (c.env?.BUCKET) {
-    await c.env.BUCKET.delete(`${pageId}.html`);
-    await c.env.BUCKET.delete(`thumbnails/${pageId}.webp`);
+    await deletePageFromBucket(c.env.BUCKET, pageId);
   }
 
   // Delete from D1
@@ -436,7 +467,8 @@ api.get("/api/pages/:id/content", async (c) => {
 
   let content = "";
   if (c.env?.BUCKET) {
-    const obj = await c.env.BUCKET.get(`${pageId}.html`);
+    let obj = await c.env.BUCKET.get(`${pageId}.html`);
+    if (!obj) obj = await c.env.BUCKET.get(`${pageId}/index.html`);
     if (obj) content = await obj.text();
   }
 
@@ -476,7 +508,10 @@ api.patch("/api/pages/:id", async (c) => {
   }
 
   if (body.content !== undefined) {
-    await c.env.BUCKET!.put(`${pageId}.html`, body.content, {
+    // Detect ZIP format: HTML is stored under {id}/index.html instead of {id}.html
+    const isZip = await c.env.BUCKET!.get(`${pageId}/index.html`).then(Boolean).catch(() => false);
+    const key = isZip ? `${pageId}/index.html` : `${pageId}.html`;
+    await c.env.BUCKET!.put(key, body.content, {
       httpMetadata: { contentType: "text/html; charset=utf-8" },
     });
   }
@@ -537,6 +572,8 @@ api.post("/api/upload", async (c) => {
   }
 
   let html: string;
+  let zipEntries: Record<string, Uint8Array> | null = null;
+  let htmlFile: string | undefined;
 
   if (file && file instanceof File) {
     const name = file.name.toLowerCase();
@@ -555,7 +592,7 @@ api.post("/api/upload", async (c) => {
       const files = unzipSync(bytes);
       const entries = Object.keys(files);
 
-      let htmlFile = entries.find(
+      htmlFile = entries.find(
         (f) => f.endsWith("/index.html") || f === "index.html"
       );
       if (!htmlFile) htmlFile = entries.find((f) => f.endsWith(".html"));
@@ -569,6 +606,7 @@ api.post("/api/upload", async (c) => {
       }
 
       html = new TextDecoder().decode(files[htmlFile]);
+      zipEntries = files;
     } else {
       html = new TextDecoder().decode(bytes);
     }
@@ -585,7 +623,26 @@ api.post("/api/upload", async (c) => {
   const now = Date.now();
   const isAnonymous = !user;
 
-  if (isAnonymous) {
+  if (zipEntries) {
+    // Store all ZIP files under {id}/ prefix
+    // Rename the main HTML to index.html so the serving code can find it
+    const prefix = isAnonymous ? `tmp/${id}` : id;
+    if (c.env?.BUCKET) {
+      const puts = Object.entries(zipEntries).map(([filename, data]) => {
+        const key = filename === htmlFile ? `${prefix}/index.html` : `${prefix}/${filename}`;
+        const mime = getMimeType(filename);
+        const opts: R2PutOptions = {
+          httpMetadata: { contentType: mime },
+        };
+        if (isAnonymous) {
+          opts.customMetadata = { createdAt: String(now) };
+        }
+        const buf = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
+        return c.env.BUCKET.put(key, buf, opts);
+      });
+      await Promise.all(puts);
+    }
+  } else if (isAnonymous) {
     // Store under tmp/ with creation timestamp for auto-cleanup
     const key = `tmp/${id}.html`;
     if (c.env?.BUCKET) {
@@ -744,11 +801,15 @@ api.get("/api/square", async (c) => {
   return c.json({ items });
 });
 
-api.get("/p/:id", async (c) => {
-  const id = c.req.param("id");
-  if (!/^[a-zA-Z0-9_-]{7}$/.test(id)) {
-    return c.html(notFoundHtml(), 404);
-  }
+api.get("/p/*", async (c) => {
+  const rest = c.req.path.replace(/^\/p\//, "");
+
+  // Parse /{id} or /{id}/{path}
+  const match = rest.match(/^([a-zA-Z0-9_-]{7})(?:\/(.*))?$/);
+  if (!match) return c.html(notFoundHtml(), 404);
+
+  const id = match[1];
+  const path = match[2];
 
   // Check expiration from D1 (logged-in user pages)
   if (c.env.D1) {
@@ -758,8 +819,7 @@ api.get("/p/:id", async (c) => {
       const p = record[0];
       if (p.expiresAt && new Date(p.expiresAt) < new Date()) {
         if (c.env?.BUCKET) {
-          await c.env.BUCKET.delete(`${id}.html`);
-          await c.env.BUCKET.delete(`thumbnails/${id}.webp`);
+          await deletePageFromBucket(c.env.BUCKET, id);
         }
         await db.delete(page).where(eq(page.id, id));
         return c.html(notFoundHtml(), 404);
@@ -767,18 +827,31 @@ api.get("/p/:id", async (c) => {
     }
   }
 
-  // Try regular path first, then tmp/ for anonymous uploads
   const bucket = c.env?.BUCKET;
-  let obj = null;
-  let isTemp = false;
+  if (!bucket) return c.html(notFoundHtml(), 404);
 
-  if (bucket) {
-    obj = await bucket.get(`${id}.html`);
-    if (!obj) {
-      obj = await bucket.get(`tmp/${id}.html`);
-      isTemp = true;
-    }
+  if (path) {
+    // Serving an asset file (e.g. data.json, image.png)
+    let obj = await bucket.get(`${id}/${path}`);
+    if (!obj) obj = await bucket.get(`tmp/${id}/${path}`);
+    if (!obj) return c.html(notFoundHtml(), 404);
+
+    const buf = await obj.arrayBuffer();
+    const mime = getMimeType(path);
+    return new Response(buf, {
+      status: 200,
+      headers: { "Content-Type": mime },
+    });
   }
+
+  // Serving the main HTML page
+  // Try ZIP directory format first, then flat format (backward compat)
+  let obj = await bucket.get(`${id}/index.html`);
+  let isZip = !!obj;
+  if (!obj) obj = await bucket.get(`tmp/${id}/index.html`);
+  if (obj) isZip = true;
+  if (!obj) obj = await bucket.get(`${id}.html`);
+  if (!obj) obj = await bucket.get(`tmp/${id}.html`);
 
   if (!obj) {
     return c.html(notFoundHtml(), 404);
@@ -815,8 +888,9 @@ api.get("/p/:id", async (c) => {
     await db.update(page).set({ viewCount: sql`view_count + 1` }).where(eq(page.id, id));
   }
 
-  const html = await obj.text();
-  const injected = injectBanner(html, pageMeta);
+  const rawHtml = await obj.text();
+  const baseHref = isZip ? `/p/${id}/` : undefined;
+  const injected = injectBanner(rawHtml, pageMeta, baseHref);
 
   return new Response(injected, {
     status: 200,

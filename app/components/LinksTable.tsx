@@ -394,12 +394,26 @@ function EditDialog({
     try {
       let contentToSave = content;
       if (contentFile) {
-        contentToSave = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.onerror = () => reject(new Error("文件读取失败"));
-          reader.readAsText(contentFile);
-        });
+        if (contentFile.name.endsWith(".zip")) {
+          const buf = await contentFile.arrayBuffer();
+          const { unzipSync } = await import("fflate");
+          const files = unzipSync(new Uint8Array(buf));
+          const entries = Object.keys(files);
+          let htmlFile = entries.find(
+            (f) => f.endsWith("/index.html") || f === "index.html"
+          );
+          if (!htmlFile) htmlFile = entries.find((f) => f.endsWith(".html"));
+          if (htmlFile) {
+            contentToSave = new TextDecoder().decode(files[htmlFile]);
+          }
+        } else {
+          contentToSave = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = () => reject(new Error("文件读取失败"));
+            reader.readAsText(contentFile);
+          });
+        }
       }
       const body: { title: string; category: string; tags: string; content?: string } = { title, category, tags: tags.join(",") };
       if (contentToSave) body.content = contentToSave;

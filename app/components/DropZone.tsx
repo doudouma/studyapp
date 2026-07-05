@@ -4,9 +4,10 @@ import { Upload, FileText, Archive, X } from "lucide-react";
 interface DropZoneProps {
   file: File | null;
   onFileSelect: (file: File | null) => void;
+  acceptZip?: boolean;
 }
 
-export function DropZone({ file, onFileSelect }: DropZoneProps) {
+export function DropZone({ file, onFileSelect, acceptZip = true }: DropZoneProps) {
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -17,6 +18,7 @@ export function DropZone({ file, onFileSelect }: DropZoneProps) {
   };
 
   const isValidFile = (f: File) => {
+    if (!acceptZip && f.name.endsWith(".zip")) return false;
     return (
       f.name.endsWith(".html") ||
       f.name.endsWith(".htm") ||
