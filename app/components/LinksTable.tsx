@@ -1,7 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "@tanstack/react-router";
-import { FileText, ExternalLink, Copy, Trash2, Loader2, QrCode } from "lucide-react";
+import { FileText, ExternalLink, Copy, Trash2, Loader2, QrCode, Pencil, X } from "lucide-react";
 import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/components/ui/tabs";
+import { DropZone } from "~/components/DropZone";
 import {
   Dialog,
   DialogContent,
@@ -12,10 +15,11 @@ import {
   DialogClose,
 } from "~/components/ui/dialog";
 
-interface PageLink {
+export interface PageLink {
   id: string;
   title: string;
   category: string;
+  tags: string;
   viewCount: number;
   createdAt: number;
 }
@@ -25,6 +29,7 @@ interface LinksTableProps {
   total: number;
   limit: number;
   onDelete: (id: string) => void;
+  onRefresh: () => void;
 }
 
 const CATEGORY_ICONS: Record<string, string> = {
@@ -81,13 +86,14 @@ function QrPopover({ pageId, onClose }: { pageId: string; onClose: () => void })
   );
 }
 
-export function LinksTable({ pages, total, limit, onDelete }: LinksTableProps) {
+export function LinksTable({ pages, total, limit, onDelete, onRefresh }: LinksTableProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [qrId, setQrId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [confirmDeleteTitle, setConfirmDeleteTitle] = useState("");
   const [deleteError, setDeleteError] = useState("");
+  const [editPage, setEditPage] = useState<PageLink | null>(null);
 
   const handleCopy = async (id: string) => {
     const url = `${window.location.origin}/p/${id}`;
@@ -199,6 +205,15 @@ export function LinksTable({ pages, total, limit, onDelete }: LinksTableProps) {
                           variant="ghost"
                           size="icon"
                           className="size-8"
+                          title="编辑"
+                          onClick={() => setEditPage(pg)}
+                        >
+                          <Pencil className="size-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-8"
                           title="二维码"
                           onClick={() => setQrId(qrId === pg.id ? null : pg.id)}
                         >
@@ -294,7 +309,247 @@ export function LinksTable({ pages, total, limit, onDelete }: LinksTableProps) {
         }}
         onClose={() => setConfirmDeleteId(null)}
       />
+
+      <EditDialog
+        page={editPage}
+        onClose={() => setEditPage(null)}
+        onSaved={() => {
+          setEditPage(null);
+          onRefresh();
+        }}
+      />
     </>
+  );
+}
+
+function EditDialog({
+  page,
+  onClose,
+  onSaved,
+}: {
+  page: PageLink | null;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [tab, setTab] = useState<"meta" | "content">("meta");
+  const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("general");
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState("");
+  const [content, setContent] = useState("");
+  const [contentLoading, setContentLoading] = useState(false);
+  const [contentMode, setContentMode] = useState<"paste" | "upload">("paste");
+  const [contentFile, setContentFile] = useState<File | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (page) {
+      setTab("meta");
+      setTitle(page.title);
+      setCategory(page.category || "general");
+      setTags(page.tags ? page.tags.split(",").filter(Boolean) : []);
+      setTagInput("");
+      setContent("");
+      setContentFile(null);
+      setError("");
+    }
+  }, [page]);
+
+  const loadContent = async () => {
+    if (!page) return;
+    setContentLoading(true);
+    setContentFile(null);
+    try {
+      const res = await fetch(`/api/pages/${page.id}/content`);
+      if (!res.ok) throw new Error("加载失败");
+      const data = await res.json() as { content: string };
+      setContent(data.content);
+    } catch {
+      setError("内容加载失败");
+    } finally {
+      setContentLoading(false);
+    }
+  };
+
+  const addTag = () => {
+    const raw = tagInput.trim();
+    if (!raw) return;
+    const existing = new Set(tags);
+    const newTags = raw.split(/[,，\s]+/).filter(t => t && !existing.has(t));
+    if (newTags.length > 0) {
+      setTags([...tags, ...newTags].slice(0, 10));
+    }
+    setTagInput("");
+  };
+
+  const removeTag = (i: number) => {
+    setTags(tags.filter((_, idx) => idx !== i));
+  };
+
+  const handleSave = async () => {
+    if (!page || saving) return;
+    setError("");
+    setSaving(true);
+    try {
+      let contentToSave = content;
+      if (contentFile) {
+        contentToSave = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = () => reject(new Error("文件读取失败"));
+          reader.readAsText(contentFile);
+        });
+      }
+      const body: { title: string; category: string; tags: string; content?: string } = { title, category, tags: tags.join(",") };
+      if (contentToSave) body.content = contentToSave;
+      const res = await fetch(`/api/pages/${page.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) {
+        const data: { error?: string } = await res.json();
+        throw new Error(data.error || "保存失败");
+      }
+      onSaved();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "保存失败");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Dialog open={!!page} onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent className={tab === "content" ? "sm:max-w-3xl" : "sm:max-w-md"} showCloseButton={false}>
+        <DialogHeader>
+          <DialogTitle>编辑链接</DialogTitle>
+        </DialogHeader>
+
+        <div className="flex gap-2 mb-1">
+          <button
+            className={`text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors ${tab === "meta" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            onClick={() => setTab("meta")}
+          >
+            基本信息
+          </button>
+          <button
+            className={`text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors ${tab === "content" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            onClick={() => { setTab("content"); loadContent(); }}
+          >
+            内容编辑
+          </button>
+        </div>
+
+        {tab === "meta" ? (
+          <div className="space-y-4 py-2">
+            <div>
+              <label className="text-sm font-medium text-foreground">
+                标题 <span className="text-destructive">*</span>
+              </label>
+              <Input
+                className="mt-1"
+                placeholder="输入页面标题..."
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground">类型</label>
+              <select
+                className="mt-1 flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                <option value="general">通用</option>
+                <option value="chinese">语文</option>
+                <option value="math">数学</option>
+                <option value="english">英语</option>
+                <option value="physics">物理</option>
+                <option value="chemistry">化学</option>
+                <option value="history">历史</option>
+                <option value="biology">生物</option>
+                <option value="geography">地理</option>
+                <option value="other">其他</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground">
+                标签{" "}
+                <span className="font-normal text-muted-foreground">
+                  (可选，最多10个)
+                </span>
+              </label>
+              <div className="mt-1 flex min-h-10 w-full flex-wrap items-center gap-1.5 rounded-lg border-2 border-input bg-transparent px-2 py-1.5 cursor-text" onClick={() => document.getElementById('edit-tag-input')?.focus()}>
+                {tags.map((t, i) => (
+                  <span key={t} className="inline-flex items-center gap-1 rounded-md bg-primary/20 px-2 py-0.5 text-xs font-semibold text-primary">
+                    {t}
+                    <button type="button" className="rounded-sm hover:bg-primary/30 transition-colors text-primary/70" onClick={(e) => { e.stopPropagation(); removeTag(i); }}>
+                      <X className="size-3" />
+                    </button>
+                  </span>
+                ))}
+                <input
+                  id="edit-tag-input"
+                  className="flex-1 min-w-[80px] bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                  placeholder={tags.length === 0 ? "输入标签后按回车添加" : ""}
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === ",") {
+                      e.preventDefault();
+                      addTag();
+                    }
+                    if (e.key === "Backspace" && tagInput === "" && tags.length > 0) {
+                      removeTag(tags.length - 1);
+                    }
+                  }}
+                  onBlur={addTag}
+                />
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="py-2 min-h-[300px] flex flex-col">
+            {contentLoading ? (
+              <div className="flex items-center justify-center py-12 text-muted-foreground">
+                <Loader2 className="size-5 animate-spin mr-2" />
+                加载内容…
+              </div>
+            ) : (
+              <Tabs value={contentMode} onValueChange={(v) => setContentMode(v as "paste" | "upload")}>
+                <TabsList variant="line" className="mb-4">
+                  <TabsTrigger value="paste">粘贴代码</TabsTrigger>
+                  <TabsTrigger value="upload">上传文件</TabsTrigger>
+                </TabsList>
+                <TabsContent value="paste">
+                  <textarea
+                    className="w-full min-h-[40vh] rounded-lg border border-border bg-background p-4 text-sm font-mono outline-none resize-y leading-relaxed focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                    placeholder="在此粘贴你的 HTML/CSS/JS 代码..."
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    spellCheck={false}
+                  />
+                </TabsContent>
+                <TabsContent value="upload">
+                  <DropZone file={contentFile} onFileSelect={(f) => { setContentFile(f); if (f) setContent(""); }} />
+                </TabsContent>
+              </Tabs>
+            )}
+          </div>
+        )}
+
+        {error && <p className="text-sm text-destructive">{error}</p>}
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>取消</Button>
+          <Button disabled={saving} onClick={handleSave}>
+            {saving ? <><Loader2 className="size-4 animate-spin mr-1" /> 保存中</> : "保存"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

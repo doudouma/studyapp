@@ -372,6 +372,7 @@ api.get("/api/pages", async (c) => {
       id: page.id,
       title: page.title,
       category: page.category,
+      tags: page.tags,
       isPermanent: page.isPermanent,
       viewCount: page.viewCount,
       createdAt: page.createdAt,
@@ -419,6 +420,75 @@ api.delete("/api/pages/:id", async (c) => {
   await db.delete(page).where(eq(page.id, pageId));
 
   return c.json({ success: true });
+});
+
+// Get page content
+api.get("/api/pages/:id/content", async (c) => {
+  const user = c.get("user");
+  if (!user) return c.json({ error: "未登录" }, 401);
+
+  const pageId = c.req.param("id");
+  if (!c.env.D1) return c.json({ error: "database unavailable" }, 503);
+  const db = createDb(c.env.D1);
+
+  const existing = await db.select().from(page).where(and(eq(page.id, pageId), eq(page.userId, user.id))).limit(1);
+  if (existing.length === 0) return c.json({ error: "页面不存在" }, 404);
+
+  let content = "";
+  if (c.env?.BUCKET) {
+    const obj = await c.env.BUCKET.get(`${pageId}.html`);
+    if (obj) content = await obj.text();
+  }
+
+  return c.json({ content });
+});
+
+// Update a page
+api.patch("/api/pages/:id", async (c) => {
+  const user = c.get("user");
+  if (!user) return c.json({ error: "未登录" }, 401);
+
+  const pageId = c.req.param("id");
+  if (!c.env.D1) return c.json({ error: "database unavailable" }, 503);
+  const db = createDb(c.env.D1);
+
+  const existing = await db.select().from(page).where(and(eq(page.id, pageId), eq(page.userId, user.id))).limit(1);
+  if (existing.length === 0) return c.json({ error: "页面不存在" }, 404);
+
+  const body = await c.req.json<{ title?: string; category?: string; tags?: string; content?: string }>();
+  const updates: Record<string, string> = {};
+
+  if (body.title !== undefined) updates.title = body.title;
+  if (body.category !== undefined) updates.category = body.category;
+  if (body.tags !== undefined) updates.tags = body.tags;
+
+  if (body.content !== undefined) {
+    if (new Blob([body.content]).size > MAX_SIZE) {
+      return c.json({ error: "内容大小不能超过 5MB" }, 413);
+    }
+    if (!c.env?.BUCKET) {
+      return c.json({ error: "storage unavailable" }, 503);
+    }
+  }
+
+  if (Object.keys(updates).length > 0) {
+    await db.update(page).set(updates as any).where(eq(page.id, pageId));
+  }
+
+  if (body.content !== undefined) {
+    await c.env.BUCKET!.put(`${pageId}.html`, body.content, {
+      httpMetadata: { contentType: "text/html; charset=utf-8" },
+    });
+  }
+
+  const [updated] = await db.select({
+    id: page.id, title: page.title, category: page.category,
+    tags: page.tags, isPermanent: page.isPermanent,
+    viewCount: page.viewCount, createdAt: page.createdAt,
+    expiresAt: page.expiresAt, previewPath: page.previewPath,
+  }).from(page).where(eq(page.id, pageId));
+
+  return c.json({ success: true, page: updated });
 });
 
 api.post("/api/upload", async (c) => {

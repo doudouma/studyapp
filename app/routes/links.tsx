@@ -23,6 +23,7 @@ interface PageData {
   id: string;
   title: string;
   category: string;
+  tags: string;
   viewCount: number;
   createdAt: number;
 }
@@ -149,6 +150,7 @@ function LinksPage() {
               pages={data?.pages || []}
               total={data?.total || 0}
               limit={data?.limit || 5}
+              onRefresh={fetchPages}
               onDelete={(id) => {
                 if (!data) return;
                 setData({
