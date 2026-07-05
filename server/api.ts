@@ -69,8 +69,8 @@ function injectBanner(html: string, meta?: { title?: string; description?: strin
   ` : "";
 
   let result = html;
-  if (baseTag) result = result.replace("<head>", `<head>${baseTag}`);
-  if (seoTags) result = result.replace("</head>", `${seoTags}</head>`);
+  if (baseTag) result = result.replace(/<head\b[^>]*>/i, (m) => `${m}${baseTag}`);
+  if (seoTags) result = result.replace(/<\/head\s*>/i, (m) => `${seoTags}${m}`);
   return result;
 }
 
@@ -486,38 +486,106 @@ api.patch("/api/pages/:id", async (c) => {
 
   const pageId = c.req.param("id");
   if (!c.env.D1) return c.json({ error: "database unavailable" }, 503);
+  if (!c.env.BUCKET) return c.json({ error: "storage unavailable" }, 503);
   const db = createDb(c.env.D1);
+  const bucket = c.env.BUCKET;
 
   const existing = await db.select().from(page).where(and(eq(page.id, pageId), eq(page.userId, user.id))).limit(1);
   if (existing.length === 0) return c.json({ error: "页面不存在" }, 404);
 
-  const body = await c.req.json<{ title?: string; category?: string; tags?: string; content?: string }>();
-  const updates: Record<string, string> = {};
+  const ct = c.req.header("content-type") || "";
+  const isMultipart = ct.includes("multipart/form-data");
 
-  if (body.title !== undefined) updates.title = body.title;
-  if (body.category !== undefined) updates.category = body.category;
-  if (body.tags !== undefined) updates.tags = body.tags;
+  if (isMultipart) {
+    const body = await c.req.parseBody();
+    const file = body.file;
+    const title = ((body.title as string) || "").trim();
+    const category = (body.category as string) || "general";
+    const tags = ((body.tags as string) || "")
+      .split(/[,，\s]+/)
+      .map((t: string) => t.trim())
+      .filter(Boolean)
+      .filter((t: string, i: number, arr: string[]) => arr.indexOf(t) === i)
+      .join(",");
 
-  if (body.content !== undefined) {
-    if (new Blob([body.content]).size > MAX_SIZE) {
-      return c.json({ error: "内容大小不能超过 5MB" }, 413);
+    const updates: Record<string, string> = {};
+    if (title) updates.title = title;
+    if (category) updates.category = category;
+    updates.tags = tags;
+
+    if (file && file instanceof File) {
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      if (bytes.length > MAX_SIZE) {
+        return c.json({ error: "文件大小不能超过 5MB" }, 413);
+      }
+
+      if (file.name.toLowerCase().endsWith(".zip")) {
+        const { unzipSync } = await import("fflate");
+        const files = unzipSync(bytes);
+        const entries = Object.keys(files);
+
+        const htmlEntry = entries.find(
+          (f) => f.endsWith("/index.html") || f === "index.html"
+        ) || entries.find((f) => f.endsWith(".html"));
+        if (!htmlEntry) return c.json({ error: "ZIP 中未找到 HTML 文件" }, 400);
+
+        const totalSize = entries.reduce((sum, f) => sum + files[f].length, 0);
+        if (totalSize > MAX_SIZE) {
+          return c.json({ error: "解压后文件大小不能超过 5MB" }, 413);
+        }
+
+        // Replace all files under {id}/ prefix
+        await deletePageFromBucket(bucket, pageId);
+        const puts = Object.entries(files).map(([filename, data]) => {
+          const key = filename === htmlEntry ? `${pageId}/index.html` : `${pageId}/${filename}`;
+          const mime = getMimeType(filename);
+          const buf = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
+          return bucket.put(key, buf, { httpMetadata: { contentType: mime } });
+        });
+        await Promise.all(puts);
+      } else {
+        // Single .html file upload
+        const content = new TextDecoder().decode(bytes);
+        await bucket.put(`${pageId}.html`, content, {
+          httpMetadata: { contentType: "text/html; charset=utf-8" },
+        });
+        // Clean up any existing ZIP format files
+        const listed = await bucket.list({ prefix: `${pageId}/` });
+        if (listed.objects.length > 0) {
+          await bucket.delete(listed.objects.map((o) => o.key));
+        }
+      }
     }
-    if (!c.env?.BUCKET) {
-      return c.json({ error: "storage unavailable" }, 503);
+
+    if (Object.keys(updates).length > 0) {
+      await db.update(page).set(updates as any).where(eq(page.id, pageId));
     }
-  }
+  } else {
+    const body = await c.req.json<{ title?: string; category?: string; tags?: string; content?: string }>();
+    const updates: Record<string, string> = {};
 
-  if (Object.keys(updates).length > 0) {
-    await db.update(page).set(updates as any).where(eq(page.id, pageId));
-  }
+    if (body.title !== undefined) updates.title = body.title;
+    if (body.category !== undefined) updates.category = body.category;
+    if (body.tags !== undefined) updates.tags = body.tags;
 
-  if (body.content !== undefined) {
-    // Detect ZIP format: HTML is stored under {id}/index.html instead of {id}.html
-    const isZip = await c.env.BUCKET!.get(`${pageId}/index.html`).then(Boolean).catch(() => false);
-    const key = isZip ? `${pageId}/index.html` : `${pageId}.html`;
-    await c.env.BUCKET!.put(key, body.content, {
-      httpMetadata: { contentType: "text/html; charset=utf-8" },
-    });
+    if (body.content !== undefined) {
+      if (new Blob([body.content]).size > MAX_SIZE) {
+        return c.json({ error: "内容大小不能超过 5MB" }, 413);
+      }
+    }
+
+    if (Object.keys(updates).length > 0) {
+      await db.update(page).set(updates as any).where(eq(page.id, pageId));
+    }
+
+    if (body.content !== undefined) {
+      // Detect ZIP format: HTML is stored under {id}/index.html instead of {id}.html
+      const isZip = await bucket.get(`${pageId}/index.html`).then(Boolean).catch(() => false);
+      const key = isZip ? `${pageId}/index.html` : `${pageId}.html`;
+      await bucket.put(key, body.content, {
+        httpMetadata: { contentType: "text/html; charset=utf-8" },
+      });
+    }
   }
 
   const [updated] = await db.select({
