@@ -166,13 +166,11 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
 }
 
 export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
-  const { user, refreshAuth } = useAuth();
+  const { user, refreshAuth, isMember, membershipExpiresAt } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [localSearch, setLocalSearch] = useState("");
-  const [isMember, setIsMember] = useState(false);
-  const [membershipExpiresAt, setMembershipExpiresAt] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
@@ -187,19 +185,6 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  // Fetch membership info when logged in
-  useEffect(() => {
-    if (user) {
-      fetch("/api/me")
-        .then((r) => r.json() as Promise<{ isMember?: boolean; membershipExpiresAt?: string | null }>)
-        .then((data) => {
-          setIsMember(data.isMember ?? false);
-          setMembershipExpiresAt(data.membershipExpiresAt ?? null);
-        })
-        .catch(() => {});
-    }
-  }, [user]);
 
   // Search value = from square page (when on square) or local state
   const searchValue = isOnSquare ? (searchQuery ?? "") : localSearch;
