@@ -15,6 +15,7 @@ export const Route = createRootRoute({
         content:
           "100mini 是一款免费的 HTML 在线托管工具。粘贴或拖拽 HTML/CSS/JS 代码，一键生成分享链接，24 小时自动销毁。",
       },
+      { name: "keywords", content: "HTML托管,学习页面,快闪托管,网页分享,免费托管,学习工具,教育工具,师生互动,静态网页,AI教育,AI学习" },
       { name: "robots", content: "index, follow" },
       { name: "theme-color", content: "#ffffff" },
       { name: "color-scheme", content: "light dark" },
