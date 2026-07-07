@@ -22,7 +22,7 @@ export const Route = createFileRoute("/")({
       {
         name: "keywords",
         content:
-          "HTML托管,学习页面,快闪托管,网页分享,免费托管,学习工具,教育工具,师生互动,静态网页",
+          "HTML托管,学习页面,快闪托管,网页分享,免费托管,学习工具,教育工具,师生互动,静态网页,AI教育,AI学习",
       },
     ],
   }),
