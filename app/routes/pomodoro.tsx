@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
+import { useAuth } from "~/lib/auth-context";
 
 export const Route = createFileRoute("/pomodoro")({
   head: () => ({
@@ -170,6 +171,13 @@ function PomodoroPage() {
           font-size: 13px; font-weight: 600; color: #7a7a7a; transition: all .2s;
         }
         .p-alarm-preview:hover { border-color: #e57373; color: #e57373; background: #fff5f5; }
+        .p-alarm-preview.playing { border-color: #e57373; color: #e57373; background: #fff0f0; cursor: default; }
+        .p-alarm-preview:disabled { opacity: 1; }
+        .p-playing-dot {
+          display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #e57373;
+          animation: p-pulse .6s ease-in-out infinite alternate;
+        }
+        @keyframes p-pulse { from { opacity: .4; transform: scale(.8); } to { opacity: 1; transform: scale(1.1); } }
         .p-settings-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
         .p-settings-row span:first-child { font-size: 14px; font-weight: 600; color: #5a5a5a; min-width: 44px; }
         .p-settings-input {
@@ -215,9 +223,11 @@ function PomodoroTimer() {
   const [fading, setFading] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
   const [alarmIndex, setAlarmIndex] = useState(0);
+  const [previewPlaying, setPreviewPlaying] = useState(false);
 
+  const { user } = useAuth();
+  const recordedRef = useRef(false);
   const confettiRef = useRef<HTMLDivElement>(null);
-  const audioCtxRef = useRef<AudioContext | null>(null);
   const stageTitleRef = useRef("");
 
   const totalSeconds = duration * 60;
@@ -231,26 +241,6 @@ function PomodoroTimer() {
   const frameClamped = Math.min(38, Math.max(0, frame));
 
   const ringOffset = CIRCUMFERENCE * Math.max(0, 1 - pct);
-
-  // Audio init on first interaction
-  useEffect(() => {
-    const init = () => {
-      const ctx = audioCtxRef.current;
-      if (ctx) {
-        if (ctx.state === "suspended") ctx.resume().catch(() => {});
-        return;
-      }
-      const AC = window.AudioContext || (window as any).webkitAudioContext;
-      if (!AC) return;
-      try { audioCtxRef.current = new AC(); } catch {}
-    };
-    document.addEventListener("click", init, { once: true });
-    document.addEventListener("touchstart", init, { once: true });
-    return () => {
-      document.removeEventListener("click", init);
-      document.removeEventListener("touchstart", init);
-    };
-  }, []);
 
   // Timer
   useEffect(() => {
@@ -285,8 +275,21 @@ function PomodoroTimer() {
     playSound();
     if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 500]);
     makeConfetti();
+    recordSession();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [completed]);
+
+  async function recordSession() {
+    if (!user || recordedRef.current) return;
+    recordedRef.current = true;
+    try {
+      await fetch("/api/pomodoro/sessions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ duration }),
+      });
+    } catch {}
+  }
 
   function playMelody(ctx: AudioContext, notes: { f: number; d: number }[]) {
     let t = ctx.currentTime + 0.05;
@@ -345,20 +348,28 @@ function PomodoroTimer() {
     ]),
   ];
 
+  function getAudioCtx(): AudioContext | null {
+    const AC = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AC) return null;
+    try { return new AC(); } catch { return null; }
+  }
+
   function playSound() {
-    const ctx = audioCtxRef.current;
+    const ctx = getAudioCtx();
     if (!ctx) return;
-    if (ctx.state === "suspended") ctx.resume().catch(() => {});
-    if (ctx.state === "closed") { audioCtxRef.current = null; return; }
     try { ALARM_PLAYS[alarmIndex](ctx); } catch {}
+    setTimeout(() => ctx.close().catch(() => {}), 2000);
   }
 
   function previewAlarm(i: number) {
-    const ctx = audioCtxRef.current;
+    const ctx = getAudioCtx();
     if (!ctx) return;
-    if (ctx.state === "suspended") ctx.resume().catch(() => {});
-    if (ctx.state === "closed") { audioCtxRef.current = null; return; }
+    setPreviewPlaying(true);
     try { ALARM_PLAYS[i](ctx); } catch {}
+    setTimeout(() => {
+      ctx.close().catch(() => {});
+      setPreviewPlaying(false);
+    }, 1500);
   }
 
   function makeConfetti() {
@@ -379,6 +390,7 @@ function PomodoroTimer() {
 
   // Reset when duration changes
   useEffect(() => {
+    recordedRef.current = false;
     setRemaining(duration * 60);
     setRunning(true);
     setCompleted(false);
@@ -391,6 +403,7 @@ function PomodoroTimer() {
   }
 
   function reset() {
+    recordedRef.current = false;
     setRemaining(totalSeconds);
     setRunning(true);
     setCompleted(false);
@@ -432,9 +445,17 @@ function PomodoroTimer() {
           <select className="p-alarm-select" value={alarmIndex} onChange={e => setAlarmIndex(Number(e.target.value))}>
             {ALARMS.map((a, i) => <option key={a.name} value={i}>{a.name}</option>)}
           </select>
-          <button className="p-alarm-preview" onClick={() => previewAlarm(alarmIndex)} aria-label="预览">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20"/></svg>
-            试听
+          <button
+            className={`p-alarm-preview${previewPlaying ? " playing" : ""}`}
+            onClick={() => previewAlarm(alarmIndex)}
+            disabled={previewPlaying}
+            aria-label="预览"
+          >
+            {previewPlaying ? (
+              <><span className="p-playing-dot" /> 播放中</>
+            ) : (
+              <><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20"/></svg> 试听</>
+            )}
           </button>
         </div>
         <div className="p-settings-actions">

@@ -4,7 +4,7 @@ import { nanoid } from "nanoid";
 import { count, eq, and, desc, sql } from "drizzle-orm";
 import { MAX_SIZE } from "./r2";
 import { createDb } from "./db";
-import { page, user, membership } from "./db/schema";
+import { page, user, membership, pomodoroSession } from "./db/schema";
 
 type Variables = {
   user: { id: string; name: string; email: string; image?: string; role?: string } | null;
@@ -875,6 +875,26 @@ api.get("/api/square", async (c) => {
     .orderBy(desc(page.sharedAt));
 
   return c.json({ items });
+});
+
+// Record a completed pomodoro session
+api.post("/api/pomodoro/sessions", async (c) => {
+  const user = c.get("user");
+  if (!user) return c.json({ error: "未登录" }, 401);
+  if (!c.env.D1) return c.json({ error: "database unavailable" }, 503);
+
+  const { duration } = await c.req.json<{ duration: number }>();
+  if (!duration || duration <= 0) return c.json({ error: "无效的时长" }, 400);
+
+  const db = createDb(c.env.D1);
+  await db.insert(pomodoroSession).values({
+    id: nanoid(12),
+    userId: user.id,
+    duration,
+    completedAt: new Date(),
+  });
+
+  return c.json({ success: true });
 });
 
 api.get("/p/*", async (c) => {
