@@ -5,3 +5,5 @@ dist/
 dist-worker/
 .wrangler/
 .vite/
+wrangler.toml
+.dev.vars
