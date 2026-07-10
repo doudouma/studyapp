@@ -109,6 +109,50 @@ async function deletePageFromBucket(bucket: R2Bucket, id: string) {
   } while (cursor);
 }
 
+const TMP_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+function isExpired(createdAt: string | undefined): boolean {
+  if (!createdAt) return true;
+  const ts = Number(createdAt);
+  if (isNaN(ts)) return true;
+  return Date.now() - ts > TMP_EXPIRY_MS;
+}
+
+async function cleanupAnonymousUploads(bucket: R2Bucket): Promise<number> {
+  let deleted = 0;
+  let cursor: string | undefined;
+  do {
+    const listed = await bucket.list({ prefix: "tmp/", cursor, include: ["customMetadata"] });
+    const toDelete: string[] = [];
+    for (const obj of listed.objects) {
+      if (isExpired(obj.customMetadata?.createdAt)) {
+        toDelete.push(obj.key);
+      }
+    }
+    if (toDelete.length > 0) {
+      await bucket.delete(toDelete);
+      deleted += toDelete.length;
+    }
+    cursor = listed.truncated ? listed.cursor : undefined;
+  } while (cursor);
+  return deleted;
+}
+
+async function deleteTmpByBucketId(bucket: R2Bucket, id: string) {
+  const prefix = `tmp/${id}`;
+  let cursor: string | undefined;
+  do {
+    const listed = await bucket.list({ prefix, cursor });
+    const toDelete = listed.objects
+      .filter((o) => o.key === `${prefix}.html` || o.key.startsWith(`${prefix}/`))
+      .map((o) => o.key);
+    if (toDelete.length > 0) {
+      await bucket.delete(toDelete);
+    }
+    cursor = listed.truncated ? listed.cursor : undefined;
+  } while (cursor);
+}
+
 async function getFromStorage(
   c: any,
   key: string
@@ -368,6 +412,13 @@ api.get("/api/admin/pages", requireAdmin, async (c) => {
     .offset(offset);
 
   return c.json({ items, total, page: pageParam, pageSize });
+});
+
+// Admin: Clean up expired anonymous (tmp) uploads
+api.post("/api/admin/cleanup-tmp", requireAdmin, async (c) => {
+  if (!c.env?.BUCKET) return c.json({ error: "storage unavailable" }, 503);
+  const count = await cleanupAnonymousUploads(c.env.BUCKET);
+  return c.json({ success: true, deleted: count });
 });
 
 // Admin: Delete any page (no ownership check)
@@ -908,9 +959,16 @@ api.get("/p/*", async (c) => {
 
   if (path && path !== "index.html") {
     // Serving an asset file (e.g. data.json, image.png)
+    let isTmp = false;
     let obj = await bucket.get(`${id}/${path}`);
-    if (!obj) obj = await bucket.get(`tmp/${id}/${path}`);
+    if (!obj) { obj = await bucket.get(`tmp/${id}/${path}`); isTmp = true; }
     if (!obj) return c.html(notFoundHtml(), 404);
+
+    // Lazy cleanup for expired tmp uploads
+    if (isTmp && isExpired(obj.customMetadata?.createdAt)) {
+      await deleteTmpByBucketId(bucket, id);
+      return c.html(notFoundHtml(), 404);
+    }
 
     const buf = await obj.arrayBuffer();
     const mime = getMimeType(path);
@@ -933,6 +991,12 @@ api.get("/p/*", async (c) => {
   if (!obj) obj = await bucket.get(`tmp/${id}.html`);
 
   if (!obj) {
+    return c.html(notFoundHtml(), 404);
+  }
+
+  // Lazy cleanup: delete expired anonymous tmp uploads
+  if (obj.key?.startsWith("tmp/") && isExpired(obj.customMetadata?.createdAt)) {
+    await deleteTmpByBucketId(bucket, id);
     return c.html(notFoundHtml(), 404);
   }
 
@@ -996,4 +1060,5 @@ function notFoundHtml(): string {
 </body></html>`;
 }
 
+export { cleanupAnonymousUploads };
 export default api;

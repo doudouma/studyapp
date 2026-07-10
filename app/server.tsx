@@ -1,5 +1,6 @@
+/// <reference types="@cloudflare/workers-types" />
 import { createStartHandler, defaultStreamHandler } from "@tanstack/react-start/server";
-import api from "~/../server/api";
+import api, { cleanupAnonymousUploads } from "~/../server/api";
 import { createAuth } from "~/../server/auth";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
@@ -92,5 +93,13 @@ app.route("/", api);
 
 // All other routes go to TanStack Start SSR
 app.all("*", (c) => startHandler(c.req.raw));
+
+// Cron trigger: cleanup expired anonymous uploads every hour
+export async function scheduled(_event: ScheduledEvent, env: Bindings, _ctx: ExecutionContext) {
+  if (env.BUCKET) {
+    const count = await cleanupAnonymousUploads(env.BUCKET);
+    console.log(`[cron] cleaned up ${count} expired anonymous upload(s)`);
+  }
+}
 
 export default app;

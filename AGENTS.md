@@ -66,6 +66,32 @@ drizzle/            # Drizzle Kit 迁移产物
 - 工具函数: `cn()` (clsx + tailwind-merge)
 - UI 组件: shadcn/ui, 使用 `@base-ui/react` 原语
 
+## 临时文件清理
+
+匿名上传的文件存储在 R2 `tmp/` 前缀下，24 小时后自动销毁。
+
+### 三路清理机制
+
+| 方式 | 触发 | 位置 | 说明 |
+|---|---|---|---|
+| **定时清理** | cron `0 * * * *` (每小时) | `app/server.tsx:98` → `server/api.ts:121` | 全量扫描 `tmp/` 前缀，检查 `customMetadata.createdAt`，删除过期对象 |
+| **惰性清理** | 用户访问过期页面时 | `server/api.ts:960-1001` | 访问过期 `tmp/` 页面时触发，删除后返回 404 |
+| **手动清理** | `POST /api/admin/cleanup-tmp` | `server/api.ts:418` | 管理员手动触发，用于验证 |
+
+### 关键逻辑
+
+| 函数 | 位置 | 说明 |
+|---|---|---|
+| `isExpired()` | `server/api.ts:114` | 判断 `createdAt` 是否超过 24h，无 metadata/非法值视为过期 |
+| `cleanupAnonymousUploads()` | `server/api.ts:121` | 全量遍历 R2 `tmp/` 前缀，分页删除 |
+| `deleteTmpByBucketId()` | `server/api.ts:141` | 按 `tmp/{id}` 前缀删除，同时处理 `tmp/{id}.html` 和 `tmp/{id}/...` 两种格式 |
+
+### 存储约定
+
+- **匿名单文件 HTML**: `tmp/{id}.html` + `customMetadata: { createdAt: String(Date.now()) }`
+- **匿名 ZIP 上传**: `tmp/{id}/index.html` + `tmp/{id}/{assets}`，统一 `createdAt`
+- **已登录用户**: 无 `tmp/` 前缀，D1 有记录，走 `expiresAt` 字段过期
+
 ## 构建与部署
 
 | 命令 | 说明 |
