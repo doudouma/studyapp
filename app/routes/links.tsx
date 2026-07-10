@@ -5,14 +5,16 @@ import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { LinksTable } from "~/components/LinksTable";
 import { useAuth } from "~/lib/auth-context";
+import { useTranslation } from "react-i18next";
+import i18n from "~/lib/i18n";
 
 export const Route = createFileRoute("/links")({
   head: () => ({
-    title: "个人中心 - 100mini",
+    title: i18n.t("profile.title"),
     meta: [
       {
         name: "description",
-        content: "管理你的账号、链接和番茄数据",
+        content: i18n.t("profile.desc"),
       },
     ],
   }),
@@ -54,6 +56,7 @@ function StatCard({ icon, label, value, accent }: { icon: React.ReactNode; label
 }
 
 function LinksPage() {
+  const { t, i18n: i18nInstance } = useTranslation();
   const { user, authLoading, isMember, membershipExpiresAt, refreshAuth } = useAuth();
   const [data, setData] = useState<PagesResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -67,12 +70,12 @@ function LinksPage() {
       const res = await fetch("/api/pages");
       if (!res.ok) {
         const json = (await res.json()) as { error?: string };
-        throw new Error(json.error || "加载失败");
+        throw new Error(json.error || t("common.loadFailed"));
       }
       const json = (await res.json()) as PagesResponse;
       setData(json);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "加载失败");
+      setError(err instanceof Error ? err.message : t("common.loadFailed"));
     } finally {
       setLoading(false);
     }
@@ -100,15 +103,15 @@ function LinksPage() {
             <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-[#006c49]/10 dark:bg-[#4edea3]/10">
               <User className="size-6 text-[#006c49] dark:text-[#4edea3]" />
             </div>
-            <h1 className="text-2xl font-bold text-foreground">个人中心</h1>
+            <h1 className="text-2xl font-bold text-foreground">{t("profile.heading")}</h1>
             <p className="mt-2 text-muted-foreground">
-              请登录后查看你的数据和链接
+              {t("profile.notLoggedIn")}
             </p>
             <Link
               to="/"
               className="mt-4 inline-flex h-10 items-center justify-center rounded-xl bg-[#006c49] px-5 text-sm font-medium text-white shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)] transition-colors hover:bg-[#006c49]/90 dark:bg-[#4edea3] dark:text-[#002113] dark:hover:bg-[#4edea3]/90"
             >
-              返回首页登录
+              {t("profile.loginCta")}
             </Link>
           </div>
         </main>
@@ -118,8 +121,10 @@ function LinksPage() {
   }
 
   const memberLabel = isMember
-    ? `会员 ${membershipExpiresAt ? `· ${new Date(membershipExpiresAt).toLocaleDateString("zh-CN")} 到期` : ""}`
-    : "普通用户";
+    ? (membershipExpiresAt
+      ? t("profile.memberWithExpiry", { date: new Date(membershipExpiresAt).toLocaleDateString(i18nInstance.language === "zh" ? "zh-CN" : "en-US") })
+      : t("profile.member"))
+    : t("profile.normalUser");
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -139,10 +144,10 @@ function LinksPage() {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-bold text-foreground">个人中心</h1>
+                  <h1 className="text-2xl font-bold text-foreground">{t("profile.heading")}</h1>
                   {isMember ? (
                     <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
-                      <Crown className="size-3" /> 会员
+                      <Crown className="size-3" /> {t("profile.member")}
                     </span>
                   ) : null}
                 </div>
@@ -153,7 +158,7 @@ function LinksPage() {
               to="/"
               className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#006c49] px-5 text-sm font-medium text-white shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)] transition-all hover:bg-[#006c49]/90 active:shadow-[inset_0_-1px_0_rgba(0,0,0,0.2)] dark:bg-[#4edea3] dark:text-[#002113] dark:hover:bg-[#4edea3]/90"
             >
-              发布新链接
+              {t("profile.newLink")}
             </Link>
           </div>
 
@@ -161,8 +166,8 @@ function LinksPage() {
           <div className="mb-8 grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard
               icon={<Crown className="size-5 text-amber-600 dark:text-amber-400" />}
-              label="会员状态"
-              value={isMember ? "已开通" : "未开通"}
+              label={t("profile.stat.member")}
+              value={isMember ? t("profile.stat.memberActive") : t("profile.stat.memberInactive")}
               accent="bg-amber-100 dark:bg-amber-900/20"
             />
             <div className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] p-5 flex items-center gap-4 col-span-2 md:col-span-1">
@@ -170,22 +175,22 @@ function LinksPage() {
                 <span className="text-lg">🍅</span>
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs text-muted-foreground">番茄</p>
+                <p className="text-xs text-muted-foreground">{t("profile.stat.tomato")}</p>
                 <div className="flex gap-4 mt-0.5">
                   <div>
                     <span className="text-xl font-bold text-foreground">{pomoCount.today}</span>
-                    <span className="text-xs text-muted-foreground ml-1">今日</span>
+                    <span className="text-xs text-muted-foreground ml-1">{t("profile.stat.today")}</span>
                   </div>
                   <div>
                     <span className="text-xl font-bold text-foreground">{pomoCount.total}</span>
-                    <span className="text-xs text-muted-foreground ml-1">累计</span>
+                    <span className="text-xs text-muted-foreground ml-1">{t("profile.stat.total")}</span>
                   </div>
                 </div>
               </div>
             </div>
             <StatCard
               icon={<LinkIcon className="size-5 text-[#006c49] dark:text-[#4edea3]" />}
-              label="管理链接"
+              label={t("profile.stat.links")}
               value={data?.total ?? "-"}
             />
           </div>
@@ -194,7 +199,7 @@ function LinksPage() {
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
               <LinkIcon className="size-5 text-[#006c49] dark:text-[#4edea3]" />
-              链接管理
+              {t("profile.section.links")}
             </h2>
           </div>
 
@@ -219,7 +224,7 @@ function LinksPage() {
                 className="mt-4 text-sm text-[#0058be] dark:text-[#adc6ff] hover:underline"
                 onClick={fetchPages}
               >
-                重试
+                {t("common.retry")}
               </button>
             </div>
           ) : (

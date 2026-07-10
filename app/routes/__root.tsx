@@ -1,5 +1,8 @@
 import { createRootRoute, HeadContent, Scripts, Outlet, Link } from "@tanstack/react-router";
 import { AuthProvider } from "~/lib/auth-context";
+import { I18nProvider } from "~/lib/i18n-provider";
+import i18n from "~/lib/i18n";
+import { useTranslation } from "react-i18next";
 import "~/styles/app.css";
 import interFontUrl from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
 
@@ -13,27 +16,26 @@ export const Route = createRootRoute({
       },
       {
         name: "description",
-        content:
-          "100mini 是一款免费的 HTML 在线托管工具。粘贴或拖拽 HTML/CSS/JS 代码，一键生成分享链接，24 小时自动销毁。",
+        content: i18n.t("app.desc"),
       },
-      { name: "keywords", content: "HTML托管,学习页面,快闪托管,网页分享,免费托管,学习工具,教育工具,师生互动,静态网页,AI教育,AI学习" },
+      { name: "keywords", content: i18n.t("app.keywords") },
       { name: "robots", content: "index, follow" },
       { name: "theme-color", content: "#ffffff" },
       { name: "color-scheme", content: "light dark" },
       { property: "og:type", content: "website" },
-      { property: "og:title", content: "100mini - 免费 HTML 托管与分享工具" },
+      { property: "og:title", content: i18n.t("app.title") },
       {
         property: "og:description",
-        content: "粘贴或拖拽 HTML/CSS/JS 代码，一键生成分享链接，24 小时自动销毁。",
+        content: i18n.t("app.desc"),
       },
       { name: "twitter:card", content: "summary" },
       {
         name: "twitter:title",
-        content: "100mini - 免费 HTML 托管与分享工具",
+        content: i18n.t("app.title"),
       },
       {
         name: "twitter:description",
-        content: "粘贴或拖拽 HTML/CSS/JS 代码，一键生成分享链接，24 小时自动销毁。",
+        content: i18n.t("app.desc"),
       },
     ],
     links: [
@@ -48,12 +50,13 @@ export const Route = createRootRoute({
 const isServer = typeof window === "undefined";
 
 function NotFound() {
+  const { t } = useTranslation();
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-8 text-center">
-      <h1 className="text-4xl font-bold text-foreground">404</h1>
-      <p className="mt-2 text-muted-foreground">页面不存在</p>
+      <h1 className="text-4xl font-bold text-foreground">{t("404.title")}</h1>
+      <p className="mt-2 text-muted-foreground">{t("404.message")}</p>
       <Link to="/" className="mt-4 text-sm text-primary hover:underline">
-        返回首页
+        {t("404.back")}
       </Link>
     </main>
   );
@@ -62,7 +65,7 @@ function NotFound() {
 function RootDocument({ children }: { children: React.ReactNode }) {
   if (isServer) {
     return (
-      <html lang="zh-CN">
+      <html lang={i18n.language || "zh-CN"}>
         <head>
           <HeadContent />
         </head>
@@ -85,9 +88,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   return (
     <RootDocument>
-      <AuthProvider>
-        <Outlet />
-      </AuthProvider>
+      <I18nProvider>
+        <AuthProvider>
+          <Outlet />
+        </AuthProvider>
+      </I18nProvider>
     </RootDocument>
   );
 }

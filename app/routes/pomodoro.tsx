@@ -2,27 +2,20 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "~/lib/auth-context";
 import { AuthDialog } from "~/components/AuthDialog";
+import { useTranslation } from "react-i18next";
+import i18n from "~/lib/i18n";
 
 export const Route = createFileRoute("/pomodoro")({
   head: () => ({
-    title: "番茄时钟 - 100mini",
+    title: i18n.t("pomodoro.title"),
     meta: [
-      { name: "description", content: "番茄工作法专注计时，让专注自然生长" },
+      { name: "description", content: i18n.t("pomodoro.desc") },
     ],
   }),
   component: PomodoroPage,
 });
 
 const CIRCUMFERENCE = 2 * Math.PI * 140;
-
-const STAGES = [
-  { pct: 1.00, frame: 0, title: "种下专注的种子", desc: "保持专注，番茄会慢慢长大" },
-  { pct: 0.82, frame: 5, title: "番茄发芽了", desc: "继续加油，它需要你的专注" },
-  { pct: 0.61, frame: 10, title: "长出新叶了", desc: "专注让它茁壮成长" },
-  { pct: 0.43, frame: 17, title: "即将开花", desc: "再坚持一下就能看到花朵了" },
-  { pct: 0.22, frame: 28, title: "小番茄出现了", desc: "快完成啦，番茄在等你！" },
-  { pct: 0.00, frame: 38, title: "番茄成熟啦！", desc: "收获你的专注成果🍅" },
-];
 
 const COLOR_STOPS = [
   { pct: 1.00, bgTop: "#fff8e7", bgBot: "#f5e6d3", ring: "#e6d0b3" },
@@ -32,36 +25,6 @@ const COLOR_STOPS = [
   { pct: 0.22, bgTop: "#fff0e6", bgBot: "#ffccbc", ring: "#ff8a65" },
   { pct: 0.00, bgTop: "#ffebee", bgBot: "#ffcdd2", ring: "#e57373" },
 ];
-
-const BREAK_TEXTS = {
-  shortBreak: [
-    { title: "小憩一下", desc: "喝口水，活动一下筋骨吧 🌿" },
-    { title: "放松一下", desc: "站起来走走，看看窗外 🪟" },
-    { title: "休息片刻", desc: "深呼吸，让大脑休息一下 🧘" },
-    { title: "摸鱼时间 🐟", desc: "刷两下手机，别让老板看见 🤫" },
-    { title: "回血中 ⚡", desc: "充充电，下一轮继续卷" },
-    { title: "放空大脑", desc: "盯着天花板发会儿呆，这是正经休息 😌" },
-    { title: "伸个懒腰 🙆", desc: "手举高，打个哈欠，舒服 ——" },
-    { title: "瞄一眼窗外", desc: "看看云，看看鸟，假装在思考人生 🌤️" },
-  ],
-  longBreak: [
-    { title: "辛苦了 🌻", desc: "完成了一个周期，好好奖励自己吧 ☕" },
-    { title: "太棒了 🎉", desc: "连续完成了四个番茄，真厉害！" },
-    { title: "给自己鼓掌 👏", desc: "去喝杯咖啡，享受一下阳光 ☀️" },
-    { title: "下班！哦不，下课！", desc: "一个周期搞定，你值得拥有五分钟的自由 🎈" },
-    { title: "你已经超过 90% 的人了", desc: "真的，能专注这么久已经很了不起了 🏆" },
-    { title: "番茄收割机 🍅", desc: "四个番茄入库，今天又是丰收的一天" },
-    { title: "中场秀 🎤", desc: "去倒杯水，顺便想想中午吃啥 🤔" },
-    { title: "贤者时间 🧘", desc: "大脑放空，灵魂出窍，下一轮再战 💪" },
-  ],
-};
-
-function getStage(pct: number) {
-  for (let i = 0; i < STAGES.length - 1; i++) {
-    if (pct >= STAGES[i + 1].pct) return STAGES[i];
-  }
-  return STAGES[STAGES.length - 1];
-}
 
 function hexToRgb(hex: string) {
   const n = parseInt(hex.slice(1), 16);
@@ -81,6 +44,12 @@ function lerpColor(c1: string, c2: string, t: number) {
   return rgbToHex(lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t));
 }
 
+function formatTime(sec: number) {
+  const m = Math.floor(sec / 60).toString().padStart(2, "0");
+  const s = (sec % 60).toString().padStart(2, "0");
+  return `${m}:${s}`;
+}
+
 function getColors(pct: number) {
   let start = COLOR_STOPS[0], end = COLOR_STOPS[COLOR_STOPS.length - 1], t = 0;
   for (let i = 0; i < COLOR_STOPS.length - 1; i++) {
@@ -96,12 +65,6 @@ function getColors(pct: number) {
     bgBot: lerpColor(start.bgBot, end.bgBot, t),
     ring: lerpColor(start.ring, end.ring, t),
   };
-}
-
-function formatTime(sec: number) {
-  const m = Math.floor(sec / 60).toString().padStart(2, "0");
-  const s = (sec % 60).toString().padStart(2, "0");
-  return `${m}:${s}`;
 }
 
 function PomodoroPage() {
@@ -227,16 +190,60 @@ function PomodoroPage() {
 }
 
 const DEFAULT_MINUTES = [25, 5, 15];
-const PRESET_LABELS = ["专注", "短休", "长休"];
-const ALARMS = [
-  { name: "番茄成熟" },
-  { name: "叮咚" },
-  { name: "鸟鸣" },
-  { name: "经典" },
-  { name: "柔和" },
+const ALARM_PLAYS = [
+  (ctx: AudioContext) => playMelody(ctx, [
+    { f: 523.25, d: 0.18 }, { f: 659.25, d: 0.18 },
+    { f: 783.99, d: 0.18 }, { f: 1046.50, d: 0.45 },
+  ]),
+  (ctx: AudioContext) => playMelody(ctx, [
+    { f: 880, d: 0.22 }, { f: 660, d: 0.35 },
+  ]),
+  (ctx: AudioContext) => playMelody(ctx, [
+    { f: 1200, d: 0.08 }, { f: 1400, d: 0.08 },
+    { f: 1600, d: 0.08 }, { f: 1800, d: 0.08 },
+    { f: 2000, d: 0.12 },
+  ]),
+  (ctx: AudioContext) => {
+    for (let i = 0; i < 3; i++) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "square";
+      osc.frequency.setValueAtTime(800, ctx.currentTime + i * 0.35);
+      gain.gain.setValueAtTime(0.001, ctx.currentTime + i * 0.35);
+      gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + i * 0.35 + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.35 + 0.3);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(ctx.currentTime + i * 0.35);
+      osc.stop(ctx.currentTime + i * 0.35 + 0.3);
+    }
+  },
+  (ctx: AudioContext) => playMelody(ctx, [
+    { f: 392, d: 0.35 }, { f: 440, d: 0.35 },
+    { f: 523.25, d: 0.5 },
+  ]),
 ];
 
+function playMelody(ctx: AudioContext, notes: { f: number; d: number }[]) {
+  let t = ctx.currentTime + 0.05;
+  notes.forEach(n => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(n.f, t);
+    gain.gain.setValueAtTime(0.001, t);
+    gain.gain.linearRampToValueAtTime(0.22, t + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + n.d);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + n.d);
+    t += n.d + 0.06;
+  });
+}
+
 function PomodoroTimer() {
+  const { t, i18n: i18nInstance } = useTranslation();
   const [presetMinutes, setPresetMinutes] = useState([...DEFAULT_MINUTES]);
   const [mode, setMode] = useState<'focus' | 'shortBreak' | 'longBreak'>('focus');
   const [pomodoroCount, setPomodoroCount] = useState(0);
@@ -262,12 +269,64 @@ function PomodoroTimer() {
   const stageTitleRef = useRef("");
   const advanceTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const hasStartedRef = useRef(false);
+
+  const STAGES = [
+    { pct: 1.00, frame: 0, title: t("pomodoro.stage0.title"), desc: t("pomodoro.stage0.desc") },
+    { pct: 0.82, frame: 5, title: t("pomodoro.stage1.title"), desc: t("pomodoro.stage1.desc") },
+    { pct: 0.61, frame: 10, title: t("pomodoro.stage2.title"), desc: t("pomodoro.stage2.desc") },
+    { pct: 0.43, frame: 17, title: t("pomodoro.stage3.title"), desc: t("pomodoro.stage3.desc") },
+    { pct: 0.22, frame: 28, title: t("pomodoro.stage4.title"), desc: t("pomodoro.stage4.desc") },
+    { pct: 0.00, frame: 38, title: t("pomodoro.stage5.title"), desc: t("pomodoro.stage5.desc") },
+  ];
+
+  const BREAK_TEXTS = {
+    shortBreak: [
+      { title: t("pomodoro.break.short0.title"), desc: t("pomodoro.break.short0.desc") },
+      { title: t("pomodoro.break.short1.title"), desc: t("pomodoro.break.short1.desc") },
+      { title: t("pomodoro.break.short2.title"), desc: t("pomodoro.break.short2.desc") },
+      { title: t("pomodoro.break.short3.title"), desc: t("pomodoro.break.short3.desc") },
+      { title: t("pomodoro.break.short4.title"), desc: t("pomodoro.break.short4.desc") },
+      { title: t("pomodoro.break.short5.title"), desc: t("pomodoro.break.short5.desc") },
+      { title: t("pomodoro.break.short6.title"), desc: t("pomodoro.break.short6.desc") },
+      { title: t("pomodoro.break.short7.title"), desc: t("pomodoro.break.short7.desc") },
+    ],
+    longBreak: [
+      { title: t("pomodoro.break.long0.title"), desc: t("pomodoro.break.long0.desc") },
+      { title: t("pomodoro.break.long1.title"), desc: t("pomodoro.break.long1.desc") },
+      { title: t("pomodoro.break.long2.title"), desc: t("pomodoro.break.long2.desc") },
+      { title: t("pomodoro.break.long3.title"), desc: t("pomodoro.break.long3.desc") },
+      { title: t("pomodoro.break.long4.title"), desc: t("pomodoro.break.long4.desc") },
+      { title: t("pomodoro.break.long5.title"), desc: t("pomodoro.break.long5.desc") },
+      { title: t("pomodoro.break.long6.title"), desc: t("pomodoro.break.long6.desc") },
+      { title: t("pomodoro.break.long7.title"), desc: t("pomodoro.break.long7.desc") },
+    ],
+  };
+
+  const ALARMS = [
+    { name: t("pomodoro.alarm1") },
+    { name: t("pomodoro.alarm2") },
+    { name: t("pomodoro.alarm3") },
+    { name: t("pomodoro.alarm4") },
+    { name: t("pomodoro.alarm5") },
+  ];
+
+  const MODE_LABELS = [t("pomodoro.focus"), t("pomodoro.shortBreak"), t("pomodoro.longBreak")];
+  const modeLabel = MODE_LABELS[mode === 'focus' ? 0 : mode === 'shortBreak' ? 1 : 2];
+
   const breakTextRef = useRef(BREAK_TEXTS.shortBreak[0]);
   useEffect(() => {
     if (mode === 'focus') return;
     const pool = BREAK_TEXTS[mode];
     breakTextRef.current = pool[Math.floor(Math.random() * pool.length)];
-  }, [mode]);
+  }, [mode, i18nInstance.language]);
+
+  function getStage(pct: number) {
+    for (let i = 0; i < STAGES.length - 1; i++) {
+      if (pct >= STAGES[i + 1].pct) return STAGES[i];
+    }
+    return STAGES[STAGES.length - 1];
+  }
+
   const nextRunningRef = useRef(true);
   const modeRef = useRef(mode);
   const countRef = useRef(pomodoroCount);
@@ -277,7 +336,6 @@ function PomodoroTimer() {
   useEffect(() => { todayRef.current = todayTomatoes; }, [todayTomatoes]);
 
   const duration = mode === 'focus' ? presetMinutes[0] : mode === 'shortBreak' ? presetMinutes[1] : presetMinutes[2];
-  const modeLabel = mode === 'focus' ? '专注' : mode === 'shortBreak' ? '短休' : '长休';
   const totalSeconds = duration * 60;
   const pct = remaining / totalSeconds;
   const stage = getStage(pct);
@@ -291,7 +349,6 @@ function PomodoroTimer() {
 
   const ringOffset = CIRCUMFERENCE * Math.max(0, 1 - pct);
 
-  // Timer
   useEffect(() => {
     if (!running || completed) return;
     const id = setInterval(() => {
@@ -300,7 +357,6 @@ function PomodoroTimer() {
     return () => clearInterval(id);
   }, [running, completed]);
 
-  // Detect completion
   useEffect(() => {
     if (remaining <= 0 && !completed) {
       setCompleted(true);
@@ -308,7 +364,6 @@ function PomodoroTimer() {
     }
   }, [remaining, completed]);
 
-  // Stage text fade
   useEffect(() => {
     if (stage.title !== stageTitleRef.current) {
       stageTitleRef.current = stage.title;
@@ -318,7 +373,6 @@ function PomodoroTimer() {
     }
   }, [stage.title]);
 
-  // Completion effects
   useEffect(() => {
     if (!completed) return;
     playSound();
@@ -339,7 +393,6 @@ function PomodoroTimer() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [completed]);
 
-  // Fetch today's tomato count from DB
   useEffect(() => {
     if (!user) return;
     fetch("/api/pomodoro/today-count")
@@ -359,63 +412,6 @@ function PomodoroTimer() {
       });
     } catch {}
   }
-
-  function playMelody(ctx: AudioContext, notes: { f: number; d: number }[]) {
-    let t = ctx.currentTime + 0.05;
-    notes.forEach(n => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(n.f, t);
-      gain.gain.setValueAtTime(0.001, t);
-      gain.gain.linearRampToValueAtTime(0.22, t + 0.03);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + n.d);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(t);
-      osc.stop(t + n.d);
-      t += n.d + 0.06;
-    });
-  }
-
-  const ALARM_PLAYS = [
-    // 番茄成熟
-    (ctx: AudioContext) => playMelody(ctx, [
-      { f: 523.25, d: 0.18 }, { f: 659.25, d: 0.18 },
-      { f: 783.99, d: 0.18 }, { f: 1046.50, d: 0.45 },
-    ]),
-    // 叮咚
-    (ctx: AudioContext) => playMelody(ctx, [
-      { f: 880, d: 0.22 }, { f: 660, d: 0.35 },
-    ]),
-    // 鸟鸣
-    (ctx: AudioContext) => playMelody(ctx, [
-      { f: 1200, d: 0.08 }, { f: 1400, d: 0.08 },
-      { f: 1600, d: 0.08 }, { f: 1800, d: 0.08 },
-      { f: 2000, d: 0.12 },
-    ]),
-    // 经典
-    (ctx: AudioContext) => {
-      for (let i = 0; i < 3; i++) {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = "square";
-        osc.frequency.setValueAtTime(800, ctx.currentTime + i * 0.35);
-        gain.gain.setValueAtTime(0.001, ctx.currentTime + i * 0.35);
-        gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + i * 0.35 + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.35 + 0.3);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(ctx.currentTime + i * 0.35);
-        osc.stop(ctx.currentTime + i * 0.35 + 0.3);
-      }
-    },
-    // 柔和
-    (ctx: AudioContext) => playMelody(ctx, [
-      { f: 392, d: 0.35 }, { f: 440, d: 0.35 },
-      { f: 523.25, d: 0.5 },
-    ]),
-  ];
 
   function getAudioCtx(): AudioContext | null {
     const AC = window.AudioContext || (window as any).webkitAudioContext;
@@ -458,7 +454,6 @@ function PomodoroTimer() {
     }
   }
 
-  // Reset when duration changes (skip initial mount)
   useEffect(() => {
     if (!hasStartedRef.current) { hasStartedRef.current = true; return; }
     recordedRef.current = false;
@@ -505,12 +500,12 @@ function PomodoroTimer() {
     <div className="pomodoro-app" style={{ background: `linear-gradient(180deg, ${colors.bgTop} 0%, ${colors.bgBot} 100%)` }}>
       <div className="p-drawer-overlay" style={{ display: showDrawer ? "block" : "none" }} onClick={() => setShowDrawer(false)} />
       <div className={`p-drawer${showDrawer ? " open" : ""}`}>
-        <Link to="/" className="p-drawer-home">← 返回首页</Link>
-        <div className="p-drawer-title">番茄时钟 设置</div>
+        <Link to="/" className="p-drawer-home">{t("pomodoro.drawerBack")}</Link>
+        <div className="p-drawer-title">{t("pomodoro.settings")}</div>
         {[
-          { label: "专注", idx: 0 },
-          { label: "短休", idx: 1 },
-          { label: "长休", idx: 2 },
+          { label: t("pomodoro.focus"), idx: 0 },
+          { label: t("pomodoro.shortBreak"), idx: 1 },
+          { label: t("pomodoro.longBreak"), idx: 2 },
         ].map(({ label, idx }) => (
           <div key={label} className="p-settings-row">
             <span>{label}</span>
@@ -526,31 +521,31 @@ function PomodoroTimer() {
                 setPresetMinutes(next);
               }}
             />
-            <span className="p-settings-unit">分钟</span>
+            <span className="p-settings-unit">{t("pomodoro.minutes")}</span>
           </div>
         ))}
-        <div className="p-drawer-section">提示音</div>
+        <div className="p-drawer-section">{t("pomodoro.alarm")}</div>
         <div className="p-alarm-select-wrap">
           <select className="p-alarm-select" value={alarmIndex} onChange={e => {
             const i = Number(e.target.value);
             setAlarmIndex(i);
             previewAlarm(i);
           }}>
-            {ALARMS.map((a, i) => <option key={a.name} value={i}>{a.name}</option>)}
+            {ALARMS.map((a, i) => <option key={i} value={i}>{a.name}</option>)}
           </select>
         </div>
         <div className="p-settings-actions">
-          <button className="p-btn p-btn-pause" onClick={() => setPresetMinutes([...DEFAULT_MINUTES])}>重置</button>
-          <button className="p-btn p-btn-complete" onClick={() => setShowDrawer(false)}>关闭</button>
+          <button className="p-btn p-btn-pause" onClick={() => setPresetMinutes([...DEFAULT_MINUTES])}>{t("common.reset")}</button>
+          <button className="p-btn p-btn-complete" onClick={() => setShowDrawer(false)}>{t("common.close")}</button>
         </div>
       </div>
 
       <header className="p-hdr">
-        <button aria-label="菜单" onClick={() => setShowDrawer(true)}>
+        <button aria-label={t("nav.menu")} onClick={() => setShowDrawer(true)}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
         </button>
-        <h1>{completed ? `${modeLabel}完成！` : `${modeLabel}中`}</h1>
-        <button aria-label="声音" onClick={() => {
+        <h1>{completed ? t("pomodoro.completed", { mode: modeLabel }) : t("pomodoro.inProgress", { mode: modeLabel })}</h1>
+        <button aria-label={t("pomodoro.sound")} onClick={() => {
           setSoundEnabled(s => { const n = !s; try { localStorage.setItem('pomodoro_sound', n ? 'on' : 'off'); } catch {} return n; });
         }}>
           {soundEnabled ? (
@@ -576,20 +571,20 @@ function PomodoroTimer() {
             />
           </svg>
           <div className="p-plant">
-            <img src={`/spritesheet2/frame_${String(displayFrame).padStart(2, "0")}.webp`} alt="番茄生长" />
+            <img src={`/spritesheet2/frame_${String(displayFrame).padStart(2, "0")}.webp`} alt={t("pomodoro.alt")} />
           </div>
           <div className="p-time">{formatTime(remaining)}</div>
         </div>
 
         <div className={`p-status${fading ? " fading" : ""}`} key={mode === 'focus' ? stage.title : mode}>
-          <h2>{completed ? `${modeLabel}完成！` : mode === 'focus' ? stage.title : breakTextRef.current.title}</h2>
-          <p>{completed ? '收获你的专注成果🍅' : mode === 'focus' ? stage.desc : breakTextRef.current.desc}</p>
+          <h2>{completed ? t("pomodoro.completed", { mode: modeLabel }) : mode === 'focus' ? stage.title : breakTextRef.current.title}</h2>
+          <p>{completed ? t("pomodoro.harvest") : mode === 'focus' ? stage.desc : breakTextRef.current.desc}</p>
         </div>
       </main>
 
       {user ? (
         <div style={{textAlign:'center',marginBottom:8,fontSize:14,color:'#7a7a7a',fontWeight:600}}>
-          今日 🍅×{todayTomatoes}
+          {t("pomodoro.todayCount", { count: todayTomatoes })}
         </div>
       ) : (
         <div style={{textAlign:'center',marginBottom:8}}>
@@ -599,7 +594,7 @@ function PomodoroTimer() {
               pulseCta ? 'animate-pulse text-[#e57373]' : 'text-[#7a7a7a] hover:text-[#e57373]'
             }`}
           >
-            登录积累番茄 🍅
+            {t("pomodoro.loginCta")}
           </button>
         </div>
       )}
@@ -611,9 +606,9 @@ function PomodoroTimer() {
       <div className="p-ctrl">
         <button className={`p-btn ${completed ? "p-btn-complete" : "p-btn-pause"}`} onClick={completed ? advanceNow : togglePause}>
           {completed ? (
-            <>下一个<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></>
+            <>{t("common.next")}<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></>
           ) : (
-            <><span>{running ? "暂停" : "开始计时"}</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">{running ? <><line x1="10" y1="4" x2="10" y2="20"/><line x1="14" y1="4" x2="14" y2="20"/></> : <polygon points="6 4 20 12 6 20"/>}</svg></>
+            <><span>{running ? t("pomodoro.pause") : t("pomodoro.start")}</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">{running ? <><line x1="10" y1="4" x2="10" y2="20"/><line x1="14" y1="4" x2="14" y2="20"/></> : <polygon points="6 4 20 12 6 20"/>}</svg></>
           )}
         </button>
       </div>

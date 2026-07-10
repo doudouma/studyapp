@@ -1,27 +1,30 @@
 import { useState, useRef, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ChevronDown, Menu, X, Copy, Check } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import i18n from "~/lib/i18n";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
-    title: "联系我们 - 100mini",
+    title: i18n.t("contact.title"),
     meta: [
-      { name: "description", content: "联系 100mini 团队" },
+      { name: "description", content: i18n.t("contact.desc") },
     ],
   }),
   component: ContactPage,
 });
 
-const navItems = [
-  { label: "首页", href: "/" },
-  { label: "广场", href: "/square" },
-  { label: "番茄钟", href: "/pomodoro" },
-];
-
 function ContactPage() {
+  const { t } = useTranslation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+
+  const navItems = [
+    { label: t("nav.home"), href: "/" },
+    { label: t("nav.square"), href: "/square" },
+    { label: t("nav.pomodoroShort"), href: "/pomodoro" },
+  ];
 
   const copyEmail = async () => {
     try {
@@ -108,13 +111,13 @@ function ContactPage() {
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-4">
             <Link to="/links" className="text-white/90 hover:text-white text-sm font-medium transition-colors">
-              个人中心
+              {t("nav.profile")}
             </Link>
             <Link
               to="/"
               className="liquid-glass rounded-full px-5 py-2 text-white text-sm font-medium"
             >
-              开始使用
+              {t("nav.getStarted")}
             </Link>
           </div>
 
@@ -152,7 +155,7 @@ function ContactPage() {
                 className="text-white/90 hover:text-white text-lg font-medium"
                 onClick={() => setMobileOpen(false)}
               >
-                个人中心
+                {t("nav.profile")}
               </Link>
             </div>
             <div className="mt-6 pt-6 border-t border-white/10 flex items-center gap-4">
@@ -161,7 +164,7 @@ function ContactPage() {
                 className="liquid-glass rounded-full px-5 py-2 text-white text-sm font-medium"
                 onClick={() => setMobileOpen(false)}
               >
-                开始使用
+                {t("nav.getStarted")}
               </Link>
             </div>
           </div>
@@ -172,12 +175,12 @@ function ContactPage() {
       <div className="relative z-10 flex-1 flex items-start justify-center pt-16 sm:pt-20 md:pt-24">
         <div className="text-center max-w-3xl px-5">
           <h1 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-[1.05] tracking-[-0.02em]">
-            联系我们<br />
-            <span className="text-white/60">聊聊你的想法</span><br />
-            <span className="text-white/60">一起做些有趣的事</span>
+            {t("contact.heading")}<br />
+            <span className="text-white/60">{t("contact.subtitle")}</span><br />
+            <span className="text-white/60">{t("contact.subtitle2")}</span>
           </h1>
           <p className="text-white/80 text-sm sm:text-base md:text-lg leading-relaxed max-w-md mx-auto mt-6 sm:mt-8">
-            有任何问题、建议或合作意向？我们很乐意听到你的声音。
+            {t("contact.message")}
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mt-6 sm:mt-8">
@@ -185,16 +188,16 @@ function ContactPage() {
               href="mailto:hello@100mini.com"
               className="px-5 sm:px-6 py-2.5 sm:py-3 bg-white text-gray-900 text-sm font-semibold rounded-full hover:bg-white/90 transition-colors"
             >
-              发送邮件
+              {t("contact.sendEmail")}
             </a>
             <button
               onClick={copyEmail}
               className="px-5 sm:px-6 py-2.5 sm:py-3 liquid-glass rounded-full text-white text-sm font-semibold hover:bg-white/10 transition-colors flex items-center gap-2"
             >
               {copied ? (
-                <><Check className="size-3.5" /> 已复制</>
+                <><Check className="size-3.5" /> {t("contact.copied")}</>
               ) : (
-                <><Copy className="size-3.5" /> 复制邮箱</>
+                <><Copy className="size-3.5" /> {t("contact.copyEmail")}</>
               )}
             </button>
           </div>
