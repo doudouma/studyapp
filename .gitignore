@@ -5,3 +5,4 @@ dist/
 dist-worker/
 .wrangler/
 .vite/
+test-results/
