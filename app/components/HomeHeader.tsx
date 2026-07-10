@@ -1,22 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { Code2, Search, Bell, Settings, LogOut, Menu, X } from "lucide-react";
-import { Button } from "~/components/ui/button";
+import { Code2, Search, Settings, LogOut, Menu, X } from "lucide-react";
 import { Input } from "~/components/ui/input";
 import { authClient } from "~/lib/auth-client";
 import { useAuth } from "~/lib/auth-context";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "~/components/ui/tabs";
+import { Button } from "~/components/ui/button";
+import { AuthDialog } from "~/components/AuthDialog";
 
 interface AppNavProps {
   searchQuery?: string;
@@ -63,105 +52,6 @@ function MobileNavLink({ href, onClick, children }: { href: string; onClick: () 
     >
       {children}
     </Link>
-  );
-}
-
-function LoginForm({ onSuccess }: { onSuccess: () => void }) {
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-
-    const form = new FormData(e.currentTarget);
-    const email = form.get("email") as string;
-    const password = form.get("password") as string;
-
-    try {
-      const result = await authClient.signIn.email({ email, password });
-      if (result?.error) {
-        setError(result.error.message || "登录失败");
-      } else {
-        onSuccess();
-      }
-    } catch {
-      setError("网络错误，请重试");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-
-    const form = new FormData(e.currentTarget);
-    const email = form.get("email") as string;
-    const password = form.get("password") as string;
-    const name = form.get("name") as string;
-
-    try {
-      const result = await authClient.signUp.email({ email, password, name });
-      if (result?.error) {
-        setError(result.error.message || "注册失败");
-      } else {
-        onSuccess();
-      }
-    } catch {
-      setError("网络错误，请重试");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <Tabs defaultValue="signin" className="w-full">
-      <TabsList className="w-full">
-        <TabsTrigger value="signin" className="flex-1">
-          登录
-        </TabsTrigger>
-        <TabsTrigger value="signup" className="flex-1">
-          注册
-        </TabsTrigger>
-      </TabsList>
-
-      <TabsContent value="signin">
-        <form onSubmit={handleSignIn} className="space-y-4 mt-4">
-          <Input name="email" type="email" placeholder="邮箱" required />
-          <Input
-            name="password"
-            type="password"
-            placeholder="密码"
-            required
-          />
-          {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "登录中..." : "登录"}
-          </Button>
-        </form>
-      </TabsContent>
-
-      <TabsContent value="signup">
-        <form onSubmit={handleSignUp} className="space-y-4 mt-4">
-          <Input name="name" placeholder="昵称" required />
-          <Input name="email" type="email" placeholder="邮箱" required />
-          <Input
-            name="password"
-            type="password"
-            placeholder="密码（至少 8 位）"
-            required
-            minLength={8}
-          />
-          {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "注册中..." : "注册"}
-          </Button>
-        </form>
-      </TabsContent>
-    </Tabs>
   );
 }
 
@@ -239,21 +129,18 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
           >
             {mobileNavOpen ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
-          <Dialog open={authOpen} onOpenChange={setAuthOpen}>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setAuthOpen(true)}
-            >
-              登录 / 注册
-            </Button>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>登录 100mini</DialogTitle>
-              </DialogHeader>
-              <LoginForm onSuccess={() => { setAuthOpen(false); refreshAuth(); navigate({ to: "/" }); }} />
-            </DialogContent>
-          </Dialog>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setAuthOpen(true)}
+          >
+            登录 / 注册
+          </Button>
+          <AuthDialog
+            open={authOpen}
+            onOpenChange={setAuthOpen}
+            onSuccess={() => { navigate({ to: "/" }); }}
+          />
         </nav>
         {mobileNavOpen && (
           <div className="border-t border-[#d3e4fe] dark:border-[#3c4a42] bg-white dark:bg-[#0b1c30] md:hidden">

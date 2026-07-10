@@ -1,6 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "~/lib/auth-context";
+import { AuthDialog } from "~/components/AuthDialog";
 
 export const Route = createFileRoute("/pomodoro")({
   head: () => ({
@@ -242,7 +243,10 @@ function PomodoroTimer() {
     try { return localStorage.getItem('pomodoro_sound') !== 'off'; } catch { return true; }
   });
 
+  const navigate = useNavigate();
   const { user } = useAuth();
+  const [authOpen, setAuthOpen] = useState(false);
+  const [pulseCta, setPulseCta] = useState(false);
   const recordedRef = useRef(false);
   const confettiRef = useRef<HTMLDivElement>(null);
   const stageTitleRef = useRef("");
@@ -310,7 +314,10 @@ function PomodoroTimer() {
     playSound();
     if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 500]);
     if (modeRef.current === 'focus') {
-      if (todayRef.current < 8) {
+      if (!user) {
+        makeConfetti();
+        setPulseCta(true);
+      } else if (todayRef.current < 8) {
         makeConfetti();
         recordSession();
         setTodayTomatoes(t => t + 1);
@@ -570,9 +577,27 @@ function PomodoroTimer() {
         </div>
       </main>
 
-      <div style={{textAlign:'center',marginBottom:8,fontSize:14,color:'#7a7a7a',fontWeight:600}}>
-        今日 🍅×{todayTomatoes}
-      </div>
+      {user ? (
+        <div style={{textAlign:'center',marginBottom:8,fontSize:14,color:'#7a7a7a',fontWeight:600}}>
+          今日 🍅×{todayTomatoes}
+        </div>
+      ) : (
+        <div style={{textAlign:'center',marginBottom:8}}>
+          <button
+            onClick={() => setAuthOpen(true)}
+            className={`cursor-pointer text-sm font-semibold transition-all ${
+              pulseCta ? 'animate-pulse text-[#e57373]' : 'text-[#7a7a7a] hover:text-[#e57373]'
+            }`}
+          >
+            登录积累番茄 🍅
+          </button>
+        </div>
+      )}
+      <AuthDialog
+        open={authOpen}
+        onOpenChange={setAuthOpen}
+        onSuccess={() => { navigate({ to: "/" }); }}
+      />
       <div className="p-ctrl">
         <button className={`p-btn ${completed ? "p-btn-complete" : "p-btn-pause"}`} onClick={completed ? advanceNow : togglePause}>
           {completed ? (
