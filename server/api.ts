@@ -878,7 +878,7 @@ api.get("/thumbnails/:id", async (c) => {
     if (!obj) return c.json({ error: "not found" }, 404);
     const headers = new Headers();
     headers.set("Content-Type", "image/webp");
-    headers.set("Cache-Control", "public, max-age=86400");
+    headers.set("Cache-Control", "public, max-age=31536000, immutable");
     return new Response(obj.body, { headers });
   }
 });

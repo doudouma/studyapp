@@ -30,8 +30,9 @@ const CATEGORY_LABELS: Record<string, string> = {
   other: "其他",
 };
 
-function PreviewCell({ item }: { item: SquareItem }) {
+function PreviewCell({ item, index }: { item: SquareItem; index: number }) {
   const [showIframe, setShowIframe] = useState(false);
+  const isPriority = index < 8;
 
   if (showIframe || !item.previewPath) {
     return (
@@ -50,7 +51,8 @@ function PreviewCell({ item }: { item: SquareItem }) {
       src={`/thumbnails/${item.id}`}
       alt={item.title}
       className="absolute inset-0 w-full h-full object-contain transition-transform group-hover:scale-105"
-      loading="lazy"
+      loading={isPriority ? undefined : "lazy"}
+      fetchpriority={index === 0 ? "high" : undefined}
       onError={() => setShowIframe(true)}
     />
   );
@@ -87,7 +89,7 @@ export function SquareGrid({ items }: SquareGridProps) {
 
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {items.map((item) => (
+      {items.map((item, index) => (
         <article
           key={item.id}
           className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] overflow-hidden group hover:shadow-sm transition-all duration-300"
@@ -99,7 +101,7 @@ export function SquareGrid({ items }: SquareGridProps) {
             className="relative block overflow-hidden"
           >
             <div className="relative overflow-hidden bg-muted" style={{ aspectRatio: "2/3" }}>
-              <PreviewCell item={item} />
+              <PreviewCell item={item} index={index} />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4 z-10">
                 <span className="flex items-center gap-2 text-sm font-medium text-white">
                   <Eye className="size-4" />

@@ -250,7 +250,7 @@ function UploadForm({
 
 function HomePage() {
   const navigate = useNavigate();
-  const { user, authLoading } = useAuth();
+  const { user } = useAuth();
   const uploadRef = useRef<HTMLElement>(null);
 
   const [mode, setMode] = useState<TabMode>("paste");
@@ -329,8 +329,6 @@ function HomePage() {
   const scrollToUpload = () => {
     uploadRef.current?.scrollIntoView({ behavior: "smooth" });
   };
-
-  if (authLoading) return null;
 
   if (result) {
     return (
