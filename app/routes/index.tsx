@@ -8,7 +8,7 @@ import { StatsSection } from "~/components/StatsSection";
 import { GuideSection } from "~/components/GuideSection";
 import { AppFooter } from "~/components/AppFooter";
 import { Card, CardContent } from "~/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/components/ui/tabs";
+
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { TagInput } from "~/components/TagInput";
@@ -88,33 +88,42 @@ function UploadForm({
   return (
     <Card className="w-full max-w-xl">
       <CardContent className="p-6">
-        <Tabs
-          value={mode}
-          onValueChange={(v) => {
-            setMode(v as TabMode);
-            if (v === "paste") setFile(null);
-            if (v === "drop") setHtmlContent("");
-          }}
-        >
-          <TabsList variant="line" className="mb-6">
-            <TabsTrigger value="paste">粘贴代码</TabsTrigger>
-            <TabsTrigger value="drop">上传文件</TabsTrigger>
-          </TabsList>
+        <div>
+          <div role="tablist" className="mb-6 inline-flex w-fit items-center justify-center gap-1 rounded-none bg-transparent">
+            <button
+              role="tab"
+              data-active={mode === "paste" ? "" : undefined}
+              onClick={() => { setMode("paste"); setFile(null); }}
+              className="relative inline-flex items-center justify-center gap-1.5 rounded-md border border-transparent px-1.5 py-0.5 text-sm font-medium whitespace-nowrap text-foreground/60 transition-all hover:text-foreground data-active:bg-background data-active:text-foreground after:absolute after:inset-x-0 after:bottom-[-5px] after:h-0.5 after:bg-foreground after:opacity-0 after:transition-opacity data-active:after:opacity-100"
+            >
+              粘贴代码
+            </button>
+            <button
+              role="tab"
+              data-active={mode === "drop" ? "" : undefined}
+              onClick={() => { setMode("drop"); setHtmlContent(""); }}
+              className="relative inline-flex items-center justify-center gap-1.5 rounded-md border border-transparent px-1.5 py-0.5 text-sm font-medium whitespace-nowrap text-foreground/60 transition-all hover:text-foreground data-active:bg-background data-active:text-foreground after:absolute after:inset-x-0 after:bottom-[-5px] after:h-0.5 after:bg-foreground after:opacity-0 after:transition-opacity data-active:after:opacity-100"
+            >
+              上传文件
+            </button>
+          </div>
 
-          <TabsContent value="paste" className="min-h-[300px] flex flex-col">
-            <textarea
-              className="w-full flex-1 rounded-lg border border-border bg-background p-4 text-sm font-mono outline-none resize-y leading-relaxed focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-              placeholder="在此粘贴你的 HTML/CSS/JS 代码..."
-              value={htmlContent}
-              onChange={(e) => setHtmlContent(e.target.value)}
-              spellCheck={false}
-            />
-          </TabsContent>
-
-          <TabsContent value="drop" className="min-h-[300px]">
-            <DropZone file={file} onFileSelect={setFile} />
-          </TabsContent>
-        </Tabs>
+          {mode === "paste" ? (
+            <div role="tabpanel" className="min-h-[300px] flex flex-col flex-1 text-sm outline-none">
+              <textarea
+                className="w-full flex-1 rounded-lg border border-border bg-background p-4 text-sm font-mono outline-none resize-y leading-relaxed focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                placeholder="在此粘贴你的 HTML/CSS/JS 代码..."
+                value={htmlContent}
+                onChange={(e) => setHtmlContent(e.target.value)}
+                spellCheck={false}
+              />
+            </div>
+          ) : (
+            <div role="tabpanel" className="min-h-[300px] flex-1 text-sm outline-none">
+              <DropZone file={file} onFileSelect={setFile} />
+            </div>
+          )}
+        </div>
 
         <div className="mt-2 mb-2 flex justify-end">
           <span
