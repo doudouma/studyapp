@@ -66,6 +66,24 @@ drizzle/            # Drizzle Kit 迁移产物
 - 工具函数: `cn()` (clsx + tailwind-merge)
 - UI 组件: shadcn/ui, 使用 `@base-ui/react` 原语
 
+## LCP 性能优化
+
+### 关键改动
+
+| 页面 | 问题 | 修复 | 文件 |
+|---|---|---|---|
+| 首页 + 广场 | SSR 因 `authLoading` 输出空 HTML | 移除 `authLoading` 阻塞，SSR 直出完整内容 | `app/routes/index.tsx:333` |
+| 全局 | Inter 字体发现晚，需等 CSS 解析后才下载 | `<link rel="preload">` 提前发现字体 | `app/routes/__root.tsx:42` |
+| 广场 | 首屏缩略图被 `loading="lazy"` 降级 | 前 8 张无 `loading`，第 1 张 `fetchpriority="high"` | `app/components/SquareGrid.tsx:54-55` |
+| 广场 | 缩略图浏览器缓存仅 24h | 改为 `max-age=31536000, immutable`（1 年） | `server/api.ts:845` |
+
+### 原则
+
+- **永不阻塞渲染**：auth 状态异步更新，不阻止首屏 paint
+- **字体**：`font-display: swap` 确保 fallback 字体即时渲染，preload 减少 FOUT 窗口
+- **图片**：首屏可见图片不使用 `loading="lazy"`，第 1 张加 `fetchpriority="high"` 提示
+- **缓存**：ID 不变的资源（缩略图）用 `immutable` 长期缓存
+
 ## 临时文件清理
 
 匿名上传的文件存储在 R2 `tmp/` 前缀下，24 小时后自动销毁。
