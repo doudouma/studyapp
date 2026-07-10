@@ -1,10 +1,10 @@
 /// <reference types="@cloudflare/workers-types" />
 import { Hono } from "hono";
 import { nanoid } from "nanoid";
-import { count, eq, and, desc, sql } from "drizzle-orm";
+import { count, eq, and, desc, sql, gte, lt } from "drizzle-orm";
 import { MAX_SIZE } from "./r2";
 import { createDb } from "./db";
-import { page, user, membership } from "./db/schema";
+import { page, user, membership, pomodoroSession } from "./db/schema";
 
 type Variables = {
   user: { id: string; name: string; email: string; image?: string; role?: string } | null;
@@ -764,8 +764,8 @@ api.post("/api/upload", async (c) => {
         if (isAnonymous) {
           opts.customMetadata = { createdAt: String(now) };
         }
-        const buf = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
-        return c.env.BUCKET.put(key, buf, opts);
+        const buf = new Uint8Array(data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength));
+        return c.env.BUCKET!.put(key, buf, opts);
       });
       await Promise.all(puts);
     }
@@ -926,6 +926,51 @@ api.get("/api/square", async (c) => {
     .orderBy(desc(page.sharedAt));
 
   return c.json({ items });
+});
+
+// Record a completed pomodoro session
+api.post("/api/pomodoro/sessions", async (c) => {
+  const user = c.get("user");
+  if (!user) return c.json({ error: "未登录" }, 401);
+  if (!c.env.D1) return c.json({ error: "database unavailable" }, 503);
+
+  const { duration } = await c.req.json<{ duration: number }>();
+  if (!duration || duration <= 0) return c.json({ error: "无效的时长" }, 400);
+
+  const db = createDb(c.env.D1);
+  await db.insert(pomodoroSession).values({
+    id: nanoid(12),
+    userId: user.id,
+    duration,
+    completedAt: new Date(),
+  });
+
+  return c.json({ success: true });
+});
+
+// Get today's pomodoro count
+api.get("/api/pomodoro/today-count", async (c) => {
+  const user = c.get("user");
+  if (!user) return c.json({ today: 0, total: 0 });
+  if (!c.env.D1) return c.json({ today: 0, total: 0 });
+
+  const db = createDb(c.env.D1);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const [todayResult, totalResult] = await Promise.all([
+    db.select({ count: sql<number>`count(*)` }).from(pomodoroSession).where(
+      and(eq(pomodoroSession.userId, user.id), gte(pomodoroSession.completedAt, today), lt(pomodoroSession.completedAt, tomorrow)),
+    ),
+    db.select({ count: sql<number>`count(*)` }).from(pomodoroSession).where(eq(pomodoroSession.userId, user.id)),
+  ]);
+
+  return c.json({
+    today: Number(todayResult[0]?.count || 0),
+    total: Number(totalResult[0]?.count || 0),
+  });
 });
 
 api.get("/p/*", async (c) => {

@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SquareRouteImport } from './routes/square'
+import { Route as PomodoroRouteImport } from './routes/pomodoro'
 import { Route as LinksRouteImport } from './routes/links'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -17,6 +18,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const SquareRoute = SquareRouteImport.update({
   id: '/square',
   path: '/square',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PomodoroRoute = PomodoroRouteImport.update({
+  id: '/pomodoro',
+  path: '/pomodoro',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LinksRoute = LinksRouteImport.update({
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/links': typeof LinksRoute
+  '/pomodoro': typeof PomodoroRoute
   '/square': typeof SquareRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/links': typeof LinksRoute
+  '/pomodoro': typeof PomodoroRoute
   '/square': typeof SquareRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,22 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/links': typeof LinksRoute
+  '/pomodoro': typeof PomodoroRoute
   '/square': typeof SquareRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/links' | '/square'
+  fullPaths: '/' | '/admin' | '/links' | '/pomodoro' | '/square'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/links' | '/square'
-  id: '__root__' | '/' | '/admin' | '/links' | '/square'
+  to: '/' | '/admin' | '/links' | '/pomodoro' | '/square'
+  id: '__root__' | '/' | '/admin' | '/links' | '/pomodoro' | '/square'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   LinksRoute: typeof LinksRoute
+  PomodoroRoute: typeof PomodoroRoute
   SquareRoute: typeof SquareRoute
 }
 
@@ -76,6 +86,13 @@ declare module '@tanstack/react-router' {
       path: '/square'
       fullPath: '/square'
       preLoaderRoute: typeof SquareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pomodoro': {
+      id: '/pomodoro'
+      path: '/pomodoro'
+      fullPath: '/pomodoro'
+      preLoaderRoute: typeof PomodoroRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/links': {
@@ -106,6 +123,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   LinksRoute: LinksRoute,
+  PomodoroRoute: PomodoroRoute,
   SquareRoute: SquareRoute,
 }
 export const routeTree = rootRouteImport
