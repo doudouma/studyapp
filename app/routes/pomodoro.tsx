@@ -32,6 +32,19 @@ const COLOR_STOPS = [
   { pct: 0.00, bgTop: "#ffebee", bgBot: "#ffcdd2", ring: "#e57373" },
 ];
 
+const BREAK_TEXTS = {
+  shortBreak: [
+    { title: "小憩一下", desc: "喝口水，活动一下筋骨吧 🌿" },
+    { title: "放松一下", desc: "站起来走走，看看窗外 🪟" },
+    { title: "休息片刻", desc: "深呼吸，让大脑休息一下 🧘" },
+  ],
+  longBreak: [
+    { title: "辛苦了 🌻", desc: "完成了一个周期，好好奖励自己吧 ☕" },
+    { title: "太棒了 🎉", desc: "连续完成了四个番茄，真厉害！" },
+    { title: "给自己鼓掌 👏", desc: "去喝杯咖啡，享受一下阳光 ☀️" },
+  ],
+};
+
 function getStage(pct: number) {
   for (let i = 0; i < STAGES.length - 1; i++) {
     if (pct >= STAGES[i + 1].pct) return STAGES[i];
@@ -82,7 +95,7 @@ function formatTime(sec: number) {
 
 function PomodoroPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#f2f2f2]">
+    <div className="min-h-screen flex items-center justify-center pomodoro-outer" style={{background:'#fff'}}>
       <style>{`
         .pomodoro-app {
           width: 100%; height: 100%; max-width: 420px; max-height: 900px;
@@ -90,7 +103,25 @@ function PomodoroPage() {
           transition: background 1.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
         @media (min-width: 480px) {
-          .pomodoro-app { height: auto; min-height: 700px; border-radius: 32px; box-shadow: 0 24px 80px rgba(0,0,0,0.18); }
+          .pomodoro-app { height: auto; min-height: 700px; border-radius: 32px; border: 1px solid #e5e5e5; }
+        }
+        @media (max-width: 479px) {
+          body { overflow: auto; background: #fff; }
+          .pomodoro-app { height: auto; padding: 12px 0; border-radius: 32px; border: 1px solid #e5e5e5; }
+          .pomodoro-outer { min-height: 100dvh; overflow-y: auto; }
+          .p-hdr { padding: 4px 16px; }
+          .p-hdr h1 { font-size: 14px; }
+          .p-hdr button { width: 32px; height: 32px; }
+          .p-hdr svg { width: 16px; height: 16px; }
+          .p-main { padding: 0 12px; gap: 8px; }
+          .p-timer-wrap { width: min(60vw, 220px); margin-bottom: 0; }
+          .p-time { font-size: clamp(28px, 10vw, 40px); top: 28%; }
+          .p-plant { bottom: -80px; }
+          .p-status { margin-bottom: 0; min-height: 44px; }
+          .p-status h2 { font-size: 16px; }
+          .p-status p { font-size: 12px; }
+          .p-ctrl { padding: 0 16px 4px; }
+          .p-btn { min-width: 130px; padding: 10px 24px; font-size: 14px; }
         }
         .p-hdr { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; flex-shrink: 0; }
         .p-hdr button {
@@ -165,19 +196,7 @@ function PomodoroPage() {
           appearance: auto; transition: border-color .2s;
         }
         .p-alarm-select:focus { border-color: #e57373; }
-        .p-alarm-preview {
-          width: 100%; padding: 8px 0; border: 2px solid #ddd; border-radius: 10px; background: #fff;
-          cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;
-          font-size: 13px; font-weight: 600; color: #7a7a7a; transition: all .2s;
-        }
-        .p-alarm-preview:hover { border-color: #e57373; color: #e57373; background: #fff5f5; }
-        .p-alarm-preview.playing { border-color: #e57373; color: #e57373; background: #fff0f0; cursor: default; }
-        .p-alarm-preview:disabled { opacity: 1; }
-        .p-playing-dot {
-          display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #e57373;
-          animation: p-pulse .6s ease-in-out infinite alternate;
-        }
-        @keyframes p-pulse { from { opacity: .4; transform: scale(.8); } to { opacity: 1; transform: scale(1.1); } }
+
         .p-settings-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
         .p-settings-row span:first-child { font-size: 14px; font-weight: 600; color: #5a5a5a; min-width: 44px; }
         .p-settings-input {
@@ -189,15 +208,7 @@ function PomodoroPage() {
         .p-settings-unit { font-size: 13px; color: #999; white-space: nowrap; }
         .p-settings-actions { display: flex; gap: 10px; margin-top: 20px; }
         .p-settings-actions .p-btn { flex: 1; min-width: 0; padding: 10px 0; font-size: 14px; }
-        .p-dur { display: flex; justify-content: center; gap: 8px; padding: 0 24px 12px; flex-shrink: 0; }
-        .p-dur button {
-          min-width: 56px; padding: 6px 16px; border: 2px solid rgba(255,255,255,0.5); border-radius: 999px;
-          background: rgba(255,255,255,0.25); color: #5a5a5a; font-size: 14px; font-weight: 600;
-          cursor: pointer; transition: all .2s; backdrop-filter: blur(4px);
-        }
-        .p-dur button:hover { background: rgba(255,255,255,0.5); border-color: rgba(255,255,255,0.7); }
-        .p-dur button.active { background: rgba(255,255,255,0.7); border-color: #e57373; color: #e57373; }
-        .p-hidden { display: none; }
+
       `}</style>
       <PomodoroTimer />
     </div>
@@ -216,20 +227,43 @@ const ALARMS = [
 
 function PomodoroTimer() {
   const [presetMinutes, setPresetMinutes] = useState([...DEFAULT_MINUTES]);
-  const [duration, setDuration] = useState(25);
+  const [mode, setMode] = useState<'focus' | 'shortBreak' | 'longBreak'>('focus');
+  const [pomodoroCount, setPomodoroCount] = useState(0);
   const [remaining, setRemaining] = useState(25 * 60);
-  const [running, setRunning] = useState(true);
+  const [running, setRunning] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [fading, setFading] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
   const [alarmIndex, setAlarmIndex] = useState(0);
   const [previewPlaying, setPreviewPlaying] = useState(false);
+  const [todayTomatoes, setTodayTomatoes] = useState(0);
+  const [totalTomatoes, setTotalTomatoes] = useState(0);
+  const [soundEnabled, setSoundEnabled] = useState(() => {
+    try { return localStorage.getItem('pomodoro_sound') !== 'off'; } catch { return true; }
+  });
 
   const { user } = useAuth();
   const recordedRef = useRef(false);
   const confettiRef = useRef<HTMLDivElement>(null);
   const stageTitleRef = useRef("");
+  const advanceTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const hasStartedRef = useRef(false);
+  const breakTextRef = useRef(BREAK_TEXTS.shortBreak[0]);
+  useEffect(() => {
+    if (mode === 'focus') return;
+    const pool = BREAK_TEXTS[mode];
+    breakTextRef.current = pool[Math.floor(Math.random() * pool.length)];
+  }, [mode]);
+  const nextRunningRef = useRef(true);
+  const modeRef = useRef(mode);
+  const countRef = useRef(pomodoroCount);
+  useEffect(() => { modeRef.current = mode; }, [mode]);
+  useEffect(() => { countRef.current = pomodoroCount; }, [pomodoroCount]);
+  const todayRef = useRef(todayTomatoes);
+  useEffect(() => { todayRef.current = todayTomatoes; }, [todayTomatoes]);
 
+  const duration = mode === 'focus' ? presetMinutes[0] : mode === 'shortBreak' ? presetMinutes[1] : presetMinutes[2];
+  const modeLabel = mode === 'focus' ? '专注' : mode === 'shortBreak' ? '短休' : '长休';
   const totalSeconds = duration * 60;
   const pct = remaining / totalSeconds;
   const stage = getStage(pct);
@@ -239,6 +273,7 @@ function PomodoroTimer() {
   const segmentPct = (pct - nextStage.pct) / (stage.pct - nextStage.pct || 1);
   const frame = Math.round(stage.frame + (nextStage.frame - stage.frame) * (1 - segmentPct));
   const frameClamped = Math.min(38, Math.max(0, frame));
+  const displayFrame = mode === 'focus' ? frameClamped : 0;
 
   const ringOffset = CIRCUMFERENCE * Math.max(0, 1 - pct);
 
@@ -274,10 +309,27 @@ function PomodoroTimer() {
     if (!completed) return;
     playSound();
     if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 500]);
-    makeConfetti();
-    recordSession();
+    if (modeRef.current === 'focus') {
+      if (todayRef.current < 8) {
+        makeConfetti();
+        recordSession();
+        setTodayTomatoes(t => t + 1);
+        setTotalTomatoes(t => t + 1);
+      }
+    }
+    advanceTimerRef.current = setTimeout(() => advanceMode(), 3000);
+    return () => { if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [completed]);
+
+  // Fetch today's tomato count from DB
+  useEffect(() => {
+    if (!user) return;
+    fetch("/api/pomodoro/today-count")
+      .then(r => r.json())
+      .then((d: any) => { if (typeof d.today === 'number') setTodayTomatoes(d.today); if (typeof d.total === 'number') setTotalTomatoes(d.total); })
+      .catch(() => {});
+  }, [user]);
 
   async function recordSession() {
     if (!user || recordedRef.current) return;
@@ -355,6 +407,7 @@ function PomodoroTimer() {
   }
 
   function playSound() {
+    if (!soundEnabled) return;
     const ctx = getAudioCtx();
     if (!ctx) return;
     try { ALARM_PLAYS[alarmIndex](ctx); } catch {}
@@ -388,27 +441,43 @@ function PomodoroTimer() {
     }
   }
 
-  // Reset when duration changes
+  // Reset when duration changes (skip initial mount)
   useEffect(() => {
+    if (!hasStartedRef.current) { hasStartedRef.current = true; return; }
     recordedRef.current = false;
     setRemaining(duration * 60);
-    setRunning(true);
+    setRunning(nextRunningRef.current);
     setCompleted(false);
     const el = confettiRef.current;
     if (el) { el.classList.remove("active"); el.innerHTML = ""; }
-  }, [duration]);
+  }, [mode, duration]);
 
-  function selectDuration(m: number) {
-    setDuration(m);
+  function advanceMode() {
+    const m = modeRef.current;
+    const c = countRef.current;
+    let nextMode: 'focus' | 'shortBreak' | 'longBreak';
+    let nextCount: number;
+    if (m === 'focus') {
+      const earned = c + 1;
+      if (earned >= 4) {
+        nextMode = 'longBreak';
+        nextCount = 0;
+      } else {
+        nextMode = 'shortBreak';
+        nextCount = earned;
+      }
+    } else {
+      nextMode = 'focus';
+      nextCount = c;
+    }
+    nextRunningRef.current = m !== 'longBreak';
+    setMode(nextMode);
+    setPomodoroCount(nextCount);
   }
 
-  function reset() {
-    recordedRef.current = false;
-    setRemaining(totalSeconds);
-    setRunning(true);
-    setCompleted(false);
-    const el = confettiRef.current;
-    if (el) { el.classList.remove("active"); el.innerHTML = ""; }
+  function advanceNow() {
+    if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current);
+    advanceMode();
   }
 
   function togglePause() {
@@ -421,42 +490,37 @@ function PomodoroTimer() {
       <div className={`p-drawer${showDrawer ? " open" : ""}`}>
         <Link to="/" className="p-drawer-home">← 返回首页</Link>
         <div className="p-drawer-title">番茄时钟 设置</div>
-        {PRESET_LABELS.map((label, i) => (
-          i === 0 ? null : (
-            <div key={label} className="p-settings-row">
-              <span>{label}</span>
-              <input
-                type="number" min={1} max={120}
-                className="p-settings-input"
-                value={presetMinutes[i]}
-                onChange={e => {
-                  const v = Math.max(1, parseInt(e.target.value) || 1);
-                  const next = [...presetMinutes];
-                  next[i] = v;
-                  setPresetMinutes(next);
-                }}
-              />
-              <span className="p-settings-unit">分钟</span>
-            </div>
-          )
+        {[
+          { label: "专注", idx: 0 },
+          { label: "短休", idx: 1 },
+          { label: "长休", idx: 2 },
+        ].map(({ label, idx }) => (
+          <div key={label} className="p-settings-row">
+            <span>{label}</span>
+            <input
+              type="number" min={idx === 0 ? 25 : 1} max={120}
+              className="p-settings-input"
+              value={presetMinutes[idx]}
+              onChange={e => {
+                const min = idx === 0 ? 25 : 1;
+                const v = Math.max(min, parseInt(e.target.value) || min);
+                const next = [...presetMinutes];
+                next[idx] = v;
+                setPresetMinutes(next);
+              }}
+            />
+            <span className="p-settings-unit">分钟</span>
+          </div>
         ))}
         <div className="p-drawer-section">提示音</div>
         <div className="p-alarm-select-wrap">
-          <select className="p-alarm-select" value={alarmIndex} onChange={e => setAlarmIndex(Number(e.target.value))}>
+          <select className="p-alarm-select" value={alarmIndex} onChange={e => {
+            const i = Number(e.target.value);
+            setAlarmIndex(i);
+            previewAlarm(i);
+          }}>
             {ALARMS.map((a, i) => <option key={a.name} value={i}>{a.name}</option>)}
           </select>
-          <button
-            className={`p-alarm-preview${previewPlaying ? " playing" : ""}`}
-            onClick={() => previewAlarm(alarmIndex)}
-            disabled={previewPlaying}
-            aria-label="预览"
-          >
-            {previewPlaying ? (
-              <><span className="p-playing-dot" /> 播放中</>
-            ) : (
-              <><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20"/></svg> 试听</>
-            )}
-          </button>
         </div>
         <div className="p-settings-actions">
           <button className="p-btn p-btn-pause" onClick={() => setPresetMinutes([...DEFAULT_MINUTES])}>重置</button>
@@ -468,21 +532,17 @@ function PomodoroTimer() {
         <button aria-label="菜单" onClick={() => setShowDrawer(true)}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
         </button>
-        <h1>{completed ? "专注完成！" : "专注中"}</h1>
-        <button aria-label="声音">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+        <h1>{completed ? `${modeLabel}完成！` : `${modeLabel}中`}</h1>
+        <button aria-label="声音" onClick={() => {
+          setSoundEnabled(s => { const n = !s; try { localStorage.setItem('pomodoro_sound', n ? 'on' : 'off'); } catch {} return n; });
+        }}>
+          {soundEnabled ? (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+          ) : (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+          )}
         </button>
       </header>
-
-      {!completed && (
-        <div className="p-dur">
-          {presetMinutes.map((m, i) => (
-            <button key={i} className={duration === m ? "active" : ""} onClick={() => selectDuration(m)}>
-              {PRESET_LABELS[i]}
-            </button>
-          ))}
-        </div>
-      )}
 
       <main className="p-main">
         <div className="p-timer-wrap">
@@ -499,23 +559,26 @@ function PomodoroTimer() {
             />
           </svg>
           <div className="p-plant">
-            <img src={`/spritesheet2/frame_${String(frameClamped).padStart(2, "0")}.webp`} alt="番茄生长" />
+            <img src={`/spritesheet2/frame_${String(displayFrame).padStart(2, "0")}.webp`} alt="番茄生长" />
           </div>
           <div className="p-time">{formatTime(remaining)}</div>
         </div>
 
-        <div className={`p-status${fading ? " fading" : ""}`} key={stage.title}>
-          <h2>{stage.title}</h2>
-          <p>{completed ? "收获你的专注成果🍅" : stage.desc}</p>
+        <div className={`p-status${fading ? " fading" : ""}`} key={mode === 'focus' ? stage.title : mode}>
+          <h2>{completed ? `${modeLabel}完成！` : mode === 'focus' ? stage.title : breakTextRef.current.title}</h2>
+          <p>{completed ? '收获你的专注成果🍅' : mode === 'focus' ? stage.desc : breakTextRef.current.desc}</p>
         </div>
       </main>
 
+      <div style={{textAlign:'center',marginBottom:8,fontSize:14,color:'#7a7a7a',fontWeight:600}}>
+        今日 🍅×{todayTomatoes}
+      </div>
       <div className="p-ctrl">
-        <button className={`p-btn ${completed ? "p-btn-complete" : "p-btn-pause"}`} onClick={completed ? reset : togglePause}>
+        <button className={`p-btn ${completed ? "p-btn-complete" : "p-btn-pause"}`} onClick={completed ? advanceNow : togglePause}>
           {completed ? (
-            <>完成<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></>
+            <>下一个<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></>
           ) : (
-            <><span>{running ? "暂停" : "继续"}</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">{running ? <><line x1="10" y1="4" x2="10" y2="20"/><line x1="14" y1="4" x2="14" y2="20"/></> : <polygon points="6 4 20 12 6 20"/>}</svg></>
+            <><span>{running ? "暂停" : "开始计时"}</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">{running ? <><line x1="10" y1="4" x2="10" y2="20"/><line x1="14" y1="4" x2="14" y2="20"/></> : <polygon points="6 4 20 12 6 20"/>}</svg></>
           )}
         </button>
       </div>
