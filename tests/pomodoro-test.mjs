@@ -1,6 +1,6 @@
 /**
  * 番茄钟自动化测试
- * 运行: node pomodoro-test.mjs
+ * 运行: node tests/pomodoro-test.mjs
  * 要求: npm run dev 在运行中
  */
 

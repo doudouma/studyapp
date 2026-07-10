@@ -8,7 +8,9 @@
     "build": "vite build --config app.config.ts",
     "deploy": "npm run build && npx wrangler deploy",
     "preview": "vite preview --config app.config.ts",
-    "cf:preview": "npx wrangler dev"
+    "cf:preview": "npx wrangler dev",
+    "test": "npx playwright test",
+    "test:ui": "npx playwright test --ui"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.800.0",
@@ -51,6 +53,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260531.1",
+    "@playwright/test": "^1.61.1",
     "@tanstack/start-plugin-core": "^1.168.0",
     "@types/node": "^25.9.1",
     "@types/react": "^19.1.0",

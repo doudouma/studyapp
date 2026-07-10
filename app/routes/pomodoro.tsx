@@ -1,6 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "~/lib/auth-context";
+import { AuthDialog } from "~/components/AuthDialog";
 
 export const Route = createFileRoute("/pomodoro")({
   head: () => ({
@@ -37,11 +38,21 @@ const BREAK_TEXTS = {
     { title: "小憩一下", desc: "喝口水，活动一下筋骨吧 🌿" },
     { title: "放松一下", desc: "站起来走走，看看窗外 🪟" },
     { title: "休息片刻", desc: "深呼吸，让大脑休息一下 🧘" },
+    { title: "摸鱼时间 🐟", desc: "刷两下手机，别让老板看见 🤫" },
+    { title: "回血中 ⚡", desc: "充充电，下一轮继续卷" },
+    { title: "放空大脑", desc: "盯着天花板发会儿呆，这是正经休息 😌" },
+    { title: "伸个懒腰 🙆", desc: "手举高，打个哈欠，舒服 ——" },
+    { title: "瞄一眼窗外", desc: "看看云，看看鸟，假装在思考人生 🌤️" },
   ],
   longBreak: [
     { title: "辛苦了 🌻", desc: "完成了一个周期，好好奖励自己吧 ☕" },
     { title: "太棒了 🎉", desc: "连续完成了四个番茄，真厉害！" },
     { title: "给自己鼓掌 👏", desc: "去喝杯咖啡，享受一下阳光 ☀️" },
+    { title: "下班！哦不，下课！", desc: "一个周期搞定，你值得拥有五分钟的自由 🎈" },
+    { title: "你已经超过 90% 的人了", desc: "真的，能专注这么久已经很了不起了 🏆" },
+    { title: "番茄收割机 🍅", desc: "四个番茄入库，今天又是丰收的一天" },
+    { title: "中场秀 🎤", desc: "去倒杯水，顺便想想中午吃啥 🤔" },
+    { title: "贤者时间 🧘", desc: "大脑放空，灵魂出窍，下一轮再战 💪" },
   ],
 };
 
@@ -242,7 +253,10 @@ function PomodoroTimer() {
     try { return localStorage.getItem('pomodoro_sound') !== 'off'; } catch { return true; }
   });
 
+  const navigate = useNavigate();
   const { user } = useAuth();
+  const [authOpen, setAuthOpen] = useState(false);
+  const [pulseCta, setPulseCta] = useState(false);
   const recordedRef = useRef(false);
   const confettiRef = useRef<HTMLDivElement>(null);
   const stageTitleRef = useRef("");
@@ -310,7 +324,10 @@ function PomodoroTimer() {
     playSound();
     if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 500]);
     if (modeRef.current === 'focus') {
-      if (todayRef.current < 8) {
+      if (!user) {
+        makeConfetti();
+        setPulseCta(true);
+      } else if (todayRef.current < 8) {
         makeConfetti();
         recordSession();
         setTodayTomatoes(t => t + 1);
@@ -570,9 +587,27 @@ function PomodoroTimer() {
         </div>
       </main>
 
-      <div style={{textAlign:'center',marginBottom:8,fontSize:14,color:'#7a7a7a',fontWeight:600}}>
-        今日 🍅×{todayTomatoes}
-      </div>
+      {user ? (
+        <div style={{textAlign:'center',marginBottom:8,fontSize:14,color:'#7a7a7a',fontWeight:600}}>
+          今日 🍅×{todayTomatoes}
+        </div>
+      ) : (
+        <div style={{textAlign:'center',marginBottom:8}}>
+          <button
+            onClick={() => setAuthOpen(true)}
+            className={`cursor-pointer text-sm font-semibold transition-all ${
+              pulseCta ? 'animate-pulse text-[#e57373]' : 'text-[#7a7a7a] hover:text-[#e57373]'
+            }`}
+          >
+            登录积累番茄 🍅
+          </button>
+        </div>
+      )}
+      <AuthDialog
+        open={authOpen}
+        onOpenChange={setAuthOpen}
+        onSuccess={() => { navigate({ to: "/" }); }}
+      />
       <div className="p-ctrl">
         <button className={`p-btn ${completed ? "p-btn-complete" : "p-btn-pause"}`} onClick={completed ? advanceNow : togglePause}>
           {completed ? (
