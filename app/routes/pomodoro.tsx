@@ -106,7 +106,7 @@ function formatTime(sec: number) {
 
 function PomodoroPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center pomodoro-outer" style={{background:'#fff'}}>
+    <div className="min-h-screen flex items-center justify-center pomodoro-outer">
       <style>{`
         .pomodoro-app {
           width: 100%; height: 100%; max-width: 420px; max-height: 900px;
@@ -117,7 +117,7 @@ function PomodoroPage() {
           .pomodoro-app { height: auto; min-height: 700px; border-radius: 32px; border: 1px solid #e5e5e5; }
         }
         @media (max-width: 479px) {
-          body { overflow: auto; background: #fff; }
+          body { overflow: auto; }
           .pomodoro-app { height: auto; padding: 12px 0; border-radius: 32px; border: 1px solid #e5e5e5; }
           .pomodoro-outer { min-height: 100dvh; overflow-y: auto; }
           .p-hdr { padding: 4px 16px; }
