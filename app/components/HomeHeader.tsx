@@ -171,7 +171,7 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
             <NavLink href="/">首页</NavLink>
             <NavLink href="/square">广场</NavLink>
             <NavLink href="/pomodoro">番茄时钟</NavLink>
-            <NavLink href="/links">我的链接</NavLink>
+            <NavLink href="/links">个人中心</NavLink>
             {user.role === "admin" && (
               <NavLink href="/admin">管理后台</NavLink>
             )}
@@ -264,7 +264,7 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
             <MobileNavLink href="/" onClick={() => setMobileNavOpen(false)}>首页</MobileNavLink>
             <MobileNavLink href="/square" onClick={() => setMobileNavOpen(false)}>广场</MobileNavLink>
             <MobileNavLink href="/pomodoro" onClick={() => setMobileNavOpen(false)}>番茄时钟</MobileNavLink>
-            <MobileNavLink href="/links" onClick={() => setMobileNavOpen(false)}>我的链接</MobileNavLink>
+            <MobileNavLink href="/links" onClick={() => setMobileNavOpen(false)}>个人中心</MobileNavLink>
             {user.role === "admin" && (
               <MobileNavLink href="/admin" onClick={() => setMobileNavOpen(false)}>管理后台</MobileNavLink>
             )}
