@@ -132,7 +132,8 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
           >
             {mobileNavOpen ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
-          <div className="hidden md:block">
+          <div className="flex items-center gap-2">
+            <div className="hidden md:block">
             <LangSwitcher />
           </div>
           <Button
@@ -142,6 +143,7 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
           >
             {t("nav.login")}
           </Button>
+          </div>
           <AuthDialog
             open={authOpen}
             onOpenChange={setAuthOpen}
