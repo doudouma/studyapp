@@ -8,3 +8,4 @@ dist-worker/
 wrangler.toml
 .dev.vars
 test-results/
+opencode.json
