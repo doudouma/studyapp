@@ -1,12 +1,116 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>100mini 番茄钟</title>
-  <link rel="stylesheet" href="popup.css" />
+  <link rel="stylesheet" href="popup.css">
 </head>
 <body>
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <div class="logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/>
+          </svg>
+        </div>
+        <span class="header-title">100mini 番茄钟</span>
+      </div>
+      <div class="header-right">
+        <button id="settingsBtn" class="btn-icon" title="设置">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Settings Drawer -->
+    <div id="settingsDrawer" class="drawer hidden">
+      <div class="drawer-backdrop"></div>
+      <div class="drawer-content">
+        <div class="drawer-header">
+          <span class="drawer-title">番茄钟 设置</span>
+          <button id="closeSettingsBtn" class="btn-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="drawer-body">
+          <div class="field">
+            <label class="field-label">专注时长</label>
+            <select id="settingFocus">
+              <option value="15">15 分钟</option>
+              <option value="20">20 分钟</option>
+              <option value="25" selected>25 分钟</option>
+              <option value="30">30 分钟</option>
+              <option value="40">40 分钟</option>
+              <option value="50">50 分钟</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label">短休息</label>
+            <select id="settingShortBreak">
+              <option value="3">3 分钟</option>
+              <option value="5" selected>5 分钟</option>
+              <option value="10">10 分钟</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label">长休息</label>
+            <select id="settingLongBreak">
+              <option value="10">10 分钟</option>
+              <option value="15" selected>15 分钟</option>
+              <option value="20">20 分钟</option>
+              <option value="30">30 分钟</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="checkbox-label">
+              <input type="checkbox" id="settingSound" checked>
+              提示音
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timer Section -->
+    <div class="timer-section">
+      <div class="sprite-container" id="spriteContainer">
+        <img id="spriteImg" src="https://100mini.com/spritesheet2/frame_00.webp" alt="番茄生长">
+      </div>
+
+      <div class="time-display" id="timeDisplay">25:00</div>
+      <div class="mode-label" id="modeLabel">专注时间</div>
+
+      <div class="controls">
+        <button id="startBtn" class="btn btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20"/></svg>
+          <span id="startBtnText">开始</span>
+        </button>
+        <button id="resetBtn" class="btn btn-secondary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          重置
+        </button>
+        <button id="skipBtn" class="btn btn-ghost" title="跳过">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20"/><line x1="4" y1="4" x2="4" y2="20"/></svg>
+        </button>
+      </div>
+
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+
+    <!-- Bottom Section -->
+    <div class="bottom-section">
+      <div id="authSection" class="auth-section">
+        <!-- Dynamic: logged in or login prompt -->
+      </div>
+    </div>
+  </div>
   <script src="popup.js"></script>
 </body>
 </html>
