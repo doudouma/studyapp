@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "100mini 番茄钟",
+  "name": "100mini Pomodoro",
   "version": "1.0.0",
-  "description": "在浏览器中随时使用番茄钟，登录 100mini 同步专注数据",
+  "description": "Pomodoro timer in your browser. Log in to 100mini to sync your focus data",
   "homepage_url": "https://100mini.com",
   "icons": {
     "16": "icons/icon16.png",
@@ -11,7 +11,7 @@
   },
   "action": {
     "default_popup": "popup/popup.html",
-    "default_title": "100mini 番茄钟",
+    "default_title": "100mini Pomodoro",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",

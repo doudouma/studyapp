@@ -10,37 +10,37 @@ const STAGES = [
   { pct: 0.00, frame: 38 },
 ];
 
-const MODE_LABELS = { focus: '专注时间', shortBreak: '短休息', longBreak: '长休息' };
+const MODE_LABELS = { focus: 'Focus', shortBreak: 'Short Break', longBreak: 'Long Break' };
 
 const STAGE_TEXTS = [
-  { pct: 1.00, title: "种下专注的种子", desc: "保持专注，番茄会慢慢长大" },
-  { pct: 0.82, title: "番茄发芽了",       desc: "继续加油，它需要你的专注" },
-  { pct: 0.61, title: "长出新叶了",       desc: "专注让它茁壮成长" },
-  { pct: 0.43, title: "即将开花",         desc: "再坚持一下就能看到花朵了" },
-  { pct: 0.22, title: "小番茄出现了",     desc: "快完成啦，番茄在等你！" },
-  { pct: 0.00, title: "番茄成熟啦！",     desc: "收获你的专注成果🍅" },
+  { pct: 1.00, title: "Plant the seed of focus", desc: "Stay focused, the tomato will grow" },
+  { pct: 0.82, title: "It's sprouting!",       desc: "Keep going, it needs your focus" },
+  { pct: 0.61, title: "New leaves growing",       desc: "Focus makes it thrive" },
+  { pct: 0.43, title: "About to bloom",         desc: "A little more and you'll see the flower" },
+  { pct: 0.22, title: "A tiny tomato appears",     desc: "Almost there, the tomato is waiting!" },
+  { pct: 0.00, title: "Tomato is ripe!",     desc: "Harvest your focus 🍅" },
 ];
 
 const BREAK_TEXTS = {
   shortBreak: [
-    { title: "小憩一下", desc: "喝口水，活动一下筋骨吧 🌿" },
-    { title: "放松一下", desc: "站起来走走，看看窗外 🪟" },
-    { title: "休息片刻", desc: "深呼吸，让大脑休息一下 🧘" },
-    { title: "摸鱼时间 🐟", desc: "刷两下手机，别让老板看见 🤫" },
-    { title: "回血中 ⚡", desc: "充充电，下一轮继续卷" },
-    { title: "放空大脑", desc: "盯着天花板发会儿呆，这是正经休息 😌" },
-    { title: "伸个懒腰 🙆", desc: "手举高，打个哈欠，舒服 ——" },
-    { title: "瞄一眼窗外", desc: "看看云，看看鸟，假装在思考人生 🌤️" },
+    { title: "Take a Breather", desc: "Drink some water, stretch your legs 🌿" },
+    { title: "Relax a Bit", desc: "Stand up, look out the window 🪟" },
+    { title: "Pause for a Moment", desc: "Take a deep breath, let your brain rest 🧘" },
+    { title: "Slacking Time 🐟", desc: "Scroll your phone, don't let the boss see 🤫" },
+    { title: "Recharging ⚡", desc: "Power up for the next round" },
+    { title: "Empty Your Mind", desc: "Stare at the ceiling, it's legitimate rest 😌" },
+    { title: "Stretch It Out 🙆", desc: "Arms up, big yawn, aaah —" },
+    { title: "Look Outside", desc: "Watch the clouds, pretend you're thinking about life 🌤️" },
   ],
   longBreak: [
-    { title: "辛苦了 🌻", desc: "完成了一个周期，好好奖励自己吧 ☕" },
-    { title: "太棒了 🎉", desc: "连续完成了四个番茄，真厉害！" },
-    { title: "给自己鼓掌 👏", desc: "去喝杯咖啡，享受一下阳光 ☀️" },
-    { title: "下班！哦不，下课！", desc: "一个周期搞定，你值得拥有五分钟的自由 🎈" },
-    { title: "你已经超过 90% 的人了", desc: "真的，能专注这么久已经很了不起了 🏆" },
-    { title: "番茄收割机 🍅", desc: "四个番茄入库，今天又是丰收的一天" },
-    { title: "中场秀 🎤", desc: "去倒杯水，顺便想想中午吃啥 🤔" },
-    { title: "贤者时间 🧘", desc: "大脑放空，灵魂出窍，下一轮再战 💪" },
+    { title: "Well Done 🌻", desc: "You've completed a cycle — treat yourself ☕" },
+    { title: "Amazing 🎉", desc: "Four tomatoes in a row, that's impressive!" },
+    { title: "Give Yourself a Hand 👏", desc: "Go grab a coffee and enjoy the sun ☀️" },
+    { title: "Class Dismissed! 🎈", desc: "One cycle done. You deserve a five-minute freedom" },
+    { title: "You're in the Top 10%", desc: "Seriously, staying focused this long is a big deal 🏆" },
+    { title: "Tomato Harvester 🍅", desc: "Four tomatoes banked — a fruitful day" },
+    { title: "Halftime Show 🎤", desc: "Get some water, and think about lunch 🤔" },
+    { title: "Zen Mode 🧘", desc: "Empty your mind, regroup, and crush the next round 💪" },
   ],
 };
 
@@ -153,11 +153,11 @@ async function render(state) {
   }
 
   if (status === 'running') {
-    mainBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> <span>暂停</span>`;
+    mainBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> <span>Pause</span>`;
   } else if (status === 'paused') {
-    mainBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20"/></svg> <span>继续</span>`;
+    mainBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20"/></svg> <span>Resume</span>`;
   } else {
-    mainBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20"/></svg> <span>开始</span>`;
+    mainBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20"/></svg> <span>Start</span>`;
   }
 }
 
@@ -191,14 +191,14 @@ async function renderAuth(user) {
         </div>
       </div>
       <div class="today-stat">
-        🍅 今日番茄: <strong>${stats.today}</strong> &nbsp;·&nbsp; 累计: <strong>${stats.total}</strong>
+        🍅 Today: <strong>${stats.today}</strong> &nbsp;·&nbsp; Total: <strong>${stats.total}</strong>
       </div>
     `;
   } else {
     authSection.innerHTML = `
       <div class="login-prompt">
-        <span>⏳ 本地模式，不保存记录</span>
-        <button id="loginBtn" class="btn-link">🔓 登录 100mini</button>
+        <span>⏳ Local mode, no sync</span>
+        <button id="loginBtn" class="btn-link">🔓 Log in to 100mini</button>
       </div>
     `;
     $('#loginBtn')?.addEventListener('click', () => {

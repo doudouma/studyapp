@@ -81,8 +81,8 @@ async function handleTimerComplete(state) {
     chrome.notifications.create({
       type: 'basic',
       iconUrl: 'icons/icon128.png',
-      title: '🍅 专注完成！',
-      message: newCount % 4 === 0 ? '已完成 4 个番茄，来次长休息吧！' : '该休息一下了！',
+      title: '🍅 Focus Complete!',
+      message: newCount % 4 === 0 ? '4 tomatoes done — time for a long break!' : 'Take a short break!',
     });
 
     const nextMode = (newCount % 4 === 0) ? 'longBreak' : 'shortBreak';
@@ -94,8 +94,8 @@ async function handleTimerComplete(state) {
     chrome.notifications.create({
       type: 'basic',
       iconUrl: 'icons/icon128.png',
-      title: '☕ 休息结束！',
-      message: '开始新一轮专注吧',
+      title: '☕ Break Over!',
+      message: 'Ready for another focus round',
     });
 
     await startTimer('focus', state.settings.focusDuration);
@@ -174,8 +174,8 @@ async function skipTimer() {
   chrome.notifications.create({
     type: 'basic',
     iconUrl: 'icons/icon128.png',
-    title: '⏭️ 已跳过',
-    message: state.mode === 'focus' ? '专注已跳过' : '休息已跳过，已回到专注模式',
+    title: '⏭️ Skipped',
+    message: state.mode === 'focus' ? 'Focus skipped' : 'Break skipped, back to focus',
   });
 }
 
