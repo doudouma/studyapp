@@ -189,15 +189,11 @@ async function renderAuth(user) {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           <span class="user-info-name">${escapeHtml(user.name || user.email || '')}</span>
         </div>
-        <button id="openAppBtn" class="btn-link">📊 查看详情</button>
       </div>
       <div class="today-stat">
         🍅 今日番茄: <strong>${stats.today}</strong> &nbsp;·&nbsp; 累计: <strong>${stats.total}</strong>
       </div>
     `;
-    $('#openAppBtn')?.addEventListener('click', () => {
-      chrome.tabs.create({ url: `${API_BASE}/pomodoro` });
-    });
   } else {
     authSection.innerHTML = `
       <div class="login-prompt">
