@@ -28,6 +28,7 @@ function getDurationForMode(mode, settings) {
     case 'focus': return settings.focusDuration;
     case 'shortBreak': return settings.shortBreakDuration;
     case 'longBreak': return settings.longBreakDuration;
+    default: return settings.focusDuration;
   }
 }
 
@@ -162,15 +163,15 @@ async function resetTimer() {
 async function skipTimer() {
   const state = await getState();
   chrome.alarms.clear(ALARM_NAME);
-  await setState({ status: 'idle', endTime: null });
-  if (state.mode === 'focus') {
-    chrome.notifications.create({
-      type: 'basic',
-      iconUrl: 'icons/icon128.png',
-      title: '⏭️ 已跳过',
-      message: '专注已跳过',
-    });
-  }
+  const settings = state.settings;
+  const totalTime = getDurationForMode('focus', settings);
+  await setState({
+    mode: 'focus',
+    status: 'idle',
+    timeLeft: totalTime,
+    totalTime,
+    endTime: null,
+  });
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
