@@ -12,6 +12,38 @@ const STAGES = [
 
 const MODE_LABELS = { focus: '专注时间', shortBreak: '短休息', longBreak: '长休息' };
 
+const STAGE_TEXTS = [
+  { pct: 1.00, title: "种下专注的种子", desc: "保持专注，番茄会慢慢长大" },
+  { pct: 0.82, title: "番茄发芽了",       desc: "继续加油，它需要你的专注" },
+  { pct: 0.61, title: "长出新叶了",       desc: "专注让它茁壮成长" },
+  { pct: 0.43, title: "即将开花",         desc: "再坚持一下就能看到花朵了" },
+  { pct: 0.22, title: "小番茄出现了",     desc: "快完成啦，番茄在等你！" },
+  { pct: 0.00, title: "番茄成熟啦！",     desc: "收获你的专注成果🍅" },
+];
+
+const BREAK_TEXTS = {
+  shortBreak: [
+    { title: "小憩一下", desc: "喝口水，活动一下筋骨吧 🌿" },
+    { title: "放松一下", desc: "站起来走走，看看窗外 🪟" },
+    { title: "休息片刻", desc: "深呼吸，让大脑休息一下 🧘" },
+    { title: "摸鱼时间 🐟", desc: "刷两下手机，别让老板看见 🤫" },
+    { title: "回血中 ⚡", desc: "充充电，下一轮继续卷" },
+    { title: "放空大脑", desc: "盯着天花板发会儿呆，这是正经休息 😌" },
+    { title: "伸个懒腰 🙆", desc: "手举高，打个哈欠，舒服 ——" },
+    { title: "瞄一眼窗外", desc: "看看云，看看鸟，假装在思考人生 🌤️" },
+  ],
+  longBreak: [
+    { title: "辛苦了 🌻", desc: "完成了一个周期，好好奖励自己吧 ☕" },
+    { title: "太棒了 🎉", desc: "连续完成了四个番茄，真厉害！" },
+    { title: "给自己鼓掌 👏", desc: "去喝杯咖啡，享受一下阳光 ☀️" },
+    { title: "下班！哦不，下课！", desc: "一个周期搞定，你值得拥有五分钟的自由 🎈" },
+    { title: "你已经超过 90% 的人了", desc: "真的，能专注这么久已经很了不起了 🏆" },
+    { title: "番茄收割机 🍅", desc: "四个番茄入库，今天又是丰收的一天" },
+    { title: "中场秀 🎤", desc: "去倒杯水，顺便想想中午吃啥 🤔" },
+    { title: "贤者时间 🧘", desc: "大脑放空，灵魂出窍，下一轮再战 💪" },
+  ],
+};
+
 const RING_RADIUS = 80;
 const CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 
@@ -65,10 +97,10 @@ const $$ = (sel) => document.querySelectorAll(sel);
 const spriteImg = $('#spriteImg');
 const timerRing = $('#timerRing');
 const timeDisplay = $('#timeDisplay');
-const modeLabel = $('#modeLabel');
-const startBtn = $('#startBtn');
-const resetBtn = $('#resetBtn');
-const skipBtn = $('#skipBtn');
+const stageTitle = $('#stageTitle');
+const stageDesc = $('#stageDesc');
+const mainBtn = $('#mainBtn');
+const mainBtnText = $('#mainBtnText');
 const authSection = $('#authSection');
 const settingsBtn = $('#settingsBtn');
 const settingsDrawer = $('#settingsDrawer');
@@ -81,9 +113,21 @@ function getFrame(pct) {
   return '38';
 }
 
+function getStageText(pct, mode, sessionCount) {
+  if (mode === 'focus') {
+    for (const s of STAGE_TEXTS) {
+      if (pct >= s.pct) return s;
+    }
+    return STAGE_TEXTS[STAGE_TEXTS.length - 1];
+  }
+  const list = BREAK_TEXTS[mode] || BREAK_TEXTS.shortBreak;
+  const idx = Math.min(sessionCount || 0, list.length - 1);
+  return list[idx];
+}
+
 async function render(state) {
   if (!state) return;
-  const { mode, status, timeLeft, totalTime } = state;
+  const { mode, status, timeLeft, totalTime, sessionCount } = state;
 
   const pct = totalTime > 0 ? timeLeft / totalTime : 0;
   const frame = getFrame(pct);
@@ -92,7 +136,10 @@ async function render(state) {
   const m = Math.floor(timeLeft / 60);
   const s = timeLeft % 60;
   timeDisplay.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-  modeLabel.textContent = MODE_LABELS[mode] || '';
+
+  const text = getStageText(pct, mode, sessionCount);
+  stageTitle.textContent = text.title;
+  stageDesc.textContent = text.desc;
 
   const colors = getColors(pct);
   const offset = CIRCUMFERENCE * Math.max(0, 1 - pct);
@@ -106,11 +153,11 @@ async function render(state) {
   }
 
   if (status === 'running') {
-    startBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> <span>暂停</span>`;
+    mainBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> <span>暂停</span>`;
   } else if (status === 'paused') {
-    startBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20"/></svg> <span>继续</span>`;
+    mainBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20"/></svg> <span>继续</span>`;
   } else {
-    startBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20"/></svg> <span>开始</span>`;
+    mainBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20"/></svg> <span>开始</span>`;
   }
 }
 
@@ -216,20 +263,12 @@ async function refreshState() {
   });
 }
 
-startBtn.addEventListener('click', async () => {
+mainBtn.addEventListener('click', async () => {
   const state = currentState || await refreshState();
   let action = 'start';
   if (state.status === 'running') action = 'pause';
   else if (state.status === 'paused') action = 'resume';
   chrome.runtime.sendMessage({ action, mode: 'focus' }, refreshState);
-});
-
-resetBtn.addEventListener('click', () => {
-  chrome.runtime.sendMessage({ action: 'reset' }, refreshState);
-});
-
-skipBtn.addEventListener('click', () => {
-  chrome.runtime.sendMessage({ action: 'skip' }, refreshState);
 });
 
 chrome.storage.onChanged.addListener((changes, area) => {
