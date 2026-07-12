@@ -35,6 +35,7 @@ function getFrame(pct) {
 }
 
 async function render(state) {
+  if (!state) return;
   const { mode, status, timeLeft, totalTime } = state;
 
   const pct = totalTime > 0 ? timeLeft / totalTime : 0;
@@ -163,26 +164,18 @@ async function refreshState() {
 
 startBtn.addEventListener('click', async () => {
   const state = currentState || await refreshState();
-  if (state.status === 'running') {
-    chrome.runtime.sendMessage({ action: 'pause' });
-    await refreshState();
-  } else if (state.status === 'paused') {
-    chrome.runtime.sendMessage({ action: 'resume' });
-    await refreshState();
-  } else {
-    chrome.runtime.sendMessage({ action: 'start', mode: 'focus' });
-    await refreshState();
-  }
+  let action = 'start';
+  if (state.status === 'running') action = 'pause';
+  else if (state.status === 'paused') action = 'resume';
+  chrome.runtime.sendMessage({ action, mode: 'focus' }, refreshState);
 });
 
 resetBtn.addEventListener('click', () => {
-  chrome.runtime.sendMessage({ action: 'reset' });
-  refreshState();
+  chrome.runtime.sendMessage({ action: 'reset' }, refreshState);
 });
 
 skipBtn.addEventListener('click', () => {
-  chrome.runtime.sendMessage({ action: 'skip' });
-  refreshState();
+  chrome.runtime.sendMessage({ action: 'skip' }, refreshState);
 });
 
 chrome.storage.onChanged.addListener((changes, area) => {
