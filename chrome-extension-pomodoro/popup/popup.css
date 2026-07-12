@@ -100,7 +100,7 @@ body {
   position: absolute;
   width: 100px;
   height: 100px;
-  bottom: 4px;
+  top: 60px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1;
@@ -115,7 +115,7 @@ body {
 
 .time-display {
   position: absolute;
-  top: 28px;
+  top: 50px;
   left: 50%;
   transform: translateX(-50%);
   font-size: 24px;
