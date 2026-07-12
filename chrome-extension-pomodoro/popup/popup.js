@@ -12,13 +12,60 @@ const STAGES = [
 
 const MODE_LABELS = { focus: '专注时间', shortBreak: '短休息', longBreak: '长休息' };
 
+const RING_RADIUS = 80;
+const CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
+
+const COLOR_STOPS = [
+  { pct: 1.00, bgTop: "#fff8e7", bgBot: "#f5e6d3", ring: "#e6d0b3" },
+  { pct: 0.82, bgTop: "#e8f5e9", bgBot: "#d4edda", ring: "#81c784" },
+  { pct: 0.61, bgTop: "#e0f2f1", bgBot: "#b2dfdb", ring: "#4db6ac" },
+  { pct: 0.43, bgTop: "#fff9e6", bgBot: "#ffe0b2", ring: "#ffb74d" },
+  { pct: 0.22, bgTop: "#fff0e6", bgBot: "#ffccbc", ring: "#ff8a65" },
+  { pct: 0.00, bgTop: "#ffebee", bgBot: "#ffcdd2", ring: "#e57373" },
+];
+
+function hexToRgb(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+function rgbToHex(r, g, b) {
+  return "#" + [r, g, b].map(v => Math.round(v).toString(16).padStart(2, "0")).join("");
+}
+
+function lerp(a, b, t) {
+  return a + (b - a) * t;
+}
+
+function lerpColor(c1, c2, t) {
+  const a = hexToRgb(c1), b = hexToRgb(c2);
+  return rgbToHex(lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t));
+}
+
+function getColors(pct) {
+  let start = COLOR_STOPS[0], end = COLOR_STOPS[COLOR_STOPS.length - 1], t = 0;
+  for (let i = 0; i < COLOR_STOPS.length - 1; i++) {
+    const s = COLOR_STOPS[i], e = COLOR_STOPS[i + 1];
+    if (pct <= s.pct && pct >= e.pct) {
+      start = s; end = e;
+      t = (pct - e.pct) / (s.pct - e.pct || 1);
+      break;
+    }
+  }
+  return {
+    bgTop: lerpColor(start.bgTop, end.bgTop, t),
+    bgBot: lerpColor(start.bgBot, end.bgBot, t),
+    ring: lerpColor(start.ring, end.ring, t),
+  };
+}
+
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
 
 const spriteImg = $('#spriteImg');
+const timerRing = $('#timerRing');
 const timeDisplay = $('#timeDisplay');
 const modeLabel = $('#modeLabel');
-const progressFill = $('#progressFill');
 const startBtn = $('#startBtn');
 const resetBtn = $('#resetBtn');
 const skipBtn = $('#skipBtn');
@@ -47,7 +94,16 @@ async function render(state) {
   timeDisplay.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   modeLabel.textContent = MODE_LABELS[mode] || '';
 
-  progressFill.style.width = `${(1 - pct) * 100}%`;
+  const colors = getColors(pct);
+  const offset = CIRCUMFERENCE * Math.max(0, 1 - pct);
+  timerRing.style.strokeDasharray = CIRCUMFERENCE;
+  timerRing.style.strokeDashoffset = offset;
+  timerRing.style.stroke = colors.ring;
+
+  const app = $('#app');
+  if (app) {
+    app.style.background = `linear-gradient(180deg, ${colors.bgTop} 0%, ${colors.bgBot} 100%)`;
+  }
 
   if (status === 'running') {
     startBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> <span>暂停</span>`;
@@ -56,8 +112,6 @@ async function render(state) {
   } else {
     startBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20"/></svg> <span>开始</span>`;
   }
-
-  progressFill.style.background = mode === 'focus' ? 'var(--green)' : '#c49f00';
 }
 
 async function checkAuth() {

@@ -77,13 +77,18 @@
     </div>
 
     <!-- Timer Section -->
-    <div class="timer-section">
+    <div class="timer-section" id="timerSection">
       <div id="loadingState" class="loading-state">加载中...</div>
-      <div class="sprite-container" id="spriteContainer">
-        <img id="spriteImg" src="https://100mini.com/spritesheet2/frame_00.webp" alt="番茄生长">
+      <div class="timer-wrap">
+        <svg class="timer-svg" viewBox="0 0 200 200">
+          <circle class="timer-bg" cx="100" cy="100" r="80" />
+          <circle id="timerRing" class="timer-progress" cx="100" cy="100" r="80" />
+        </svg>
+        <div class="sprite-container">
+          <img id="spriteImg" src="https://100mini.com/spritesheet2/frame_00.webp" alt="番茄生长">
+        </div>
+        <div class="time-display" id="timeDisplay">25:00</div>
       </div>
-
-      <div class="time-display" id="timeDisplay">25:00</div>
       <div class="mode-label" id="modeLabel">专注时间</div>
 
       <div class="controls">
@@ -100,9 +105,6 @@
         </button>
       </div>
 
-      <div class="progress-bar">
-        <div class="progress-fill" id="progressFill"></div>
-      </div>
     </div>
 
     <!-- Bottom Section -->
