@@ -188,7 +188,8 @@ chrome.storage.onChanged.addListener((changes, area) => {
 
 document.addEventListener('DOMContentLoaded', async () => {
   const state = await refreshState();
-  applySettingsToUI(state.settings);
+  $('#loadingState')?.classList.add('hidden');
+  if (state) applySettingsToUI(state.settings);
   const user = await checkAuth();
   await renderAuth(user);
 });

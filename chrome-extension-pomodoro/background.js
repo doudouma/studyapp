@@ -104,15 +104,14 @@ async function handleTimerComplete(state) {
 
 async function syncSession(duration) {
   try {
-    const res = await fetch(`${API_BASE}/api/pomodoro/sessions`, {
+    await fetch(`${API_BASE}/api/pomodoro/sessions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ duration }),
       credentials: 'include',
     });
-    if (!res.ok) console.warn('Sync failed:', await res.text());
   } catch (e) {
-    console.warn('Sync error:', e);
+    // Silently ignore — sync is best-effort
   }
 }
 
@@ -172,37 +171,50 @@ async function skipTimer() {
     totalTime,
     endTime: null,
   });
+  chrome.notifications.create({
+    type: 'basic',
+    iconUrl: 'icons/icon128.png',
+    title: '⏭️ 已跳过',
+    message: state.mode === 'focus' ? '专注已跳过' : '休息已跳过，已回到专注模式',
+  });
+}
+
+function catchSend(sendResponse) {
+  return (e) => sendResponse({ error: e.message });
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   switch (message.action) {
     case 'getState':
-      getState().then(sendResponse);
+      getState().then(sendResponse).catch(catchSend(sendResponse));
       return true;
     case 'start':
-      startTimer(message.mode, message.duration).then(sendResponse);
+      startTimer(message.mode, message.duration).then(sendResponse).catch(catchSend(sendResponse));
       return true;
     case 'pause':
-      pauseTimer().then(sendResponse);
+      pauseTimer().then(sendResponse).catch(catchSend(sendResponse));
       return true;
     case 'resume':
-      resumeTimer().then(sendResponse);
+      resumeTimer().then(sendResponse).catch(catchSend(sendResponse));
       return true;
     case 'reset':
-      resetTimer().then(sendResponse);
+      resetTimer().then(sendResponse).catch(catchSend(sendResponse));
       return true;
     case 'skip':
-      skipTimer().then(sendResponse);
+      skipTimer().then(sendResponse).catch(catchSend(sendResponse));
       return true;
     case 'updateSettings':
-      setState({ settings: message.settings }).then(() => {
-        return getState().then(s => {
-          if (s.status === 'idle') {
-            const d = getDurationForMode('focus', message.settings);
-            return setState({ timeLeft: d, totalTime: d });
-          }
-        });
-      }).then(sendResponse);
+      (async () => {
+        await setState({ settings: message.settings });
+        const s = await getState();
+        if (s.status === 'idle') {
+          const d = getDurationForMode('focus', message.settings);
+          await setState({ timeLeft: d, totalTime: d });
+        }
+      })().then(sendResponse).catch(catchSend(sendResponse));
+      return true;
+    default:
+      sendResponse({ error: 'unknown action' });
       return true;
   }
 });
@@ -216,6 +228,8 @@ chrome.runtime.onStartup.addListener(async () => {
       const timeLeft = Math.round((state.endTime - Date.now()) / 1000);
       await setState({ timeLeft });
       chrome.alarms.create(ALARM_NAME, { periodInMinutes: 1 / 60 });
+    } else {
+      await setState({ status: 'idle', endTime: null });
     }
   }
 });
