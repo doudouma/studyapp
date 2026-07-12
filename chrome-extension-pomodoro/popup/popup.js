@@ -20,7 +20,6 @@ const timeDisplay = $('#timeDisplay');
 const modeLabel = $('#modeLabel');
 const progressFill = $('#progressFill');
 const startBtn = $('#startBtn');
-const startBtnText = $('#startBtnText');
 const resetBtn = $('#resetBtn');
 const skipBtn = $('#skipBtn');
 const authSection = $('#authSection');
@@ -115,13 +114,6 @@ function escapeHtml(str) {
   div.textContent = str;
   return div.innerHTML;
 }
-
-const SETTING_IDS = {
-  focusDuration: 'settingFocus',
-  shortBreakDuration: 'settingShortBreak',
-  longBreakDuration: 'settingLongBreak',
-  soundEnabled: 'settingSound',
-};
 
 function readSettingsFromUI() {
   return {
