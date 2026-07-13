@@ -9,16 +9,29 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SquareRouteImport } from './routes/square'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PomodoroRouteImport } from './routes/pomodoro'
 import { Route as LinksRouteImport } from './routes/links'
+import { Route as CookieRouteImport } from './routes/cookie'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SquareRoute = SquareRouteImport.update({
   id: '/square',
   path: '/square',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PomodoroRoute = PomodoroRouteImport.update({
@@ -29,6 +42,11 @@ const PomodoroRoute = PomodoroRouteImport.update({
 const LinksRoute = LinksRouteImport.update({
   id: '/links',
   path: '/links',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CookieRoute = CookieRouteImport.update({
+  id: '/cookie',
+  path: '/cookie',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -51,58 +69,105 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
+  '/cookie': typeof CookieRoute
   '/links': typeof LinksRoute
   '/pomodoro': typeof PomodoroRoute
+  '/privacy': typeof PrivacyRoute
   '/square': typeof SquareRoute
+  '/terms': typeof TermsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
+  '/cookie': typeof CookieRoute
   '/links': typeof LinksRoute
   '/pomodoro': typeof PomodoroRoute
+  '/privacy': typeof PrivacyRoute
   '/square': typeof SquareRoute
+  '/terms': typeof TermsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
+  '/cookie': typeof CookieRoute
   '/links': typeof LinksRoute
   '/pomodoro': typeof PomodoroRoute
+  '/privacy': typeof PrivacyRoute
   '/square': typeof SquareRoute
+  '/terms': typeof TermsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/contact' | '/links' | '/pomodoro' | '/square'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/contact'
+    | '/cookie'
+    | '/links'
+    | '/pomodoro'
+    | '/privacy'
+    | '/square'
+    | '/terms'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/contact' | '/links' | '/pomodoro' | '/square'
+  to:
+    | '/'
+    | '/admin'
+    | '/contact'
+    | '/cookie'
+    | '/links'
+    | '/pomodoro'
+    | '/privacy'
+    | '/square'
+    | '/terms'
   id:
     | '__root__'
     | '/'
     | '/admin'
     | '/contact'
+    | '/cookie'
     | '/links'
     | '/pomodoro'
+    | '/privacy'
     | '/square'
+    | '/terms'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   ContactRoute: typeof ContactRoute
+  CookieRoute: typeof CookieRoute
   LinksRoute: typeof LinksRoute
   PomodoroRoute: typeof PomodoroRoute
+  PrivacyRoute: typeof PrivacyRoute
   SquareRoute: typeof SquareRoute
+  TermsRoute: typeof TermsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/square': {
       id: '/square'
       path: '/square'
       fullPath: '/square'
       preLoaderRoute: typeof SquareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pomodoro': {
@@ -117,6 +182,13 @@ declare module '@tanstack/react-router' {
       path: '/links'
       fullPath: '/links'
       preLoaderRoute: typeof LinksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cookie': {
+      id: '/cookie'
+      path: '/cookie'
+      fullPath: '/cookie'
+      preLoaderRoute: typeof CookieRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -147,9 +219,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   ContactRoute: ContactRoute,
+  CookieRoute: CookieRoute,
   LinksRoute: LinksRoute,
   PomodoroRoute: PomodoroRoute,
+  PrivacyRoute: PrivacyRoute,
   SquareRoute: SquareRoute,
+  TermsRoute: TermsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
