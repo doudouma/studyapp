@@ -1,5 +1,6 @@
 import { useRef, useState, useCallback } from "react";
 import { Upload, FileText, Archive, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface DropZoneProps {
   file: File | null;
@@ -8,6 +9,7 @@ interface DropZoneProps {
 }
 
 export function DropZone({ file, onFileSelect, acceptZip = true }: DropZoneProps) {
+  const { t } = useTranslation();
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -31,16 +33,16 @@ export function DropZone({ file, onFileSelect, acceptZip = true }: DropZoneProps
   const handleFile = useCallback(
     (f: File) => {
       if (!isValidFile(f)) {
-        alert("仅支持 .html 或 .zip 文件");
+        alert(t("components.dropzone.invalidType"));
         return;
       }
       if (f.size > 5 * 1024 * 1024) {
-        alert("文件大小不能超过 5MB");
+        alert(t("components.dropzone.invalidSize"));
         return;
       }
       onFileSelect(f);
     },
-    [onFileSelect]
+    [onFileSelect, t]
   );
 
   const handleDrop = useCallback(
@@ -110,9 +112,9 @@ export function DropZone({ file, onFileSelect, acceptZip = true }: DropZoneProps
         <Upload className="size-7" />
       </div>
       <div className="mt-4 text-base text-foreground mb-1">
-        拖拽 <strong>.html</strong> 或 <strong>.zip</strong> 文件到此处
+        {t("components.dropzone.prompt")}
       </div>
-      <div className="text-sm text-muted-foreground">或点击选择文件</div>
+      <div className="text-sm text-muted-foreground">{t("components.dropzone.subPrompt")}</div>
     </div>
   );
 }

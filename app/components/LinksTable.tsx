@@ -14,6 +14,7 @@ import {
   DialogFooter,
   DialogClose,
 } from "~/components/ui/dialog";
+import { useTranslation } from "react-i18next";
 
 export interface PageLink {
   id: string;
@@ -32,24 +33,12 @@ interface LinksTableProps {
   onRefresh: () => void;
 }
 
-const CATEGORY_ICONS: Record<string, string> = {
-  chinese: "语文",
-  math: "数学",
-  english: "英语",
-  physics: "物理",
-  chemistry: "化学",
-  history: "历史",
-  biology: "生物",
-  geography: "地理",
-  other: "其他",
-};
-
 function formatDate(ts: number): string {
   const d = new Date(ts);
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
-  return `${y}年${m}月${day}日`;
+  return `${y}/${m}/${day}`;
 }
 
 function QrPopover({ pageId, onClose }: { pageId: string; onClose: () => void }) {
@@ -87,6 +76,7 @@ function QrPopover({ pageId, onClose }: { pageId: string; onClose: () => void })
 }
 
 export function LinksTable({ pages, total, limit, onDelete, onRefresh }: LinksTableProps) {
+  const { t } = useTranslation();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [qrId, setQrId] = useState<string | null>(null);
@@ -95,6 +85,21 @@ export function LinksTable({ pages, total, limit, onDelete, onRefresh }: LinksTa
   const [deleteError, setDeleteError] = useState("");
   const [editPage, setEditPage] = useState<PageLink | null>(null);
 
+  const getCategoryIcon = (cat: string) => {
+    const labels: Record<string, string> = {
+      chinese: t("home.select.chinese"),
+      math: t("home.select.math"),
+      english: t("home.select.english"),
+      physics: t("home.select.physics"),
+      chemistry: t("home.select.chemistry"),
+      history: t("home.select.history"),
+      biology: t("home.select.biology"),
+      geography: t("home.select.geography"),
+      other: t("home.select.other"),
+    };
+    return labels[cat] || cat;
+  };
+
   const handleCopy = async (id: string) => {
     const url = `${window.location.origin}/p/${id}`;
     try {
@@ -102,7 +107,6 @@ export function LinksTable({ pages, total, limit, onDelete, onRefresh }: LinksTa
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 2000);
     } catch {
-      // fallback
       const input = document.createElement("input");
       input.value = url;
       document.body.appendChild(input);
@@ -122,12 +126,12 @@ export function LinksTable({ pages, total, limit, onDelete, onRefresh }: LinksTa
       const res = await fetch(`/api/pages/${id}`, { method: "DELETE" });
       if (!res.ok) {
         const data: { error?: string } = await res.json();
-        setDeleteError(data.error || "删除失败");
+        setDeleteError(data.error || t("components.linksTable.deleteFailed"));
         return;
       }
       onDelete(id);
     } catch {
-      setDeleteError("删除失败，请稍后重试");
+      setDeleteError(t("components.linksTable.deleteFailedRetry"));
     } finally {
       setDeletingId(null);
     }
@@ -140,15 +144,15 @@ export function LinksTable({ pages, total, limit, onDelete, onRefresh }: LinksTa
           <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-[#006c49]/10 dark:bg-[#4edea3]/10">
             <FileText className="size-6 text-[#006c49] dark:text-[#4edea3]" />
           </div>
-          <h3 className="text-lg font-semibold text-foreground">还没有创建链接</h3>
+          <h3 className="text-lg font-semibold text-foreground">{t("components.linksTable.heading.empty")}</h3>
           <p className="mt-1.5 text-sm text-muted-foreground">
-            上传你的第一个 HTML 页面，链接就会出现在这里
+            {t("components.linksTable.emptyDesc")}
           </p>
           <Link
             to="/"
             className="mt-5 inline-flex h-10 items-center justify-center rounded-xl bg-[#006c49] px-5 text-sm font-medium text-white shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)] transition-colors hover:bg-[#006c49]/90 dark:bg-[#4edea3] dark:text-[#002113] dark:hover:bg-[#4edea3]/90"
           >
-            去上传
+            {t("components.linksTable.goUpload")}
           </Link>
         </div>
       ) : (
@@ -158,16 +162,16 @@ export function LinksTable({ pages, total, limit, onDelete, onRefresh }: LinksTa
               <thead>
                 <tr className="border-b border-border bg-muted/50">
                   <th className="px-6 py-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                    标题
+                    {t("components.linksTable.col.title")}
                   </th>
                   <th className="px-6 py-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                    创建日期
+                    {t("components.linksTable.col.createdAt")}
                   </th>
                   <th className="px-6 py-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                    阅读量
+                    {t("components.linksTable.col.views")}
                   </th>
                   <th className="px-6 py-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground text-right">
-                    操作
+                    {t("components.linksTable.col.action")}
                   </th>
                 </tr>
               </thead>
@@ -181,10 +185,10 @@ export function LinksTable({ pages, total, limit, onDelete, onRefresh }: LinksTa
                         </div>
                         <div>
                           <p className="text-sm font-semibold text-foreground">
-                            {pg.title || "未命名"}
+                            {pg.title || t("components.linksTable.unnamed")}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {CATEGORY_ICONS[pg.category] || pg.category}
+                            {getCategoryIcon(pg.category)}
                           </p>
                         </div>
                       </div>
@@ -205,7 +209,7 @@ export function LinksTable({ pages, total, limit, onDelete, onRefresh }: LinksTa
                           variant="ghost"
                           size="icon"
                           className="size-8"
-                          title="编辑"
+                          title={t("common.edit")}
                           onClick={() => setEditPage(pg)}
                         >
                           <Pencil className="size-4" />
@@ -214,7 +218,7 @@ export function LinksTable({ pages, total, limit, onDelete, onRefresh }: LinksTa
                           variant="ghost"
                           size="icon"
                           className="size-8"
-                          title="二维码"
+                          title={t("components.linksTable.qrcode")}
                           onClick={() => setQrId(qrId === pg.id ? null : pg.id)}
                         >
                           <QrCode className="size-4" />
@@ -226,7 +230,7 @@ export function LinksTable({ pages, total, limit, onDelete, onRefresh }: LinksTa
                           variant="ghost"
                           size="icon"
                           className="size-8"
-                          title="查看"
+                          title={t("common.view")}
                           onClick={() => window.open(`/p/${pg.id}`, "_blank")}
                         >
                           <ExternalLink className="size-4" />
@@ -235,11 +239,11 @@ export function LinksTable({ pages, total, limit, onDelete, onRefresh }: LinksTa
                           variant="ghost"
                           size="icon"
                           className="size-8"
-                          title="复制链接"
+                          title={t("common.copy")}
                           onClick={() => handleCopy(pg.id)}
                         >
                           {copiedId === pg.id ? (
-                            <span className="text-xs font-medium text-primary">已复制</span>
+                            <span className="text-xs font-medium text-primary">{t("common.copied")}</span>
                           ) : (
                             <Copy className="size-4" />
                           )}
@@ -248,11 +252,11 @@ export function LinksTable({ pages, total, limit, onDelete, onRefresh }: LinksTa
                           variant="ghost"
                           size="icon"
                           className="size-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                          title="删除"
+                          title={t("common.delete")}
                           disabled={deletingId === pg.id}
                           onClick={() => {
                             setConfirmDeleteId(pg.id);
-                            setConfirmDeleteTitle(pg.title || "未命名");
+                            setConfirmDeleteTitle(pg.title || t("components.linksTable.unnamed"));
                           }}
                         >
                           {deletingId === pg.id ? (
@@ -270,14 +274,14 @@ export function LinksTable({ pages, total, limit, onDelete, onRefresh }: LinksTa
           </div>
           <div className="border-t border-border bg-muted/20 px-6 py-3">
             <p className="text-xs text-muted-foreground">
-              显示 {pages.length} / {total} 个链接
+              {t("components.linksTable.pagination", { start: pages.length, total })}
               {limit > 0 ? (
                 <span className="ml-1">
-                  · 已使用 {total}/{limit}
+                  {t("components.linksTable.usage", { used: total, limit })}
                 </span>
               ) : limit === -1 ? (
                 <span className="ml-1">
-                  · 已使用 {total}（会员无限制）
+                  {t("components.linksTable.usageUnlimited", { used: total })}
                 </span>
               ) : null}
             </p>
@@ -292,7 +296,7 @@ export function LinksTable({ pages, total, limit, onDelete, onRefresh }: LinksTa
             className="ml-2 text-destructive/70 hover:text-destructive"
             onClick={() => setDeleteError("")}
           >
-            关闭
+            {t("common.close")}
           </button>
         </div>
       )}
@@ -331,6 +335,7 @@ function EditDialog({
   onClose: () => void;
   onSaved: () => void;
 }) {
+  const { t } = useTranslation();
   const [tab, setTab] = useState<"meta" | "content">("meta");
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("general");
@@ -362,11 +367,11 @@ function EditDialog({
     setContentFile(null);
     try {
       const res = await fetch(`/api/pages/${page.id}/content`);
-      if (!res.ok) throw new Error("加载失败");
+      if (!res.ok) throw new Error(t("common.loadFailed"));
       const data = await res.json() as { content: string };
       setContent(data.content);
     } catch {
-      setError("内容加载失败");
+      setError(t("common.loadFailed"));
     } finally {
       setContentLoading(false);
     }
@@ -394,7 +399,6 @@ function EditDialog({
     try {
       let res: Response;
       if (contentFile) {
-        // Send file to server (multipart) — server handles ZIP extraction
         const formData = new FormData();
         formData.append("file", contentFile);
         formData.append("title", title);
@@ -415,11 +419,11 @@ function EditDialog({
       }
       if (!res.ok) {
         const data: { error?: string } = await res.json();
-        throw new Error(data.error || "保存失败");
+        throw new Error(data.error || t("components.linksTable.editDialog.saveFailed"));
       }
       onSaved();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "保存失败");
+      setError(err instanceof Error ? err.message : t("components.linksTable.editDialog.saveFailed"));
     } finally {
       setSaving(false);
     }
@@ -429,7 +433,7 @@ function EditDialog({
     <Dialog open={!!page} onOpenChange={(o) => { if (!o) onClose(); }}>
       <DialogContent className={tab === "content" ? "sm:max-w-3xl" : "sm:max-w-md"} showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle>编辑链接</DialogTitle>
+          <DialogTitle>{t("components.linksTable.editDialog.title")}</DialogTitle>
         </DialogHeader>
 
         <div className="flex gap-2 mb-1">
@@ -437,13 +441,13 @@ function EditDialog({
             className={`text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors ${tab === "meta" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
             onClick={() => setTab("meta")}
           >
-            基本信息
+            {t("components.linksTable.editDialog.basic")}
           </button>
           <button
             className={`text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors ${tab === "content" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
             onClick={() => { setTab("content"); loadContent(); }}
           >
-            内容编辑
+            {t("components.linksTable.editDialog.content")}
           </button>
         </div>
 
@@ -451,39 +455,39 @@ function EditDialog({
           <div className="space-y-4 py-2">
             <div>
               <label className="text-sm font-medium text-foreground">
-                标题 <span className="text-destructive">*</span>
+                {t("home.form.title")} <span className="text-destructive">*</span>
               </label>
               <Input
                 className="mt-1"
-                placeholder="输入页面标题..."
+                placeholder={t("home.form.titlePlaceholder")}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground">类型</label>
+              <label className="text-sm font-medium text-foreground">{t("home.form.category")}</label>
               <select
                 className="mt-1 flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
               >
-                <option value="general">通用</option>
-                <option value="chinese">语文</option>
-                <option value="math">数学</option>
-                <option value="english">英语</option>
-                <option value="physics">物理</option>
-                <option value="chemistry">化学</option>
-                <option value="history">历史</option>
-                <option value="biology">生物</option>
-                <option value="geography">地理</option>
-                <option value="other">其他</option>
+                <option value="general">{t("home.select.default")}</option>
+                <option value="chinese">{t("home.select.chinese")}</option>
+                <option value="math">{t("home.select.math")}</option>
+                <option value="english">{t("home.select.english")}</option>
+                <option value="physics">{t("home.select.physics")}</option>
+                <option value="chemistry">{t("home.select.chemistry")}</option>
+                <option value="history">{t("home.select.history")}</option>
+                <option value="biology">{t("home.select.biology")}</option>
+                <option value="geography">{t("home.select.geography")}</option>
+                <option value="other">{t("home.select.other")}</option>
               </select>
             </div>
             <div>
               <label className="text-sm font-medium text-foreground">
-                标签{" "}
+                {t("home.form.tags")}{" "}
                 <span className="font-normal text-muted-foreground">
-                  (可选，最多10个)
+                  {t("home.form.tagsHint")}
                 </span>
               </label>
               <div className="mt-1 flex min-h-10 w-full flex-wrap items-center gap-1.5 rounded-lg border-2 border-input bg-transparent px-2 py-1.5 cursor-text" onClick={() => document.getElementById('edit-tag-input')?.focus()}>
@@ -498,7 +502,7 @@ function EditDialog({
                 <input
                   id="edit-tag-input"
                   className="flex-1 min-w-[80px] bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                  placeholder={tags.length === 0 ? "输入标签后按回车添加" : ""}
+                  placeholder={tags.length === 0 ? t("home.form.tagsPlaceholder") : ""}
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
                   onKeyDown={(e) => {
@@ -520,18 +524,18 @@ function EditDialog({
             {contentLoading ? (
               <div className="flex items-center justify-center py-12 text-muted-foreground">
                 <Loader2 className="size-5 animate-spin mr-2" />
-                加载内容…
+                {t("components.linksTable.editDialog.loading")}
               </div>
             ) : (
               <Tabs value={contentMode} onValueChange={(v) => setContentMode(v as "paste" | "upload")}>
                 <TabsList variant="line" className="mb-4">
-                  <TabsTrigger value="paste">粘贴代码</TabsTrigger>
-                  <TabsTrigger value="upload">上传文件</TabsTrigger>
+                  <TabsTrigger value="paste">{t("home.tab.paste")}</TabsTrigger>
+                  <TabsTrigger value="upload">{t("home.tab.upload")}</TabsTrigger>
                 </TabsList>
                 <TabsContent value="paste">
                   <textarea
                     className="w-full min-h-[40vh] rounded-lg border border-border bg-background p-4 text-sm font-mono outline-none resize-y leading-relaxed focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-                    placeholder="在此粘贴你的 HTML/CSS/JS 代码..."
+                    placeholder={t("home.textarea.placeholder")}
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     spellCheck={false}
@@ -548,9 +552,9 @@ function EditDialog({
         {error && <p className="text-sm text-destructive">{error}</p>}
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>取消</Button>
+          <Button variant="outline" onClick={onClose}>{t("common.cancel")}</Button>
           <Button disabled={saving} onClick={handleSave}>
-            {saving ? <><Loader2 className="size-4 animate-spin mr-1" /> 保存中</> : "保存"}
+            {saving ? <><Loader2 className="size-4 animate-spin mr-1" /> {t("common.saving")}</> : t("common.save")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -571,22 +575,24 @@ function DeleteConfirmDialog({
   onConfirm: () => void;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
+
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
       <DialogContent className="sm:max-w-sm" showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle>确认删除</DialogTitle>
+          <DialogTitle>{t("common.confirmDelete")}</DialogTitle>
           <DialogDescription>
-            确定要删除「{title}」吗？此操作不可撤销。
+            {t("components.linksTable.deleteConfirm", { name: title })}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <DialogClose render={<Button variant="outline">取消</Button>} />
+          <DialogClose render={<Button variant="outline">{t("common.cancel")}</Button>} />
           <Button variant="destructive" disabled={deleting} onClick={onConfirm}>
             {deleting ? (
-              <><Loader2 className="size-4 animate-spin mr-1" /> 删除中</>
+              <><Loader2 className="size-4 animate-spin mr-1" /> {t("common.deleting")}</>
             ) : (
-              "确认删除"
+              t("common.confirmDelete")
             )}
           </Button>
         </DialogFooter>

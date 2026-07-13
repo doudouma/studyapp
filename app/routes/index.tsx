@@ -8,21 +8,22 @@ import { StatsSection } from "~/components/StatsSection";
 import { GuideSection } from "~/components/GuideSection";
 import { AppFooter } from "~/components/AppFooter";
 import { Card, CardContent } from "~/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/components/ui/tabs";
+
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { TagInput } from "~/components/TagInput";
 import { createFileRoute } from "@tanstack/react-router";
 import { useAuth } from "~/lib/auth-context";
+import { useTranslation } from "react-i18next";
+import i18n from "~/lib/i18n";
 
 export const Route = createFileRoute("/")({
   head: () => ({
-    title: "100mini - 学习页面快闪托管与分享",
+    title: i18n.t("home.title"),
     meta: [
       {
         name: "keywords",
-        content:
-          "HTML托管,学习页面,快闪托管,网页分享,免费托管,学习工具,教育工具,师生互动,静态网页,AI教育,AI学习",
+        content: i18n.t("app.keywords"),
       },
     ],
   }),
@@ -85,36 +86,46 @@ function UploadForm({
   canSubmit: boolean;
   user: any;
 }) {
+  const { t } = useTranslation();
   return (
     <Card className="w-full max-w-xl">
       <CardContent className="p-6">
-        <Tabs
-          value={mode}
-          onValueChange={(v) => {
-            setMode(v as TabMode);
-            if (v === "paste") setFile(null);
-            if (v === "drop") setHtmlContent("");
-          }}
-        >
-          <TabsList variant="line" className="mb-6">
-            <TabsTrigger value="paste">粘贴代码</TabsTrigger>
-            <TabsTrigger value="drop">上传文件</TabsTrigger>
-          </TabsList>
+        <div>
+          <div role="tablist" className="mb-6 inline-flex w-fit items-center justify-center gap-1 rounded-none bg-transparent">
+            <button
+              role="tab"
+              data-active={mode === "paste" ? "" : undefined}
+              onClick={() => { setMode("paste"); setFile(null); }}
+              className="relative inline-flex items-center justify-center gap-1.5 rounded-md border border-transparent px-1.5 py-0.5 text-sm font-medium whitespace-nowrap text-foreground/60 transition-all hover:text-foreground data-active:bg-background data-active:text-foreground after:absolute after:inset-x-0 after:bottom-[-5px] after:h-0.5 after:bg-foreground after:opacity-0 after:transition-opacity data-active:after:opacity-100"
+            >
+              {t("home.tab.paste")}
+            </button>
+            <button
+              role="tab"
+              data-active={mode === "drop" ? "" : undefined}
+              onClick={() => { setMode("drop"); setHtmlContent(""); }}
+              className="relative inline-flex items-center justify-center gap-1.5 rounded-md border border-transparent px-1.5 py-0.5 text-sm font-medium whitespace-nowrap text-foreground/60 transition-all hover:text-foreground data-active:bg-background data-active:text-foreground after:absolute after:inset-x-0 after:bottom-[-5px] after:h-0.5 after:bg-foreground after:opacity-0 after:transition-opacity data-active:after:opacity-100"
+            >
+              {t("home.tab.upload")}
+            </button>
+          </div>
 
-          <TabsContent value="paste" className="min-h-[300px] flex flex-col">
-            <textarea
-              className="w-full flex-1 rounded-lg border border-border bg-background p-4 text-sm font-mono outline-none resize-y leading-relaxed focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-              placeholder="在此粘贴你的 HTML/CSS/JS 代码..."
-              value={htmlContent}
-              onChange={(e) => setHtmlContent(e.target.value)}
-              spellCheck={false}
-            />
-          </TabsContent>
-
-          <TabsContent value="drop" className="min-h-[300px]">
-            <DropZone file={file} onFileSelect={setFile} />
-          </TabsContent>
-        </Tabs>
+          {mode === "paste" ? (
+            <div role="tabpanel" className="min-h-[300px] flex flex-col flex-1 text-sm outline-none">
+              <textarea
+                className="w-full flex-1 rounded-lg border border-border bg-background p-4 text-sm font-mono outline-none resize-y leading-relaxed focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                placeholder={t("home.textarea.placeholder")}
+                value={htmlContent}
+                onChange={(e) => setHtmlContent(e.target.value)}
+                spellCheck={false}
+              />
+            </div>
+          ) : (
+            <div role="tabpanel" className="min-h-[300px] flex-1 text-sm outline-none">
+              <DropZone file={file} onFileSelect={setFile} />
+            </div>
+          )}
+        </div>
 
         <div className="mt-2 mb-2 flex justify-end">
           <span
@@ -132,47 +143,47 @@ function UploadForm({
           <>
             <div className="mb-3">
               <label className="text-sm font-medium text-foreground">
-                标题 <span className="text-destructive">*</span>
+                {t("home.form.title")} <span className="text-destructive">{t("home.form.titleRequired")}</span>
               </label>
               <Input
                 className="mt-1"
-                placeholder="输入页面标题..."
+                placeholder={t("home.form.titlePlaceholder")}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
             </div>
 
             <div className="mb-3">
-              <label className="text-sm font-medium text-foreground">类型</label>
+              <label className="text-sm font-medium text-foreground">{t("home.form.category")}</label>
               <select
                 className="mt-1 flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
               >
-                <option value="general">通用</option>
-                <option value="chinese">语文</option>
-                <option value="math">数学</option>
-                <option value="english">英语</option>
-                <option value="physics">物理</option>
-                <option value="chemistry">化学</option>
-                <option value="history">历史</option>
-                <option value="biology">生物</option>
-                <option value="geography">地理</option>
-                <option value="other">其他</option>
+                <option value="general">{t("home.select.default")}</option>
+                <option value="chinese">{t("home.select.chinese")}</option>
+                <option value="math">{t("home.select.math")}</option>
+                <option value="english">{t("home.select.english")}</option>
+                <option value="physics">{t("home.select.physics")}</option>
+                <option value="chemistry">{t("home.select.chemistry")}</option>
+                <option value="history">{t("home.select.history")}</option>
+                <option value="biology">{t("home.select.biology")}</option>
+                <option value="geography">{t("home.select.geography")}</option>
+                <option value="other">{t("home.select.other")}</option>
               </select>
             </div>
 
             <div className="mb-3">
               <label className="text-sm font-medium text-foreground">
-                标签{" "}
+                {t("home.form.tags")}{" "}
                 <span className="font-normal text-muted-foreground">
-                  (可选，最多10个)
+                  {t("home.form.tagsHint")}
                 </span>
               </label>
               <TagInput
                 tags={tags}
                 onChange={setTags}
-                placeholder="输入标签后按回车添加"
+                placeholder={t("home.form.tagsPlaceholder")}
               />
             </div>
 
@@ -183,7 +194,7 @@ function UploadForm({
                 checked={shareToSquare}
                 onChange={(e) => setShareToSquare(e.target.checked)}
               />
-              <span className="text-sm text-foreground">分享到广场</span>
+              <span className="text-sm text-foreground">{t("home.form.shareToSquare")}</span>
             </label>
           </>
         )}
@@ -193,38 +204,38 @@ function UploadForm({
             <div className="flex items-center gap-2 mb-3">
               <Crown className="size-4 text-[#c49f00] dark:text-[#eec200]" />
               <span className="text-xs font-semibold text-[#735c00] dark:text-[#eec200] tracking-wide uppercase">
-                登录后解锁更多
+                {t("home.upsell.title")}
               </span>
             </div>
             <div className="grid grid-cols-2 gap-x-4 gap-y-2">
               <div className="flex items-center gap-2">
                 <Clock className="size-3.5 text-[#c49f00] dark:text-[#eec200]" />
-                <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">24h 自动销毁</span>
+                <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">{t("home.upsell.anonymousExpiry")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Infinity className="size-3.5 text-[#006c49] dark:text-[#4edea3]" />
-                <span className="text-xs text-[#006c49] dark:text-[#4edea3] font-medium">永久保留</span>
+                <span className="text-xs text-[#006c49] dark:text-[#4edea3] font-medium">{t("home.upsell.permanent")}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">无标题/分类</span>
+                <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">{t("home.upsell.noTitle")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Tags className="size-3.5 text-[#006c49] dark:text-[#4edea3]" />
-                <span className="text-xs text-[#006c49] dark:text-[#4edea3] font-medium">标题·分类·标签</span>
+                <span className="text-xs text-[#006c49] dark:text-[#4edea3] font-medium">{t("home.upsell.withTitle")}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">不可分享到广场</span>
+                <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">{t("home.upsell.noShare")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Share2 className="size-3.5 text-[#006c49] dark:text-[#4edea3]" />
-                <span className="text-xs text-[#006c49] dark:text-[#4edea3] font-medium">分享到学习广场</span>
+                <span className="text-xs text-[#006c49] dark:text-[#4edea3] font-medium">{t("home.upsell.canShare")}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">无法管理链接</span>
+                <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">{t("home.upsell.noManage")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <List className="size-3.5 text-[#006c49] dark:text-[#4edea3]" />
-                <span className="text-xs text-[#006c49] dark:text-[#4edea3] font-medium">管理你的所有链接</span>
+                <span className="text-xs text-[#006c49] dark:text-[#4edea3] font-medium">{t("home.upsell.canManage")}</span>
               </div>
             </div>
           </div>
@@ -241,7 +252,7 @@ function UploadForm({
           disabled={!canSubmit || loading}
           onClick={handleSubmit}
         >
-          {loading ? "发布中..." : "发布页面"}
+          {loading ? t("common.submitting") : t("common.submit")}
         </Button>
       </CardContent>
     </Card>
@@ -249,6 +260,7 @@ function UploadForm({
 }
 
 function HomePage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const uploadRef = useRef<HTMLElement>(null);
@@ -303,13 +315,13 @@ function HomePage() {
 
       const json = await res.json() as { error?: string } & UploadResult;
       if (!res.ok) {
-        throw new Error(json.error || "上传失败");
+        throw new Error(json.error || t("common.error"));
       }
 
       setResult(json);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "上传失败，请稍后重试"
+        err instanceof Error ? err.message : t("common.errorRetry")
       );
     } finally {
       setLoading(false);
@@ -356,17 +368,11 @@ function HomePage() {
         {/* Hero */}
         <section className="relative overflow-hidden bg-gradient-to-b from-[#006c49]/10 via-[#006c49]/[0.02] to-background dark:from-[#4edea3]/10 dark:via-[#4edea3]/[0.02] dark:to-background pb-12 pt-20 md:pt-28">
           <div className="mx-auto max-w-4xl px-6 text-center">
-            {/* <div className="mb-5 flex justify-center">
-              <div className="inline-flex size-16 items-center justify-center rounded-2xl bg-[#006c49] text-white dark:bg-[#4edea3] dark:text-[#002113] shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)]">
-                <Code2 className="size-8" />
-              </div>
-            </div> */}
             <h1 className="text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-[52px] lg:leading-[1.15]">
-              学习页面快闪托管
+              {t("home.hero.title")}
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground leading-relaxed md:text-xl">
-              粘贴或上传你的互动学习单页，30秒生成分享链接。
-              零成本、免注册、24小时自动销毁。
+              {t("home.hero.subtitle")}
             </p>
             <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
               <Button
@@ -374,7 +380,7 @@ function HomePage() {
                 className="gap-2 h-11 px-6 text-base rounded-xl"
                 onClick={scrollToUpload}
               >
-                开始上传
+                {t("home.hero.cta1")}
                 <ArrowDown className="size-4" />
               </Button>
               <Button
@@ -383,7 +389,7 @@ function HomePage() {
                 className="text-base h-11 px-6 rounded-xl"
                 onClick={() => navigate({ to: "/square", search: { q: "" } })}
               >
-                浏览学习广场
+                {t("home.hero.cta2")}
               </Button>
             </div>
           </div>
@@ -395,9 +401,9 @@ function HomePage() {
           className="scroll-mt-24 mx-auto max-w-2xl px-6 pb-8 -mt-8 relative z-10"
         >
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold tracking-tight">上传你的页面</h2>
+            <h2 className="text-2xl font-bold tracking-tight">{t("home.section.upload")}</h2>
             <p className="mt-2 text-base text-muted-foreground">
-              支持 HTML 代码粘贴或 .html/.zip 文件上传
+              {t("home.section.uploadDesc")}
             </p>
           </div>
           <UploadForm

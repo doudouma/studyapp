@@ -1,22 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { Code2, Search, Bell, Settings, LogOut, Menu, X } from "lucide-react";
-import { Button } from "~/components/ui/button";
+import { Code2, Search, Settings, LogOut, Menu, X } from "lucide-react";
 import { Input } from "~/components/ui/input";
 import { authClient } from "~/lib/auth-client";
 import { useAuth } from "~/lib/auth-context";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "~/components/ui/tabs";
+import { Button } from "~/components/ui/button";
+import { AuthDialog } from "~/components/AuthDialog";
+import { useTranslation } from "react-i18next";
+import { LangSwitcher } from "~/components/LangSwitcher";
 
 interface AppNavProps {
   searchQuery?: string;
@@ -66,106 +57,8 @@ function MobileNavLink({ href, onClick, children }: { href: string; onClick: () 
   );
 }
 
-function LoginForm({ onSuccess }: { onSuccess: () => void }) {
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-
-    const form = new FormData(e.currentTarget);
-    const email = form.get("email") as string;
-    const password = form.get("password") as string;
-
-    try {
-      const result = await authClient.signIn.email({ email, password });
-      if (result?.error) {
-        setError(result.error.message || "登录失败");
-      } else {
-        onSuccess();
-      }
-    } catch {
-      setError("网络错误，请重试");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-
-    const form = new FormData(e.currentTarget);
-    const email = form.get("email") as string;
-    const password = form.get("password") as string;
-    const name = form.get("name") as string;
-
-    try {
-      const result = await authClient.signUp.email({ email, password, name });
-      if (result?.error) {
-        setError(result.error.message || "注册失败");
-      } else {
-        onSuccess();
-      }
-    } catch {
-      setError("网络错误，请重试");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <Tabs defaultValue="signin" className="w-full">
-      <TabsList className="w-full">
-        <TabsTrigger value="signin" className="flex-1">
-          登录
-        </TabsTrigger>
-        <TabsTrigger value="signup" className="flex-1">
-          注册
-        </TabsTrigger>
-      </TabsList>
-
-      <TabsContent value="signin">
-        <form onSubmit={handleSignIn} className="space-y-4 mt-4">
-          <Input name="email" type="email" placeholder="邮箱" required />
-          <Input
-            name="password"
-            type="password"
-            placeholder="密码"
-            required
-          />
-          {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "登录中..." : "登录"}
-          </Button>
-        </form>
-      </TabsContent>
-
-      <TabsContent value="signup">
-        <form onSubmit={handleSignUp} className="space-y-4 mt-4">
-          <Input name="name" placeholder="昵称" required />
-          <Input name="email" type="email" placeholder="邮箱" required />
-          <Input
-            name="password"
-            type="password"
-            placeholder="密码（至少 8 位）"
-            required
-            minLength={8}
-          />
-          {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "注册中..." : "注册"}
-          </Button>
-        </form>
-      </TabsContent>
-    </Tabs>
-  );
-}
-
 export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
+  const { t } = useTranslation();
   const { user, refreshAuth, isMember, membershipExpiresAt } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
@@ -226,39 +119,46 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
               <span className="text-xl font-bold tracking-tight">100mini</span>
             </Link>
             <div className="hidden items-center gap-6 md:flex">
-              <NavLink href="/">首页</NavLink>
-              <NavLink href="/square">广场</NavLink>
+              <NavLink href="/">{t("nav.home")}</NavLink>
+              <NavLink href="/square">{t("nav.square")}</NavLink>
+              <NavLink href="/pomodoro">{t("nav.pomodoro")}</NavLink>
             </div>
           </div>
 
           <button
             className="flex items-center justify-center size-9 md:hidden"
             onClick={() => setMobileNavOpen(!mobileNavOpen)}
-            aria-label="菜单"
+            aria-label={t("nav.menu")}
           >
             {mobileNavOpen ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
-          <Dialog open={authOpen} onOpenChange={setAuthOpen}>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setAuthOpen(true)}
-            >
-              登录 / 注册
-            </Button>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>登录 100mini</DialogTitle>
-              </DialogHeader>
-              <LoginForm onSuccess={() => { setAuthOpen(false); refreshAuth(); navigate({ to: "/" }); }} />
-            </DialogContent>
-          </Dialog>
+          <div className="flex items-center gap-2">
+            <div className="hidden md:block">
+            <LangSwitcher />
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setAuthOpen(true)}
+          >
+            {t("nav.login")}
+          </Button>
+          </div>
+          <AuthDialog
+            open={authOpen}
+            onOpenChange={setAuthOpen}
+            onSuccess={() => { navigate({ to: "/" }); }}
+          />
         </nav>
         {mobileNavOpen && (
           <div className="border-t border-[#d3e4fe] dark:border-[#3c4a42] bg-white dark:bg-[#0b1c30] md:hidden">
             <div className="flex flex-col gap-1 px-6 py-4">
-              <MobileNavLink href="/" onClick={() => setMobileNavOpen(false)}>首页</MobileNavLink>
-              <MobileNavLink href="/square" onClick={() => setMobileNavOpen(false)}>广场</MobileNavLink>
+              <MobileNavLink href="/" onClick={() => setMobileNavOpen(false)}>{t("nav.home")}</MobileNavLink>
+              <MobileNavLink href="/square" onClick={() => setMobileNavOpen(false)}>{t("nav.square")}</MobileNavLink>
+              <MobileNavLink href="/pomodoro" onClick={() => setMobileNavOpen(false)}>{t("nav.pomodoro")}</MobileNavLink>
+              <div className="px-4 pt-2">
+                <LangSwitcher />
+              </div>
             </div>
           </div>
         )}
@@ -279,11 +179,12 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
             <span className="text-xl font-bold tracking-tight">100mini</span>
           </Link>
           <div className="hidden items-center gap-6 md:flex">
-            <NavLink href="/">首页</NavLink>
-            <NavLink href="/square">广场</NavLink>
-            <NavLink href="/links">我的链接</NavLink>
+            <NavLink href="/">{t("nav.home")}</NavLink>
+            <NavLink href="/square">{t("nav.square")}</NavLink>
+            <NavLink href="/pomodoro">{t("nav.pomodoro")}</NavLink>
+            <NavLink href="/links">{t("nav.profile")}</NavLink>
             {user.role === "admin" && (
-              <NavLink href="/admin">管理后台</NavLink>
+              <NavLink href="/admin">{t("nav.admin")}</NavLink>
             )}
           </div>
         </div>
@@ -293,7 +194,7 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
           <button
             className="flex items-center justify-center size-9 md:hidden"
             onClick={() => setMobileNavOpen(!mobileNavOpen)}
-            aria-label="菜单"
+            aria-label={t("nav.menu")}
           >
             {mobileNavOpen ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
@@ -301,7 +202,7 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               className="h-9 w-48 bg-muted pl-9 text-sm lg:w-64"
-              placeholder="搜索页面..."
+              placeholder={t("nav.search")}
               value={searchValue}
               onChange={(e) => handleSearchChange(e.target.value)}
               onKeyDown={handleSearchKeyDown}
@@ -313,6 +214,9 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
           <Button variant="ghost" size="icon" className="size-9">
             <Settings className="size-4" />
           </Button> */}
+          <div className="hidden md:block">
+            <LangSwitcher />
+          </div>
           <div className="relative" ref={menuRef}>
             <button
               className="flex size-8 items-center justify-center rounded-full bg-primary font-bold text-xs text-primary-foreground cursor-pointer overflow-hidden"
@@ -337,14 +241,14 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
                   {isMember ? (
                     <div className="flex items-center gap-1.5">
                       <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
-                        🏆 会员
+                        {t("nav.member")}
                       </span>
                       <span className="text-[11px] text-muted-foreground">
-                        到期 {membershipExpiresAt ? new Date(membershipExpiresAt).toLocaleDateString("zh-CN") : ""}
+                        {t("nav.memberExpire", { date: membershipExpiresAt ? new Date(membershipExpiresAt).toLocaleDateString("zh-CN") : "" })}
                       </span>
                     </div>
                   ) : (
-                    <span className="text-xs text-muted-foreground">普通用户</span>
+                    <span className="text-xs text-muted-foreground">{t("nav.normalUser")}</span>
                   )}
                 </div>
                 {user.role === "admin" && (
@@ -353,7 +257,7 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
                     onClick={() => { setMenuOpen(false); navigate({ to: "/admin" }); }}
                   >
                     <Settings className="size-4" />
-                    管理后台
+                    {t("nav.admin")}
                   </button>
                 )}
                 <button
@@ -361,7 +265,7 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
                   onClick={handleLogout}
                 >
                   <LogOut className="size-4" />
-                  退出登录
+                  {t("nav.logout")}
                 </button>
               </div>
             )}
@@ -371,12 +275,16 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
       {mobileNavOpen && (
         <div className="border-t border-[#d3e4fe] dark:border-[#3c4a42] bg-white dark:bg-[#0b1c30] md:hidden">
           <div className="flex flex-col gap-1 px-6 py-4">
-            <MobileNavLink href="/" onClick={() => setMobileNavOpen(false)}>首页</MobileNavLink>
-            <MobileNavLink href="/square" onClick={() => setMobileNavOpen(false)}>广场</MobileNavLink>
-            <MobileNavLink href="/links" onClick={() => setMobileNavOpen(false)}>我的链接</MobileNavLink>
+            <MobileNavLink href="/" onClick={() => setMobileNavOpen(false)}>{t("nav.home")}</MobileNavLink>
+            <MobileNavLink href="/square" onClick={() => setMobileNavOpen(false)}>{t("nav.square")}</MobileNavLink>
+            <MobileNavLink href="/pomodoro" onClick={() => setMobileNavOpen(false)}>{t("nav.pomodoro")}</MobileNavLink>
+            <MobileNavLink href="/links" onClick={() => setMobileNavOpen(false)}>{t("nav.profile")}</MobileNavLink>
             {user.role === "admin" && (
-              <MobileNavLink href="/admin" onClick={() => setMobileNavOpen(false)}>管理后台</MobileNavLink>
+              <MobileNavLink href="/admin" onClick={() => setMobileNavOpen(false)}>{t("nav.admin")}</MobileNavLink>
             )}
+            <div className="px-4 pt-2">
+              <LangSwitcher />
+            </div>
           </div>
         </div>
       )}

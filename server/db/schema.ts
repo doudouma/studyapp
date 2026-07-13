@@ -70,6 +70,15 @@ export const page = sqliteTable("page", {
   expiresAt: integer("expires_at", { mode: "timestamp" }),
 });
 
+export const pomodoroSession = sqliteTable("pomodoro_session", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  duration: integer("duration").notNull(),
+  completedAt: integer("completed_at", { mode: "timestamp" }).notNull(),
+});
+
 export const membership = sqliteTable("membership", {
   id: text("id").primaryKey(),
   userId: text("user_id")

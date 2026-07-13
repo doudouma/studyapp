@@ -10,6 +10,8 @@ import { useAuth } from "~/lib/auth-context";
 import { createDb } from "~/../server/db";
 import { page, user } from "~/../server/db/schema";
 import { eq, desc } from "drizzle-orm";
+import { useTranslation } from "react-i18next";
+import i18n from "~/lib/i18n";
 
 const PAGE_SIZE = 12;
 
@@ -81,25 +83,25 @@ export const Route = createFileRoute("/square")({
     return fetchSquareData({ data: { offset: 0 } });
   },
   head: () => ({
-    title: "学习广场 - 发现和分享 HTML 学习资源 | 100mini",
+    title: i18n.t("square.title"),
     meta: [
       {
         name: "description",
-        content: "浏览社区分享的 HTML 学习页面、互动工具和创意作品。支持按学科、标签筛选，发现优质学习资源。",
+        content: i18n.t("square.desc"),
       },
-      { name: "keywords", content: "学习广场,HTML分享,学习资源,互动工具,教育页面,学科资源" },
+      { name: "keywords", content: i18n.t("square.keywords") },
       { property: "og:type", content: "website" },
-      { property: "og:title", content: "学习广场 - 发现和分享 HTML 学习资源 | 100mini" },
+      { property: "og:title", content: i18n.t("square.title") },
       {
         property: "og:description",
-        content: "浏览社区分享的 HTML 学习页面、互动工具和创意作品。支持按学科、标签筛选。",
+        content: i18n.t("square.desc"),
       },
       { property: "og:url", content: "https://100mini.com/square" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:title", content: "学习广场 - 发现和分享 HTML 学习资源 | 100mini" },
+      { name: "twitter:title", content: i18n.t("square.title") },
       {
         name: "twitter:description",
-        content: "浏览社区分享的 HTML 学习页面、互动工具和创意作品。",
+        content: i18n.t("square.desc"),
       },
     ],
     links: [
@@ -110,20 +112,21 @@ export const Route = createFileRoute("/square")({
 });
 
 const CATEGORIES = [
-  { key: "", label: "全部" },
-  { key: "general", label: "通用" },
-  { key: "chinese", label: "语文" },
-  { key: "math", label: "数学" },
-  { key: "english", label: "英语" },
-  { key: "physics", label: "物理" },
-  { key: "chemistry", label: "化学" },
-  { key: "history", label: "历史" },
-  { key: "biology", label: "生物" },
-  { key: "geography", label: "地理" },
-  { key: "other", label: "其他" },
+  { key: "", tKey: "square.all" },
+  { key: "general", tKey: "home.select.default" },
+  { key: "chinese", tKey: "home.select.chinese" },
+  { key: "math", tKey: "home.select.math" },
+  { key: "english", tKey: "home.select.english" },
+  { key: "physics", tKey: "home.select.physics" },
+  { key: "chemistry", tKey: "home.select.chemistry" },
+  { key: "history", tKey: "home.select.history" },
+  { key: "biology", tKey: "home.select.biology" },
+  { key: "geography", tKey: "home.select.geography" },
+  { key: "other", tKey: "home.select.other" },
 ];
 
 function SquarePage() {
+  const { t } = useTranslation();
   const { q } = Route.useSearch();
   const { items: initialItems, hasMore: initialHasMore } = useLoaderData({ from: Route.id });
   const [allItems, setAllItems] = useState<SquareItem[]>(initialItems);
@@ -213,10 +216,10 @@ function SquarePage() {
           <div className="mb-8">
             <div className="flex items-center gap-2">
               <Globe className="size-6 text-[#006c49] dark:text-[#4edea3]" />
-              <h1 className="text-2xl font-bold text-foreground">学习广场</h1>
+              <h1 className="text-2xl font-bold text-foreground">{t("square.heading")}</h1>
             </div>
             <p className="mt-1.5 text-base text-muted-foreground">
-              发现来自社区的学习页面与互动工具
+              {t("square.subtitle")}
             </p>
           </div>
 
@@ -232,7 +235,7 @@ function SquarePage() {
                     : "bg-[#e5eeff] text-[#3c4a42] dark:bg-[#1e314a] dark:text-[#8f9e95] hover:bg-[#dce9ff] dark:hover:bg-[#213145]"
                 }`}
               >
-                {cat.label}
+                {t(cat.tKey)}
               </button>
             ))}
           </div>
@@ -248,7 +251,7 @@ function SquarePage() {
                     : "bg-muted text-muted-foreground hover:bg-muted/80"
                 }`}
               >
-                全部标签
+                {t("square.allTags")}
               </button>
               {allTags.map((tag) => (
                 <button
@@ -274,12 +277,12 @@ function SquarePage() {
           {loading && (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="size-5 animate-spin text-muted-foreground" />
-              <span className="ml-2 text-sm text-muted-foreground">加载中...</span>
+              <span className="ml-2 text-sm text-muted-foreground">{t("common.loading")}</span>
             </div>
           )}
           {!hasMore && allItems.length > PAGE_SIZE && (
             <p className="py-8 text-center text-sm text-muted-foreground">
-              已加载全部内容
+              {t("square.loadedAll")}
             </p>
           )}
         </div>

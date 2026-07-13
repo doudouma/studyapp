@@ -1,18 +1,20 @@
 import { useState, useEffect } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Link as LinkIcon } from "lucide-react";
+import { Link as LinkIcon, User, Crown, Clock, Hash, ArrowUpRight } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { LinksTable } from "~/components/LinksTable";
 import { useAuth } from "~/lib/auth-context";
+import { useTranslation } from "react-i18next";
+import i18n from "~/lib/i18n";
 
 export const Route = createFileRoute("/links")({
   head: () => ({
-    title: "我的链接 - 100mini",
+    title: i18n.t("profile.title"),
     meta: [
       {
         name: "description",
-        content: "管理你上传的所有 HTML 分享链接",
+        content: i18n.t("profile.desc"),
       },
     ],
   }),
@@ -34,11 +36,32 @@ interface PagesResponse {
   limit: number;
 }
 
+interface PomodoroCount {
+  today: number;
+  total: number;
+}
+
+function StatCard({ icon, label, value, accent }: { icon: React.ReactNode; label: string; value: string | number; accent?: string }) {
+  return (
+    <div className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] p-5 flex items-center gap-4">
+      <div className={`flex size-12 shrink-0 items-center justify-center rounded-xl ${accent || "bg-[#006c49]/10 dark:bg-[#4edea3]/10"}`}>
+        {icon}
+      </div>
+      <div className="min-w-0">
+        <p className="text-xs text-muted-foreground">{label}</p>
+        <p className="text-xl font-bold text-foreground truncate">{value}</p>
+      </div>
+    </div>
+  );
+}
+
 function LinksPage() {
-  const { user, authLoading } = useAuth();
+  const { t, i18n: i18nInstance } = useTranslation();
+  const { user, authLoading, isMember, membershipExpiresAt, refreshAuth } = useAuth();
   const [data, setData] = useState<PagesResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [pomoCount, setPomoCount] = useState<PomodoroCount>({ today: 0, total: 0 });
 
   const fetchPages = async () => {
     setLoading(true);
@@ -47,12 +70,12 @@ function LinksPage() {
       const res = await fetch("/api/pages");
       if (!res.ok) {
         const json = (await res.json()) as { error?: string };
-        throw new Error(json.error || "加载失败");
+        throw new Error(json.error || t("common.loadFailed"));
       }
       const json = (await res.json()) as PagesResponse;
       setData(json);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "加载失败");
+      setError(err instanceof Error ? err.message : t("common.loadFailed"));
     } finally {
       setLoading(false);
     }
@@ -61,6 +84,9 @@ function LinksPage() {
   useEffect(() => {
     if (user) {
       fetchPages();
+      fetch("/api/pomodoro/today-count").then(r => r.json()).then(d => {
+        if (d && typeof d.today === "number") setPomoCount(d);
+      }).catch(() => {});
     } else if (!authLoading) {
       setLoading(false);
     }
@@ -68,7 +94,6 @@ function LinksPage() {
 
   if (authLoading) return null;
 
-  // Not logged in — prompt to login
   if (!user) {
     return (
       <div className="flex min-h-screen flex-col">
@@ -76,17 +101,17 @@ function LinksPage() {
         <main className="flex flex-1 items-center justify-center p-8">
           <div className="text-center">
             <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-[#006c49]/10 dark:bg-[#4edea3]/10">
-              <LinkIcon className="size-6 text-[#006c49] dark:text-[#4edea3]" />
+              <User className="size-6 text-[#006c49] dark:text-[#4edea3]" />
             </div>
-            <h1 className="text-2xl font-bold text-foreground">我的链接</h1>
+            <h1 className="text-2xl font-bold text-foreground">{t("profile.heading")}</h1>
             <p className="mt-2 text-muted-foreground">
-              请登录后查看和管理你的链接
+              {t("profile.notLoggedIn")}
             </p>
             <Link
               to="/"
               className="mt-4 inline-flex h-10 items-center justify-center rounded-xl bg-[#006c49] px-5 text-sm font-medium text-white shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)] transition-colors hover:bg-[#006c49]/90 dark:bg-[#4edea3] dark:text-[#002113] dark:hover:bg-[#4edea3]/90"
             >
-              返回首页登录
+              {t("profile.loginCta")}
             </Link>
           </div>
         </main>
@@ -95,32 +120,89 @@ function LinksPage() {
     );
   }
 
+  const memberLabel = isMember
+    ? (membershipExpiresAt
+      ? t("profile.memberWithExpiry", { date: new Date(membershipExpiresAt).toLocaleDateString(i18nInstance.language === "zh" ? "zh-CN" : "en-US") })
+      : t("profile.member"))
+    : t("profile.normalUser");
+
   return (
     <div className="flex min-h-screen flex-col">
       <AppNav />
 
       <main className="flex-1">
         <div className="mx-auto max-w-5xl px-6 pt-10 pb-12">
-          {/* Header */}
-          <div className="mb-8 flex items-end justify-between">
-            <div>
-              <div className="flex items-center gap-2">
-                <LinkIcon className="size-6 text-[#006c49] dark:text-[#4edea3]" />
-                <h1 className="text-2xl font-bold text-foreground">我的链接</h1>
+          {/* Profile Header */}
+          <div className="mb-8 flex items-start justify-between flex-wrap gap-4">
+            <div className="flex items-center gap-4">
+              <div className="flex size-14 items-center justify-center rounded-2xl bg-primary font-bold text-xl text-primary-foreground overflow-hidden shrink-0">
+                {user.image ? (
+                  <img src={user.image} alt={user.name} className="size-full object-cover" />
+                ) : (
+                  user.name?.charAt(0)?.toUpperCase() || "?"
+                )}
               </div>
-              <p className="mt-1.5 text-base text-muted-foreground">
-                管理你上传的所有 HTML 分享链接
-              </p>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-2xl font-bold text-foreground">{t("profile.heading")}</h1>
+                  {isMember ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                      <Crown className="size-3" /> {t("profile.member")}
+                    </span>
+                  ) : null}
+                </div>
+                <p className="mt-0.5 text-sm text-muted-foreground">{memberLabel}</p>
+              </div>
             </div>
             <Link
               to="/"
               className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#006c49] px-5 text-sm font-medium text-white shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)] transition-all hover:bg-[#006c49]/90 active:shadow-[inset_0_-1px_0_rgba(0,0,0,0.2)] dark:bg-[#4edea3] dark:text-[#002113] dark:hover:bg-[#4edea3]/90"
             >
-              发布新链接
+              {t("profile.newLink")}
             </Link>
           </div>
 
-          {/* Content */}
+          {/* Stats Grid */}
+          <div className="mb-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+            <StatCard
+              icon={<Crown className="size-5 text-amber-600 dark:text-amber-400" />}
+              label={t("profile.stat.member")}
+              value={isMember ? t("profile.stat.memberActive") : t("profile.stat.memberInactive")}
+              accent="bg-amber-100 dark:bg-amber-900/20"
+            />
+            <div className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] p-5 flex items-center gap-4 col-span-2 md:col-span-1">
+              <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-[#006c49]/10 dark:bg-[#4edea3]/10">
+                <span className="text-lg">🍅</span>
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs text-muted-foreground">{t("profile.stat.tomato")}</p>
+                <div className="flex gap-4 mt-0.5">
+                  <div>
+                    <span className="text-xl font-bold text-foreground">{pomoCount.today}</span>
+                    <span className="text-xs text-muted-foreground ml-1">{t("profile.stat.today")}</span>
+                  </div>
+                  <div>
+                    <span className="text-xl font-bold text-foreground">{pomoCount.total}</span>
+                    <span className="text-xs text-muted-foreground ml-1">{t("profile.stat.total")}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <StatCard
+              icon={<LinkIcon className="size-5 text-[#006c49] dark:text-[#4edea3]" />}
+              label={t("profile.stat.links")}
+              value={data?.total ?? "-"}
+            />
+          </div>
+
+          {/* Links Section */}
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+              <LinkIcon className="size-5 text-[#006c49] dark:text-[#4edea3]" />
+              {t("profile.section.links")}
+            </h2>
+          </div>
+
           {loading ? (
             <div className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] p-12">
               <div className="space-y-4">
@@ -142,7 +224,7 @@ function LinksPage() {
                 className="mt-4 text-sm text-[#0058be] dark:text-[#adc6ff] hover:underline"
                 onClick={fetchPages}
               >
-                重试
+                {t("common.retry")}
               </button>
             </div>
           ) : (

@@ -1,69 +1,6 @@
 import { useState } from "react";
-import { FileText, Upload, Share2, ChevronDown, FileImage, ImageDown, TestTube, Tag, Sparkles } from "lucide-react";
-
-const steps = [
-  {
-    icon: FileText,
-    title: "准备内容",
-    description: "用 AI 或编辑器生成 HTML 互动学习页，支持 CSS/JS 及各类静态资源",
-  },
-  {
-    icon: Upload,
-    title: "上传发布",
-    description: "粘贴代码或拖拽上传 .html/.zip 文件，填写标题和分类信息",
-  },
-  {
-    icon: Share2,
-    title: "分享链接",
-    description: "一键复制链接发微信群/小红书/朋友圈，或生成二维码方便传播",
-  },
-];
-
-const faqs = [
-  {
-    q: "支持哪些文件格式？",
-    a: "支持 .html、.htm 和 .zip 文件。上传 ZIP 时请确保其中包含 index.html 作为入口文件。",
-  },
-  {
-    q: "文件大小有限制吗？",
-    a: "单个文件或 ZIP 压缩包大小不能超过 5MB。建议压缩图片等资源以减小体积。",
-  },
-  {
-    q: "页面能保留多久？",
-    a: "匿名上传的页面 24 小时后自动销毁。登录后上传的页面可永久保留（免费赠送 5 个永久额度），会员用户不限数量。",
-  },
-  {
-    q: "如何让页面出现在学习广场？",
-    a: "登录后在上传时勾选「分享到广场」即可。你的页面将按学科分类展示，供全网用户浏览使用。",
-  },
-  {
-    q: "安全方面有什么保障？",
-    a: "所有用户页面强制注入安全 Banner，并通过 Content-Security-Policy 禁用表单提交，防止钓鱼行为。",
-  },
-];
-
-const tips = [
-  {
-    icon: FileImage,
-    title: "文件组织",
-    description: "ZIP 上传时将主页命名为 index.html，CSS/JS 放在子文件夹中",
-  },
-  {
-    icon: ImageDown,
-    title: "图片压缩",
-    description: "上传前压缩图片，减少加载时间，提升访问体验",
-  },
-  {
-    icon: TestTube,
-    title: "本地测试",
-    description: "先在浏览器本地打开 HTML 确保效果正常，再上传到平台",
-  },
-  {
-    icon: Tag,
-    title: "清晰命名",
-    description: "填写有意义的标题和分类标签，让别人更容易搜索到你的页面",
-  },
-];
+import { FileText, Upload, Share2, ChevronDown, FileImage, ImageDown, TestTube, Tag } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 function FaqItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
@@ -90,13 +27,79 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 }
 
 export function GuideSection() {
+  const { t } = useTranslation();
+
+  const steps = [
+    {
+      icon: FileText,
+      title: t("components.guide.step1.title"),
+      description: t("components.guide.step1.desc"),
+    },
+    {
+      icon: Upload,
+      title: t("components.guide.step2.title"),
+      description: t("components.guide.step2.desc"),
+    },
+    {
+      icon: Share2,
+      title: t("components.guide.step3.title"),
+      description: t("components.guide.step3.desc"),
+    },
+  ];
+
+  const faqs = [
+    {
+      q: t("components.guide.faq1.q"),
+      a: t("components.guide.faq1.a"),
+    },
+    {
+      q: t("components.guide.faq2.q"),
+      a: t("components.guide.faq2.a"),
+    },
+    {
+      q: t("components.guide.faq3.q"),
+      a: t("components.guide.faq3.a"),
+    },
+    {
+      q: t("components.guide.faq4.q"),
+      a: t("components.guide.faq4.a"),
+    },
+    {
+      q: t("components.guide.faq5.q"),
+      a: t("components.guide.faq5.a"),
+    },
+  ];
+
+  const tips = [
+    {
+      icon: FileImage,
+      title: t("components.guide.tip1.title"),
+      description: t("components.guide.tip1.desc"),
+    },
+    {
+      icon: ImageDown,
+      title: t("components.guide.tip2.title"),
+      description: t("components.guide.tip2.desc"),
+    },
+    {
+      icon: TestTube,
+      title: t("components.guide.tip3.title"),
+      description: t("components.guide.tip3.desc"),
+    },
+    {
+      icon: Tag,
+      title: t("components.guide.tip4.title"),
+      description: t("components.guide.tip4.desc"),
+    },
+  ];
+
   return (
     <>
       {/* Quick Start */}
       <section className="w-full py-20">
         <div className="mx-auto max-w-5xl px-6">
           <h2 className="mb-12 text-center text-2xl font-bold tracking-tight md:text-3xl">
-            快速上手
+            {t("components.guide.heading")}
           </h2>
           <div className="grid gap-10 md:grid-cols-3">
             {steps.map((step) => {
@@ -121,7 +124,7 @@ export function GuideSection() {
       <section className="w-full bg-[#eff4ff] dark:bg-[#1e314a] py-20">
         <div className="mx-auto max-w-3xl px-6">
           <h2 className="mb-12 text-center text-2xl font-bold tracking-tight md:text-3xl">
-            常见问题
+            {t("components.guide.faq")}
           </h2>
           <div className="rounded-2xl border border-[#d3e4fe] dark:border-[#3c4a42] bg-white dark:bg-[#15243b] px-6">
             {faqs.map((faq) => (
@@ -135,7 +138,7 @@ export function GuideSection() {
       <section className="w-full py-20">
         <div className="mx-auto max-w-5xl px-6">
           <h2 className="mb-12 text-center text-2xl font-bold tracking-tight md:text-3xl">
-            小贴士
+            {t("components.guide.tips")}
           </h2>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {tips.map((tip) => {

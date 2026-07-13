@@ -1,5 +1,6 @@
 import { useState, useRef, type KeyboardEvent } from "react";
 import { X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface TagInputProps {
   tags: string[];
@@ -18,9 +19,11 @@ function parseTags(input: string): string[] {
 export function TagInput({
   tags,
   onChange,
-  placeholder = "输入标签后按回车添加",
+  placeholder: placeholderProp,
   maxTags = 10,
 }: TagInputProps) {
+  const { t } = useTranslation();
+  const placeholder = placeholderProp ?? t("components.tagInput.placeholder");
   const [input, setInput] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 

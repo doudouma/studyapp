@@ -119,4 +119,33 @@ drizzle/            # Drizzle Kit 迁移产物
 | `npm run deploy` | 构建 + wrangler 部署 |
 | `npm run cf:preview` | Wrangler 本地预览 Worker |
 
+## wrangler.toml 注意事项
+
+### `[triggers]` 必须放在文件末尾
+
+TOML 中 `[triggers]` 是一个 section 表头，其后的所有键值对都会被嵌套进 `[triggers]` 下，导致 `assets` 和 `routes` 等顶级配置丢失。
+
+**错误示例**（`assets` 和 `routes` 被错误嵌套）：
+```toml
+[triggers]
+crons = ["0 * * * *"]
+
+assets = { ... }   # 实际变成 triggers.assets
+routes = [ ... ]   # 实际变成 triggers.routes
+```
+
+**正确做法**：`[triggers]` 放在文件末尾：
+```toml
+# ... 所有其他配置 ...
+
+[triggers]
+crons = ["0 * * * *"]
+```
+
+### 静态资源 (ASSETS binding)
+
+- `wrangler.toml` 中声明 `assets = { directory = "dist/client", binding = "ASSETS" }`
+- Worker 中需要添加中间件通过 `env.ASSETS.fetch(c.req.raw)` 托管静态资源，否则 `/assets/*` 会返回 404
+- 路径：`app/server.tsx` → `app.use("/assets/*", ...)` 中间件
+
 **重要：提交代码、部署等操作必须由用户确认后才执行，AI 不得自动执行。**

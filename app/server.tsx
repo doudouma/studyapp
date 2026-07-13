@@ -4,6 +4,8 @@ import api, { cleanupAnonymousUploads } from "~/../server/api";
 import { createAuth } from "~/../server/auth";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import i18n from "~/lib/i18n";
+import { parseAcceptLanguage } from "~/lib/locale";
 
 type Bindings = {
   BUCKET?: R2Bucket;
@@ -92,7 +94,10 @@ app.use("/api/*", async (c, next) => {
 app.route("/", api);
 
 // All other routes go to TanStack Start SSR
-app.all("*", (c) => startHandler(c.req.raw));
+app.all("*", (c) => {
+  i18n.changeLanguage(parseAcceptLanguage(c.req.header("Accept-Language")));
+  return startHandler(c.req.raw);
+});
 
 // Cron trigger: cleanup expired anonymous uploads every hour
 export async function scheduled(_event: ScheduledEvent, env: Bindings, _ctx: ExecutionContext) {
