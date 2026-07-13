@@ -23,6 +23,24 @@ export function AppFooter() {
           >
             {t("footer.contact")}
           </Link>
+          <Link
+            to="/terms"
+            className="text-xs text-muted-foreground transition-colors hover:text-[#006c49] dark:hover:text-[#4edea3]"
+          >
+            {t("footer.terms")}
+          </Link>
+          <Link
+            to="/privacy"
+            className="text-xs text-muted-foreground transition-colors hover:text-[#006c49] dark:hover:text-[#4edea3]"
+          >
+            {t("footer.privacy")}
+          </Link>
+          <Link
+            to="/cookie"
+            className="text-xs text-muted-foreground transition-colors hover:text-[#006c49] dark:hover:text-[#4edea3]"
+          >
+            {t("footer.cookie")}
+          </Link>
         </div>
       </div>
     </footer>
