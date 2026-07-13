@@ -7,3 +7,5 @@ dist-worker/
 .vite/
 wrangler.toml
 .dev.vars
+test-results/
+opencode.json
