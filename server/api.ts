@@ -122,7 +122,7 @@ async function cleanupAnonymousUploads(bucket: R2Bucket): Promise<number> {
   let deleted = 0;
   let cursor: string | undefined;
   do {
-    const listed = await bucket.list({ prefix: "tmp/", cursor, include: ["customMetadata"] });
+    const listed = await bucket.list({ prefix: "tmp/", cursor, include: ["customMetadata"] } as any);
     const toDelete: string[] = [];
     for (const obj of listed.objects) {
       if (isExpired(obj.customMetadata?.createdAt)) {
