@@ -6,12 +6,60 @@ import { useTranslation } from "react-i18next";
 import i18n from "~/lib/i18n";
 
 export const Route = createFileRoute("/pomodoro")({
-  head: () => ({
-    title: i18n.t("pomodoro.title"),
-    meta: [
-      { name: "description", content: i18n.t("pomodoro.desc") },
-    ],
-  }),
+  head: () => {
+    const title = i18n.t("pomodoro.title");
+    const desc = i18n.t("pomodoro.desc");
+    const keywords = i18n.t("pomodoro.keywords");
+    const lang = i18n.language?.startsWith("zh") ? "zh" : "en";
+    const pageUrl = "https://100mini.com/pomodoro";
+    const altUrls = {
+      zh: "https://100mini.com/pomodoro",
+      en: "https://100mini.com/en/pomodoro",
+    };
+    return {
+      title,
+      meta: [
+        { name: "description", content: desc },
+        { name: "keywords", content: keywords },
+        { name: "robots", content: "index, follow" },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: pageUrl },
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        { property: "og:image", content: "https://100mini.com/spritesheet2/frame_38.webp" },
+        { property: "og:locale", content: lang === "zh" ? "zh_CN" : "en_US" },
+        { property: "og:site_name", content: "100mini" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: desc },
+        { name: "twitter:image", content: "https://100mini.com/spritesheet2/frame_38.webp" },
+      ],
+      links: [
+        { rel: "canonical", href: altUrls[lang] || pageUrl },
+        { rel: "alternate", hrefLang: "zh", href: altUrls.zh },
+        { rel: "alternate", hrefLang: "en", href: altUrls.en },
+        { rel: "alternate", hrefLang: "x-default", href: pageUrl },
+      ],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            name: lang === "zh" ? "100mini 番茄时钟" : "100mini Pomodoro Timer",
+            url: pageUrl,
+            description: desc,
+            applicationCategory: "ProductivityApplication",
+            operatingSystem: "All",
+            browserRequirements: "Requires JavaScript",
+            offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+            author: { "@type": "Organization", name: "100mini", url: "https://100mini.com" },
+            inLanguage: lang === "zh" ? "zh-CN" : "en-US",
+          }),
+        },
+      ],
+    };
+  },
   component: PomodoroPage,
 });
 

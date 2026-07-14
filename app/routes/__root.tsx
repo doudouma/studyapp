@@ -39,7 +39,6 @@ export const Route = createRootRoute({
       },
     ],
     links: [
-      { rel: "canonical", href: "https://100mini.com/" },
       { rel: "preload", href: interFontUrl, as: "font", type: "font/woff2", crossOrigin: "anonymous" },
     ],
   }),
