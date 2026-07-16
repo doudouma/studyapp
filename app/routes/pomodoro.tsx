@@ -311,32 +311,6 @@ function PomodoroPage() {
         .p-settings-actions { display: flex; gap: 10px; margin-top: 20px; }
         .p-settings-actions .p-btn { flex: 1; min-width: 0; padding: 10px 0; font-size: 14px; }
 
-        .p-guide-overlay {
-          position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 100;
-          backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center;
-          padding: 20px; transition: opacity .3s;
-        }
-        .p-guide-card {
-          background: rgba(255,255,255,0.96); backdrop-filter: blur(12px);
-          border-radius: 20px; max-width: 380px; width: 100%; max-height: 80vh;
-          overflow-y: auto; padding: 28px 24px; box-shadow: 0 8px 40px rgba(0,0,0,0.15);
-          animation: p-guide-in .3s ease;
-        }
-        @keyframes p-guide-in {
-          from { opacity: 0; transform: scale(0.95) translateY(10px); }
-          to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-        .p-guide-card h2 { font-size: 18px; font-weight: 700; color: #3e3e3e; margin-bottom: 16px; letter-spacing: .3px; }
-        .p-guide-card h3 { font-size: 14px; font-weight: 700; color: #e57373; margin: 16px 0 6px; letter-spacing: .3px; }
-        .p-guide-card p { font-size: 14px; color: #5a5a5a; line-height: 1.7; margin-bottom: 8px; }
-        .p-guide-card ol { margin: 0 0 12px; padding-left: 20px; }
-        .p-guide-card li { font-size: 14px; color: #5a5a5a; line-height: 1.8; margin-bottom: 4px; }
-        .p-guide-card .p-guide-tip { font-size: 13px; color: #999; font-style: italic; margin-top: 4px; }
-        .p-guide-close { display: block; width: 100%; margin-top: 16px; padding: 10px; border: none;
-          border-radius: 12px; background: #e57373; color: #fff; font-size: 15px; font-weight: 600;
-          cursor: pointer; transition: background .2s; }
-        .p-guide-close:hover { background: #d35f5f; }
-
         .p-guide-section { max-width: 640px; margin: 48px auto; padding: 0 24px 64px; }
         .p-guide-section h2 { font-size: 24px; font-weight: 700; color: #3e3e3e; margin-bottom: 20px; text-align: center; letter-spacing: .5px; }
         .p-guide-section h3 { font-size: 18px; font-weight: 700; color: #e57373; margin-bottom: 10px; }
@@ -416,7 +390,6 @@ function PomodoroTimer() {
   const [completed, setCompleted] = useState(false);
   const [fading, setFading] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
-  const [showGuide, setShowGuide] = useState(false);
   const [alarmIndex, setAlarmIndex] = useState(0);
   const [previewPlaying, setPreviewPlaying] = useState(false);
   const [todayTomatoes, setTodayTomatoes] = useState(0);
@@ -705,36 +678,12 @@ function PomodoroTimer() {
         </div>
       </div>
 
-      {showGuide && (
-        <div className="p-guide-overlay" onClick={() => setShowGuide(false)}>
-          <div className="p-guide-card" onClick={e => e.stopPropagation()}>
-            <h2>{t("pomodoro.guide")}</h2>
-            <h3>{t("pomodoro.guide.what")}</h3>
-            <p>{t("pomodoro.guide.what.desc")}</p>
-            <ol>
-              <li>{t("pomodoro.guide.step1")}</li>
-              <li>{t("pomodoro.guide.step2")}</li>
-              <li>{t("pomodoro.guide.step3")}</li>
-              <li>{t("pomodoro.guide.step4")}</li>
-              <li>{t("pomodoro.guide.step5")}</li>
-            </ol>
-            <p className="p-guide-tip">{t("pomodoro.guide.customize")}</p>
-            <button className="p-guide-close" onClick={() => setShowGuide(false)}>
-              {t("common.close")}
-            </button>
-          </div>
-        </div>
-      )}
-
       <header className="p-hdr">
         <button aria-label={t("nav.menu")} onClick={() => setShowDrawer(true)}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
         </button>
         <h1>{completed ? t("pomodoro.completed", { mode: modeLabel }) : t("pomodoro.inProgress", { mode: modeLabel })}</h1>
         <div className="flex items-center gap-1">
-          <button aria-label={t("pomodoro.guide")} onClick={() => setShowGuide(true)}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          </button>
           <button aria-label={t("pomodoro.sound")} onClick={() => {
             setSoundEnabled(s => { const n = !s; try { localStorage.setItem('pomodoro_sound', n ? 'on' : 'off'); } catch {} return n; });
           }}>
