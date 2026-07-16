@@ -57,6 +57,66 @@ export const Route = createFileRoute("/pomodoro")({
             inLanguage: lang === "zh" ? "zh-CN" : "en-US",
           }),
         },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: lang === "zh" ? [
+              {
+                "@type": "Question",
+                name: "什么是番茄工作法？",
+                acceptedAnswer: { "@type": "Answer", text: "番茄工作法是一种时间管理方法，将工作分为 25 分钟的专注时段，中间穿插短暂休息。每完成 4 个专注时段后，进行一次长休息，帮助保持高效专注。" },
+              },
+              {
+                "@type": "Question",
+                name: "一个番茄时段多久？",
+                acceptedAnswer: { "@type": "Answer", text: "默认每个番茄时段为 25 分钟专注。你可以在设置中自定义专注时长、短休息和长休息的时间。" },
+              },
+              {
+                "@type": "Question",
+                name: "一天应该完成几个番茄？",
+                acceptedAnswer: { "@type": "Answer", text: "因人而异，初学者可以从每天 4-6 个番茄开始，有经验的用户通常每天完成 8-12 个番茄。关键在于保持节奏，而不是追求数量。" },
+              },
+              {
+                "@type": "Question",
+                name: "番茄时钟免费吗？",
+                acceptedAnswer: { "@type": "Answer", text: "完全免费，无需注册即可使用。登录后可以追踪每日完成的番茄数量，帮助更好地管理时间。" },
+              },
+              {
+                "@type": "Question",
+                name: "可以自定义时长和提示音吗？",
+                acceptedAnswer: { "@type": "Answer", text: "可以。点击左上角菜单按钮，在设置中可分别调整专注时长、短休息时长、长休息时长，以及选择 5 种不同的提示音效。" },
+              },
+            ] : [
+              {
+                "@type": "Question",
+                name: "What is the Pomodoro Technique?",
+                acceptedAnswer: { "@type": "Answer", text: "The Pomodoro Technique is a time management method that breaks work into 25-minute focus sessions separated by short breaks. After every 4 focus sessions, take a longer break to maintain productivity." },
+              },
+              {
+                "@type": "Question",
+                name: "How long is a Pomodoro session?",
+                acceptedAnswer: { "@type": "Answer", text: "By default, each Pomodoro session is 25 minutes of focused work. You can customize the focus duration, short break, and long break in the Settings menu." },
+              },
+              {
+                "@type": "Question",
+                name: "How many Pomodoros should I do per day?",
+                acceptedAnswer: { "@type": "Answer", text: "It varies by individual. Beginners can start with 4-6 Pomodoros per day, while experienced users typically complete 8-12. The key is maintaining a sustainable rhythm rather than chasing a specific number." },
+              },
+              {
+                "@type": "Question",
+                name: "Is this Pomodoro timer free?",
+                acceptedAnswer: { "@type": "Answer", text: "Yes, it is completely free with no sign-up required. Logging in allows you to track your daily completed Pomodoros and monitor your productivity over time." },
+              },
+              {
+                "@type": "Question",
+                name: "Can I customize the duration and alarm sounds?",
+                acceptedAnswer: { "@type": "Answer", text: "Yes. Click the menu button in the top-left corner to open Settings, where you can adjust the focus duration, short break, and long break, and choose from 5 different alarm melodies." },
+              },
+            ],
+          }),
+        },
       ],
     };
   },
@@ -115,11 +175,31 @@ function getColors(pct: number) {
   };
 }
 
+function GuideContent() {
+  const { t } = useTranslation();
+  return (
+    <section className="p-guide-section">
+      <h2>{t("pomodoro.guide")}</h2>
+      <h3>{t("pomodoro.guide.what")}</h3>
+      <p>{t("pomodoro.guide.what.desc")}</p>
+      <ol>
+        <li>{t("pomodoro.guide.step1")}</li>
+        <li>{t("pomodoro.guide.step2")}</li>
+        <li>{t("pomodoro.guide.step3")}</li>
+        <li>{t("pomodoro.guide.step4")}</li>
+        <li>{t("pomodoro.guide.step5")}</li>
+      </ol>
+      <p className="p-guide-tip">{t("pomodoro.guide.customize")}</p>
+    </section>
+  );
+}
+
 function PomodoroPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center pomodoro-outer">
-      <style>{`
-        .pomodoro-app {
+    <>
+      <div className="min-h-screen flex flex-col items-center pomodoro-outer">
+        <style>{`
+          .pomodoro-app {
           width: 100%; height: 100%; max-width: 420px; max-height: 900px;
           display: flex; flex-direction: column; position: relative; overflow: hidden;
           transition: background 1.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -231,9 +311,45 @@ function PomodoroPage() {
         .p-settings-actions { display: flex; gap: 10px; margin-top: 20px; }
         .p-settings-actions .p-btn { flex: 1; min-width: 0; padding: 10px 0; font-size: 14px; }
 
+        .p-guide-overlay {
+          position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 100;
+          backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center;
+          padding: 20px; transition: opacity .3s;
+        }
+        .p-guide-card {
+          background: rgba(255,255,255,0.96); backdrop-filter: blur(12px);
+          border-radius: 20px; max-width: 380px; width: 100%; max-height: 80vh;
+          overflow-y: auto; padding: 28px 24px; box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+          animation: p-guide-in .3s ease;
+        }
+        @keyframes p-guide-in {
+          from { opacity: 0; transform: scale(0.95) translateY(10px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .p-guide-card h2 { font-size: 18px; font-weight: 700; color: #3e3e3e; margin-bottom: 16px; letter-spacing: .3px; }
+        .p-guide-card h3 { font-size: 14px; font-weight: 700; color: #e57373; margin: 16px 0 6px; letter-spacing: .3px; }
+        .p-guide-card p { font-size: 14px; color: #5a5a5a; line-height: 1.7; margin-bottom: 8px; }
+        .p-guide-card ol { margin: 0 0 12px; padding-left: 20px; }
+        .p-guide-card li { font-size: 14px; color: #5a5a5a; line-height: 1.8; margin-bottom: 4px; }
+        .p-guide-card .p-guide-tip { font-size: 13px; color: #999; font-style: italic; margin-top: 4px; }
+        .p-guide-close { display: block; width: 100%; margin-top: 16px; padding: 10px; border: none;
+          border-radius: 12px; background: #e57373; color: #fff; font-size: 15px; font-weight: 600;
+          cursor: pointer; transition: background .2s; }
+        .p-guide-close:hover { background: #d35f5f; }
+
+        .p-guide-section { max-width: 640px; margin: 48px auto; padding: 0 24px 64px; }
+        .p-guide-section h2 { font-size: 24px; font-weight: 700; color: #3e3e3e; margin-bottom: 20px; text-align: center; letter-spacing: .5px; }
+        .p-guide-section h3 { font-size: 18px; font-weight: 700; color: #e57373; margin-bottom: 10px; }
+        .p-guide-section p { font-size: 15px; color: #5a5a5a; line-height: 1.8; margin-bottom: 16px; }
+        .p-guide-section ol { margin: 0 0 20px; padding-left: 24px; }
+        .p-guide-section li { font-size: 15px; color: #5a5a5a; line-height: 1.9; margin-bottom: 8px; }
+        .p-guide-section .p-guide-tip { font-size: 14px; color: #999; font-style: italic; text-align: center; }
+
       `}</style>
       <PomodoroTimer />
     </div>
+    <GuideContent />
+  </>
   );
 }
 
@@ -300,6 +416,7 @@ function PomodoroTimer() {
   const [completed, setCompleted] = useState(false);
   const [fading, setFading] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
   const [alarmIndex, setAlarmIndex] = useState(0);
   const [previewPlaying, setPreviewPlaying] = useState(false);
   const [todayTomatoes, setTodayTomatoes] = useState(0);
@@ -588,20 +705,46 @@ function PomodoroTimer() {
         </div>
       </div>
 
+      {showGuide && (
+        <div className="p-guide-overlay" onClick={() => setShowGuide(false)}>
+          <div className="p-guide-card" onClick={e => e.stopPropagation()}>
+            <h2>{t("pomodoro.guide")}</h2>
+            <h3>{t("pomodoro.guide.what")}</h3>
+            <p>{t("pomodoro.guide.what.desc")}</p>
+            <ol>
+              <li>{t("pomodoro.guide.step1")}</li>
+              <li>{t("pomodoro.guide.step2")}</li>
+              <li>{t("pomodoro.guide.step3")}</li>
+              <li>{t("pomodoro.guide.step4")}</li>
+              <li>{t("pomodoro.guide.step5")}</li>
+            </ol>
+            <p className="p-guide-tip">{t("pomodoro.guide.customize")}</p>
+            <button className="p-guide-close" onClick={() => setShowGuide(false)}>
+              {t("common.close")}
+            </button>
+          </div>
+        </div>
+      )}
+
       <header className="p-hdr">
         <button aria-label={t("nav.menu")} onClick={() => setShowDrawer(true)}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
         </button>
         <h1>{completed ? t("pomodoro.completed", { mode: modeLabel }) : t("pomodoro.inProgress", { mode: modeLabel })}</h1>
-        <button aria-label={t("pomodoro.sound")} onClick={() => {
-          setSoundEnabled(s => { const n = !s; try { localStorage.setItem('pomodoro_sound', n ? 'on' : 'off'); } catch {} return n; });
-        }}>
-          {soundEnabled ? (
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-          ) : (
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
-          )}
-        </button>
+        <div className="flex items-center gap-1">
+          <button aria-label={t("pomodoro.guide")} onClick={() => setShowGuide(true)}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </button>
+          <button aria-label={t("pomodoro.sound")} onClick={() => {
+            setSoundEnabled(s => { const n = !s; try { localStorage.setItem('pomodoro_sound', n ? 'on' : 'off'); } catch {} return n; });
+          }}>
+            {soundEnabled ? (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+            ) : (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+            )}
+          </button>
+        </div>
       </header>
 
       <main className="p-main">
