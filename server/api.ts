@@ -111,21 +111,20 @@ async function deletePageFromBucket(bucket: R2Bucket, id: string) {
 
 const TMP_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
 
-function isExpired(createdAt: string | undefined): boolean {
-  if (!createdAt) return true;
-  const ts = Number(createdAt);
-  if (isNaN(ts)) return true;
-  return Date.now() - ts > TMP_EXPIRY_MS;
+
+function isExpiredByUploaded(uploaded: Date | undefined): boolean {
+  if (!uploaded) return true;
+  return Date.now() - uploaded.getTime() > TMP_EXPIRY_MS;
 }
 
 async function cleanupAnonymousUploads(bucket: R2Bucket): Promise<number> {
   let deleted = 0;
   let cursor: string | undefined;
   do {
-    const listed = await bucket.list({ prefix: "tmp/", cursor, include: ["customMetadata"] } as any);
+    const listed = await bucket.list({ prefix: "tmp/", cursor });
     const toDelete: string[] = [];
     for (const obj of listed.objects) {
-      if (isExpired(obj.customMetadata?.createdAt)) {
+      if (isExpiredByUploaded(obj.uploaded)) {
         toDelete.push(obj.key);
       }
     }
@@ -1010,7 +1009,7 @@ api.get("/p/*", async (c) => {
     if (!obj) return c.html(notFoundHtml(), 404);
 
     // Lazy cleanup for expired tmp uploads
-    if (isTmp && isExpired(obj.customMetadata?.createdAt)) {
+    if (isTmp && isExpiredByUploaded(obj.uploaded)) {
       await deleteTmpByBucketId(bucket, id);
       return c.html(notFoundHtml(), 404);
     }
@@ -1040,7 +1039,7 @@ api.get("/p/*", async (c) => {
   }
 
   // Lazy cleanup: delete expired anonymous tmp uploads
-  if (obj.key?.startsWith("tmp/") && isExpired(obj.customMetadata?.createdAt)) {
+  if (obj.key?.startsWith("tmp/") && isExpiredByUploaded(obj.uploaded)) {
     await deleteTmpByBucketId(bucket, id);
     return c.html(notFoundHtml(), 404);
   }

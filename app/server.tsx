@@ -101,9 +101,12 @@ app.all("*", (c) => {
 
 // Cron trigger: cleanup expired anonymous uploads every hour
 export async function scheduled(_event: ScheduledEvent, env: Bindings, _ctx: ExecutionContext) {
-  if (env.BUCKET) {
+  if (!env.BUCKET) return;
+  try {
     const count = await cleanupAnonymousUploads(env.BUCKET);
     console.log(`[cron] cleaned up ${count} expired anonymous upload(s)`);
+  } catch (err) {
+    console.error("[cron] cleanup failed:", err);
   }
 }
 
