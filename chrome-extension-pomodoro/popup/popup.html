@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>100mini Pomodoro</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <div class="logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/>
+          </svg>
+        </div>
+        <span class="header-title">100mini Pomodoro</span>
+      </div>
+      <div class="header-right">
+        <button id="settingsBtn" class="btn-icon" title="Settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Settings Drawer -->
+    <div id="settingsDrawer" class="drawer hidden">
+      <div class="drawer-backdrop"></div>
+      <div class="drawer-content">
+        <div class="drawer-header">
+          <span class="drawer-title">Pomodoro Settings</span>
+          <button id="closeSettingsBtn" class="btn-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="drawer-body">
+          <div class="field">
+            <label class="field-label">Focus Duration</label>
+            <select id="settingFocus">
+              <option value="15">15 min</option>
+              <option value="20">20 min</option>
+              <option value="25" selected>25 min</option>
+              <option value="30">30 min</option>
+              <option value="40">40 min</option>
+              <option value="50">50 min</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label">Short Break</label>
+            <select id="settingShortBreak">
+              <option value="3">3 min</option>
+              <option value="5" selected>5 min</option>
+              <option value="10">10 min</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label">Long Break</label>
+            <select id="settingLongBreak">
+              <option value="10">10 min</option>
+              <option value="15" selected>15 min</option>
+              <option value="20">20 min</option>
+              <option value="30">30 min</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="checkbox-label">
+              <input type="checkbox" id="settingSound" checked>
+              Sound
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timer Section -->
+    <div class="timer-section" id="timerSection">
+      <div id="loadingState" class="loading-state">Loading...</div>
+      <div class="timer-wrap">
+        <svg class="timer-svg" viewBox="0 0 200 200">
+          <circle class="timer-bg" cx="100" cy="100" r="80" />
+          <circle id="timerRing" class="timer-progress" cx="100" cy="100" r="80" />
+        </svg>
+        <div class="sprite-container">
+          <img id="spriteImg" src="https://100mini.com/spritesheet2/frame_00.webp" alt="Tomato growth">
+        </div>
+        <div class="time-display" id="timeDisplay">25:00</div>
+      </div>
+      <div class="stage-text" id="stageTitle">Plant the seed of focus</div>
+      <div class="stage-desc" id="stageDesc">Stay focused, the tomato will grow</div>
+
+      <button id="mainBtn" class="btn-main">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20"/></svg>
+        <span id="mainBtnText">Start</span>
+      </button>
+
+    </div>
+
+    <!-- Bottom Section -->
+    <div class="bottom-section">
+      <div id="authSection" class="auth-section">
+        <!-- Dynamic: logged in or login prompt -->
+      </div>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
