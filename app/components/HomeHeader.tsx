@@ -8,6 +8,7 @@ import { Button } from "~/components/ui/button";
 import { AuthDialog } from "~/components/AuthDialog";
 import { useTranslation } from "react-i18next";
 import { LangSwitcher } from "~/components/LangSwitcher";
+import { fetchSquareData } from "~/lib/square-server";
 
 interface AppNavProps {
   searchQuery?: string;
@@ -80,6 +81,13 @@ function handleBookmark() {
   }
 }
 
+let _prefetching = false;
+function prefetchSquare() {
+  if (_prefetching) return;
+  _prefetching = true;
+  fetchSquareData({ data: { offset: 0 } }).catch(() => {}).finally(() => { _prefetching = false; });
+}
+
 export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
   const { t } = useTranslation();
   const { user, refreshAuth, isMember, membershipExpiresAt } = useAuth();
@@ -143,7 +151,9 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
             </Link>
             <div className="hidden items-center gap-6 md:flex">
               <NavLink href="/">{t("nav.home")}</NavLink>
-              <NavLink href="/square">{t("nav.square")}</NavLink>
+              <div onPointerEnter={prefetchSquare}>
+                <NavLink href="/square">{t("nav.square")}</NavLink>
+              </div>
               <NavLink href="/pomodoro">{t("nav.pomodoro")}</NavLink>
             </div>
           </div>
@@ -185,7 +195,9 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
           <div className="border-t border-[#d3e4fe] dark:border-[#3c4a42] bg-white dark:bg-[#0b1c30] md:hidden">
             <div className="flex flex-col gap-1 px-6 py-4">
               <MobileNavLink href="/" onClick={() => setMobileNavOpen(false)}>{t("nav.home")}</MobileNavLink>
-              <MobileNavLink href="/square" onClick={() => setMobileNavOpen(false)}>{t("nav.square")}</MobileNavLink>
+              <div onPointerEnter={prefetchSquare}>
+                <MobileNavLink href="/square" onClick={() => setMobileNavOpen(false)}>{t("nav.square")}</MobileNavLink>
+              </div>
               <MobileNavLink href="/pomodoro" onClick={() => setMobileNavOpen(false)}>{t("nav.pomodoro")}</MobileNavLink>
               <div className="px-4 pt-2">
                 <LangSwitcher />
@@ -211,7 +223,9 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
           </Link>
           <div className="hidden items-center gap-6 md:flex">
             <NavLink href="/">{t("nav.home")}</NavLink>
-            <NavLink href="/square">{t("nav.square")}</NavLink>
+            <div onPointerEnter={prefetchSquare}>
+              <NavLink href="/square">{t("nav.square")}</NavLink>
+            </div>
             <NavLink href="/pomodoro">{t("nav.pomodoro")}</NavLink>
             <NavLink href="/links">{t("nav.profile")}</NavLink>
             {user.role === "admin" && (
@@ -315,7 +329,9 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
         <div className="border-t border-[#d3e4fe] dark:border-[#3c4a42] bg-white dark:bg-[#0b1c30] md:hidden">
           <div className="flex flex-col gap-1 px-6 py-4">
             <MobileNavLink href="/" onClick={() => setMobileNavOpen(false)}>{t("nav.home")}</MobileNavLink>
-            <MobileNavLink href="/square" onClick={() => setMobileNavOpen(false)}>{t("nav.square")}</MobileNavLink>
+            <div onPointerEnter={prefetchSquare}>
+              <MobileNavLink href="/square" onClick={() => setMobileNavOpen(false)}>{t("nav.square")}</MobileNavLink>
+            </div>
             <MobileNavLink href="/pomodoro" onClick={() => setMobileNavOpen(false)}>{t("nav.pomodoro")}</MobileNavLink>
             <MobileNavLink href="/links" onClick={() => setMobileNavOpen(false)}>{t("nav.profile")}</MobileNavLink>
             {user.role === "admin" && (
