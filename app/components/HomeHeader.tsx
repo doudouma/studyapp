@@ -164,16 +164,16 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
             >
               <Bookmark className="size-4" />
             </button>
-            <div className="hidden md:block">
-            <LangSwitcher />
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setAuthOpen(true)}
-          >
-            {t("nav.login")}
-          </Button>
+            <div className="hidden md:flex items-center size-9">
+              <LangSwitcher />
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setAuthOpen(true)}
+            >
+              {t("nav.login")}
+            </Button>
           </div>
           <AuthDialog
             open={authOpen}
@@ -253,7 +253,7 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
           >
             <Bookmark className="size-4" />
           </button>
-          <div className="hidden md:block">
+          <div className="hidden md:flex items-center size-9">
             <LangSwitcher />
           </div>
           <div className="relative" ref={menuRef}>
