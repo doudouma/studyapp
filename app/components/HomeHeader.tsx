@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { Code2, Search, Settings, LogOut, Menu, X } from "lucide-react";
+import { Code2, Search, Settings, LogOut, Menu, X, Bookmark } from "lucide-react";
 import { Input } from "~/components/ui/input";
 import { authClient } from "~/lib/auth-client";
 import { useAuth } from "~/lib/auth-context";
@@ -55,6 +55,29 @@ function MobileNavLink({ href, onClick, children }: { href: string; onClick: () 
       {children}
     </Link>
   );
+}
+
+function handleBookmark() {
+  const url = window.location.href;
+  const title = document.title;
+
+  const win = window as unknown as {
+    sidebar?: { addPanel: (t: string, u: string, s: string) => void };
+    external?: { AddFavorite?: (u: string, t: string) => void };
+  };
+
+  if (win.sidebar?.addPanel) {
+    // Firefox (legacy)
+    win.sidebar.addPanel(title, url, "");
+  } else if (win.external?.AddFavorite) {
+    // Internet Explorer / legacy Edge
+    win.external.AddFavorite(url, title);
+  } else {
+    // Chrome, Safari, modern Edge, modern Firefox
+    const isMac = navigator.userAgent.includes("Mac");
+    const key = isMac ? "Cmd" : "Ctrl";
+    alert(`Press ${key}+D to bookmark this page`);
+  }
 }
 
 export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
@@ -133,6 +156,14 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
             {mobileNavOpen ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
           <div className="flex items-center gap-2">
+            <button
+              className="hidden sm:flex items-center justify-center size-9 rounded-md text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              onClick={handleBookmark}
+              title={t("nav.bookmark")}
+              aria-label={t("nav.bookmark")}
+            >
+              <Bookmark className="size-4" />
+            </button>
             <div className="hidden md:block">
             <LangSwitcher />
           </div>
@@ -214,6 +245,14 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
           <Button variant="ghost" size="icon" className="size-9">
             <Settings className="size-4" />
           </Button> */}
+          <button
+            className="hidden sm:flex items-center justify-center size-9 rounded-md text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            onClick={handleBookmark}
+            title={t("nav.bookmark")}
+            aria-label={t("nav.bookmark")}
+          >
+            <Bookmark className="size-4" />
+          </button>
           <div className="hidden md:block">
             <LangSwitcher />
           </div>
