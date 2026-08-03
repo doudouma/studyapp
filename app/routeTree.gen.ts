@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SquareRouteImport } from './routes/square'
+import { Route as RhythmRouteImport } from './routes/rhythm'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PomodoroRouteImport } from './routes/pomodoro'
 import { Route as LinksRouteImport } from './routes/links'
@@ -27,6 +28,11 @@ const TermsRoute = TermsRouteImport.update({
 const SquareRoute = SquareRouteImport.update({
   id: '/square',
   path: '/square',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RhythmRoute = RhythmRouteImport.update({
+  id: '/rhythm',
+  path: '/rhythm',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/links': typeof LinksRoute
   '/pomodoro': typeof PomodoroRoute
   '/privacy': typeof PrivacyRoute
+  '/rhythm': typeof RhythmRoute
   '/square': typeof SquareRoute
   '/terms': typeof TermsRoute
 }
@@ -84,6 +91,7 @@ export interface FileRoutesByTo {
   '/links': typeof LinksRoute
   '/pomodoro': typeof PomodoroRoute
   '/privacy': typeof PrivacyRoute
+  '/rhythm': typeof RhythmRoute
   '/square': typeof SquareRoute
   '/terms': typeof TermsRoute
 }
@@ -96,6 +104,7 @@ export interface FileRoutesById {
   '/links': typeof LinksRoute
   '/pomodoro': typeof PomodoroRoute
   '/privacy': typeof PrivacyRoute
+  '/rhythm': typeof RhythmRoute
   '/square': typeof SquareRoute
   '/terms': typeof TermsRoute
 }
@@ -109,6 +118,7 @@ export interface FileRouteTypes {
     | '/links'
     | '/pomodoro'
     | '/privacy'
+    | '/rhythm'
     | '/square'
     | '/terms'
   fileRoutesByTo: FileRoutesByTo
@@ -120,6 +130,7 @@ export interface FileRouteTypes {
     | '/links'
     | '/pomodoro'
     | '/privacy'
+    | '/rhythm'
     | '/square'
     | '/terms'
   id:
@@ -131,6 +142,7 @@ export interface FileRouteTypes {
     | '/links'
     | '/pomodoro'
     | '/privacy'
+    | '/rhythm'
     | '/square'
     | '/terms'
   fileRoutesById: FileRoutesById
@@ -143,6 +155,7 @@ export interface RootRouteChildren {
   LinksRoute: typeof LinksRoute
   PomodoroRoute: typeof PomodoroRoute
   PrivacyRoute: typeof PrivacyRoute
+  RhythmRoute: typeof RhythmRoute
   SquareRoute: typeof SquareRoute
   TermsRoute: typeof TermsRoute
 }
@@ -161,6 +174,13 @@ declare module '@tanstack/react-router' {
       path: '/square'
       fullPath: '/square'
       preLoaderRoute: typeof SquareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rhythm': {
+      id: '/rhythm'
+      path: '/rhythm'
+      fullPath: '/rhythm'
+      preLoaderRoute: typeof RhythmRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -223,6 +243,7 @@ const rootRouteChildren: RootRouteChildren = {
   LinksRoute: LinksRoute,
   PomodoroRoute: PomodoroRoute,
   PrivacyRoute: PrivacyRoute,
+  RhythmRoute: RhythmRoute,
   SquareRoute: SquareRoute,
   TermsRoute: TermsRoute,
 }
