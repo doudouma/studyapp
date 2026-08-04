@@ -10,10 +10,6 @@ export const Route = createFileRoute("/rhythm")({
   head: () => {
     const lang = i18n.language?.startsWith("zh") ? "zh" : "en";
     const pageUrl = "https://100mini.com/rhythm";
-    const altUrls = {
-      zh: "https://100mini.com/rhythm",
-      en: "https://100mini.com/en/rhythm",
-    };
     const faqs = Array.from({ length: 5 }, (_, i) => ({
       name: i18n.t(`rhythm.faq${i + 1}.q`),
       text: i18n.t(`rhythm.faq${i + 1}.a`),
@@ -37,10 +33,7 @@ export const Route = createFileRoute("/rhythm")({
         { name: "twitter:image", content: "https://100mini.com/spritesheet2/frame_38.webp" },
       ],
       links: [
-        { rel: "canonical", href: altUrls[lang] || pageUrl },
-        { rel: "alternate", hrefLang: "zh", href: altUrls.zh },
-        { rel: "alternate", hrefLang: "en", href: altUrls.en },
-        { rel: "alternate", hrefLang: "x-default", href: pageUrl },
+        { rel: "canonical", href: pageUrl },
       ],
       scripts: [
         {

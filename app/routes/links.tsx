@@ -84,8 +84,11 @@ function LinksPage() {
   useEffect(() => {
     if (user) {
       fetchPages();
-      fetch("/api/pomodoro/today-count").then(r => r.json()).then(d => {
-        if (d && typeof d.today === "number") setPomoCount(d);
+      fetch("/api/pomodoro/today-count").then(r => r.json()).then((d) => {
+        const count = d as Partial<PomodoroCount>;
+        if (count && typeof count.today === "number" && typeof count.total === "number") {
+          setPomoCount({ today: count.today, total: count.total });
+        }
       }).catch(() => {});
     } else if (!authLoading) {
       setLoading(false);

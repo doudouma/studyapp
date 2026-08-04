@@ -1,4 +1,4 @@
-export function parseAcceptLanguage(header: string | null): string {
+export function parseAcceptLanguage(header: string | null | undefined): string {
   if (!header) return "zh";
   const langs = header.split(",").map((l) => {
     const [lang, q = "1"] = l.trim().split(";q=");

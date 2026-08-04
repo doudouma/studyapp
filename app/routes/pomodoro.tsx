@@ -12,10 +12,6 @@ export const Route = createFileRoute("/pomodoro")({
     const keywords = i18n.t("pomodoro.keywords");
     const lang = i18n.language?.startsWith("zh") ? "zh" : "en";
     const pageUrl = "https://100mini.com/pomodoro";
-    const altUrls = {
-      zh: "https://100mini.com/pomodoro",
-      en: "https://100mini.com/en/pomodoro",
-    };
     return {
       title,
       meta: [
@@ -35,10 +31,7 @@ export const Route = createFileRoute("/pomodoro")({
         { name: "twitter:image", content: "https://100mini.com/spritesheet2/frame_38.webp" },
       ],
       links: [
-        { rel: "canonical", href: altUrls[lang] || pageUrl },
-        { rel: "alternate", hrefLang: "zh", href: altUrls.zh },
-        { rel: "alternate", hrefLang: "en", href: altUrls.en },
-        { rel: "alternate", hrefLang: "x-default", href: pageUrl },
+        { rel: "canonical", href: pageUrl },
       ],
       scripts: [
         {

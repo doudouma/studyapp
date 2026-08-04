@@ -54,7 +54,7 @@ function PreviewCell({ item, index }: { item: SquareItem; index: number }) {
       alt={item.title}
       className="absolute inset-0 w-full h-full object-contain transition-transform group-hover:scale-105"
       loading={isPriority ? undefined : "lazy"}
-      fetchpriority={index === 0 ? "high" : undefined}
+      fetchPriority={index === 0 ? "high" : undefined}
       onError={() => setShowIframe(true)}
     />
   );
