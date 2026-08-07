@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "100mini Hosting - Instant AI HTML & Web Host",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Instant, 1-click web hosting for AI-generated HTML code from ChatGPT, Claude, Cursor & Gemini. Free, no sign-up required.",
   "homepage_url": "https://100mini.com",
   "icons": {
