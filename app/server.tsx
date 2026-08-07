@@ -99,7 +99,7 @@ app.all("*", (c) => {
   return startHandler(c.req.raw);
 });
 
-// Cron trigger: cleanup expired anonymous uploads every hour
+// Cron trigger: cleanup expired anonymous uploads daily (3 AM UTC)
 export async function scheduled(_event: ScheduledEvent, env: Bindings, _ctx: ExecutionContext) {
   if (!env.BUCKET) return;
   try {

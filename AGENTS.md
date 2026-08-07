@@ -92,7 +92,7 @@ drizzle/            # Drizzle Kit 迁移产物
 
 | 方式 | 触发 | 位置 | 说明 |
 |---|---|---|---|
-| **定时清理** | cron `0 * * * *` (每小时) | `app/server.tsx:98` → `server/api.ts:121` | 全量扫描 `tmp/` 前缀，检查对象 `uploaded` 时间，删除超过 7 天的对象 |
+| **定时清理** | cron `0 3 * * *` (每天 3:00 UTC) | `app/server.tsx:98` → `server/api.ts:121` | 全量扫描 `tmp/` 前缀，检查对象 `uploaded` 时间，删除超过 7 天的对象 |
 | **惰性清理** | 用户访问过期页面时 | `server/api.ts:1048` | 访问过期 `tmp/` 页面时触发，删除后返回 404 |
 | **手动清理** | `POST /api/admin/cleanup-tmp` | `server/api.ts:418` | 管理员手动触发，用于验证 |
 
@@ -128,7 +128,7 @@ TOML 中 `[triggers]` 是一个 section 表头，其后的所有键值对都会�
 **错误示例**（`assets` 和 `routes` 被错误嵌套）：
 ```toml
 [triggers]
-crons = ["0 * * * *"]
+crons = ["0 3 * * *"]
 
 assets = { ... }   # 实际变成 triggers.assets
 routes = [ ... ]   # 实际变成 triggers.routes
@@ -139,7 +139,7 @@ routes = [ ... ]   # 实际变成 triggers.routes
 # ... 所有其他配置 ...
 
 [triggers]
-crons = ["0 * * * *"]
+crons = ["0 3 * * *"]
 ```
 
 ### 静态资源 (ASSETS binding)
