@@ -6,7 +6,7 @@
 
 ## 1. Overview
 
-A lightweight static HTML hosting tool for education. Users paste or drag-drop HTML code, get a shareable short link that renders the page with a security banner. Pages auto-expire after 24 hours.
+A lightweight static HTML hosting tool for education. Users paste or drag-drop HTML code, get a shareable short link that renders the page with a security banner. Pages auto-expire after 7 days.
 
 **Tech Stack**: TanStack Start (React) + Hono + Vercel + Cloudflare R2
 
@@ -20,7 +20,7 @@ User Browser                    Vercel (TanStack Start + Hono)          Cloudfla
      |                                  |                                    |
      |-- POST /api/upload ------------> |                                    |
      |   (HTML content + filename)      |-- PUT object (id.html) ----------> |
-     |                                  |   with 24h lifecycle rule          |
+     |                                  |   with 7d lifecycle rule          |
      |<-- { url: "/p/abc123" } -------- |                                    |
      |                                  |                                    |
      |-- GET /p/abc13 ----------------> |                                    |
@@ -31,7 +31,7 @@ User Browser                    Vercel (TanStack Start + Hono)          Cloudfla
 
 **Key decisions:**
 - No database in MVP — R2 object keys serve as the ID system
-- R2 lifecycle rule handles 24h auto-deletion (zero maintenance)
+- R2 lifecycle rule handles 7d auto-deletion (zero maintenance)
 - Hono handles upload + serve; TanStack Start handles the home page UI
 - `nanoid(7)` generates short random IDs
 
@@ -138,7 +138,7 @@ studyapp/
 
 - **Platform**: Vercel (TanStack Start has a Vercel adapter)
 - **Environment variables**: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`
-- **R2 bucket**: lifecycle rule configured via Cloudflare dashboard (24h object expiry)
+- **R2 bucket**: lifecycle rule configured via Cloudflare dashboard (7d object expiry)
 - **Zip handling**: `fflate` library for extracting index.html from zip files
 
 ## 7. Error Handling

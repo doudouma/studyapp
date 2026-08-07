@@ -86,7 +86,7 @@ drizzle/            # Drizzle Kit 迁移产物
 
 ## 临时文件清理
 
-匿名上传的文件存储在 R2 `tmp/` 前缀下，24 小时后自动销毁。
+匿名上传的文件存储在 R2 `tmp/` 前缀下，7 天后自动销毁。
 
 ### 三路清理机制
 
@@ -100,7 +100,7 @@ drizzle/            # Drizzle Kit 迁移产物
 
 | 函数 | 位置 | 说明 |
 |---|---|---|
-| `isExpired()` | `server/api.ts:114` | 判断 `createdAt` 是否超过 24h，无 metadata/非法值视为过期 |
+| `isExpiredByUploaded()` | `server/api.ts:115` | 判断 `uploaded` 是否超过 7 天，无上传时间视为过期 |
 | `cleanupAnonymousUploads()` | `server/api.ts:121` | 全量遍历 R2 `tmp/` 前缀，分页删除 |
 | `deleteTmpByBucketId()` | `server/api.ts:141` | 按 `tmp/{id}` 前缀删除，同时处理 `tmp/{id}.html` 和 `tmp/{id}/...` 两种格式 |
 

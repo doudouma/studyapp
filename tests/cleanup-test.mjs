@@ -4,7 +4,7 @@
  * 验证 isExpiredByUploaded 和清理函数逻辑正确
  */
 
-const TMP_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24小时
+const TMP_EXPIRY_MS = 7 * 24 * 60 * 60 * 1000; // 7天
 
 function isExpiredByUploaded(uploaded) {
   if (!uploaded) return true;
@@ -45,40 +45,40 @@ try {
   no(`异常: ${e.message}`);
 }
 
-// 4. 23 小时前 → 未过期 (不足24h)
-console.log('\n4️⃣  23小时前上传');
+// 4. 6 天 23 小时前 → 未过期 (不足7天)
+console.log('\n4️⃣  6天23小时前上传');
 try {
-  const d = new Date(Date.now() - 23 * 60 * 60 * 1000);
+  const d = new Date(Date.now() - (6 * 24 + 23) * 60 * 60 * 1000);
   if (!isExpiredByUploaded(d)) ok('未过期');
   else no('不应过期');
 } catch (e) {
   no(`异常: ${e.message}`);
 }
 
-// 5. 25 小时前 → 过期
-console.log('\n5️⃣  25小时前上传');
+// 5. 8 天前 → 过期
+console.log('\n5️⃣  8天前上传');
 try {
-  const d = new Date(Date.now() - 25 * 60 * 60 * 1000);
+  const d = new Date(Date.now() - 8 * 24 * 60 * 60 * 1000);
   if (isExpiredByUploaded(d)) ok('视为过期');
   else no('应视为过期');
 } catch (e) {
   no(`异常: ${e.message}`);
 }
 
-// 6. 正好 24 小时前 → 未过期 (严格大于)
-console.log('\n6️⃣  正好24小时前上传');
+// 6. 正好 7 天前 → 未过期 (严格大于)
+console.log('\n6️⃣  正好7天前上传');
 try {
-  const d = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   if (!isExpiredByUploaded(d)) ok('未过期 (边界)');
   else no('边界情况不应过期');
 } catch (e) {
   no(`异常: ${e.message}`);
 }
 
-// 7. 24小时 + 1ms 前 → 过期
-console.log('\n7️⃣  24小时+1ms前上传');
+// 7. 7天 + 1ms 前 → 过期
+console.log('\n7️⃣  7天+1ms前上传');
 try {
-  const d = new Date(Date.now() - 24 * 60 * 60 * 1000 - 1);
+  const d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000 - 1);
   if (isExpiredByUploaded(d)) ok('视为过期 (边界)');
   else no('边界情况应过期');
 } catch (e) {

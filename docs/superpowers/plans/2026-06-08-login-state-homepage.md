@@ -391,7 +391,7 @@ if (!user) {
       </Card>
 
       <p className="mt-6 text-sm text-muted-foreground">
-        匿名上传 · 24小时后自动销毁 · 单文件最大 5MB
+        匿名上传 · 7天后自动销毁 · 单文件最大 5MB
       </p>
     </main>
   );
