@@ -62,12 +62,14 @@ function LinksPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pomoCount, setPomoCount] = useState<PomodoroCount>({ today: 0, total: 0 });
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
 
   const fetchPages = async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/pages");
+      const res = await fetch(`/api/pages?page=${page}&pageSize=${pageSize}`);
       if (!res.ok) {
         const json = (await res.json()) as { error?: string };
         throw new Error(json.error || t("common.loadFailed"));
@@ -93,7 +95,7 @@ function LinksPage() {
     } else if (!authLoading) {
       setLoading(false);
     }
-  }, [user, authLoading]);
+  }, [user, authLoading, page]);
 
   if (authLoading) return null;
 
@@ -235,14 +237,19 @@ function LinksPage() {
               pages={data?.pages || []}
               total={data?.total || 0}
               limit={data?.limit || 5}
+              page={page}
+              totalPages={Math.max(1, Math.ceil((data?.total || 0) / pageSize))}
+              onPageChange={setPage}
               onRefresh={fetchPages}
               onDelete={(id) => {
                 if (!data) return;
-                setData({
-                  ...data,
-                  pages: data.pages.filter((p) => p.id !== id),
-                  total: data.total - 1,
-                });
+                const remaining = data.pages.filter((p) => p.id !== id);
+                if (remaining.length === 0 && page > 1) {
+                  setData({ ...data, pages: remaining, total: data.total - 1 });
+                  setPage(page - 1);
+                } else {
+                  setData({ ...data, pages: remaining, total: data.total - 1 });
+                }
               }}
             />
           )}

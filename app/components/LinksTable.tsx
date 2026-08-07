@@ -29,6 +29,9 @@ interface LinksTableProps {
   pages: PageLink[];
   total: number;
   limit: number;
+  page?: number;
+  totalPages?: number;
+  onPageChange?: (page: number) => void;
   onDelete: (id: string) => void;
   onRefresh: () => void;
 }
@@ -75,7 +78,7 @@ function QrPopover({ pageId, onClose }: { pageId: string; onClose: () => void })
   );
 }
 
-export function LinksTable({ pages, total, limit, onDelete, onRefresh }: LinksTableProps) {
+export function LinksTable({ pages, total, limit, page = 1, totalPages = 1, onPageChange, onDelete, onRefresh }: LinksTableProps) {
   const { t } = useTranslation();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -272,7 +275,7 @@ export function LinksTable({ pages, total, limit, onDelete, onRefresh }: LinksTa
               </tbody>
             </table>
           </div>
-          <div className="border-t border-border bg-muted/20 px-6 py-3">
+          <div className="border-t border-border bg-muted/20 px-6 py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-xs text-muted-foreground">
               {t("components.linksTable.pagination", { start: pages.length, total })}
               {limit > 0 ? (
@@ -285,6 +288,17 @@ export function LinksTable({ pages, total, limit, onDelete, onRefresh }: LinksTa
                 </span>
               ) : null}
             </p>
+            {totalPages > 1 && onPageChange && (
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
+                  {t("admin.pagination.prev")}
+                </Button>
+                <span className="text-sm text-muted-foreground">{page} / {totalPages}</span>
+                <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => onPageChange(page + 1)}>
+                  {t("admin.pagination.next")}
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       )}

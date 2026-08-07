@@ -447,6 +447,10 @@ api.get("/api/pages", async (c) => {
 
   const db = createDb(c.env.D1);
 
+  const p = Math.max(1, parseInt(c.req.query("page") || "1", 10) || 1);
+  const pageSize = Math.min(100, Math.max(1, parseInt(c.req.query("pageSize") || "10", 10) || 10));
+  const offset = (p - 1) * pageSize;
+
   const [totalResult] = await db
     .select({ count: count() })
     .from(page)
@@ -467,7 +471,9 @@ api.get("/api/pages", async (c) => {
     })
     .from(page)
     .where(eq(page.userId, user.id))
-    .orderBy(desc(page.createdAt));
+    .orderBy(desc(page.createdAt))
+    .limit(pageSize)
+    .offset(offset);
 
   // Check membership for limit
   let limit = FREE_PERMANENT_LIMIT;

@@ -99,7 +99,7 @@ function AdminPage() {
   const [deletePage, setDeletePage] = useState<AdminPageData | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  const pageSize = 20;
+  const pageSize = 10;
 
   // Check auth and admin role
   useEffect(() => {
