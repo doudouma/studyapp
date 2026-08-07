@@ -299,6 +299,7 @@
   "admin.page.deleteDesc": "确定删除 \"{{name}}\"？此操作不可撤销，页面将从广场移除。",
   "admin.page.confirmDelete": "确认删除",
   "admin.page.deleteFailed": "删除失败",
+  "admin.page.view": "查看页面",
   "admin.page.actionFailed": "操作失败",
   "admin.pagination.prev": "上一页",
   "admin.pagination.next": "下一页",

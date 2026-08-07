@@ -299,6 +299,7 @@
   "admin.page.deleteDesc": "Delete \"{{name}}\"? This action cannot be undone. The page will be removed from the Square.",
   "admin.page.confirmDelete": "Confirm Delete",
   "admin.page.deleteFailed": "Delete failed",
+  "admin.page.view": "View page",
   "admin.page.actionFailed": "Action failed",
   "admin.pagination.prev": "Previous",
   "admin.pagination.next": "Next",

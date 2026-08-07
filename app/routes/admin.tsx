@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Shield, Trash2 } from "lucide-react";
+import { Eye, Shield, Trash2 } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { Button } from "~/components/ui/button";
@@ -373,9 +373,16 @@ function AdminPage() {
                           </td>
                           <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">{formatDate(p.createdAt)}</td>
                           <td className="px-4 py-3 text-right">
-                            <Button variant="destructive" size="sm" onClick={() => setDeletePage(p)}>
-                              <Trash2 className="size-3.5" />
-                            </Button>
+                            <div className="flex items-center justify-end gap-2">
+                              <a href={`/p/${p.id}`} target="_blank" rel="noreferrer" title={t("admin.page.view")}>
+                                <Button variant="outline" size="sm" className="px-2">
+                                  <Eye className="size-3.5" />
+                                </Button>
+                              </a>
+                              <Button variant="destructive" size="sm" onClick={() => setDeletePage(p)}>
+                                <Trash2 className="size-3.5" />
+                              </Button>
+                            </div>
                           </td>
                         </tr>
                       ))}
