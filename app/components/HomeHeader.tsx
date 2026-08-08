@@ -156,6 +156,7 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
               </div>
               <NavLink href="/pomodoro">{t("nav.pomodoro")}</NavLink>
               <NavLink href="/rhythm">{t("nav.rhythm")}</NavLink>
+              <NavLink href="/md2html">{t("nav.md2html")}</NavLink>
             </div>
           </div>
 
@@ -201,6 +202,7 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
               </div>
               <MobileNavLink href="/pomodoro" onClick={() => setMobileNavOpen(false)}>{t("nav.pomodoro")}</MobileNavLink>
               <MobileNavLink href="/rhythm" onClick={() => setMobileNavOpen(false)}>{t("nav.rhythm")}</MobileNavLink>
+              <MobileNavLink href="/md2html" onClick={() => setMobileNavOpen(false)}>{t("nav.md2html")}</MobileNavLink>
               <div className="px-4 pt-2">
                 <LangSwitcher />
               </div>
@@ -230,6 +232,7 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
             </div>
             <NavLink href="/pomodoro">{t("nav.pomodoro")}</NavLink>
             <NavLink href="/rhythm">{t("nav.rhythm")}</NavLink>
+            <NavLink href="/md2html">{t("nav.md2html")}</NavLink>
             <NavLink href="/links">{t("nav.profile")}</NavLink>
             {user.role === "admin" && (
               <NavLink href="/admin">{t("nav.admin")}</NavLink>
@@ -337,6 +340,7 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
             </div>
             <MobileNavLink href="/pomodoro" onClick={() => setMobileNavOpen(false)}>{t("nav.pomodoro")}</MobileNavLink>
             <MobileNavLink href="/rhythm" onClick={() => setMobileNavOpen(false)}>{t("nav.rhythm")}</MobileNavLink>
+            <MobileNavLink href="/md2html" onClick={() => setMobileNavOpen(false)}>{t("nav.md2html")}</MobileNavLink>
             <MobileNavLink href="/links" onClick={() => setMobileNavOpen(false)}>{t("nav.profile")}</MobileNavLink>
             {user.role === "admin" && (
               <MobileNavLink href="/admin" onClick={() => setMobileNavOpen(false)}>{t("nav.admin")}</MobileNavLink>

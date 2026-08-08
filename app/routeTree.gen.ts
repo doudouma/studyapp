@@ -14,6 +14,7 @@ import { Route as SquareRouteImport } from './routes/square'
 import { Route as RhythmRouteImport } from './routes/rhythm'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PomodoroRouteImport } from './routes/pomodoro'
+import { Route as Md2htmlRouteImport } from './routes/md2html'
 import { Route as LinksRouteImport } from './routes/links'
 import { Route as CookieRouteImport } from './routes/cookie'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -43,6 +44,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const PomodoroRoute = PomodoroRouteImport.update({
   id: '/pomodoro',
   path: '/pomodoro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Md2htmlRoute = Md2htmlRouteImport.update({
+  id: '/md2html',
+  path: '/md2html',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LinksRoute = LinksRouteImport.update({
@@ -77,6 +83,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/cookie': typeof CookieRoute
   '/links': typeof LinksRoute
+  '/md2html': typeof Md2htmlRoute
   '/pomodoro': typeof PomodoroRoute
   '/privacy': typeof PrivacyRoute
   '/rhythm': typeof RhythmRoute
@@ -89,6 +96,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/cookie': typeof CookieRoute
   '/links': typeof LinksRoute
+  '/md2html': typeof Md2htmlRoute
   '/pomodoro': typeof PomodoroRoute
   '/privacy': typeof PrivacyRoute
   '/rhythm': typeof RhythmRoute
@@ -102,6 +110,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/cookie': typeof CookieRoute
   '/links': typeof LinksRoute
+  '/md2html': typeof Md2htmlRoute
   '/pomodoro': typeof PomodoroRoute
   '/privacy': typeof PrivacyRoute
   '/rhythm': typeof RhythmRoute
@@ -116,6 +125,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cookie'
     | '/links'
+    | '/md2html'
     | '/pomodoro'
     | '/privacy'
     | '/rhythm'
@@ -128,6 +138,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cookie'
     | '/links'
+    | '/md2html'
     | '/pomodoro'
     | '/privacy'
     | '/rhythm'
@@ -140,6 +151,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cookie'
     | '/links'
+    | '/md2html'
     | '/pomodoro'
     | '/privacy'
     | '/rhythm'
@@ -153,6 +165,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   CookieRoute: typeof CookieRoute
   LinksRoute: typeof LinksRoute
+  Md2htmlRoute: typeof Md2htmlRoute
   PomodoroRoute: typeof PomodoroRoute
   PrivacyRoute: typeof PrivacyRoute
   RhythmRoute: typeof RhythmRoute
@@ -195,6 +208,13 @@ declare module '@tanstack/react-router' {
       path: '/pomodoro'
       fullPath: '/pomodoro'
       preLoaderRoute: typeof PomodoroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/md2html': {
+      id: '/md2html'
+      path: '/md2html'
+      fullPath: '/md2html'
+      preLoaderRoute: typeof Md2htmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/links': {
@@ -241,6 +261,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   CookieRoute: CookieRoute,
   LinksRoute: LinksRoute,
+  Md2htmlRoute: Md2htmlRoute,
   PomodoroRoute: PomodoroRoute,
   PrivacyRoute: PrivacyRoute,
   RhythmRoute: RhythmRoute,
