@@ -15,8 +15,8 @@ export const Route = createFileRoute("/rhythm")({
       text: i18n.t(`rhythm.faq${i + 1}.a`),
     }));
     return {
-      title: i18n.t("rhythm.title"),
       meta: [
+        { title: i18n.t("rhythm.title") },
         { name: "description", content: i18n.t("rhythm.desc") },
         { name: "keywords", content: i18n.t("rhythm.keywords") },
         { name: "robots", content: "index, follow" },

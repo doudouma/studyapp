@@ -6,8 +6,8 @@ import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/cookie")({
   head: () => ({
-    title: i18n.t("cookie.title"),
     meta: [
+      { title: i18n.t("cookie.title") },
       { name: "description", content: i18n.t("cookie.desc") },
     ],
   }),

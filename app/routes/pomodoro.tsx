@@ -13,8 +13,8 @@ export const Route = createFileRoute("/pomodoro")({
     const lang = i18n.language?.startsWith("zh") ? "zh" : "en";
     const pageUrl = "https://100mini.com/pomodoro";
     return {
-      title,
       meta: [
+        { title },
         { name: "description", content: desc },
         { name: "keywords", content: keywords },
         { name: "robots", content: "index, follow" },

@@ -6,8 +6,8 @@ import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/privacy")({
   head: () => ({
-    title: i18n.t("privacy.title"),
     meta: [
+      { title: i18n.t("privacy.title") },
       { name: "description", content: i18n.t("privacy.desc") },
     ],
   }),

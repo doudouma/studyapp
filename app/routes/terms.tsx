@@ -6,8 +6,8 @@ import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/terms")({
   head: () => ({
-    title: i18n.t("terms.title"),
     meta: [
+      { title: i18n.t("terms.title") },
       { name: "description", content: i18n.t("terms.desc") },
     ],
   }),

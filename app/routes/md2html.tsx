@@ -19,9 +19,21 @@ import { TagInput } from "~/components/TagInput";
 
 export const Route = createFileRoute("/md2html")({
   head: () => ({
-    title: i18n.t("md2html.title"),
     meta: [
-      { name: "description", content: i18n.t("md2html.subtitle") },
+      { title: i18n.t("md2html.seoTitle") },
+      { name: "description", content: i18n.t("md2html.seoDesc") },
+      { name: "keywords", content: i18n.t("md2html.seoKeywords") },
+      { name: "robots", content: "index, follow" },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://100mini.com/md2html" },
+      { property: "og:title", content: i18n.t("md2html.seoTitle") },
+      { property: "og:description", content: i18n.t("md2html.seoDesc") },
+      { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: i18n.t("md2html.seoTitle") },
+      { name: "twitter:description", content: i18n.t("md2html.seoDesc") },
+    ],
+    links: [
+      { rel: "canonical", href: "https://100mini.com/md2html" },
     ],
   }),
   component: Md2HtmlPage,

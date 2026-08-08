@@ -18,8 +18,8 @@ export const Route = createFileRoute("/square")({
     return fetchSquareData({ data: { offset: 0 } });
   },
   head: () => ({
-    title: i18n.t("square.title"),
     meta: [
+      { title: i18n.t("square.title") },
       {
         name: "description",
         content: i18n.t("square.desc"),

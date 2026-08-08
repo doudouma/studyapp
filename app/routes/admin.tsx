@@ -17,8 +17,8 @@ import i18n from "~/lib/i18n";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
-    title: i18n.t("admin.title"),
     meta: [
+      { title: i18n.t("admin.title") },
       { name: "description", content: i18n.t("admin.desc") },
     ],
   }),

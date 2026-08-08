@@ -9,6 +9,7 @@ import interFontUrl from "@fontsource-variable/inter/files/inter-latin-wght-norm
 export const Route = createRootRoute({
   head: () => ({
     meta: [
+      { title: i18n.t("app.title") },
       { charSet: "utf-8" },
       {
         name: "viewport",
