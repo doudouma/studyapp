@@ -12,7 +12,7 @@ export function TemplatePicker({ value, onChange }: TemplatePickerProps) {
   const zh = i18n.language?.startsWith("zh");
 
   return (
-    <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4 lg:grid-cols-8">
+    <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-5 lg:grid-cols-9">
       {MD_TEMPLATES.map((tpl: MdTemplate) => {
         const selected = tpl.id === value;
         return (

@@ -35,7 +35,7 @@ const DEFAULT_MD_ZH = `# 100mini · 让分享变得如此简单
 ## 🚀 产品亮点
 
 - **秒级上线**：粘贴即发布，无需注册即可使用
-- **8 套品牌模板**：Apple 到 Linear，风格一键切换
+- **9 套品牌模板**：Apple 到 Linear，风格一键切换
 - **任意浏览器打开**：生成的链接支持手机、平板、电脑访问
 - *免费额度*：登录用户可永久保存，匿名用户 7 天自动销毁
 
@@ -111,7 +111,7 @@ npm run build
 
 \`\`\`json
 {
-  "templates": 8,
+  "templates": 9,
   "anonymous": "7 days",
   "permanent": true,
   "maxSize": "5 MB"
@@ -138,7 +138,7 @@ const DEFAULT_MD_EN = `# 100mini · Make Sharing Effortless
 ## 🚀 Key Features
 
 - **Publish in seconds**: paste and publish, no sign-up required
-- **8 brand templates**: from Apple to Linear, switch styles in one click
+- **9 brand templates**: from Apple to Linear, switch styles in one click
 - **Opens in any browser**: works on phones, tablets, and desktops
 - *Free quota*: logged-in users keep pages forever, anonymous pages self-destroy after 7 days
 
@@ -214,7 +214,7 @@ npm run build
 
 \`\`\`json
 {
-  "templates": 8,
+  "templates": 9,
   "anonymous": "7 days",
   "permanent": true,
   "maxSize": "5 MB"

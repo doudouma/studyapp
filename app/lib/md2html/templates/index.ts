@@ -6,6 +6,7 @@ import { tiffany } from "./tiffany";
 import { cola } from "./cola";
 import { linear } from "./linear";
 import { xiaomi } from "./xiaomi";
+import { swiss } from "./swiss";
 import type { MdTemplate } from "./types";
 
 export type { MdTemplate } from "./types";
@@ -18,6 +19,7 @@ export { tiffany } from "./tiffany";
 export { cola } from "./cola";
 export { linear } from "./linear";
 export { xiaomi } from "./xiaomi";
+export { swiss } from "./swiss";
 
 export const MD_TEMPLATES: MdTemplate[] = [
   apple,
@@ -28,6 +30,7 @@ export const MD_TEMPLATES: MdTemplate[] = [
   cola,
   linear,
   xiaomi,
+  swiss,
 ];
 
 export function getTemplate(id: string): MdTemplate {
