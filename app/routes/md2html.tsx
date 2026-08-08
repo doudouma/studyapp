@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { FileText, Wand2, Loader2 } from "lucide-react";
+import { FileText, Upload, Wand2, Loader2 } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { Button } from "~/components/ui/button";
@@ -11,6 +11,7 @@ import { MdPreview } from "~/components/md2html/MdPreview";
 import { ExportMenu } from "~/components/md2html/ExportMenu";
 import { SuccessCard } from "~/components/SuccessCard";
 import { renderMarkdown, extractTitle } from "~/lib/md2html/render";
+import { getTemplate } from "~/lib/md2html/templates";
 import { useAuth } from "~/lib/auth-context";
 import { useTranslation } from "react-i18next";
 import i18n from "~/lib/i18n";
@@ -262,6 +263,7 @@ function Md2HtmlPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang]);
   const [templateId, setTemplateId] = useState("apple");
+  const [variantIndex, setVariantIndex] = useState(0);
   const [html, setHtml] = useState("");
   const [rendering, setRendering] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -283,14 +285,14 @@ function Md2HtmlPage() {
   const contentSize = new Blob([md]).size;
   const canSubmit = md.trim().length > 0 && (!user || title.trim().length > 0);
 
-  const doRender = useCallback(async (text: string, tpl: string) => {
+  const doRender = useCallback(async (text: string, tpl: string, vi: number) => {
     if (!text.trim()) {
       setHtml("");
       return;
     }
     setRendering(true);
     try {
-      const rendered = await renderMarkdown(text, tpl);
+      const rendered = await renderMarkdown(text, tpl, vi);
       setHtml(rendered);
     } catch {
       setHtml(`<pre>${text.replace(/</g, "&lt;")}</pre>`);
@@ -302,12 +304,23 @@ function Md2HtmlPage() {
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      doRender(md, templateId);
+      doRender(md, templateId, variantIndex);
     }, 300);
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [md, templateId, doRender]);
+  }, [md, templateId, variantIndex, doRender]);
+
+  const handleTemplateChange = useCallback((id: string, currentVariant: number) => {
+    if (id === templateId) {
+      const tpl = getTemplate(id);
+      const total = 1 + (tpl.variants?.length ?? 0);
+      setVariantIndex((currentVariant + 1) % total);
+    } else {
+      setTemplateId(id);
+      setVariantIndex(0);
+    }
+  }, [templateId]);
 
   useEffect(() => {
     if (!title && md.trim()) {
@@ -334,7 +347,7 @@ function Md2HtmlPage() {
     setLoading(true);
     setError(null);
     try {
-      const finalHtml = await renderMarkdown(md, templateId);
+      const finalHtml = await renderMarkdown(md, templateId, variantIndex);
       const formData = new FormData();
       formData.append("content", finalHtml);
       formData.append("title", title);
@@ -392,7 +405,7 @@ function Md2HtmlPage() {
       <main className="flex w-full flex-1 flex-col overflow-hidden">
         <div className="flex shrink-0 items-center gap-3 border-b border-border bg-background px-3 py-2">
           <div className="min-w-0 flex-1">
-            <TemplatePicker value={templateId} onChange={setTemplateId} />
+            <TemplatePicker value={templateId} variantIndex={variantIndex} onChange={handleTemplateChange} />
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <ExportMenu html={html} md={md} />
@@ -423,10 +436,12 @@ function Md2HtmlPage() {
                   onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
                 />
                 <Button
-                  variant="outline"
+                  variant="default"
                   size="sm"
+                  className="gap-1.5 font-semibold shadow-sm"
                   onClick={() => fileRef.current?.click()}
                 >
+                  <Upload className="size-3.5" />
                   {t("md2html.importFile")}
                 </Button>
               </div>

@@ -32,4 +32,33 @@ export const tiffany: MdTemplate = {
     .md-body li::marker { color: #81D8D0; }
     .hljs { background: transparent; }
   `,
+  variants: [
+    {
+      swatch: ["#81D8D0", "#0A0A0A", "#FFFFFF"],
+      css: `
+        .md-body { color: #0A0A0A; background: #81D8D0; font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Noto Sans SC", Arial, sans-serif; line-height: 1.7; }
+        .md-body h1, .md-body h2, .md-body h3 { font-family: "Didot", "Bodoni MT", "Playfair Display", "Songti SC", "Noto Serif SC", Georgia, serif; font-weight: 500; line-height: 1.2; color: #0A0A0A; letter-spacing: 0.005em; }
+        .md-body h1 { font-size: 2.2em; }
+        .md-body h1::after { content: ""; display: block; width: 48px; height: 1px; background: #0A0A0A; margin-top: 0.5em; }
+        .md-body h2 { font-size: 1.6em; }
+        .md-body h3 { font-size: 1.2em; color: rgba(10, 10, 10, 0.65); }
+        .md-body em { font-style: italic; color: #0A0A0A; }
+        .md-body a { color: #0A0A0A; font-weight: 600; text-decoration: none; border-bottom: 1px solid #FFFFFF; }
+        .md-body a:hover { border-bottom-color: #0A0A0A; }
+        .md-body strong { font-weight: 600; }
+        .md-body blockquote { border-left: none; border-top: 1px solid #0A0A0A; border-bottom: 1px solid #0A0A0A; margin: 1.6em 0; padding: 0.8em 0.2em; color: rgba(10, 10, 10, 0.75); font-style: italic; font-family: "Didot", "Playfair Display", "Songti SC", "Noto Serif SC", Georgia, serif; }
+        .md-body code { background: #FFFFFF; color: #0A0A0A; padding: 0.12em 0.4em; font-family: "SF Mono", "Menlo", monospace; font-size: 0.88em; }
+        .md-body pre { border: 1px solid #0A0A0A; border-radius: 0; padding: 1em; overflow-x: auto; background: rgba(255, 255, 255, 0.5); }
+        .md-body pre code { background: none; color: #0A0A0A; padding: 0; }
+        .md-body table { border-collapse: collapse; width: 100%; }
+        .md-body th, .md-body td { border-bottom: 1px solid rgba(10, 10, 10, 0.4); padding: 0.6em 0.8em; text-align: left; }
+        .md-body th { border-bottom: 1px solid #0A0A0A; font-weight: 600; }
+        .md-body hr { border: none; border-top: 1px solid rgba(10, 10, 10, 0.4); margin: 2.5em 0; }
+        .md-body img { max-width: 100%; }
+        .md-body blockquote p { margin: 0.4em 0; }
+        .md-body li::marker { color: #0A0A0A; }
+        .hljs { background: transparent; }
+      `,
+    },
+  ],
 };

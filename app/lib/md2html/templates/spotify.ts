@@ -31,4 +31,32 @@ export const spotify: MdTemplate = {
     .md-body li::marker { color: #1DB954; }
     .hljs { background: transparent; }
   `,
+  variants: [
+    {
+      swatch: ["#FFFFFF", "#1DB954", "#121212"],
+      css: `
+        .md-body { color: #121212; background: #FFFFFF; font-family: "Circular Std", "Avenir Next", "Montserrat", "Nunito", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+        .md-body h1, .md-body h2, .md-body h3 { color: #121212; font-weight: 800; line-height: 1.12; letter-spacing: -0.01em; }
+        .md-body h1 { font-size: 2.2em; }
+        .md-body h1::after { content: ""; display: block; width: 44px; height: 4px; border-radius: 2px; background: #1DB954; margin-top: 0.5em; }
+        .md-body h2 { font-size: 1.55em; }
+        .md-body h3 { font-size: 1.15em; color: #535353; }
+        .md-body a { color: #1DB954; text-decoration: none; border-bottom: 1px solid rgba(29, 185, 84, 0.5); }
+        .md-body a:hover { border-bottom-color: #1DB954; }
+        .md-body strong { color: #1DB954; font-weight: 700; }
+        .md-body blockquote { border-left: 3px solid #1DB954; background: #F6FFF9; border-radius: 8px; margin: 1.4em 0; padding: 1em 1.3em; color: #535353; }
+        .md-body code { background: #F6FFF9; color: #1DB954; padding: 0.15em 0.4em; border-radius: 4px; font-family: "SF Mono", "Menlo", monospace; font-size: 0.9em; }
+        .md-body pre { background: #FFFFFF; border: 1px solid #D9D9D9; border-radius: 8px; padding: 1em; overflow-x: auto; }
+        .md-body pre code { background: none; color: #121212; padding: 0; }
+        .md-body table { border-collapse: collapse; width: 100%; }
+        .md-body th, .md-body td { border: 1px solid #D9D9D9; padding: 0.5em 0.8em; text-align: left; }
+        .md-body th { background: #F6FFF9; font-weight: 700; }
+        .md-body hr { border: none; height: 2px; background: #D9D9D9; border-radius: 1px; margin: 2em 0; }
+        .md-body img { max-width: 100%; border-radius: 8px; }
+        .md-body blockquote p { margin: 0.3em 0; }
+        .md-body li::marker { color: #1DB954; }
+        .hljs { background: transparent; }
+      `,
+    },
+  ],
 };

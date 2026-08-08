@@ -8,7 +8,7 @@ import json from "highlight.js/lib/languages/json";
 import css from "highlight.js/lib/languages/css";
 import xml from "highlight.js/lib/languages/xml";
 import python from "highlight.js/lib/languages/python";
-import { getTemplate } from "./templates";
+import { getTemplate, getVariant } from "./templates";
 
 hljs.registerLanguage("javascript", javascript);
 hljs.registerLanguage("typescript", typescript);
@@ -89,8 +89,10 @@ function escapeHtml(str: string): string {
 export async function renderMarkdown(
   md: string,
   templateId: string,
+  variantIndex = 0,
 ): Promise<string> {
   const template = getTemplate(templateId);
+  const variant = getVariant(template, variantIndex);
   const bodyHtml = await marked.parse(md);
   const title = extractTitle(md);
   const lang = typeof document !== "undefined" && document.documentElement.lang || "zh-CN";
@@ -102,7 +104,7 @@ export async function renderMarkdown(
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${escapeHtml(title)}</title>
 <style>
-  body { margin: 0; background: ${template.swatch[0]}; }
+  body { margin: 0; background: ${variant.swatch[0]}; }
   .md-shell { max-width: 720px; margin: 0 auto; padding: 48px 24px; }
   .md-body ul { padding-left: 1.6em; }
   .md-body ol { padding-left: 1.6em; }
@@ -111,8 +113,8 @@ export async function renderMarkdown(
   .md-body kbd { display: inline-block; padding: 0.15em 0.45em; border: 1px solid; border-bottom-width: 2px; border-radius: 4px; font-family: "SF Mono", "Menlo", monospace; font-size: 0.85em; }
   .md-body .hljs { background: transparent; }
   .md-body pre code.hljs { background: transparent; }
-${template.css}
-${hljsTheme(template.swatch[0])}
+${variant.css}
+${hljsTheme(variant.swatch[0])}
 </style>
 </head>
 <body>

@@ -4,10 +4,11 @@ import { cn } from "~/lib/utils";
 
 interface TemplatePickerProps {
   value: string;
-  onChange: (id: string) => void;
+  variantIndex: number;
+  onChange: (id: string, variantIndex: number) => void;
 }
 
-export function TemplatePicker({ value, onChange }: TemplatePickerProps) {
+export function TemplatePicker({ value, variantIndex, onChange }: TemplatePickerProps) {
   const { i18n } = useTranslation();
   const zh = i18n.language?.startsWith("zh");
 
@@ -15,10 +16,13 @@ export function TemplatePicker({ value, onChange }: TemplatePickerProps) {
     <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-5 lg:grid-cols-9">
       {MD_TEMPLATES.map((tpl: MdTemplate) => {
         const selected = tpl.id === value;
+        const swatch = selected
+          ? tpl.variants?.[variantIndex - 1]?.swatch ?? tpl.swatch
+          : tpl.swatch;
         return (
           <button
             key={tpl.id}
-            onClick={() => onChange(tpl.id)}
+            onClick={() => onChange(tpl.id, variantIndex)}
             className={cn(
               "group flex items-center gap-1.5 rounded-lg border px-2 py-1.5 text-left transition-all",
               selected
@@ -29,7 +33,7 @@ export function TemplatePicker({ value, onChange }: TemplatePickerProps) {
             title={zh ? tpl.descZh : tpl.descEn}
           >
             <span className="flex h-5 w-full min-w-0 flex-1 items-stretch overflow-hidden rounded">
-              {tpl.swatch.map((color) => (
+              {swatch.map((color) => (
                 <span
                   key={color}
                   className="h-full min-w-2 flex-1"

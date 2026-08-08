@@ -1,3 +1,8 @@
+export interface TemplateVariant {
+  swatch: string[];
+  css: string;
+}
+
 export interface MdTemplate {
   id: string;
   emoji: string;
@@ -7,4 +12,5 @@ export interface MdTemplate {
   descEn: string;
   swatch: string[];
   css: string;
+  variants?: TemplateVariant[];
 }
