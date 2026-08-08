@@ -13,6 +13,8 @@ type Bindings = {
   BETTER_AUTH_URL?: string;
   BETTER_AUTH_SECRET?: string;
   BETTER_AUTH_API_KEY?: string;
+  GOOGLE_CLIENT_ID?: string;
+  GOOGLE_CLIENT_SECRET?: string;
 };
 
 // In Vite dev mode, c.env is undefined — use getPlatformProxy for local D1/R2

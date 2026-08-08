@@ -8,6 +8,8 @@ export function createAuth(env: {
   BETTER_AUTH_URL?: string;
   BETTER_AUTH_SECRET?: string;
   BETTER_AUTH_API_KEY?: string;
+  GOOGLE_CLIENT_ID?: string;
+  GOOGLE_CLIENT_SECRET?: string;
 }, requestURL?: string) {
   if (!env.D1) {
     return null;
@@ -29,7 +31,12 @@ export function createAuth(env: {
     secret: env.BETTER_AUTH_SECRET || "dev-secret",
     basePath: "/api/auth",
     appName: "100mini",
-    socialProviders: {},
+    socialProviders: {
+      google: {
+        clientId: env.GOOGLE_CLIENT_ID || "",
+        clientSecret: env.GOOGLE_CLIENT_SECRET || "",
+      },
+    },
     emailAndPassword: {
       enabled: true,
       autoSignIn: true,

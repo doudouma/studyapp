@@ -362,6 +362,8 @@
   "components.auth.login": "Login",
   "components.auth.register": "Register",
   "components.auth.dialogTitle": "Login to 100mini",
+  "components.auth.google": "Continue with Google",
+  "components.auth.or": "or",
   "components.auth.email": "Email",
   "components.auth.password": "Password",
   "components.auth.passwordHint": "Password (min 8 characters)",

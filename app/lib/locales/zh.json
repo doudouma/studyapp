@@ -362,6 +362,8 @@
   "components.auth.login": "登录",
   "components.auth.register": "注册",
   "components.auth.dialogTitle": "登录 100mini",
+  "components.auth.google": "使用 Google 登录",
+  "components.auth.or": "或",
   "components.auth.email": "邮箱",
   "components.auth.password": "密码",
   "components.auth.passwordHint": "密码（至少 8 位）",
