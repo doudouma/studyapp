@@ -51,6 +51,7 @@
   "nav.bookmark": "Bookmark this page",
   "any2md.title": "Any to MD - Convert documents to Markdown | 100mini",
   "any2md.subtitle": "Convert Word, PPT, Excel, PDF and more to Markdown in your browser. Files never leave your machine.",
+  "any2md.keywords": "convert docx to markdown, pdf to markdown, ppt to markdown, xlsx to markdown, document to md converter, online markdown converter, free converter, browser local conversion, anydoc",
   "any2md.drop": "Drop a document or click to browse",
   "any2md.dropHint": "Supports doc/docx/ppt/pptx/xls/xlsx/odt/ods/odp/rtf/epub/csv/pdf, up to 20MB",
   "any2md.loading": "Loading the converter…",

@@ -25,6 +25,7 @@ export const Route = createFileRoute("/any2md")({
   head: () => {
     const lang = i18n.language?.startsWith("zh") ? "zh" : "en";
     const pageUrl = "https://100mini.com/any2md";
+    const ogImage = "https://100mini.com/spritesheet2/frame_38.webp";
     const faqs = Array.from({ length: 6 }, (_, i) => ({
       name: i18n.t(`any2md.faq${i + 1}.q`),
       text: i18n.t(`any2md.faq${i + 1}.a`),
@@ -33,16 +34,19 @@ export const Route = createFileRoute("/any2md")({
       meta: [
         { title: i18n.t("any2md.title") },
         { name: "description", content: i18n.t("any2md.subtitle") },
+        { name: "keywords", content: i18n.t("any2md.keywords") },
         { name: "robots", content: "index, follow" },
         { property: "og:type", content: "website" },
         { property: "og:url", content: pageUrl },
         { property: "og:title", content: i18n.t("any2md.title") },
         { property: "og:description", content: i18n.t("any2md.subtitle") },
+        { property: "og:image", content: ogImage },
         { property: "og:locale", content: lang === "zh" ? "zh_CN" : "en_US" },
         { property: "og:site_name", content: "100mini" },
-        { name: "twitter:card", content: "summary" },
+        { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: i18n.t("any2md.title") },
         { name: "twitter:description", content: i18n.t("any2md.subtitle") },
+        { name: "twitter:image", content: ogImage },
       ],
       links: [
         { rel: "canonical", href: pageUrl },

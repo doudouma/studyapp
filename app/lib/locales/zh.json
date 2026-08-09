@@ -51,6 +51,7 @@
   "nav.bookmark": "收藏此页",
   "any2md.title": "Any转MD - 任意文档转 Markdown | 100mini",
   "any2md.subtitle": "Word、PPT、Excel、PDF 等文档一键转 Markdown，浏览器本地转换，文件不出本机。",
+  "any2md.keywords": "文档转Markdown,Word转Markdown,PDF转Markdown,PPT转Markdown,Excel转Markdown,docx转md,在线转换工具,Markdown转换器,免费转换,浏览器本地转换",
   "any2md.drop": "拖入或点击选择文档",
   "any2md.dropHint": "支持 doc/docx/ppt/pptx/xls/xlsx/odt/ods/odp/rtf/epub/csv/pdf，≤20MB",
   "any2md.loading": "正在加载转换引擎…",
