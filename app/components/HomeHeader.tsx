@@ -68,7 +68,8 @@ function ToolsDropdown() {
     location.pathname.startsWith("/pomodoro") ||
     location.pathname.startsWith("/rhythm") ||
     location.pathname.startsWith("/md2html") ||
-    location.pathname.startsWith("/any2md");
+    location.pathname.startsWith("/any2md") ||
+    location.pathname.startsWith("/freetool");
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -95,7 +96,11 @@ function ToolsDropdown() {
         <ChevronDown className={`size-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
-        <div className="absolute left-0 top-full z-50 mt-2 min-w-32 rounded-lg border border-border bg-popover py-1 shadow-lg">
+        <div className="absolute left-0 top-full z-50 mt-2 min-w-40 rounded-lg border border-border bg-popover py-1 shadow-lg">
+          <DropdownLink href="/freetool" onClick={() => setOpen(false)}>
+            {t("nav.toolsAll")}
+          </DropdownLink>
+          <div className="mx-3 my-1 border-t border-border" />
           <DropdownLink href="/pomodoro" onClick={() => setOpen(false)}>
             {t("nav.pomodoro")}
           </DropdownLink>

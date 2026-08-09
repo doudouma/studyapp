@@ -16,6 +16,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PomodoroRouteImport } from './routes/pomodoro'
 import { Route as Md2htmlRouteImport } from './routes/md2html'
 import { Route as LinksRouteImport } from './routes/links'
+import { Route as FreetoolRouteImport } from './routes/freetool'
 import { Route as CookieRouteImport } from './routes/cookie'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as Any2mdRouteImport } from './routes/any2md'
@@ -57,6 +58,11 @@ const LinksRoute = LinksRouteImport.update({
   path: '/links',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FreetoolRoute = FreetoolRouteImport.update({
+  id: '/freetool',
+  path: '/freetool',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CookieRoute = CookieRouteImport.update({
   id: '/cookie',
   path: '/cookie',
@@ -89,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/any2md': typeof Any2mdRoute
   '/contact': typeof ContactRoute
   '/cookie': typeof CookieRoute
+  '/freetool': typeof FreetoolRoute
   '/links': typeof LinksRoute
   '/md2html': typeof Md2htmlRoute
   '/pomodoro': typeof PomodoroRoute
@@ -103,6 +110,7 @@ export interface FileRoutesByTo {
   '/any2md': typeof Any2mdRoute
   '/contact': typeof ContactRoute
   '/cookie': typeof CookieRoute
+  '/freetool': typeof FreetoolRoute
   '/links': typeof LinksRoute
   '/md2html': typeof Md2htmlRoute
   '/pomodoro': typeof PomodoroRoute
@@ -118,6 +126,7 @@ export interface FileRoutesById {
   '/any2md': typeof Any2mdRoute
   '/contact': typeof ContactRoute
   '/cookie': typeof CookieRoute
+  '/freetool': typeof FreetoolRoute
   '/links': typeof LinksRoute
   '/md2html': typeof Md2htmlRoute
   '/pomodoro': typeof PomodoroRoute
@@ -134,6 +143,7 @@ export interface FileRouteTypes {
     | '/any2md'
     | '/contact'
     | '/cookie'
+    | '/freetool'
     | '/links'
     | '/md2html'
     | '/pomodoro'
@@ -148,6 +158,7 @@ export interface FileRouteTypes {
     | '/any2md'
     | '/contact'
     | '/cookie'
+    | '/freetool'
     | '/links'
     | '/md2html'
     | '/pomodoro'
@@ -162,6 +173,7 @@ export interface FileRouteTypes {
     | '/any2md'
     | '/contact'
     | '/cookie'
+    | '/freetool'
     | '/links'
     | '/md2html'
     | '/pomodoro'
@@ -177,6 +189,7 @@ export interface RootRouteChildren {
   Any2mdRoute: typeof Any2mdRoute
   ContactRoute: typeof ContactRoute
   CookieRoute: typeof CookieRoute
+  FreetoolRoute: typeof FreetoolRoute
   LinksRoute: typeof LinksRoute
   Md2htmlRoute: typeof Md2htmlRoute
   PomodoroRoute: typeof PomodoroRoute
@@ -237,6 +250,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LinksRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/freetool': {
+      id: '/freetool'
+      path: '/freetool'
+      fullPath: '/freetool'
+      preLoaderRoute: typeof FreetoolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cookie': {
       id: '/cookie'
       path: '/cookie'
@@ -281,6 +301,7 @@ const rootRouteChildren: RootRouteChildren = {
   Any2mdRoute: Any2mdRoute,
   ContactRoute: ContactRoute,
   CookieRoute: CookieRoute,
+  FreetoolRoute: FreetoolRoute,
   LinksRoute: LinksRoute,
   Md2htmlRoute: Md2htmlRoute,
   PomodoroRoute: PomodoroRoute,

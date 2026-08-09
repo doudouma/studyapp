@@ -10,3 +10,11 @@ wrangler.toml
 test-results/
 opencode.json
 anydoc/
+# 敏感文件：Chrome 扩展签名私钥、本地环境变量
+*.pem
+*.p8
+*.p12
+*.pfx
+*.key
+.env.local
+.env.*.local
