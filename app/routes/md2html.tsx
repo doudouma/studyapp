@@ -287,6 +287,18 @@ function Md2HtmlPage() {
   const [shareToSquare, setShareToSquare] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [importToast, setImportToast] = useState(false);
+
+  useEffect(() => {
+    const draft = sessionStorage.getItem("any2md.draft");
+    if (draft) {
+      sessionStorage.removeItem("any2md.draft");
+      defaultMdRef.current = draft;
+      setMd(draft);
+      setImportToast(true);
+      setTimeout(() => setImportToast(false), 2500);
+    }
+  }, []);
 
   const formatSize = (bytes: number) => {
     if (bytes < 1024) return `${bytes} B`;
@@ -413,6 +425,11 @@ function Md2HtmlPage() {
 
   return (
     <div className="flex h-screen flex-col overflow-hidden">
+      {importToast && (
+        <div className="pointer-events-none fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full border border-border bg-popover px-4 py-2 text-sm shadow-lg">
+          {t("md2html.importedFromAny2md")}
+        </div>
+      )}
       <AppNav />
       <main className="flex w-full flex-1 flex-col overflow-hidden">
         <div className="flex shrink-0 items-center gap-3 border-b border-border bg-background px-3 py-2">

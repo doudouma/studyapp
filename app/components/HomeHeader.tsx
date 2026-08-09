@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { Code2, Search, Settings, LogOut, Menu, X, Bookmark } from "lucide-react";
+import { Code2, Search, Settings, LogOut, Menu, X, Bookmark, ChevronDown } from "lucide-react";
 import { Input } from "~/components/ui/input";
 import { authClient } from "~/lib/auth-client";
 import { useAuth } from "~/lib/auth-context";
@@ -51,6 +51,81 @@ function MobileNavLink({ href, onClick, children }: { href: string; onClick: () 
         isActive
           ? "block rounded-lg bg-[#006c49]/10 dark:bg-[#4edea3]/10 px-4 py-2.5 text-sm font-semibold text-[#006c49] dark:text-[#4edea3]"
           : "block rounded-lg px-4 py-2.5 text-sm font-medium text-muted-foreground hover:bg-[#e5eeff] dark:hover:bg-[#1e314a] transition-colors"
+      }
+    >
+      {children}
+    </Link>
+  );
+}
+
+function ToolsDropdown() {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+
+  const isActive =
+    location.pathname.startsWith("/pomodoro") ||
+    location.pathname.startsWith("/rhythm") ||
+    location.pathname.startsWith("/md2html") ||
+    location.pathname.startsWith("/any2md");
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className={
+          isActive || open
+            ? "flex items-center gap-0.5 border-b-2 border-primary pb-0.5 text-sm font-semibold text-primary"
+            : "flex items-center gap-0.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+        }
+      >
+        {t("nav.tools")}
+        <ChevronDown className={`size-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div className="absolute left-0 top-full z-50 mt-2 min-w-32 rounded-lg border border-border bg-popover py-1 shadow-lg">
+          <DropdownLink href="/pomodoro" onClick={() => setOpen(false)}>
+            {t("nav.pomodoro")}
+          </DropdownLink>
+          <DropdownLink href="/rhythm" onClick={() => setOpen(false)}>
+            {t("nav.rhythm")}
+          </DropdownLink>
+          <DropdownLink href="/md2html" onClick={() => setOpen(false)}>
+            {t("nav.md2html")}
+          </DropdownLink>
+          <DropdownLink href="/any2md" onClick={() => setOpen(false)}>
+            {t("nav.any2md")}
+          </DropdownLink>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function DropdownLink({ href, onClick, children }: { href: string; onClick: () => void; children: React.ReactNode }) {
+  const location = useLocation();
+  const isActive = location.pathname.startsWith(href);
+
+  return (
+    <Link
+      to={href}
+      onClick={onClick}
+      className={
+        isActive
+          ? "block px-3 py-2 text-sm font-semibold text-primary transition-colors hover:bg-muted"
+          : "block px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
       }
     >
       {children}
@@ -154,9 +229,7 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
               <div onPointerEnter={prefetchSquare}>
                 <NavLink href="/square">{t("nav.square")}</NavLink>
               </div>
-              <NavLink href="/pomodoro">{t("nav.pomodoro")}</NavLink>
-              <NavLink href="/rhythm">{t("nav.rhythm")}</NavLink>
-              <NavLink href="/md2html">{t("nav.md2html")}</NavLink>
+              <ToolsDropdown />
             </div>
           </div>
 
@@ -225,14 +298,12 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
             </div>
             <span className="text-xl font-bold tracking-tight">100mini</span>
           </Link>
-          <div className="hidden items-center gap-6 md:flex">
+            <div className="hidden items-center gap-6 md:flex">
             <NavLink href="/">{t("nav.home")}</NavLink>
             <div onPointerEnter={prefetchSquare}>
               <NavLink href="/square">{t("nav.square")}</NavLink>
             </div>
-            <NavLink href="/pomodoro">{t("nav.pomodoro")}</NavLink>
-            <NavLink href="/rhythm">{t("nav.rhythm")}</NavLink>
-            <NavLink href="/md2html">{t("nav.md2html")}</NavLink>
+            <ToolsDropdown />
             <NavLink href="/links">{t("nav.profile")}</NavLink>
             {user.role === "admin" && (
               <NavLink href="/admin">{t("nav.admin")}</NavLink>

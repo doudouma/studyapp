@@ -18,6 +18,7 @@ import { Route as Md2htmlRouteImport } from './routes/md2html'
 import { Route as LinksRouteImport } from './routes/links'
 import { Route as CookieRouteImport } from './routes/cookie'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as Any2mdRouteImport } from './routes/any2md'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -66,6 +67,11 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Any2mdRoute = Any2mdRouteImport.update({
+  id: '/any2md',
+  path: '/any2md',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -80,6 +86,7 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/any2md': typeof Any2mdRoute
   '/contact': typeof ContactRoute
   '/cookie': typeof CookieRoute
   '/links': typeof LinksRoute
@@ -93,6 +100,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/any2md': typeof Any2mdRoute
   '/contact': typeof ContactRoute
   '/cookie': typeof CookieRoute
   '/links': typeof LinksRoute
@@ -107,6 +115,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/any2md': typeof Any2mdRoute
   '/contact': typeof ContactRoute
   '/cookie': typeof CookieRoute
   '/links': typeof LinksRoute
@@ -122,6 +131,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/any2md'
     | '/contact'
     | '/cookie'
     | '/links'
@@ -135,6 +145,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/any2md'
     | '/contact'
     | '/cookie'
     | '/links'
@@ -148,6 +159,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/any2md'
     | '/contact'
     | '/cookie'
     | '/links'
@@ -162,6 +174,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  Any2mdRoute: typeof Any2mdRoute
   ContactRoute: typeof ContactRoute
   CookieRoute: typeof CookieRoute
   LinksRoute: typeof LinksRoute
@@ -238,6 +251,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/any2md': {
+      id: '/any2md'
+      path: '/any2md'
+      fullPath: '/any2md'
+      preLoaderRoute: typeof Any2mdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -258,6 +278,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  Any2mdRoute: Any2mdRoute,
   ContactRoute: ContactRoute,
   CookieRoute: CookieRoute,
   LinksRoute: LinksRoute,

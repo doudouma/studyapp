@@ -10,6 +10,9 @@ export default defineConfig({
       "~": path.resolve(__dirname, "app"),
     },
   },
+  optimizeDeps: {
+    exclude: ["@firecrawl/anydoc-wasm"],
+  },
   plugins: [
     tanstackStart({
       srcDirectory: "app",
