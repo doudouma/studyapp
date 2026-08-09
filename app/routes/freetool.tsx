@@ -108,16 +108,29 @@ function FreeToolPage() {
       <AppNav />
       <main className="flex-1">
         {/* Hero */}
-        <section className="relative overflow-hidden border-b border-border bg-gradient-to-b from-[#006c49]/5 via-[#006c49]/[0.02] to-background dark:from-[#4edea3]/5 dark:via-[#4edea3]/[0.02] dark:to-background py-16 sm:py-20">
-          <div className="mx-auto max-w-5xl px-6 text-center">
-            <div className="mx-auto mb-5 inline-flex items-center gap-1.5 rounded-full border border-[#006c49]/20 bg-[#006c49]/5 px-3 py-1 text-xs font-medium text-[#006c49] dark:border-[#4edea3]/20 dark:bg-[#4edea3]/10 dark:text-[#4edea3]">
-              <Sparkles className="size-3.5" />
+        <section className="relative overflow-hidden bg-[#006c49] dark:bg-[#0b1c30]">
+          {/* 装饰：光晕 + 点阵纹理 */}
+          <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+            <div className="absolute -left-24 -top-24 size-72 rounded-full bg-[#4edea3]/20 blur-3xl" />
+            <div className="absolute -bottom-32 -right-24 size-80 rounded-full bg-white/10 blur-3xl" />
+            <div
+              className="absolute inset-0 opacity-[0.15]"
+              style={{
+                backgroundImage:
+                  "radial-gradient(circle, #fff 1px, transparent 1px)",
+                backgroundSize: "24px 24px",
+              }}
+            />
+          </div>
+          <div className="relative mx-auto max-w-5xl px-6 py-20 text-center sm:py-28">
+            <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-sm">
+              <Sparkles className="size-4 text-[#4edea3]" />
               {t("freetool.more")}
             </div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+            <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
               {t("freetool.heading")}
             </h1>
-            <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+            <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-[#cfe8dd] sm:text-lg">
               {t("freetool.subheading")}
             </p>
           </div>
