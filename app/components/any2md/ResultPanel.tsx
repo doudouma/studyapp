@@ -9,6 +9,7 @@ interface ResultPanelProps {
   chars: number;
   ms: number;
   markdown: string;
+  canContinue: boolean;
   onDownload: () => void;
   onCopy: () => void;
   onContinue: () => void;
@@ -21,6 +22,7 @@ export function ResultPanel({
   chars,
   ms,
   markdown,
+  canContinue,
   onDownload,
   onCopy,
   onContinue,
@@ -61,7 +63,13 @@ export function ResultPanel({
           {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
           {copied ? t("any2md.copied") : t("any2md.copy")}
         </Button>
-        <Button variant="default" size="sm" className="gap-1.5" onClick={onContinue}>
+        <Button
+          variant="default"
+          size="sm"
+          className="gap-1.5"
+          disabled={!canContinue}
+          onClick={onContinue}
+        >
           {t("any2md.continueToMd2html")}
           <ArrowRight className="size-3.5" />
         </Button>
@@ -69,6 +77,11 @@ export function ResultPanel({
           <RotateCcw className="size-4" />
         </Button>
       </div>
+      {!canContinue && (
+        <div className="basis-full text-xs text-muted-foreground">
+          {t("any2md.tooLargeForPublish")}
+        </div>
+      )}
     </div>
   );
 }

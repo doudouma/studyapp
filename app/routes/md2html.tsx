@@ -16,6 +16,7 @@ import { useAuth } from "~/lib/auth-context";
 import { useTranslation } from "react-i18next";
 import i18n from "~/lib/i18n";
 import { TagInput } from "~/components/TagInput";
+import { PUBLISH_LIMIT } from "~/lib/any2md/convert";
 
 export const Route = createFileRoute("/md2html")({
   head: () => ({
@@ -245,7 +246,7 @@ npm run build
 > Everyone can build a mini site —— try **100mini** now! ✨
 `;
 
-const MAX_SIZE = 5 * 1024 * 1024;
+const MAX_SIZE = PUBLISH_LIMIT;
 
 interface UploadResult {
   id: string;
@@ -307,7 +308,7 @@ function Md2HtmlPage() {
   };
 
   const contentSize = new Blob([md]).size;
-  const canSubmit = md.trim().length > 0 && (!user || title.trim().length > 0);
+  const canSubmit = md.trim().length > 0 && (!user || title.trim().length > 0) && contentSize <= MAX_SIZE;
 
   const doRender = useCallback(async (text: string, tpl: string, vi: number) => {
     if (!text.trim()) {
@@ -372,6 +373,9 @@ function Md2HtmlPage() {
     setError(null);
     try {
       const finalHtml = await renderMarkdown(md, templateId, variantIndex);
+      if (new Blob([finalHtml]).size > MAX_SIZE) {
+        throw new Error(t("md2html.sizeError"));
+      }
       const formData = new FormData();
       formData.append("content", finalHtml);
       formData.append("title", title);

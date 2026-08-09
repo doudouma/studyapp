@@ -2,15 +2,20 @@ import { test, expect } from "@playwright/test";
 
 async function gotoAndWaitReady(page: import("@playwright/test").Page) {
   await page.goto("/any2md");
-  await page
-    .getByText(/拖入或点击选择文档|Drop a document|正在加载转换引擎|Loading the converter/)
-    .waitFor({ timeout: 20000 });
-  // 等待 React hydration 完成，否则 setInputFiles 不触发合成 onChange
+  // 等待 React hydration 完成（React 19 在 DOM 上挂 __reactProps$*），否则 setInputFiles 不触发合成 onChange
   await page.waitForFunction(() => {
     const input = document.querySelector('input[type="file"]');
-    return !!input && typeof window !== "undefined";
+    return !!input && Object.keys(input).some((k) => k.startsWith("__reactProps"));
   });
-  await page.waitForTimeout(1200);
+  // 等待 WASM 引擎真正就绪：loading 文案消失，且 ready 的 Upload 图标容器出现
+  await page.waitForFunction(() => {
+    const main = document.querySelector("main");
+    if (!main) return false;
+    const text = main.textContent ?? "";
+    const loading = /正在加载转换引擎|Loading the converter/.test(text);
+    const uploadIcon = main.querySelector(".size-14");
+    return !loading && !!uploadIcon;
+  });
 }
 
 test.describe("Any to MD", () => {

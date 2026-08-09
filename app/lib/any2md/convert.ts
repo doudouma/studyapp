@@ -5,6 +5,8 @@ export const SUPPORTED_EXTS = [
 
 export const MAX_SIZE = 20 * 1024 * 1024;
 
+export const PUBLISH_LIMIT = 5 * 1024 * 1024;
+
 export type EngineStatus = "idle" | "loading" | "ready" | "error";
 
 type WasmModule = typeof import("@firecrawl/anydoc-wasm");
@@ -20,7 +22,10 @@ export function ensureEngine(): Promise<WasmModule> {
       await mod.default();
       engine = mod;
       return mod;
-    })();
+    })().catch((err) => {
+      enginePromise = null;
+      throw err;
+    });
   }
   return enginePromise;
 }

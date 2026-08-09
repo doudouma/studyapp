@@ -12,11 +12,14 @@ import {
   isSupportedExt,
   errorKey,
   MAX_SIZE,
+  PUBLISH_LIMIT,
   type EngineStatus,
   type ConvertResult,
 } from "~/lib/any2md/convert";
 import { useTranslation } from "react-i18next";
 import i18n from "~/lib/i18n";
+
+const textEncoder = new TextEncoder();
 
 export const Route = createFileRoute("/any2md")({
   head: () => {
@@ -95,7 +98,7 @@ function Any2MdPage() {
   const [error, setError] = useState<string | null>(null);
 
   const loadEngine = useCallback(() => {
-    setEngineStatus("loading");
+    setEngineStatus((prev) => (prev === "ready" || prev === "loading" ? prev : "loading"));
     ensureEngine()
       .then(() => setEngineStatus("ready"))
       .catch(() => setEngineStatus("error"));
@@ -151,8 +154,12 @@ function Any2MdPage() {
 
   const handleContinue = () => {
     if (!result) return;
-    sessionStorage.setItem("any2md.draft", result.markdown);
-    navigate({ to: "/md2html" });
+    try {
+      sessionStorage.setItem("any2md.draft", result.markdown);
+      navigate({ to: "/md2html" });
+    } catch {
+      setError(t("any2md.storageError"));
+    }
   };
 
   const handleReset = () => {
@@ -183,7 +190,7 @@ function Any2MdPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <AppNav />
-      <main className="flex-1 bg-[#eff4ff] dark:bg-[#1e314a]">
+      <main className="flex-1">
         <div className="mx-auto max-w-3xl px-6 pt-10 pb-12">
           {/* Hero */}
           <div className="mb-8">
@@ -210,6 +217,7 @@ function Any2MdPage() {
                 chars={result.markdown.length}
                 ms={result.ms}
                 markdown={result.markdown}
+                canContinue={textEncoder.encode(result.markdown).length <= PUBLISH_LIMIT}
                 onDownload={handleDownload}
                 onCopy={() => {}}
                 onContinue={handleContinue}
