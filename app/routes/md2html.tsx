@@ -5,7 +5,6 @@ import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { Card, CardContent } from "~/components/ui/card";
 import { TemplatePicker } from "~/components/md2html/TemplatePicker";
 import { MdPreview } from "~/components/md2html/MdPreview";
 import { ExportMenu } from "~/components/md2html/ExportMenu";
@@ -17,6 +16,13 @@ import { useTranslation } from "react-i18next";
 import i18n from "~/lib/i18n";
 import { TagInput } from "~/components/TagInput";
 import { PUBLISH_LIMIT } from "~/lib/any2md/convert";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
 
 export const Route = createFileRoute("/md2html")({
   head: () => ({
@@ -289,6 +295,7 @@ function Md2HtmlPage() {
   const fileRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [importToast, setImportToast] = useState(false);
+  const [publishOpen, setPublishOpen] = useState(false);
 
   useEffect(() => {
     const draft = sessionStorage.getItem("any2md.draft");
@@ -445,7 +452,7 @@ function Md2HtmlPage() {
             <Button
               className="gap-2 px-4"
               disabled={!canSubmit || loading}
-              onClick={handleGenerate}
+              onClick={() => { if (user) setPublishOpen(true); else handleGenerate(); }}
             >
               {loading ? <Loader2 className="size-4 animate-spin" /> : <Wand2 className="size-4" />}
               {loading ? t("md2html.generating") : t("md2html.generate")}
@@ -506,67 +513,83 @@ function Md2HtmlPage() {
           </div>
         </div>
 
-        {user && (
-          <Card className="rounded-none border-x-0 border-b-0">
-            <CardContent className="p-4">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="text-sm font-medium text-foreground">
-                    {t("home.form.title")} <span className="text-destructive">*</span>
-                  </label>
-                  <Input
-                    className="mt-1"
-                    placeholder={t("home.form.titlePlaceholder")}
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-foreground">{t("home.form.category")}</label>
-                  <select
-                    className="mt-1 flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                  >
-                    <option value="general">{t("home.select.default")}</option>
-                    <option value="chinese">{t("home.select.chinese")}</option>
-                    <option value="math">{t("home.select.math")}</option>
-                    <option value="english">{t("home.select.english")}</option>
-                    <option value="physics">{t("home.select.physics")}</option>
-                    <option value="chemistry">{t("home.select.chemistry")}</option>
-                    <option value="history">{t("home.select.history")}</option>
-                    <option value="biology">{t("home.select.biology")}</option>
-                    <option value="geography">{t("home.select.geography")}</option>
-                    <option value="other">{t("home.select.other")}</option>
-                  </select>
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="text-sm font-medium text-foreground">
-                    {t("home.form.tags")}{" "}
-                    <span className="font-normal text-muted-foreground">{t("home.form.tagsHint")}</span>
-                  </label>
-                  <TagInput tags={tags} onChange={setTags} placeholder={t("home.form.tagsPlaceholder")} />
-                </div>
-              </div>
-              <label className="mt-4 flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="size-4 rounded border-border accent-primary"
-                  checked={shareToSquare}
-                  onChange={(e) => setShareToSquare(e.target.checked)}
-                />
-                <span className="text-sm text-foreground">{t("home.form.shareToSquare")}</span>
-              </label>
-            </CardContent>
-          </Card>
-        )}
-
         {error && (
           <div className="border-t border-destructive/20 bg-destructive/10 px-4 py-2 text-sm text-destructive">
             {error}
           </div>
         )}
       </main>
+
+      {/* 发布弹窗（登录用户） */}
+      <Dialog open={publishOpen} onOpenChange={setPublishOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("md2html.publishTitle")}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-1">
+            <div>
+              <label className="text-sm font-medium text-foreground">
+                {t("home.form.title")} <span className="text-destructive">{t("home.form.titleRequired")}</span>
+              </label>
+              <Input
+                className="mt-1"
+                placeholder={t("home.form.titlePlaceholder")}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground">{t("home.form.category")}</label>
+              <select
+                className="mt-1 flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                <option value="general">{t("home.select.default")}</option>
+                <option value="chinese">{t("home.select.chinese")}</option>
+                <option value="math">{t("home.select.math")}</option>
+                <option value="english">{t("home.select.english")}</option>
+                <option value="physics">{t("home.select.physics")}</option>
+                <option value="chemistry">{t("home.select.chemistry")}</option>
+                <option value="history">{t("home.select.history")}</option>
+                <option value="biology">{t("home.select.biology")}</option>
+                <option value="geography">{t("home.select.geography")}</option>
+                <option value="other">{t("home.select.other")}</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground">
+                {t("home.form.tags")}{" "}
+                <span className="font-normal text-muted-foreground">{t("home.form.tagsHint")}</span>
+              </label>
+              <div className="mt-1">
+                <TagInput tags={tags} onChange={setTags} placeholder={t("home.form.tagsPlaceholder")} />
+              </div>
+            </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                className="size-4 rounded border-border accent-primary"
+                checked={shareToSquare}
+                onChange={(e) => setShareToSquare(e.target.checked)}
+              />
+              <span className="text-sm text-foreground">{t("home.form.shareToSquare")}</span>
+            </label>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPublishOpen(false)}>
+              {t("common.cancel")}
+            </Button>
+            <Button
+              disabled={!canSubmit || loading}
+              onClick={() => { setPublishOpen(false); handleGenerate(); }}
+            >
+              {loading ? <Loader2 className="size-4 animate-spin" /> : <Wand2 className="size-4" />}
+              {t("md2html.publish")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

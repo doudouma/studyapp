@@ -546,5 +546,7 @@
   "md2html.export.copyHtml": "复制 HTML 代码",
   "md2html.export.done": "已导出",
   "md2html.export.failed": "导出失败",
+  "md2html.publishTitle": "发布页面",
+  "md2html.publish": "发布",
   "md2html.fileTypeError": "仅支持 .md / .markdown / .txt 文件"
 }

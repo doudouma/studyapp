@@ -546,5 +546,7 @@
   "md2html.export.copyHtml": "Copy HTML code",
   "md2html.export.done": "Exported",
   "md2html.export.failed": "Export failed",
+  "md2html.publishTitle": "Publish Page",
+  "md2html.publish": "Publish",
   "md2html.fileTypeError": "Only .md / .markdown / .txt files are supported"
 }
