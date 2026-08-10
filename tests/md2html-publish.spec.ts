@@ -24,7 +24,7 @@ test.describe("MD to HTML publish dialog", () => {
     await page.waitForLoadState("networkidle");
 
     // 登录用户应看到头像（登录态生效）
-    await expect(page.getByLabel("菜单")).toBeVisible().catch(() => {});
+    await expect(page.getByLabel("菜单")).toBeVisible();
 
     // 点生成链接 → 弹窗出现
     await page.getByRole("button", { name: /生成链接|Generate Link/ }).click();

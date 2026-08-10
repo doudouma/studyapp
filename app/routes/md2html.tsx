@@ -296,6 +296,11 @@ function Md2HtmlPage() {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [importToast, setImportToast] = useState(false);
   const [publishOpen, setPublishOpen] = useState(false);
+  const userRef = useRef(user);
+
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
 
   useEffect(() => {
     const draft = sessionStorage.getItem("any2md.draft");
@@ -315,7 +320,8 @@ function Md2HtmlPage() {
   };
 
   const contentSize = new Blob([md]).size;
-  const canSubmit = md.trim().length > 0 && (!user || title.trim().length > 0) && contentSize <= MAX_SIZE;
+  const canStart = md.trim().length > 0 && contentSize <= MAX_SIZE;
+  const canPublish = canStart && title.trim().length > 0;
 
   const doRender = useCallback(async (text: string, tpl: string, vi: number) => {
     if (!text.trim()) {
@@ -374,29 +380,60 @@ function Md2HtmlPage() {
     setTitle("");
   };
 
-  const handleGenerate = async () => {
-    if (!canSubmit) return;
+  const startPublish = () => {
+    if (!canStart || loading) return;
+    if (user) {
+      setPublishOpen(true);
+      return;
+    }
+    void doAnonymousUpload();
+  };
+
+  const upload = async (finalHtml: string) => {
+    if (new Blob([finalHtml]).size > MAX_SIZE) {
+      throw new Error(t("md2html.sizeError"));
+    }
+    const formData = new FormData();
+    formData.append("content", finalHtml);
+    formData.append("title", title);
+    formData.append("category", category);
+    formData.append("tags", tags.join(","));
+    formData.append("shareToSquare", String(shareToSquare));
+
+    const res = await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    });
+    const json = (await res.json()) as { error?: string } & UploadResult;
+    if (!res.ok) throw new Error(json.error || t("common.error"));
+    setResult(json);
+  };
+
+  const doAnonymousUpload = async () => {
     setLoading(true);
     setError(null);
     try {
       const finalHtml = await renderMarkdown(md, templateId, variantIndex);
-      if (new Blob([finalHtml]).size > MAX_SIZE) {
-        throw new Error(t("md2html.sizeError"));
+      if (userRef.current) {
+        setLoading(false);
+        setPublishOpen(true);
+        return;
       }
-      const formData = new FormData();
-      formData.append("content", finalHtml);
-      formData.append("title", title);
-      formData.append("category", category);
-      formData.append("tags", tags.join(","));
-      formData.append("shareToSquare", String(shareToSquare));
+      await upload(finalHtml);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("common.errorRetry"));
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-      const json = (await res.json()) as { error?: string } & UploadResult;
-      if (!res.ok) throw new Error(json.error || t("common.error"));
-      setResult(json);
+  const doPublish = async () => {
+    if (!canPublish || loading) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const finalHtml = await renderMarkdown(md, templateId, variantIndex);
+      await upload(finalHtml);
     } catch (err) {
       setError(err instanceof Error ? err.message : t("common.errorRetry"));
     } finally {
@@ -451,8 +488,8 @@ function Md2HtmlPage() {
             <ExportMenu html={html} md={md} />
             <Button
               className="gap-2 px-4"
-              disabled={!canSubmit || loading}
-              onClick={() => { if (user) setPublishOpen(true); else handleGenerate(); }}
+              disabled={!canStart || loading}
+              onClick={startPublish}
             >
               {loading ? <Loader2 className="size-4 animate-spin" /> : <Wand2 className="size-4" />}
               {loading ? t("md2html.generating") : t("md2html.generate")}
@@ -581,8 +618,8 @@ function Md2HtmlPage() {
               {t("common.cancel")}
             </Button>
             <Button
-              disabled={!canSubmit || loading}
-              onClick={() => { setPublishOpen(false); handleGenerate(); }}
+              disabled={!canPublish || loading}
+              onClick={() => { setPublishOpen(false); doPublish(); }}
             >
               {loading ? <Loader2 className="size-4 animate-spin" /> : <Wand2 className="size-4" />}
               {t("md2html.publish")}
