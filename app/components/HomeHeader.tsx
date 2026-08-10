@@ -278,9 +278,14 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
               <div onPointerEnter={prefetchSquare}>
                 <MobileNavLink href="/square" onClick={() => setMobileNavOpen(false)}>{t("nav.square")}</MobileNavLink>
               </div>
+              <div className="px-4 pb-1 pt-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                {t("nav.tools")}
+              </div>
+              <MobileNavLink href="/freetool" onClick={() => setMobileNavOpen(false)}>{t("nav.toolsAll")}</MobileNavLink>
               <MobileNavLink href="/pomodoro" onClick={() => setMobileNavOpen(false)}>{t("nav.pomodoro")}</MobileNavLink>
               <MobileNavLink href="/rhythm" onClick={() => setMobileNavOpen(false)}>{t("nav.rhythm")}</MobileNavLink>
               <MobileNavLink href="/md2html" onClick={() => setMobileNavOpen(false)}>{t("nav.md2html")}</MobileNavLink>
+              <MobileNavLink href="/any2md" onClick={() => setMobileNavOpen(false)}>{t("nav.any2md")}</MobileNavLink>
               <div className="px-4 pt-2">
                 <LangSwitcher />
               </div>
@@ -414,9 +419,14 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
             <div onPointerEnter={prefetchSquare}>
               <MobileNavLink href="/square" onClick={() => setMobileNavOpen(false)}>{t("nav.square")}</MobileNavLink>
             </div>
+            <div className="px-4 pb-1 pt-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              {t("nav.tools")}
+            </div>
+            <MobileNavLink href="/freetool" onClick={() => setMobileNavOpen(false)}>{t("nav.toolsAll")}</MobileNavLink>
             <MobileNavLink href="/pomodoro" onClick={() => setMobileNavOpen(false)}>{t("nav.pomodoro")}</MobileNavLink>
             <MobileNavLink href="/rhythm" onClick={() => setMobileNavOpen(false)}>{t("nav.rhythm")}</MobileNavLink>
             <MobileNavLink href="/md2html" onClick={() => setMobileNavOpen(false)}>{t("nav.md2html")}</MobileNavLink>
+            <MobileNavLink href="/any2md" onClick={() => setMobileNavOpen(false)}>{t("nav.any2md")}</MobileNavLink>
             <MobileNavLink href="/links" onClick={() => setMobileNavOpen(false)}>{t("nav.profile")}</MobileNavLink>
             {user.role === "admin" && (
               <MobileNavLink href="/admin" onClick={() => setMobileNavOpen(false)}>{t("nav.admin")}</MobileNavLink>
