@@ -17,13 +17,14 @@ import {
   type ConvertResult,
 } from "~/lib/any2md/convert";
 import { useTranslation } from "react-i18next";
-import i18n from "~/lib/i18n";
+import i18n, { getBcp47 } from "~/lib/i18n";
 
 const textEncoder = new TextEncoder();
 
 export const Route = createFileRoute("/any2md")({
   head: () => {
     const lang = i18n.language?.startsWith("zh") ? "zh" : "en";
+    const bcp = getBcp47(i18n.language);
     const pageUrl = "https://100mini.com/any2md";
     const ogImage = "https://100mini.com/spritesheet2/frame_38.webp";
     const faqs = Array.from({ length: 6 }, (_, i) => ({
@@ -41,7 +42,7 @@ export const Route = createFileRoute("/any2md")({
         { property: "og:title", content: i18n.t("any2md.title") },
         { property: "og:description", content: i18n.t("any2md.subtitle") },
         { property: "og:image", content: ogImage },
-        { property: "og:locale", content: lang === "zh" ? "zh_CN" : "en_US" },
+        { property: "og:locale", content: bcp.replace("-", "_") },
         { property: "og:site_name", content: "100mini" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: i18n.t("any2md.title") },
@@ -71,7 +72,7 @@ export const Route = createFileRoute("/any2md")({
               "Download, copy, or continue to MD to HTML templates",
             ],
             author: { "@type": "Organization", name: "100mini", url: "https://100mini.com" },
-            inLanguage: lang === "zh" ? "zh-CN" : "en-US",
+            inLanguage: bcp,
           }),
         },
         {

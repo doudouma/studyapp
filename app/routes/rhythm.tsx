@@ -2,13 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import i18n from "~/lib/i18n";
+import i18n, { getBcp47 } from "~/lib/i18n";
 import { AppNav } from "~/components/HomeHeader";
 import { RhythmGame } from "~/components/RhythmGame";
 
 export const Route = createFileRoute("/rhythm")({
   head: () => {
     const lang = i18n.language?.startsWith("zh") ? "zh" : "en";
+    const bcp = getBcp47(i18n.language);
     const pageUrl = "https://100mini.com/rhythm";
     const faqs = Array.from({ length: 5 }, (_, i) => ({
       name: i18n.t(`rhythm.faq${i + 1}.q`),
@@ -25,7 +26,7 @@ export const Route = createFileRoute("/rhythm")({
         { property: "og:title", content: i18n.t("rhythm.title") },
         { property: "og:description", content: i18n.t("rhythm.desc") },
         { property: "og:image", content: "https://100mini.com/spritesheet2/frame_38.webp" },
-        { property: "og:locale", content: lang === "zh" ? "zh_CN" : "en_US" },
+        { property: "og:locale", content: bcp.replace("-", "_") },
         { property: "og:site_name", content: "100mini" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: i18n.t("rhythm.title") },
@@ -55,7 +56,7 @@ export const Route = createFileRoute("/rhythm")({
               "Supports MP3, WAV, OGG and M4A",
             ],
             author: { "@type": "Organization", name: "100mini", url: "https://100mini.com" },
-            inLanguage: lang === "zh" ? "zh-CN" : "en-US",
+            inLanguage: bcp,
           }),
         },
         {

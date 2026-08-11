@@ -3,11 +3,11 @@ import { Timer, Music, FileText, FileCode2, ArrowRight, Sparkles } from "lucide-
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { useTranslation } from "react-i18next";
-import i18n from "~/lib/i18n";
+import i18n, { getBcp47 } from "~/lib/i18n";
 
 export const Route = createFileRoute("/freetool")({
   head: () => {
-    const lang = i18n.language?.startsWith("zh") ? "zh" : "en";
+    const bcp = getBcp47(i18n.language);
     const pageUrl = "https://100mini.com/freetool";
     const ogImage = "https://100mini.com/spritesheet2/frame_38.webp";
     return {
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/freetool")({
         { property: "og:title", content: i18n.t("freetool.title") },
         { property: "og:description", content: i18n.t("freetool.desc") },
         { property: "og:image", content: ogImage },
-        { property: "og:locale", content: lang === "zh" ? "zh_CN" : "en_US" },
+        { property: "og:locale", content: bcp.replace("-", "_") },
         { property: "og:site_name", content: "100mini" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: i18n.t("freetool.title") },
