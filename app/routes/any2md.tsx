@@ -201,7 +201,7 @@ function Any2MdPage() {
           <div className="mb-8">
             <div className="flex items-center gap-2">
               <FileText className="size-6 text-[#006c49] dark:text-[#4edea3]" />
-              <h1 className="text-2xl font-bold text-foreground">Any 转 MD</h1>
+              <h1 className="text-2xl font-bold text-foreground">{t("any2md.heading")}</h1>
             </div>
             <p className="mt-2 text-sm text-muted-foreground">{t("any2md.subtitle")}</p>
           </div>

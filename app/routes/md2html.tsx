@@ -504,7 +504,7 @@ function Md2HtmlPage() {
                 <FileText className="size-4" />
                 {t("md2html.editor")}
                 <span className="hidden items-baseline gap-1 text-sm font-bold tracking-tight text-foreground sm:flex">
-                  — just write Markdown <span className="text-primary">&amp; go</span>
+                  {t("md2html.editorTagline")}
                 </span>
               </span>
               <div className="flex items-center gap-2">
