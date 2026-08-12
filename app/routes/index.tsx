@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, memo, useMemo, useCallback } from "react";
 import { ArrowDown, Code2, Clock, Infinity, Tags, Share2, List, Crown, LogIn } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { DropZone } from "~/components/DropZone";
@@ -8,6 +8,11 @@ import { StatsSection } from "~/components/StatsSection";
 import { GuideSection } from "~/components/GuideSection";
 import { AppFooter } from "~/components/AppFooter";
 import { Card, CardContent } from "~/components/ui/card";
+
+const MemoStatsSection = memo(StatsSection);
+const MemoGuideSection = memo(GuideSection);
+const MemoAppNav = memo(AppNav);
+const MemoAppFooter = memo(AppFooter);
 
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -262,6 +267,42 @@ function UploadForm({
   );
 }
 
+function HeroSection({ onUpload, onBrowse }: { onUpload: () => void; onBrowse: () => void }) {
+  const { t } = useTranslation();
+  return (
+    <section className="relative overflow-hidden bg-gradient-to-b from-[#006c49]/10 via-[#006c49]/[0.02] to-background dark:from-[#4edea3]/10 dark:via-[#4edea3]/[0.02] dark:to-background pb-12 pt-20 md:pt-28">
+      <div className="mx-auto max-w-4xl px-6 text-center">
+        <h1 className="text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-[52px] lg:leading-[1.15]">
+          {t("home.hero.title")}
+        </h1>
+        <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground leading-relaxed md:text-xl">
+          {t("home.hero.subtitle")}
+        </p>
+        <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+          <Button
+            size="lg"
+            className="gap-2 h-11 px-6 text-base rounded-xl"
+            onClick={onUpload}
+          >
+            {t("home.hero.cta1")}
+            <ArrowDown className="size-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            className="text-base h-11 px-6 rounded-xl"
+            onClick={onBrowse}
+          >
+            {t("home.hero.cta2")}
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const MemoHero = memo(HeroSection);
+
 function HomePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -279,8 +320,10 @@ function HomePage() {
   const [result, setResult] = useState<UploadResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const contentSize =
-    mode === "paste" ? new Blob([htmlContent]).size : file?.size ?? 0;
+  const contentSize = useMemo(
+    () => (mode === "paste" ? new Blob([htmlContent]).size : file?.size ?? 0),
+    [mode, htmlContent, file],
+  );
 
   const formatSize = (bytes: number) => {
     if (bytes < 1024) return `${bytes} B`;
@@ -341,14 +384,15 @@ function HomePage() {
     setError(null);
   };
 
-  const scrollToUpload = () => {
+  const scrollToUpload = useCallback(() => {
     uploadRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  }, []);
+  const browseSquare = useCallback(() => navigate({ to: "/square", search: { q: "" } }), [navigate]);
 
   if (result) {
     return (
       <div className="flex min-h-screen flex-col">
-        <AppNav />
+        <MemoAppNav />
         <main className="flex flex-1 flex-col items-center justify-center p-8">
           <SuccessCard
             url={result.url}
@@ -359,44 +403,16 @@ function HomePage() {
             user={user}
           />
         </main>
-        <AppFooter />
+        <MemoAppFooter />
       </div>
     );
   }
 
   return (
     <div className="flex min-h-screen flex-col">
-      <AppNav />
+      <MemoAppNav />
       <main className="flex-1">
-        {/* Hero */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-[#006c49]/10 via-[#006c49]/[0.02] to-background dark:from-[#4edea3]/10 dark:via-[#4edea3]/[0.02] dark:to-background pb-12 pt-20 md:pt-28">
-          <div className="mx-auto max-w-4xl px-6 text-center">
-            <h1 className="text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-[52px] lg:leading-[1.15]">
-              {t("home.hero.title")}
-            </h1>
-            <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground leading-relaxed md:text-xl">
-              {t("home.hero.subtitle")}
-            </p>
-            <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-              <Button
-                size="lg"
-                className="gap-2 h-11 px-6 text-base rounded-xl"
-                onClick={scrollToUpload}
-              >
-                {t("home.hero.cta1")}
-                <ArrowDown className="size-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="text-base h-11 px-6 rounded-xl"
-                onClick={() => navigate({ to: "/square", search: { q: "" } })}
-              >
-                {t("home.hero.cta2")}
-              </Button>
-            </div>
-          </div>
-        </section>
+        <MemoHero onUpload={scrollToUpload} onBrowse={browseSquare} />
 
         {/* Upload area */}
         <section
@@ -434,10 +450,10 @@ function HomePage() {
           />
         </section>
 
-        <StatsSection />
-        <GuideSection />
+        <MemoStatsSection />
+        <MemoGuideSection />
       </main>
-      <AppFooter />
+      <MemoAppFooter />
     </div>
   );
 }
