@@ -587,7 +587,7 @@ interface UploadResult {
 function Md2HtmlPage() {
   const { t, i18n: i18nInstance } = useTranslation();
   const { user } = useAuth();
-  const lang = i18nInstance.language?.startsWith("zh") ? "zh" : "en";
+  const lang = (i18nInstance.language || "en").toLowerCase().split("-")[0];
   const defaultMd = getDefaultMd(lang);
   const [md, setMd] = useState(defaultMd);
   const defaultMdRef = useRef(defaultMd);
