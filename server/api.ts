@@ -178,6 +178,16 @@ api.get("/sitemap.xml", async (c) => {
   const staticPages = [
     { loc: "/", changefreq: "daily", priority: "1.0" },
     { loc: "/square", changefreq: "hourly", priority: "0.9" },
+    { loc: "/md2html", changefreq: "weekly", priority: "0.8" },
+    { loc: "/any2md", changefreq: "weekly", priority: "0.8" },
+    { loc: "/freetool", changefreq: "weekly", priority: "0.7" },
+    { loc: "/links", changefreq: "weekly", priority: "0.7" },
+    { loc: "/pomodoro", changefreq: "weekly", priority: "0.6" },
+    { loc: "/rhythm", changefreq: "weekly", priority: "0.6" },
+    { loc: "/contact", changefreq: "yearly", priority: "0.3" },
+    { loc: "/privacy", changefreq: "yearly", priority: "0.3" },
+    { loc: "/terms", changefreq: "yearly", priority: "0.3" },
+    { loc: "/cookie", changefreq: "yearly", priority: "0.3" },
   ];
 
   let dynamicPages: { id: string; sharedAt: Date | null }[] = [];
