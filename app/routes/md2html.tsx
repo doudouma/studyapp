@@ -149,6 +149,315 @@ npm run build
 > 每个人都能建的 mini 站 —— 立即体验 **100mini**！ ✨
 `;
 
+const DEFAULT_MD_ES = `# 100mini · Hacer que compartir sea sencillo
+
+**100mini** es una herramienta gratuita de alojamiento de HTML / Markdown diseñada para aprender y compartir. Pega tu contenido, elige una plantilla, genera un enlace — accesible **en cualquier lugar durante 7 días**.
+
+---
+
+## 🚀 Características principales
+
+- **Publica en segundos**: pega y publica, sin necesidad de registrarte
+- **9 plantillas de marca**: de Apple a Linear, cambia de estilo con un clic
+- **Se abre en cualquier navegador**: funciona en móviles, tablets y ordenadores
+- *Cuota gratuita*: los usuarios con sesión guardan las páginas para siempre, las páginas anónimas se destruyen a los 7 días
+
+### Casos de uso
+
+1. Los profesores comparten apuntes y material de estudio
+2. Los estudiantes presentan proyectos y demostraciones
+3. Notas personales y base de conocimientos
+4. Comparte contenido web rápidamente por WeChat / QQ
+
+---
+
+## 📌 Inicio rápido
+
+> 💡 Consejo: arrastra un archivo Markdown al editor de la izquierda y ¡verás el resultado al instante!
+
+### Pasos
+
+- [x] Pega Markdown o importa un archivo \`.md\`
+- [x] Elige una plantilla en la parte superior
+- [ ] Haz clic en "Generar enlace" para publicar
+- [ ] Copia el enlace y compártelo con amigos
+
+---
+
+## ✨ Demostraciones de formato
+
+El contenido de abajo cubre la sintaxis común de Markdown — comprueba el resultado renderizado en todas las plantillas.
+
+### Estilos de texto
+
+Texto normal con **negrita**, *cursiva*, ~~tachado~~ y \`código en línea\`. Los atajos de teclado se ven así: <kbd>Ctrl</kbd> + <kbd>C</kbd>.
+
+### Listas anidadas
+
+1. Primer nivel
+   - Segundo nivel (sin orden)
+     - Tercer nivel con sangría
+2. Continuar numeración
+
+### Tabla comparativa
+
+| Función | Usuario gratuito | Miembro |
+| :--- | :---: | ---: |
+| Publicación anónima | ✅ 7 días | ✅ Permanente |
+| Título personalizado | ❌ | ✅ |
+| Compartir en la Plaza | ❌ | ✅ |
+| Límite de tamaño | 5 MB | 5 MB |
+
+### Cita
+
+> **Reflexión**: una herramienta realmente útil permite que las personas dediquen su tiempo al contenido, no a la herramienta en sí.
+
+---
+
+## 🛠️ Soporte técnico
+
+\`\`\`js
+// Renderiza un Markdown en solo dos pasos
+import { renderMarkdown } from "./md2html";
+
+const html = await renderMarkdown(md, "apple");
+console.log(html.length); // longitud total del HTML
+\`\`\`
+
+\`\`\`bash
+# Ejecuta el servidor de desarrollo localmente
+npm run dev
+
+# Compilación de producción
+npm run build
+\`\`\`
+
+\`\`\`json
+{
+  "templates": 9,
+  "anonymous": "7 days",
+  "permanent": true,
+  "maxSize": "5 MB"
+}
+\`\`\`
+
+---
+
+## 📮 Contáctanos
+
+- **Sitio web**: [https://100mini.com](https://100mini.com)
+- **Correo**: <hello@100mini.com>
+- **Comentarios**: envíanos un correo con tus ideas
+
+> Todos pueden crear un mini sitio — ¡prueba **100mini** ahora! ✨
+`;
+
+const DEFAULT_MD_PT = `# 100mini · Torne o Compartilhamento Simples
+
+**100mini** é uma ferramenta gratuita de hospedagem de HTML / Markdown criada para aprender e compartilhar. Cole seu conteúdo, escolha um template, gere um link — acessível **em qualquer lugar por 7 dias**.
+
+---
+
+## 🚀 Principais recursos
+
+- **Publique em segundos**: cole e publique, sem precisar se cadastrar
+- **9 templates de marca**: da Apple à Linear, mude o estilo com um clique
+- **Abre em qualquer navegador**: funciona em celulares, tablets e computadores
+- *Cota gratuita*: usuários logados mantêm as páginas para sempre, páginas anônimas são destruídas após 7 dias
+
+### Casos de uso
+
+1. Professores compartilham anotações de aula e materiais de estudo
+2. Alunos enviam projetos e demonstrações
+3. Notas pessoais e base de conhecimento
+4. Compartilhe conteúdo web rapidamente via WeChat / QQ
+
+---
+
+## 📌 Início rápido
+
+> 💡 Dica: arraste um arquivo Markdown para o editor à esquerda e veja o resultado na hora!
+
+### Etapas
+
+- [x] Cole Markdown ou importe um arquivo \`.md\`
+- [x] Escolha um template no topo
+- [ ] Clique em "Gerar link" para publicar
+- [ ] Copie o link e compartilhe com amigos
+
+---
+
+## ✨ Demonstrações de formato
+
+O conteúdo abaixo cobre a sintaxe comum do Markdown — confira o resultado renderizado nos templates.
+
+### Estilos de texto
+
+Texto normal com **negrito**, *itálico*, ~~tachado~~ e \`código inline\`. Atalhos de teclado ficam assim: <kbd>Ctrl</kbd> + <kbd>C</kbd>.
+
+### Listas aninhadas
+
+1. Primeiro nível
+   - Segundo nível (sem ordem)
+     - Terceiro nível recuado
+2. Continuar numeração
+
+### Tabela comparativa
+
+| Recurso | Usuário gratuito | Membro |
+| :--- | :---: | ---: |
+| Publicação anônima | ✅ 7 dias | ✅ Permanente |
+| Título personalizado | ❌ | ✅ |
+| Compartilhar na Praça | ❌ | ✅ |
+| Limite de tamanho | 5 MB | 5 MB |
+
+### Citação
+
+> **Pensamento profundo**: uma ferramenta realmente útil faz com que as pessoas gastem seu tempo com o conteúdo, não com a ferramenta em si.
+
+---
+
+## 🛠️ Suporte técnico
+
+\`\`\`js
+// Renderize um Markdown em apenas dois passos
+import { renderMarkdown } from "./md2html";
+
+const html = await renderMarkdown(md, "apple");
+console.log(html.length); // comprimento total do HTML
+\`\`\`
+
+\`\`\`bash
+# Execute o servidor de desenvolvimento localmente
+npm run dev
+
+# Compilação de produção
+npm run build
+\`\`\`
+
+\`\`\`json
+{
+  "templates": 9,
+  "anonymous": "7 days",
+  "permanent": true,
+  "maxSize": "5 MB"
+}
+\`\`\`
+
+---
+
+## 📮 Fale conosco
+
+- **Site**: [https://100mini.com](https://100mini.com)
+- **E-mail**: <hello@100mini.com>
+- **Feedback**: envie um e-mail com suas ideias
+
+> Todos podem criar um mini site — experimente o **100mini** agora! ✨
+`;
+
+const DEFAULT_MD_FR = `# 100mini · Simplifions le partage
+
+**100mini** est un outil gratuit d'hébergement HTML / Markdown conçu pour apprendre et partager. Collez votre contenu, choisissez un modèle, générez un lien — accessible **partout pendant 7 jours**.
+
+---
+
+## 🚀 Fonctionnalités clés
+
+- **Publiez en quelques secondes** : collez et publiez, sans inscription
+- **9 modèles de marque** : d'Apple à Linear, changez de style en un clic
+- **S'ouvre dans n'importe quel navigateur** : fonctionne sur mobile, tablette et ordinateur
+- *Quota gratuit* : les utilisateurs connectés gardent leurs pages pour toujours, les pages anonymes sont détruites après 7 jours
+
+### Cas d'usage
+
+1. Les enseignants partagent leurs cours et supports d'étude
+2. Les élèves soumettent projets et démonstrations
+3. Notes personnelles et base de connaissances
+4. Partagez rapidement du contenu web via WeChat / QQ
+
+---
+
+## 📌 Démarrage rapide
+
+> 💡 Astuce : glissez un fichier Markdown dans l'éditeur à gauche et voyez le résultat instantanément !
+
+### Étapes
+
+- [x] Collez du Markdown ou importez un fichier \`.md\`
+- [x] Choisissez un modèle en haut
+- [ ] Cliquez sur « Générer le lien » pour publier
+- [ ] Copiez le lien et partagez-le avec vos amis
+
+---
+
+## ✨ Démonstrations de format
+
+Le contenu ci-dessous couvre la syntaxe Markdown courante — vérifiez le rendu dans tous les modèles.
+
+### Styles de texte
+
+Texte normal avec **gras**, *italique*, ~~barré~~ et \`code en ligne\`. Les raccourcis clavier ressemblent à <kbd>Ctrl</kbd> + <kbd>C</kbd>.
+
+### Listes imbriquées
+
+1. Premier niveau
+   - Deuxième niveau (sans ordre)
+     - Troisième niveau indenté
+2. Continuer la numérotation
+
+### Tableau comparatif
+
+| Fonction | Utilisateur gratuit | Membre |
+| :--- | :---: | ---: |
+| Publication anonyme | ✅ 7 jours | ✅ Permanent |
+| Titre personnalisé | ❌ | ✅ |
+| Partager sur la Place | ❌ | ✅ |
+| Limite de taille | 5 Mo | 5 Mo |
+
+### Citation
+
+> **Réflexion** : un outil vraiment utile permet aux gens de consacrer leur temps au contenu, et non à l'outil lui-même.
+
+---
+
+## 🛠️ Support technique
+
+\`\`\`js
+// Rendre un Markdown en deux étapes seulement
+import { renderMarkdown } from "./md2html";
+
+const html = await renderMarkdown(md, "apple");
+console.log(html.length); // longueur totale du HTML
+\`\`\`
+
+\`\`\`bash
+# Lancer le serveur de développement localement
+npm run dev
+
+# Compilation de production
+npm run build
+\`\`\`
+
+\`\`\`json
+{
+  "templates": 9,
+  "anonymous": "7 days",
+  "permanent": true,
+  "maxSize": "5 MB"
+}
+\`\`\`
+
+---
+
+## 📮 Contactez-nous
+
+- **Site web** : [https://100mini.com](https://100mini.com)
+- **E-mail** : <hello@100mini.com>
+- **Retour** : envoyez-nous un e-mail avec vos idées
+
+> Tout le monde peut créer un mini site — essayez **100mini** dès maintenant ! ✨
+`;
+
 const DEFAULT_MD_EN = `# 100mini · Make Sharing Effortless
 
 **100mini** is a free HTML / Markdown hosting tool built for learning and sharing. Paste your content, pick a template, generate a link — accessible **anywhere for 7 days**.
@@ -254,6 +563,18 @@ npm run build
 
 const MAX_SIZE = PUBLISH_LIMIT;
 
+const DEFAULT_MD_BY_LANG: Record<string, string> = {
+  zh: DEFAULT_MD_ZH,
+  en: DEFAULT_MD_EN,
+  es: DEFAULT_MD_ES,
+  pt: DEFAULT_MD_PT,
+  fr: DEFAULT_MD_FR,
+};
+
+function getDefaultMd(lang: string): string {
+  return DEFAULT_MD_BY_LANG[lang] ?? DEFAULT_MD_EN;
+}
+
 interface UploadResult {
   id: string;
   url: string;
@@ -267,12 +588,12 @@ function Md2HtmlPage() {
   const { t, i18n: i18nInstance } = useTranslation();
   const { user } = useAuth();
   const lang = i18nInstance.language?.startsWith("zh") ? "zh" : "en";
-  const defaultMd = lang === "zh" ? DEFAULT_MD_ZH : DEFAULT_MD_EN;
+  const defaultMd = getDefaultMd(lang);
   const [md, setMd] = useState(defaultMd);
   const defaultMdRef = useRef(defaultMd);
 
   useEffect(() => {
-    const currentDefault = lang === "zh" ? DEFAULT_MD_ZH : DEFAULT_MD_EN;
+    const currentDefault = getDefaultMd(lang);
     if (md === defaultMdRef.current) {
       defaultMdRef.current = currentDefault;
       setMd(currentDefault);
@@ -444,7 +765,7 @@ function Md2HtmlPage() {
   const handleReset = () => {
     setResult(null);
     setHtml("");
-    const currentDefault = lang === "zh" ? DEFAULT_MD_ZH : DEFAULT_MD_EN;
+    const currentDefault = getDefaultMd(lang);
     defaultMdRef.current = currentDefault;
     setMd(currentDefault);
     setTitle("");
