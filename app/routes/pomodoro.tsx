@@ -4,15 +4,19 @@ import { useAuth } from "~/lib/auth-context";
 import { AuthDialog } from "~/components/AuthDialog";
 import { useTranslation } from "react-i18next";
 import i18n, { getBcp47 } from "~/lib/i18n";
+import { withLangPrefix, currentLang, BASE_URL } from "~/lib/seo";
 
 export const Route = createFileRoute("/pomodoro")({
   head: () => {
     const title = i18n.t("pomodoro.title");
     const desc = i18n.t("pomodoro.desc");
     const keywords = i18n.t("pomodoro.keywords");
-    const lang = i18n.language?.startsWith("zh") ? "zh" : "en";
+    const faqs = Array.from({ length: 5 }, (_, i) => ({
+      name: i18n.t(`pomodoro.faq${i + 1}.q`),
+      text: i18n.t(`pomodoro.faq${i + 1}.a`),
+    }));
     const bcp = getBcp47(i18n.language);
-    const pageUrl = "https://100mini.com/pomodoro";
+    const pageUrl = BASE_URL + withLangPrefix(currentLang(), "/pomodoro");
     return {
       meta: [
         { title },
@@ -20,19 +24,14 @@ export const Route = createFileRoute("/pomodoro")({
         { name: "keywords", content: keywords },
         { name: "robots", content: "index, follow" },
         { property: "og:type", content: "website" },
-        { property: "og:url", content: pageUrl },
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:image", content: "https://100mini.com/spritesheet2/frame_38.webp" },
-        { property: "og:locale", content: bcp.replace("-", "_") },
         { property: "og:site_name", content: "100mini" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: desc },
         { name: "twitter:image", content: "https://100mini.com/spritesheet2/frame_38.webp" },
-      ],
-      links: [
-        { rel: "canonical", href: pageUrl },
       ],
       scripts: [
         {
@@ -40,7 +39,7 @@ export const Route = createFileRoute("/pomodoro")({
           children: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebApplication",
-            name: lang === "zh" ? "100mini 番茄时钟" : "100mini Pomodoro Timer",
+            name: title,
             url: pageUrl,
             description: desc,
             applicationCategory: "ProductivityApplication",
@@ -56,59 +55,11 @@ export const Route = createFileRoute("/pomodoro")({
           children: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "FAQPage",
-            mainEntity: lang === "zh" ? [
-              {
-                "@type": "Question",
-                name: "什么是番茄工作法？",
-                acceptedAnswer: { "@type": "Answer", text: "番茄工作法是一种时间管理方法，将工作分为 25 分钟的专注时段，中间穿插短暂休息。每完成 4 个专注时段后，进行一次长休息，帮助保持高效专注。" },
-              },
-              {
-                "@type": "Question",
-                name: "一个番茄时段多久？",
-                acceptedAnswer: { "@type": "Answer", text: "默认每个番茄时段为 25 分钟专注。你可以在设置中自定义专注时长、短休息和长休息的时间。" },
-              },
-              {
-                "@type": "Question",
-                name: "一天应该完成几个番茄？",
-                acceptedAnswer: { "@type": "Answer", text: "因人而异，初学者可以从每天 4-6 个番茄开始，有经验的用户通常每天完成 8-12 个番茄。关键在于保持节奏，而不是追求数量。" },
-              },
-              {
-                "@type": "Question",
-                name: "番茄时钟免费吗？",
-                acceptedAnswer: { "@type": "Answer", text: "完全免费，无需注册即可使用。登录后可以追踪每日完成的番茄数量，帮助更好地管理时间。" },
-              },
-              {
-                "@type": "Question",
-                name: "可以自定义时长和提示音吗？",
-                acceptedAnswer: { "@type": "Answer", text: "可以。点击左上角菜单按钮，在设置中可分别调整专注时长、短休息时长、长休息时长，以及选择 5 种不同的提示音效。" },
-              },
-            ] : [
-              {
-                "@type": "Question",
-                name: "What is the Pomodoro Technique?",
-                acceptedAnswer: { "@type": "Answer", text: "The Pomodoro Technique is a time management method that breaks work into 25-minute focus sessions separated by short breaks. After every 4 focus sessions, take a longer break to maintain productivity." },
-              },
-              {
-                "@type": "Question",
-                name: "How long is a Pomodoro session?",
-                acceptedAnswer: { "@type": "Answer", text: "By default, each Pomodoro session is 25 minutes of focused work. You can customize the focus duration, short break, and long break in the Settings menu." },
-              },
-              {
-                "@type": "Question",
-                name: "How many Pomodoros should I do per day?",
-                acceptedAnswer: { "@type": "Answer", text: "It varies by individual. Beginners can start with 4-6 Pomodoros per day, while experienced users typically complete 8-12. The key is maintaining a sustainable rhythm rather than chasing a specific number." },
-              },
-              {
-                "@type": "Question",
-                name: "Is this Pomodoro timer free?",
-                acceptedAnswer: { "@type": "Answer", text: "Yes, it is completely free with no sign-up required. Logging in allows you to track your daily completed Pomodoros and monitor your productivity over time." },
-              },
-              {
-                "@type": "Question",
-                name: "Can I customize the duration and alarm sounds?",
-                acceptedAnswer: { "@type": "Answer", text: "Yes. Click the menu button in the top-left corner to open Settings, where you can adjust the focus duration, short break, and long break, and choose from 5 different alarm melodies." },
-              },
-            ],
+            mainEntity: faqs.map((faq) => ({
+              "@type": "Question",
+              name: faq.name,
+              acceptedAnswer: { "@type": "Answer", text: faq.text },
+            })),
           }),
         },
       ],

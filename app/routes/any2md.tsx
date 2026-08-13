@@ -4,6 +4,7 @@ import { FileText, ShieldCheck, Files, Table2, ArrowRight, Check, ChevronDown } 
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { FileDrop } from "~/components/any2md/FileDrop";
+import { withLangPrefix, currentLang, BASE_URL } from "~/lib/seo";
 import { ResultPanel } from "~/components/any2md/ResultPanel";
 import { MdView } from "~/components/any2md/MdView";
 import {
@@ -23,9 +24,8 @@ const textEncoder = new TextEncoder();
 
 export const Route = createFileRoute("/any2md")({
   head: () => {
-    const lang = i18n.language?.startsWith("zh") ? "zh" : "en";
     const bcp = getBcp47(i18n.language);
-    const pageUrl = "https://100mini.com/any2md";
+    const pageUrl = BASE_URL + withLangPrefix(currentLang(), "/any2md");
     const ogImage = "https://100mini.com/spritesheet2/frame_38.webp";
     const faqs = Array.from({ length: 6 }, (_, i) => ({
       name: i18n.t(`any2md.faq${i + 1}.q`),
@@ -38,19 +38,14 @@ export const Route = createFileRoute("/any2md")({
         { name: "keywords", content: i18n.t("any2md.keywords") },
         { name: "robots", content: "index, follow" },
         { property: "og:type", content: "website" },
-        { property: "og:url", content: pageUrl },
         { property: "og:title", content: i18n.t("any2md.title") },
         { property: "og:description", content: i18n.t("any2md.subtitle") },
         { property: "og:image", content: ogImage },
-        { property: "og:locale", content: bcp.replace("-", "_") },
         { property: "og:site_name", content: "100mini" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: i18n.t("any2md.title") },
         { name: "twitter:description", content: i18n.t("any2md.subtitle") },
         { name: "twitter:image", content: ogImage },
-      ],
-      links: [
-        { rel: "canonical", href: pageUrl },
       ],
       scripts: [
         {
@@ -66,10 +61,10 @@ export const Route = createFileRoute("/any2md")({
             browserRequirements: "Requires JavaScript and WebAssembly",
             offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
             featureList: [
-              "Convert Word, PPT, Excel and PDF to Markdown in the browser",
-              "Runs 100% locally, files never leave the machine",
-              "13 formats supported",
-              "Download, copy, or continue to MD to HTML templates",
+              i18n.t("any2md.feature1"),
+              i18n.t("any2md.feature2"),
+              i18n.t("any2md.feature3"),
+              i18n.t("any2md.feature4"),
             ],
             author: { "@type": "Organization", name: "100mini", url: "https://100mini.com" },
             inLanguage: bcp,

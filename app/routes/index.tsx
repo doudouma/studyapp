@@ -31,9 +31,6 @@ export const Route = createFileRoute("/")({
         content: i18n.t("app.keywords"),
       },
     ],
-    links: [
-      { rel: "canonical", href: "https://100mini.com/" },
-    ],
   }),
   component: HomePage,
 });

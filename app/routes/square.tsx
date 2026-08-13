@@ -31,16 +31,12 @@ export const Route = createFileRoute("/square")({
         property: "og:description",
         content: i18n.t("square.desc"),
       },
-      { property: "og:url", content: "https://100mini.com/square" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: i18n.t("square.title") },
       {
         name: "twitter:description",
         content: i18n.t("square.desc"),
       },
-    ],
-    links: [
-      { rel: "canonical", href: "https://100mini.com/square" },
     ],
   }),
   component: SquarePage,

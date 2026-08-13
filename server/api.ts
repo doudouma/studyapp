@@ -2,6 +2,14 @@
 import { Hono } from "hono";
 import { nanoid } from "nanoid";
 import { count, eq, and, desc, sql, gte, lt } from "drizzle-orm";
+import {
+  LANGS,
+  DEFAULT_LANG,
+  withLangPrefix,
+  BASE_URL,
+  getBcp47,
+  type Lang,
+} from "../app/lib/lang";
 import { MAX_SIZE } from "./r2";
 import { createDb } from "./db";
 import { page, user, membership, pomodoroSession } from "./db/schema";
@@ -164,64 +172,117 @@ async function getFromStorage(
   return null;
 }
 
+// --- SEO: multilingual sitemaps & robots ---
+//
+// Language URL strategy: en (default) at root (no prefix); zh/es/pt/fr at
+// /{lang}/... . Each language has its own sitemap for individual Google Search
+// Console submission, plus a sitemap index at /sitemap.xml listing them all.
+// Every URL advertises its hreflang alternates via <xhtml:link> so search
+// engines know the language-region correspondence.
+
+const STATIC_PAGES: { loc: string; changefreq: string; priority: string }[] = [
+  { loc: "/", changefreq: "daily", priority: "1.0" },
+  { loc: "/square", changefreq: "hourly", priority: "0.9" },
+  { loc: "/md2html", changefreq: "weekly", priority: "0.8" },
+  { loc: "/any2md", changefreq: "weekly", priority: "0.8" },
+  { loc: "/freetool", changefreq: "weekly", priority: "0.7" },
+  { loc: "/links", changefreq: "weekly", priority: "0.7" },
+  { loc: "/pomodoro", changefreq: "weekly", priority: "0.6" },
+  { loc: "/rhythm", changefreq: "weekly", priority: "0.6" },
+  { loc: "/contact", changefreq: "yearly", priority: "0.3" },
+  { loc: "/privacy", changefreq: "yearly", priority: "0.3" },
+  { loc: "/terms", changefreq: "yearly", priority: "0.3" },
+  { loc: "/cookie", changefreq: "yearly", priority: "0.3" },
+];
+
+const XML_HDR = '<?xml version="1.0" encoding="UTF-8"?>';
+
+function escapeXml(s: string): string {
+  return s.replace(/[<>&'"]/g, (ch) =>
+    ch === "<" ? "&lt;" : ch === ">" ? "&gt;" : ch === "&" ? "&amp;" : ch === "'" ? "&apos;" : "&quot;"
+  );
+}
+
 api.get("/robots.txt", (c) => {
+  const sitemapLines = LANGS.map((l) => `Sitemap: ${BASE_URL}/sitemap-${l}.xml`).join("\n");
   return c.text(`User-agent: *
 Allow: /
 Disallow: /p/
+Disallow: /api/
+Disallow: /admin
 
-Sitemap: https://100mini.com/sitemap.xml
+${sitemapLines}
 `);
 });
 
-api.get("/sitemap.xml", async (c) => {
-  const baseUrl = "https://100mini.com";
-  const staticPages = [
-    { loc: "/", changefreq: "daily", priority: "1.0" },
-    { loc: "/square", changefreq: "hourly", priority: "0.9" },
-    { loc: "/md2html", changefreq: "weekly", priority: "0.8" },
-    { loc: "/any2md", changefreq: "weekly", priority: "0.8" },
-    { loc: "/freetool", changefreq: "weekly", priority: "0.7" },
-    { loc: "/links", changefreq: "weekly", priority: "0.7" },
-    { loc: "/pomodoro", changefreq: "weekly", priority: "0.6" },
-    { loc: "/rhythm", changefreq: "weekly", priority: "0.6" },
-    { loc: "/contact", changefreq: "yearly", priority: "0.3" },
-    { loc: "/privacy", changefreq: "yearly", priority: "0.3" },
-    { loc: "/terms", changefreq: "yearly", priority: "0.3" },
-    { loc: "/cookie", changefreq: "yearly", priority: "0.3" },
-  ];
+// Sitemap index — lists each per-language sitemap.
+api.get("/sitemap.xml", (c) => {
+  const entries = LANGS.map(
+    (l) => `\n  <sitemap>\n    <loc>${BASE_URL}/sitemap-${l}.xml</loc>\n  </sitemap>`
+  ).join("");
+  return c.text(
+    `${XML_HDR}\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${entries}\n</sitemapindex>`,
+    200,
+    { "Content-Type": "application/xml" }
+  );
+});
 
-  let dynamicPages: { id: string; sharedAt: Date | null }[] = [];
-  if (c.env.D1) {
+// hreflang alternates for a static page (one <xhtml:link> per language + x-default)
+function alternateLinksXml(basePath: string): string {
+  const lines = LANGS.map(
+    (l) =>
+      `\n    <xhtml:link rel="alternate" hreflang="${getBcp47(l)}" href="${BASE_URL}${withLangPrefix(l, basePath)}"/>`
+  );
+  lines.push(
+    `\n    <xhtml:link rel="alternate" hreflang="x-default" href="${BASE_URL}${withLangPrefix(DEFAULT_LANG, basePath)}"/>`
+  );
+  return lines.join("");
+}
+
+async function buildLangSitemap(c: any, lang: Lang): Promise<string> {
+  const urls: string[] = STATIC_PAGES.map((p) => {
+    const loc = `${BASE_URL}${withLangPrefix(lang, p.loc)}`;
+    return `
+  <url>
+    <loc>${loc}</loc>
+    <changefreq>${p.changefreq}</changefreq>
+    <priority>${p.priority}</priority>${alternateLinksXml(p.loc)}
+  </url>`;
+  });
+
+  // User-generated shared pages live at root only (single canonical URL, no
+  // language variants — /{lang}/p/:id 301-redirects to /p/:id). Include them
+  // only in the default-language (en) sitemap.
+  if (lang === DEFAULT_LANG && c.env?.D1) {
     const db = createDb(c.env.D1);
-    dynamicPages = await db
+    const dynamicPages = await db
       .select({ id: page.id, sharedAt: page.sharedAt })
       .from(page)
       .where(eq(page.isSharedToSquare, true))
       .orderBy(desc(page.sharedAt))
       .limit(1000);
+    for (const p of dynamicPages) {
+      if (!p.sharedAt) continue;
+      const lastmod = new Date(p.sharedAt).toISOString().split("T")[0];
+      urls.push(`
+  <url>
+    <loc>${BASE_URL}/p/${escapeXml(p.id)}</loc>
+    <lastmod>${lastmod}</lastmod>
+  </url>`);
+    }
   }
 
-  const urls = [
-    ...staticPages.map((p) => `
-  <url>
-    <loc>${baseUrl}${p.loc}</loc>
-    <changefreq>${p.changefreq}</changefreq>
-    <priority>${p.priority}</priority>
-  </url>`),
-    ...dynamicPages.filter((p) => p.sharedAt).map((p) => `
-  <url>
-    <loc>${baseUrl}/p/${p.id}</loc>
-    <lastmod>${new Date(p.sharedAt!).toISOString().split("T")[0]}</lastmod>
-  </url>`),
-  ];
+  return `${XML_HDR}\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">${urls.join("")}\n</urlset>`;
+}
 
-  return c.text(
-    `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.join("")}
-</urlset>`,
-    { headers: { "Content-Type": "application/xml" } }
-  );
-});
+// Register one sitemap route per language: /sitemap-zh.xml, /sitemap-en.xml, ...
+for (const lang of LANGS) {
+  api.get(`/sitemap-${lang}.xml`, async (c) => {
+    const body = await buildLangSitemap(c, lang as Lang);
+    return c.text(body, 200, { "Content-Type": "application/xml" });
+  });
+}
+
 
 // Get current user + page count
 api.get("/api/me", async (c) => {

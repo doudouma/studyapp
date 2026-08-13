@@ -3,12 +3,12 @@ import { Timer, Music, FileText, FileCode2, ArrowRight, Sparkles } from "lucide-
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { useTranslation } from "react-i18next";
-import i18n, { getBcp47 } from "~/lib/i18n";
+import i18n from "~/lib/i18n";
+import { withLangPrefix, currentLang, BASE_URL } from "~/lib/seo";
 
 export const Route = createFileRoute("/freetool")({
   head: () => {
-    const bcp = getBcp47(i18n.language);
-    const pageUrl = "https://100mini.com/freetool";
+    const pageUrl = BASE_URL + withLangPrefix(currentLang(), "/freetool");
     const ogImage = "https://100mini.com/spritesheet2/frame_38.webp";
     return {
       meta: [
@@ -17,19 +17,14 @@ export const Route = createFileRoute("/freetool")({
         { name: "keywords", content: i18n.t("freetool.keywords") },
         { name: "robots", content: "index, follow" },
         { property: "og:type", content: "website" },
-        { property: "og:url", content: pageUrl },
         { property: "og:title", content: i18n.t("freetool.title") },
         { property: "og:description", content: i18n.t("freetool.desc") },
         { property: "og:image", content: ogImage },
-        { property: "og:locale", content: bcp.replace("-", "_") },
         { property: "og:site_name", content: "100mini" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: i18n.t("freetool.title") },
         { name: "twitter:description", content: i18n.t("freetool.desc") },
         { name: "twitter:image", content: ogImage },
-      ],
-      links: [
-        { rel: "canonical", href: pageUrl },
       ],
       scripts: [
         {

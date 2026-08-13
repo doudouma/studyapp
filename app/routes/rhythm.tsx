@@ -3,14 +3,14 @@ import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import i18n, { getBcp47 } from "~/lib/i18n";
+import { withLangPrefix, currentLang, BASE_URL } from "~/lib/seo";
 import { AppNav } from "~/components/HomeHeader";
 import { RhythmGame } from "~/components/RhythmGame";
 
 export const Route = createFileRoute("/rhythm")({
   head: () => {
-    const lang = i18n.language?.startsWith("zh") ? "zh" : "en";
     const bcp = getBcp47(i18n.language);
-    const pageUrl = "https://100mini.com/rhythm";
+    const pageUrl = BASE_URL + withLangPrefix(currentLang(), "/rhythm");
     const faqs = Array.from({ length: 5 }, (_, i) => ({
       name: i18n.t(`rhythm.faq${i + 1}.q`),
       text: i18n.t(`rhythm.faq${i + 1}.a`),
@@ -22,19 +22,14 @@ export const Route = createFileRoute("/rhythm")({
         { name: "keywords", content: i18n.t("rhythm.keywords") },
         { name: "robots", content: "index, follow" },
         { property: "og:type", content: "website" },
-        { property: "og:url", content: pageUrl },
         { property: "og:title", content: i18n.t("rhythm.title") },
         { property: "og:description", content: i18n.t("rhythm.desc") },
         { property: "og:image", content: "https://100mini.com/spritesheet2/frame_38.webp" },
-        { property: "og:locale", content: bcp.replace("-", "_") },
         { property: "og:site_name", content: "100mini" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: i18n.t("rhythm.title") },
         { name: "twitter:description", content: i18n.t("rhythm.desc") },
         { name: "twitter:image", content: "https://100mini.com/spritesheet2/frame_38.webp" },
-      ],
-      links: [
-        { rel: "canonical", href: pageUrl },
       ],
       scripts: [
         {
@@ -42,7 +37,7 @@ export const Route = createFileRoute("/rhythm")({
           children: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebApplication",
-            name: lang === "zh" ? "100mini 节奏游戏" : "100mini Rhythm Forge",
+            name: i18n.t("rhythm.title"),
             url: pageUrl,
             description: i18n.t("rhythm.desc"),
             applicationCategory: "GameApplication",
@@ -50,10 +45,10 @@ export const Route = createFileRoute("/rhythm")({
             browserRequirements: "Requires JavaScript and Web Audio API",
             offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
             featureList: [
-              "Turn any song into a rhythm game",
-              "Auto-generated 4K falling-note beatmaps",
-              "Runs 100% locally in the browser",
-              "Supports MP3, WAV, OGG and M4A",
+              i18n.t("rhythm.feature1"),
+              i18n.t("rhythm.feature2"),
+              i18n.t("rhythm.feature3"),
+              i18n.t("rhythm.feature4"),
             ],
             author: { "@type": "Organization", name: "100mini", url: "https://100mini.com" },
             inLanguage: bcp,

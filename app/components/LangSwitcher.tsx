@@ -1,7 +1,11 @@
-import { useTranslation } from "react-i18next";
-import { setLanguage } from "~/lib/i18n";
+import {
+  currentLang,
+  stripLangPrefix,
+  withLangPrefix,
+  type Lang,
+} from "~/lib/seo";
 
-const LANGUAGES = [
+const LANGUAGES: { code: Lang; label: string }[] = [
   { code: "zh", label: "中文" },
   { code: "en", label: "English" },
   { code: "es", label: "Español" },
@@ -9,12 +13,23 @@ const LANGUAGES = [
   { code: "fr", label: "Français" },
 ];
 
+/**
+ * Switch language by navigating to the equivalent page under the new language's
+ * URL prefix. Uses a full page navigation so the router re-initializes its
+ * basepath for the new language.
+ */
 export function LangSwitcher() {
-  const { i18n: i18nInstance } = useTranslation();
-  const current = i18nInstance.language;
+  // Read the active language from the i18n instance: server.tsx sets it from
+  // the URL prefix before SSR, and the client sets it from window.location.
+  // This keeps the selected <option> correct during SSR (no window access).
+  const current = currentLang();
 
   const change = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setLanguage(e.target.value);
+    const next = e.target.value as Lang;
+    if (next === current) return;
+    const basePath = stripLangPrefix(window.location.pathname);
+    const newUrl = withLangPrefix(next, basePath) + window.location.search + window.location.hash;
+    window.location.assign(newUrl);
   };
 
   return (

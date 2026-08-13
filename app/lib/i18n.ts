@@ -5,6 +5,7 @@ import en from "./locales/en.json";
 import es from "./locales/es.json";
 import pt from "./locales/pt.json";
 import fr from "./locales/fr.json";
+import { parseLangFromPath, DEFAULT_LANG, type Lang } from "./lang";
 
 const resources = {
   zh: { translation: zh },
@@ -14,42 +15,34 @@ const resources = {
   fr: { translation: fr },
 };
 
-const SUPPORTED = ["zh", "en", "es", "pt", "fr"];
-
-function detectLang(browserLang: string): string {
-  const base = browserLang.toLowerCase().split("-")[0];
-  if (SUPPORTED.includes(base)) return base;
-  return "en";
+/**
+ * Language is derived from the URL (not localStorage), so every language
+ * version has a unique, indexable URL:
+ *   /        → en (default, no prefix)
+ *   /zh/...  → zh
+ *   /es/...  → es
+ *   /pt/...  → pt
+ *   /fr/...  → fr
+ *
+ * On the server, server.tsx sets the language from the URL prefix before SSR.
+ * On the client, we read it from window.location.pathname.
+ */
+function detectInitialLang(): Lang {
+  if (typeof window !== "undefined") {
+    return parseLangFromPath(window.location.pathname);
+  }
+  return DEFAULT_LANG; // server default; server.tsx overrides per-request
 }
-
-const lang =
-  typeof window !== "undefined"
-    ? localStorage.getItem("lang") || detectLang(navigator.language)
-    : "zh";
 
 i18n.use(initReactI18next).init({
   resources,
-  lng: lang,
-  fallbackLng: "zh",
+  lng: detectInitialLang(),
+  fallbackLng: DEFAULT_LANG,
   interpolation: { escapeValue: false },
 });
 
 export default i18n;
 
-export function setLanguage(lng: string) {
-  i18n.changeLanguage(lng);
-  if (typeof window !== "undefined") {
-    localStorage.setItem("lang", lng);
-    document.documentElement.lang = lng;
-  }
-}
-
-export function getBcp47(lng: string | undefined): string {
-  switch (lng?.toLowerCase().split("-")[0]) {
-    case "zh": return "zh-CN";
-    case "es": return "es-ES";
-    case "pt": return "pt-BR";
-    case "fr": return "fr-FR";
-    default: return "en-US";
-  }
-}
+// getBcp47 is re-exported from ./lang (single source of truth) so existing
+// callers importing from "~/lib/i18n" keep working.
+export { getBcp47 } from "./lang";
