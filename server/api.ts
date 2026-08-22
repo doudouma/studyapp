@@ -1901,6 +1901,76 @@ api.get("/api/wardrobe/assets/*", async (c) => {
 
 // ==================== Outfit API ====================
 
+// 异步生成 outfit 图片（FLUX.2 klein 4B，multipart 输入，固定 4 步），并更新记录状态
+async function generateOutfitImage(
+  env: { AI?: Ai; BUCKET?: R2Bucket; D1?: D1Database },
+  db: ReturnType<typeof createDb>,
+  outfitId: string,
+  prompt: string
+) {
+  try {
+    await db.update(wardrobeOutfit)
+      .set({ status: "generating" })
+      .where(eq(wardrobeOutfit.id, outfitId));
+
+    const form = new FormData();
+    form.append("prompt", prompt);
+    form.append("width", "1024");
+    form.append("height", "1024");
+
+    // FormData 不暴露序列化后的 body 和 boundary，通过 Response 构造函数生成 Content-Type
+    const formResponse = new Response(form);
+    const formStream = formResponse.body;
+    const formContentType = formResponse.headers.get("content-type") || "multipart/form-data";
+
+    const response = await (env.AI as any).run(IMAGE_MODEL, {
+      multipart: {
+        body: formStream,
+        contentType: formContentType,
+      },
+    });
+
+    let imageBuffer: ArrayBuffer;
+    if (response instanceof ArrayBuffer) {
+      imageBuffer = response;
+    } else if (response instanceof Uint8Array) {
+      imageBuffer = response.buffer as ArrayBuffer;
+    } else if (response && typeof response === "object" && typeof response.image === "string") {
+      // klein-4b 输出为 { image: "<base64>" }
+      const binary = atob(response.image);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      imageBuffer = bytes.buffer as ArrayBuffer;
+    } else {
+      throw new Error("Invalid response format");
+    }
+
+    const imageKey = `wardrobe/outfits/${outfitId}.png`;
+    await env.BUCKET!.put(imageKey, imageBuffer, {
+      httpMetadata: { contentType: "image/png" },
+    });
+
+    await db.update(wardrobeOutfit)
+      .set({
+        status: "completed",
+        imageUrl: `/api/wardrobe/assets/outfits/${outfitId}.png`,
+        updatedAt: new Date(),
+      })
+      .where(eq(wardrobeOutfit.id, outfitId));
+  } catch (error: any) {
+    console.error("[outfit] Generation failed:", error.message);
+    await db.update(wardrobeOutfit)
+      .set({
+        status: "failed",
+        error: error.message,
+        updatedAt: new Date(),
+      })
+      .where(eq(wardrobeOutfit.id, outfitId));
+  }
+}
+
 // 获取用户的 outfit 列表
 api.get("/api/wardrobe/outfits", async (c) => {
   const user = c.get("user");
@@ -1974,74 +2044,7 @@ Professional fashion photography, clean white background, well-lit, high quality
 
   // 异步生成图片
   if (c.env.AI) {
-    c.executionCtx.waitUntil(
-      (async () => {
-        try {
-          await db.update(wardrobeOutfit)
-            .set({ status: "generating" })
-            .where(eq(wardrobeOutfit.id, outfitId));
-
-          // FLUX.2 [klein] 4B 要求 multipart form data 输入（固定 4 步，无 num_steps 参数）
-          const form = new FormData();
-          form.append("prompt", prompt);
-          form.append("width", "1024");
-          form.append("height", "1024");
-
-          // FormData 不暴露序列化后的 body 和 boundary，通过 Response 构造函数生成 Content-Type
-          const formResponse = new Response(form);
-          const formStream = formResponse.body;
-          const formContentType = formResponse.headers.get("content-type") || "multipart/form-data";
-
-          const response = await (c.env.AI as any).run(IMAGE_MODEL, {
-            multipart: {
-              body: formStream,
-              contentType: formContentType,
-            },
-          });
-
-          let imageBuffer: ArrayBuffer;
-          if (response instanceof ArrayBuffer) {
-            imageBuffer = response;
-          } else if (response instanceof Uint8Array) {
-            imageBuffer = response.buffer as ArrayBuffer;
-          } else if (response && typeof response === "object" && typeof response.image === "string") {
-            // klein-4b 输出为 { image: "<base64>" }
-            const binary = atob(response.image);
-            const bytes = new Uint8Array(binary.length);
-            for (let i = 0; i < binary.length; i++) {
-              bytes[i] = binary.charCodeAt(i);
-            }
-            imageBuffer = bytes.buffer as ArrayBuffer;
-          } else {
-            throw new Error("Invalid response format");
-          }
-
-          const imageKey = `wardrobe/outfits/${outfitId}.png`;
-          await c.env.BUCKET!.put(imageKey, imageBuffer, {
-            httpMetadata: { contentType: "image/png" },
-          });
-
-          const imageUrl = `/api/wardrobe/assets/outfits/${outfitId}.png`;
-          
-          await db.update(wardrobeOutfit)
-            .set({ 
-              status: "completed", 
-              imageUrl,
-              updatedAt: new Date() 
-            })
-            .where(eq(wardrobeOutfit.id, outfitId));
-        } catch (error: any) {
-          console.error("[outfit] Generation failed:", error.message);
-          await db.update(wardrobeOutfit)
-            .set({ 
-              status: "failed", 
-              error: error.message,
-              updatedAt: new Date() 
-            })
-            .where(eq(wardrobeOutfit.id, outfitId));
-        }
-      })()
-    );
+    c.executionCtx.waitUntil(generateOutfitImage(c.env, db, outfitId, prompt));
   }
 
   return c.json({ 
@@ -2053,6 +2056,156 @@ Professional fashion photography, clean white background, well-lit, high quality
       status: "planned" 
     } 
   });
+});
+
+// 参考 wardrobe-main 的 outfit 自动化创建：自动从服装库策划色彩和谐的组合并批量生成
+api.post("/api/wardrobe/outfits/auto", async (c) => {
+  const user = c.get("user");
+  if (!user) return c.json({ error: "Unauthorized" }, 401);
+
+  const body = await c.req.json().catch(() => ({}));
+  const count = Math.max(1, Math.min(6, Number(body.count) || 3));
+
+  const db = createDb(c.env.D1!);
+  const allItems = await db.select()
+    .from(wardrobeItem)
+    .where(eq(wardrobeItem.userId, user.id))
+    .all();
+
+  if (allItems.length === 0) {
+    return c.json({ error: "Your wardrobe is empty. Import some clothes first." }, 400);
+  }
+
+  const tops = allItems.filter((i) => i.part === "upperbody");
+  const jackets = allItems.filter((i) => i.part === "wholebody_up");
+  const bottoms = allItems.filter((i) => i.part === "lowerbody");
+  const shoes = allItems.filter((i) => i.part === "shoes");
+  const accessories = allItems.filter((i) => i.part === "accessories_up");
+
+  if (tops.length === 0 || bottoms.length === 0) {
+    return c.json({ error: "You need at least one top and one bottom to create outfits." }, 400);
+  }
+
+  // ---- 颜色工具 ----
+  const hexToRgb = (hex: string | null): { red: number; green: number; blue: number } => {
+    if (!hex) return { red: 128, green: 128, blue: 128 };
+    const clean = hex.replace("#", "");
+    const value = parseInt(clean.length === 3 ? clean.split("").map((ch) => ch + ch).join("") : clean, 16);
+    return { red: (value >> 16) & 255, green: (value >> 8) & 255, blue: value & 255 };
+  };
+  const colorDist = (a: { red: number; green: number; blue: number }, b: { red: number; green: number; blue: number }) =>
+    Math.sqrt((a.red - b.red) ** 2 + (a.green - b.green) ** 2 + (a.blue - b.blue) ** 2);
+
+  // 近似命名色（用于生成 outfit 名称）
+  const NAMED_COLORS: [string, number, number, number][] = [
+    ["black", 0, 0, 0], ["white", 255, 255, 255], ["grey", 128, 128, 128],
+    ["navy", 0, 0, 128], ["blue", 0, 0, 255], ["teal", 0, 128, 128],
+    ["green", 0, 128, 0], ["olive", 128, 128, 0], ["khaki", 195, 176, 145],
+    ["brown", 139, 69, 19], ["camel", 193, 154, 107], ["beige", 245, 245, 220],
+    ["cream", 255, 253, 208], ["maroon", 128, 0, 0], ["red", 255, 0, 0],
+    ["burgundy", 144, 0, 32], ["coral", 255, 127, 80], ["pink", 255, 192, 203],
+    ["purple", 128, 0, 128], ["violet", 238, 130, 238], ["lavender", 230, 230, 250],
+    ["orange", 255, 165, 0], ["amber", 255, 191, 0], ["yellow", 255, 255, 0],
+    ["gold", 255, 215, 0], ["cyan", 0, 255, 255], ["turquoise", 64, 224, 208],
+  ];
+  const colorName = (hex: string | null): string => {
+    if (!hex) return "neutral";
+    const rgb = hexToRgb(hex);
+    let best = "neutral";
+    let bestScore = Infinity;
+    for (const [label, r, g, b] of NAMED_COLORS) {
+      const score = colorDist(rgb, { red: r, green: g, blue: b });
+      if (score < bestScore) { bestScore = score; best = label; }
+    }
+    return best;
+  };
+
+  // ---- 策划组合：色彩和谐 + 公平使用 ----
+  const usage = new Map<string, number>();
+  const bump = (id: string) => usage.set(id, (usage.get(id) || 0) + 1);
+  const leastUsed = (pool: (typeof allItems)[number][]) =>
+    pool.length === 0 ? null : [...pool].sort((a, b) => (usage.get(a.id) || 0) - (usage.get(b.id) || 0))[0];
+  const harmonicPick = (pool: (typeof allItems)[number][], ref: { red: number; green: number; blue: number }) => {
+    if (pool.length === 0) return null;
+    let best: (typeof allItems)[number] | null = null;
+    let bestScore = Infinity;
+    for (const item of pool) {
+      const score = colorDist(ref, hexToRgb(item.color)) + (usage.get(item.id) || 0) * 60;
+      if (score < bestScore) { bestScore = score; best = item; }
+    }
+    return best;
+  };
+
+  const STYLE_WORDS = ["Classic", "Minimal", "Urban", "Layered", "Chic", "Everyday"];
+  const OCCASIONS = ["casual", "smart-casual", "office", "weekend", "date night", "city walk"];
+  const SETTINGS = [
+    "a quiet warm-stone courtyard with restrained greenery",
+    "a minimal concrete studio with soft natural light",
+    "soft daylight by a large window in an airy room",
+    "a city rooftop at golden hour with clean lines",
+    "a calm beige-toned street corner in morning light",
+    "a park path with soft blurred foliage in the background",
+  ];
+
+  const maxCombos = Math.min(count, tops.length * bottoms.length);
+  const combos: { top: any; bottom: any; jacket: any; shoes: any; accessory: any }[] = [];
+  for (let i = 0; i < maxCombos; i++) {
+    const top = leastUsed(tops)!;
+    bump(top.id);
+    const bottom = harmonicPick(bottoms, hexToRgb(top.color))!;
+    bump(bottom.id);
+    const jacket = harmonicPick(jackets, hexToRgb(top.color));
+    if (jacket) bump(jacket.id);
+    const shoe = leastUsed(shoes);
+    if (shoe) bump(shoe.id);
+    const accessory = leastUsed(accessories);
+    if (accessory) bump(accessory.id);
+    combos.push({ top, bottom, jacket, shoes: shoe, accessory });
+  }
+
+  // ---- 写入数据库并异步生成 ----
+  const created: any[] = [];
+  for (let i = 0; i < combos.length; i++) {
+    const combo = combos[i];
+    const outfitId = nanoid(10);
+    const topColor = colorName(combo.top.color);
+    const bottomColor = colorName(combo.bottom.color);
+    const name = `${topColor.charAt(0).toUpperCase() + topColor.slice(1)} & ${bottomColor.charAt(0).toUpperCase() + bottomColor.slice(1)} ${STYLE_WORDS[i % STYLE_WORDS.length]}`;
+    const occasion = OCCASIONS[i % OCCASIONS.length];
+    const itemIds = [combo.top, combo.bottom, combo.jacket, combo.shoes, combo.accessory]
+      .filter((item): item is any => !!item)
+      .map((item) => item.id);
+
+    const partLabel = (part: string) => {
+      const map: Record<string, string> = {
+        upperbody: "top", wholebody_up: "jacket", lowerbody: "bottoms", shoes: "shoes", accessories_up: "accessory",
+      };
+      return map[part] || part;
+    };
+    const describe = (item: any) => `${item.name} (${partLabel(item.part)}, ${colorName(item.color)})`;
+    const setting = SETTINGS[i % SETTINGS.length];
+    const prompt = `Full-body editorial fashion photo of a complete outfit: ${[
+      describe(combo.top), describe(combo.bottom), combo.jacket ? describe(combo.jacket) : null,
+      combo.shoes ? describe(combo.shoes) : null, combo.accessory ? describe(combo.accessory) : null,
+    ].filter(Boolean).join(", ")}. Harmonious ${topColor} and ${bottomColor} tonal palette, one dominant piece. Natural layered look, ${setting}, clean composition, square 1:1, photorealistic, professional fashion photography.`;
+
+    await db.insert(wardrobeOutfit).values({
+      id: outfitId,
+      userId: user.id,
+      name,
+      occasion,
+      itemIds: JSON.stringify(itemIds),
+      status: "planned",
+    });
+
+    if (c.env.AI) {
+      c.executionCtx.waitUntil(generateOutfitImage(c.env, db, outfitId, prompt));
+    }
+
+    created.push({ id: outfitId, name, occasion, itemIds, status: "planned" });
+  }
+
+  return c.json({ outfits: created });
 });
 
 // 获取 outfit 详情

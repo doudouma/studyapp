@@ -677,6 +677,8 @@ function WardrobePage() {
   const [outfitName, setOutfitName] = useState("");
   const [occasion, setOccasion] = useState("");
   const [generating, setGenerating] = useState(false);
+  const [autoCount, setAutoCount] = useState(3);
+  const [autoGenerating, setAutoGenerating] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -776,6 +778,25 @@ function WardrobePage() {
       }
     } catch { /* ignore */ }
     finally { setGenerating(false); }
+  };
+
+  const handleAutoGenerate = async () => {
+    if (autoGenerating) return;
+    setAutoGenerating(true);
+    try {
+      const response = await fetch("/api/wardrobe/outfits/auto", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ count: autoCount }),
+      });
+      const data = (await response.json()) as { outfits?: any[]; error?: string };
+      if (response.ok && data.outfits) {
+        setOutfits((prev) => [...data.outfits!, ...prev]);
+      } else {
+        alert(data.error || "Failed to generate outfits");
+      }
+    } catch { /* ignore */ }
+    finally { setAutoGenerating(false); }
   };
 
   const handleDeleteOutfit = async (id: string) => {
@@ -976,6 +997,69 @@ function WardrobePage() {
                   </span>
                 )}
               </button>
+            </div>
+
+            {/* 自动策划 Outfit */}
+            <div style={{
+              border: "1px solid var(--line)",
+              padding: "24px",
+              marginBottom: "32px",
+              background: "rgba(255,255,255,0.5)"
+            }}>
+              <h3 style={{
+                margin: "0 0 8px",
+                fontSize: "14px",
+                fontWeight: 500,
+                letterSpacing: "0.05em",
+                textTransform: "uppercase"
+              }}>
+                Auto Generate Outfits
+              </h3>
+              <p style={{ margin: "0 0 16px", fontSize: "12px", color: "var(--muted)" }}>
+                We curate color-harmonious combinations from your wardrobe and generate them automatically.
+              </p>
+              <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <label style={{ fontSize: "11px", fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--muted)" }}>
+                    Number of outfits
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={6}
+                    value={autoCount}
+                    onChange={(e) => setAutoCount(Math.max(1, Math.min(6, Number(e.target.value) || 1)))}
+                    style={{ width: "56px", minHeight: "36px", border: "1px solid var(--line)", padding: "6px 8px", background: "transparent", color: "var(--ink)", fontSize: "13px" }}
+                  />
+                </div>
+                <button
+                  onClick={handleAutoGenerate}
+                  disabled={autoGenerating || items.length < 2}
+                  style={{
+                    minHeight: "36px",
+                    border: "1px solid var(--ink)",
+                    padding: "8px 16px",
+                    background: autoGenerating || items.length < 2 ? "var(--line)" : "var(--ink)",
+                    color: "var(--paper)",
+                    fontSize: "12px",
+                    fontWeight: 500,
+                    cursor: autoGenerating || items.length < 2 ? "not-allowed" : "pointer",
+                    opacity: autoGenerating || items.length < 2 ? 0.5 : 1,
+                  }}
+                >
+                  {autoGenerating ? (
+                    <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <Loader2 size={14} className="animate-spin" />
+                      Generating {autoCount} outfits...
+                    </span>
+                  ) : (
+                    <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <Sparkles size={14} />
+                      Generate {autoCount} Outfits
+                    </span>
+                  )}
+                </button>
+              </div>
             </div>
 
             {/* 服装选择网格 */}
