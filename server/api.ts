@@ -13,7 +13,7 @@ import {
 } from "../app/lib/lang";
 import { MAX_SIZE } from "./r2";
 import { createDb } from "./db";
-import { page, user, membership, pomodoroSession } from "./db/schema";
+import { page, user, membership, pomodoroSession, wardrobeItem, wardrobeJob } from "./db/schema";
 
 type Variables = {
   user: { id: string; name: string; email: string; image?: string; role?: string } | null;
@@ -21,7 +21,7 @@ type Variables = {
 };
 
 const api = new Hono<{
-  Bindings: { BUCKET?: R2Bucket; D1?: D1Database };
+  Bindings: { BUCKET?: R2Bucket; D1?: D1Database; AI?: Ai };
   Variables: Variables;
 }>();
 
@@ -1238,4 +1238,664 @@ function notFoundHtml(lang: Lang = DEFAULT_LANG): string {
 }
 
 export { cleanupAnonymousUploads };
+
+// ==================== Wardrobe API ====================
+
+// AI 模型配置
+const VISION_MODEL = "@cf/meta/llama-3.2-11b-vision-instruct";
+
+// 视觉分析提示词
+const ANALYSIS_PROMPT = `Analyze this image and identify all clothing items.
+
+For each clothing item, provide:
+- name: specific clothing name
+- part: category (upperbody, wholebody_up, lowerbody, accessories_up, shoes)
+- color: hex color code
+- secondaryColor: hex or null
+- tags: array of descriptive tags
+- boundingBox: {x, y, width, height} normalized to 0-1000
+
+Return the result as a JSON object with an "items" array.`;
+
+// 从 Markdown 响应中提取服装信息
+function extractItemsFromMarkdown(content: string): any[] {
+  const items: any[] = [];
+  
+  // 尝试识别服装项目 - 更精确的匹配
+  const lines = content.split('\n');
+  let currentItem: any = null;
+  
+  // 服装关键词映射到类别
+  const categoryMap: Record<string, string> = {
+    'shirt': 'upperbody', 'blouse': 'upperbody', 'top': 'upperbody', 't-shirt': 'upperbody',
+    'sweater': 'upperbody', 'cardigan': 'upperbody', 'hoodie': 'upperbody', 'sweatshirt': 'upperbody',
+    'dress': 'wholebody_up', 'jumpsuit': 'wholebody_up', 'romper': 'wholebody_up',
+    'jacket': 'wholebody_up', 'coat': 'wholebody_up', 'blazer': 'wholebody_up', 'vest': 'wholebody_up',
+    'pants': 'lowerbody', 'jeans': 'lowerbody', 'trousers': 'lowerbody', 'shorts': 'lowerbody',
+    'skirt': 'lowerbody', 'leggings': 'lowerbody',
+    'shoes': 'shoes', 'boots': 'shoes', 'sneakers': 'shoes', 'sandals': 'shoes', 'heels': 'shoes', 'slippers': 'shoes',
+    'hat': 'accessories_up', 'cap': 'accessories_up', 'beanie': 'accessories_up',
+    'bag': 'accessories_up', 'purse': 'accessories_up', 'backpack': 'accessories_up',
+    'sunglasses': 'accessories_up', 'glasses': 'accessories_up', 'scarf': 'accessories_up', 'belt': 'accessories_up',
+  };
+  
+  // 颜色关键词映射到 hex
+  const colorMap: Record<string, string> = {
+    'white': '#FFFFFF', 'black': '#000000', 'red': '#FF0000', 'blue': '#0000FF', 'green': '#008000',
+    'yellow': '#FFFF00', 'purple': '#800080', 'orange': '#FFA500', 'pink': '#FFC0CB', 'brown': '#A52A2A',
+    'gray': '#808080', 'grey': '#808080', 'navy': '#000080', 'beige': '#F5F5DC', 'cream': '#FFFDD0',
+    'maroon': '#800000', 'olive': '#808000', 'teal': '#008080', 'cyan': '#00FFFF', 'magenta': '#FF00FF',
+  };
+  
+  for (const line of lines) {
+    const lowerLine = line.toLowerCase();
+    
+    // 检测新的服装项 - 查找包含服装关键词的行
+    let detectedCategory = null;
+    let detectedName = null;
+    
+    for (const [keyword, category] of Object.entries(categoryMap)) {
+      if (lowerLine.includes(keyword)) {
+        detectedCategory = category;
+        // 提取名称 - 尝试从行中提取
+        const nameMatch = line.match(new RegExp(`([^.,]*${keyword}[^.,]*)`, 'i'));
+        if (nameMatch) {
+          detectedName = nameMatch[1].replace(/[*#]/g, '').trim();
+          // 清理名称
+          detectedName = detectedName.replace(/^(a|an|the|this|that|these|those)\s+/i, '');
+          detectedName = detectedName.charAt(0).toUpperCase() + detectedName.slice(1);
+        } else {
+          detectedName = keyword.charAt(0).toUpperCase() + keyword.slice(1);
+        }
+        break;
+      }
+    }
+    
+    if (detectedCategory && detectedName) {
+      // 提取颜色
+      let color = '#808080';
+      for (const [colorName, hex] of Object.entries(colorMap)) {
+        if (lowerLine.includes(colorName)) {
+          color = hex;
+          break;
+        }
+      }
+      
+      // 检查是否已经存在相同的项目
+      const existingItem = items.find(item => 
+        item.name.toLowerCase() === detectedName.toLowerCase() || 
+        (item.part === detectedCategory && item.name.toLowerCase().includes(detectedName.toLowerCase().split(' ')[0]))
+      );
+      
+      if (!existingItem) {
+        currentItem = {
+          name: detectedName,
+          part: detectedCategory,
+          color: color,
+          secondaryColor: null,
+          tags: [],
+          boundingBox: { x: 0, y: 0, width: 1000, height: 1000 }
+        };
+        items.push(currentItem);
+      }
+    }
+    
+    // 提取标签 - 从描述性词语中提取
+    if (currentItem) {
+      const tagPatterns = [
+        /pattern:\s*([^.,]+)/i,
+        /style:\s*([^.,]+)/i,
+        /material:\s*([^.,]+)/i,
+        /design:\s*([^.,]+)/i,
+        /floral/i, /striped/i, /plaid/i, /denim/i, /leather/i, /cotton/i, /silk/i, /wool/i,
+        /casual/i, /formal/i, /sporty/i, /vintage/i, /modern/i,
+      ];
+      
+      for (const pattern of tagPatterns) {
+        const match = line.match(pattern);
+        if (match) {
+          const tag = (match[1] || match[0]).toLowerCase().trim();
+          if (tag && !currentItem.tags.includes(tag) && currentItem.tags.length < 4) {
+            currentItem.tags.push(tag);
+          }
+        }
+      }
+    }
+  }
+  
+  // 如果没有识别到任何项目，尝试从整体描述中提取
+  if (items.length === 0) {
+    // 尝试识别常见的服装组合
+    if (content.toLowerCase().includes('shirt') || content.toLowerCase().includes('top')) {
+      items.push({
+        name: 'Shirt',
+        part: 'upperbody',
+        color: '#FFFFFF',
+        secondaryColor: null,
+        tags: [],
+        boundingBox: { x: 0, y: 0, width: 1000, height: 1000 }
+      });
+    }
+    if (content.toLowerCase().includes('pants') || content.toLowerCase().includes('jeans')) {
+      items.push({
+        name: 'Pants',
+        part: 'lowerbody',
+        color: '#0000FF',
+        secondaryColor: null,
+        tags: [],
+        boundingBox: { x: 0, y: 0, width: 1000, height: 1000 }
+      });
+    }
+    if (content.toLowerCase().includes('boots') || content.toLowerCase().includes('shoes')) {
+      items.push({
+        name: 'Boots',
+        part: 'shoes',
+        color: '#000000',
+        secondaryColor: null,
+        tags: [],
+        boundingBox: { x: 0, y: 0, width: 1000, height: 1000 }
+      });
+    }
+  }
+  
+  // 如果还是没有识别到任何项目，创建一个默认项目
+  if (items.length === 0) {
+    items.push({
+      name: 'Clothing Item',
+      part: 'upperbody',
+      color: '#808080',
+      secondaryColor: null,
+      tags: [],
+      boundingBox: { x: 0, y: 0, width: 1000, height: 1000 }
+    });
+  }
+  
+  return items;
+}
+
+// 同意 Meta 许可证
+let metaLicenseAgreed = false;
+async function ensureMetaLicense(ai: Ai) {
+  if (metaLicenseAgreed) return;
+  try {
+    await (ai as any).run(VISION_MODEL, {
+      prompt: "agree",
+    });
+    metaLicenseAgreed = true;
+  } catch (e) {
+    // 如果错误不是许可证相关，则已经同意
+    metaLicenseAgreed = true;
+  }
+}
+
+// Wardrobe 上传限制
+const WARDROBE_MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const WARDROBE_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+
+// 上传图片并创建任务
+api.post("/api/wardrobe/upload", async (c) => {
+  const user = c.get("user");
+  if (!user) return c.json({ error: "Unauthorized" }, 401);
+
+  const formData = await c.req.formData();
+  const file = formData.get("image") as File | null;
+  if (!file) return c.json({ error: "No image provided" }, 400);
+
+  // 检查文件类型
+  if (!WARDROBE_ALLOWED_TYPES.includes(file.type)) {
+    return c.json({ 
+      error: "Invalid file type. Allowed: JPEG, PNG, WebP, GIF" 
+    }, 400);
+  }
+
+  // 检查文件大小
+  if (file.size > WARDROBE_MAX_FILE_SIZE) {
+    const maxSizeMB = WARDROBE_MAX_FILE_SIZE / (1024 * 1024);
+    return c.json({ 
+      error: `File too large. Maximum size: ${maxSizeMB}MB` 
+    }, 400);
+  }
+
+  const jobId = nanoid(10);
+  const buffer = await file.arrayBuffer();
+
+  // 存储原始图片到 R2
+  const key = `wardrobe/${jobId}/original.png`;
+  await c.env.BUCKET!.put(key, buffer, {
+    httpMetadata: { contentType: file.type || "image/png" },
+  });
+
+  const imageUrl = `/api/wardrobe/assets/${jobId}/original.png`;
+
+  // 创建任务记录
+  const db = createDb(c.env.D1!);
+  await db.insert(wardrobeJob).values({
+    id: jobId,
+    userId: user.id,
+    status: "pending",
+    originalImageUrl: imageUrl,
+  });
+
+  return c.json({ jobId, imageUrl });
+});
+
+// 获取任务状态
+api.get("/api/wardrobe/jobs/:id", async (c) => {
+  const user = c.get("user");
+  if (!user) return c.json({ error: "Unauthorized" }, 401);
+
+  const jobId = c.req.param("id");
+  const db = createDb(c.env.D1!);
+
+  const job = await db.select().from(wardrobeJob).where(eq(wardrobeJob.id, jobId)).get();
+  if (!job || job.userId !== user.id) {
+    return c.json({ error: "Job not found" }, 404);
+  }
+
+  return c.json({
+    id: job.id,
+    status: job.status,
+    originalImageUrl: job.originalImageUrl,
+    analysisResult: job.analysisResult ? JSON.parse(job.analysisResult) : null,
+    error: job.error,
+  });
+});
+
+// 分析图片
+api.post("/api/wardrobe/jobs/:id/analyze", async (c) => {
+  const user = c.get("user");
+  if (!user) return c.json({ error: "Unauthorized" }, 401);
+
+  const jobId = c.req.param("id");
+  const db = createDb(c.env.D1!);
+
+  const job = await db.select().from(wardrobeJob).where(eq(wardrobeJob.id, jobId)).get();
+  if (!job || job.userId !== user.id) {
+    return c.json({ error: "Job not found" }, 404);
+  }
+
+  if (!c.env.AI) {
+    return c.json({ error: "AI not configured" }, 500);
+  }
+
+  // 更新状态为分析中
+  await db.update(wardrobeJob)
+    .set({ status: "analyzing", updatedAt: new Date() })
+    .where(eq(wardrobeJob.id, jobId));
+
+  const maxRetries = 5; // 增加重试次数
+  let lastError: Error | null = null;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      // 同意 Meta 许可证 (首次使用需要)
+      await ensureMetaLicense(c.env.AI);
+
+      // 从 R2 读取图片
+      const imageKey = `wardrobe/${jobId}/original.png`;
+      const imageObject = await c.env.BUCKET!.get(imageKey);
+      if (!imageObject) throw new Error("Image not found");
+
+      const imageBuffer = await imageObject.arrayBuffer();
+      // 使用分块编码避免堆栈溢出
+      const bytes = new Uint8Array(imageBuffer);
+      let binary = "";
+      const chunkSize = 8192;
+      for (let i = 0; i < bytes.length; i += chunkSize) {
+        const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+        binary += String.fromCharCode.apply(null, chunk as unknown as number[]);
+      }
+      const base64 = btoa(binary);
+      const imageDataUrl = `data:image/png;base64,${base64}`;
+
+      // 调用视觉分析 (带超时)
+      const aiPromise = c.env.AI.run(VISION_MODEL, {
+        messages: [
+          {
+            role: "user",
+            content: [
+              { type: "text", text: ANALYSIS_PROMPT },
+              { type: "image_url", image_url: { url: imageDataUrl } },
+            ],
+          },
+        ],
+      });
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("AI request timeout")), 120000)
+      );
+      const response = await Promise.race([aiPromise, timeoutPromise]);
+
+      // 解析响应
+      const content = (response as any).response || (response as any).choices?.[0]?.message?.content;
+      if (!content) throw new Error("No response from AI model");
+
+      console.log("[wardrobe] AI response:", content.substring(0, 500));
+
+      let items;
+      try {
+        // 尝试直接解析 JSON
+        const parsed = JSON.parse(content);
+        items = parsed.items || [];
+      } catch (e) {
+        // 尝试从文本中提取 JSON - 找到第一个 { 和最后一个 }
+        const firstBrace = content.indexOf('{');
+        const lastBrace = content.lastIndexOf('}');
+        
+        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+          const jsonStr = content.substring(firstBrace, lastBrace + 1);
+          try {
+            const parsed = JSON.parse(jsonStr);
+            items = parsed.items || [];
+          } catch (e2) {
+            // 尝试提取多个 JSON 对象
+            const allMatches = jsonStr.match(/\{[^{}]*\}/g);
+            if (allMatches && allMatches.length > 0) {
+              // 找到包含 "items" 的 JSON
+              for (const match of allMatches) {
+                try {
+                  const parsed = JSON.parse(match);
+                  if (parsed.items) {
+                    items = parsed.items;
+                    break;
+                  }
+                } catch (e3) {
+                  // 继续尝试下一个
+                }
+              }
+            }
+            if (!items) {
+              // 尝试从 Markdown 中提取信息
+              items = extractItemsFromMarkdown(content);
+            }
+          }
+        } else {
+          // 尝试从 Markdown 中提取信息
+          items = extractItemsFromMarkdown(content);
+        }
+      }
+
+      if (!Array.isArray(items)) {
+        throw new Error("Invalid items format in AI response");
+      }
+
+      // 更新任务状态
+      await db.update(wardrobeJob)
+        .set({
+          status: "completed",
+          analysisResult: JSON.stringify(items),
+          updatedAt: new Date(),
+        })
+        .where(eq(wardrobeJob.id, jobId));
+
+      return c.json({ items });
+    } catch (error: any) {
+      lastError = error;
+      console.log(`[wardrobe] Attempt ${attempt} failed:`, error.message);
+      
+      // 如果是容量限制、网络错误或超时，等待后重试
+      if (
+        error.message.includes("3040") ||
+        error.message.includes("Capacity temporarily exceeded") ||
+        error.message.includes("rate limit") ||
+        error.message.includes("timeout") ||
+        error.message.includes("Network connection lost") ||
+        error.message.includes("network")
+      ) {
+        if (attempt < maxRetries) {
+          // 递增等待时间：10秒、20秒、30秒、40秒
+          const waitTime = attempt * 10000;
+          console.log(`[wardrobe] Waiting ${waitTime}ms before retry...`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+          continue;
+        }
+      }
+      
+      // 其他错误直接抛出
+      break;
+    }
+  }
+
+  // 所有重试都失败
+  const errorMessage = lastError?.message || "Analysis failed";
+  await db.update(wardrobeJob)
+    .set({
+      status: "failed",
+      error: errorMessage,
+      updatedAt: new Date(),
+    })
+    .where(eq(wardrobeJob.id, jobId));
+
+  return c.json({ error: errorMessage }, 500);
+});
+
+// 提取服装项并生成图片
+api.post("/api/wardrobe/jobs/:id/extract/:itemIndex", async (c) => {
+  const user = c.get("user");
+  if (!user) return c.json({ error: "Unauthorized" }, 401);
+
+  const jobId = c.req.param("id");
+  const itemIndex = parseInt(c.req.param("itemIndex"));
+  const db = createDb(c.env.D1!);
+
+  const job = await db.select().from(wardrobeJob).where(eq(wardrobeJob.id, jobId)).get();
+  if (!job || job.userId !== user.id) {
+    return c.json({ error: "Job not found" }, 404);
+  }
+
+  if (!job.analysisResult) {
+    return c.json({ error: "No analysis result" }, 400);
+  }
+
+  const items = JSON.parse(job.analysisResult);
+  if (itemIndex < 0 || itemIndex >= items.length) {
+    return c.json({ error: "Invalid item index" }, 400);
+  }
+
+  const item = items[itemIndex];
+
+  if (!c.env.AI) {
+    return c.json({ error: "AI not configured" }, 500);
+  }
+
+  const maxRetries = 5; // 增加重试次数
+  let lastError: Error | null = null;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      // 从 R2 读取原始图片
+      const imageKey = `wardrobe/${jobId}/original.png`;
+      const imageObject = await c.env.BUCKET!.get(imageKey);
+      if (!imageObject) throw new Error("Original image not found");
+
+      const originalBuffer = await imageObject.arrayBuffer();
+      
+      // 使用 Cloudflare Images API 的 segment 功能移除背景
+      // 构建图片 URL - 需要通过公共 URL 访问
+      const imageUrl = `https://www.100mini.com/api/wardrobe/assets/${jobId}/original.png`;
+      
+      // 使用 fetch 的 cf.image 选项进行背景移除
+      const imageResponse = await fetch(imageUrl, {
+        cf: {
+          image: {
+            segment: "foreground",
+            background: "#ffffff",
+            format: "png",
+            width: 512,
+            height: 512,
+            fit: "contain",
+          },
+        },
+      });
+
+      if (!imageResponse.ok) {
+        throw new Error(`Image processing failed: ${imageResponse.status}`);
+      }
+
+      const imageBuffer = await imageResponse.arrayBuffer();
+
+      // 存储生成的图片
+      const itemId = nanoid(10);
+      const itemImageKey = `wardrobe/items/${itemId}.png`;
+      await c.env.BUCKET!.put(itemImageKey, imageBuffer, {
+        httpMetadata: { contentType: "image/png" },
+      });
+
+      const itemImageUrl = `/api/wardrobe/assets/items/${itemId}.png`;
+
+      // 创建服装项记录
+      await db.insert(wardrobeItem).values({
+        id: itemId,
+        userId: user.id,
+        name: item.name,
+        part: item.part,
+        color: item.color,
+        secondaryColor: item.secondaryColor || null,
+        tags: JSON.stringify(item.tags || []),
+        imageUrl: itemImageUrl,
+      });
+
+      return c.json({
+        item: {
+          id: itemId,
+          name: item.name,
+          part: item.part,
+          color: item.color,
+          secondaryColor: item.secondaryColor,
+          tags: item.tags,
+          imageUrl: itemImageUrl,
+        },
+      });
+    } catch (error: any) {
+      lastError = error;
+      console.log(`[wardrobe] Image generation attempt ${attempt} failed:`, error.message);
+      
+      // 如果是容量限制、网络错误或超时，等待后重试
+      if (
+        error.message.includes("3040") ||
+        error.message.includes("Capacity temporarily exceeded") ||
+        error.message.includes("rate limit") ||
+        error.message.includes("timeout") ||
+        error.message.includes("Network connection lost") ||
+        error.message.includes("network")
+      ) {
+        if (attempt < maxRetries) {
+          // 递增等待时间：10秒、20秒、30秒、40秒
+          const waitTime = attempt * 10000;
+          console.log(`[wardrobe] Waiting ${waitTime}ms before retry...`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+          continue;
+        }
+      }
+      
+      // 其他错误直接抛出
+      break;
+    }
+  }
+
+  // 所有重试都失败
+  const errorMessage = lastError?.message || "Image generation failed";
+  return c.json({ error: errorMessage }, 500);
+});
+
+// 获取用户的服装列表
+api.get("/api/wardrobe/items", async (c) => {
+  const user = c.get("user");
+  if (!user) return c.json({ error: "Unauthorized" }, 401);
+
+  const db = createDb(c.env.D1!);
+  const items = await db.select()
+    .from(wardrobeItem)
+    .where(eq(wardrobeItem.userId, user.id))
+    .orderBy(desc(wardrobeItem.createdAt))
+    .all();
+
+  return c.json({
+    items: items.map((item) => ({
+      id: item.id,
+      name: item.name,
+      part: item.part,
+      color: item.color,
+      secondaryColor: item.secondaryColor,
+      tags: item.tags ? JSON.parse(item.tags) : [],
+      imageUrl: item.imageUrl,
+      thumbnailUrl: item.thumbnailUrl,
+      createdAt: item.createdAt,
+    })),
+  });
+});
+
+// 更新服装项
+api.put("/api/wardrobe/items/:id", async (c) => {
+  const user = c.get("user");
+  if (!user) return c.json({ error: "Unauthorized" }, 401);
+
+  const itemId = c.req.param("id");
+  const db = createDb(c.env.D1!);
+
+  const item = await db.select().from(wardrobeItem).where(eq(wardrobeItem.id, itemId)).get();
+  if (!item || item.userId !== user.id) {
+    return c.json({ error: "Item not found" }, 404);
+  }
+
+  const body = await c.req.json();
+  const updates: any = {};
+
+  if (body.name) updates.name = body.name;
+  if (body.part) updates.part = body.part;
+  if (body.color) updates.color = body.color;
+  if (body.secondaryColor !== undefined) updates.secondaryColor = body.secondaryColor;
+  if (body.tags) updates.tags = JSON.stringify(body.tags);
+
+  updates.updatedAt = new Date();
+
+  await db.update(wardrobeItem)
+    .set(updates)
+    .where(eq(wardrobeItem.id, itemId));
+
+  return c.json({ success: true });
+});
+
+// 删除服装项
+api.delete("/api/wardrobe/items/:id", async (c) => {
+  const user = c.get("user");
+  if (!user) return c.json({ error: "Unauthorized" }, 401);
+
+  const itemId = c.req.param("id");
+  const db = createDb(c.env.D1!);
+
+  const item = await db.select().from(wardrobeItem).where(eq(wardrobeItem.id, itemId)).get();
+  if (!item || item.userId !== user.id) {
+    return c.json({ error: "Item not found" }, 404);
+  }
+
+  // 删除 R2 中的图片
+  if (item.imageUrl) {
+    const key = item.imageUrl.replace("/api/wardrobe/assets/", "wardrobe/");
+    await c.env.BUCKET!.delete(key);
+  }
+
+  // 删除记录
+  await db.delete(wardrobeItem).where(eq(wardrobeItem.id, itemId));
+
+  return c.json({ success: true });
+});
+
+// 获取 wardrobe 资源文件
+api.get("/api/wardrobe/assets/*", async (c) => {
+  const path = c.req.path.replace("/api/wardrobe/assets/", "");
+  const key = `wardrobe/${path}`;
+
+  const object = await c.env.BUCKET!.get(key);
+  if (!object) {
+    return c.json({ error: "Not found" }, 404);
+  }
+
+  const headers = new Headers();
+  object.writeHttpMetadata(headers);
+  headers.set("etag", object.httpEtag);
+  headers.set("cache-control", "public, max-age=31536000, immutable");
+
+  return c.body(object.body, { headers });
+});
+
 export default api;

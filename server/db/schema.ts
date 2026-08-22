@@ -1,4 +1,5 @@
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { sql } from "drizzle-orm";
 
 // --- Better Auth tables (D1/SQLite compatible) ---
 
@@ -90,4 +91,35 @@ export const membership = sqliteTable("membership", {
   expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
+});
+
+// --- Wardrobe tables ---
+
+export const wardrobeItem = sqliteTable("wardrobe_item", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  part: text("part").notNull(), // upperbody, wholebody_up, lowerbody, accessories_up, shoes
+  color: text("color").notNull(),
+  secondaryColor: text("secondary_color"),
+  tags: text("tags"), // JSON array string
+  imageUrl: text("image_url").notNull(),
+  thumbnailUrl: text("thumbnail_url"),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const wardrobeJob = sqliteTable("wardrobe_job", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  status: text("status").notNull().default("pending"), // pending, analyzing, generating, completed, failed
+  originalImageUrl: text("original_image_url"),
+  analysisResult: text("analysis_result"), // JSON string
+  error: text("error"),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull().default(sql`CURRENT_TIMESTAMP`),
 });

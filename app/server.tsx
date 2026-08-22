@@ -15,6 +15,7 @@ import {
 type Bindings = {
   BUCKET?: R2Bucket;
   D1?: D1Database;
+  AI?: Ai;
   BETTER_AUTH_URL?: string;
   BETTER_AUTH_SECRET?: string;
   BETTER_AUTH_API_KEY?: string;
@@ -44,13 +45,13 @@ app.use("*", async (c, next) => {
   if (!c.env?.D1) {
     try {
       const proxy = await getDevBindings();
-      c.env = { ...c.env, D1: proxy.env.D1, BUCKET: proxy.env.BUCKET } as any;
-      (globalThis as any).__CF_ENV__ = { D1: proxy.env.D1, BUCKET: proxy.env.BUCKET };
+      c.env = { ...c.env, D1: proxy.env.D1, BUCKET: proxy.env.BUCKET, AI: proxy.env.AI } as any;
+      (globalThis as any).__CF_ENV__ = { D1: proxy.env.D1, BUCKET: proxy.env.BUCKET, AI: proxy.env.AI };
     } catch (err) {
       console.warn("Local bindings not available:", (err as Error).message);
     }
   } else {
-    (globalThis as any).__CF_ENV__ = { D1: c.env.D1, BUCKET: c.env.BUCKET };
+    (globalThis as any).__CF_ENV__ = { D1: c.env.D1, BUCKET: c.env.BUCKET, AI: c.env.AI };
   }
   return next();
 });

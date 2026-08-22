@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WardrobeRouteImport } from './routes/wardrobe'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SquareRouteImport } from './routes/square'
 import { Route as RhythmRouteImport } from './routes/rhythm'
@@ -23,6 +24,11 @@ import { Route as Any2mdRouteImport } from './routes/any2md'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 
+const WardrobeRoute = WardrobeRouteImport.update({
+  id: '/wardrobe',
+  path: '/wardrobe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -103,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/rhythm': typeof RhythmRoute
   '/square': typeof SquareRoute
   '/terms': typeof TermsRoute
+  '/wardrobe': typeof WardrobeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -118,6 +125,7 @@ export interface FileRoutesByTo {
   '/rhythm': typeof RhythmRoute
   '/square': typeof SquareRoute
   '/terms': typeof TermsRoute
+  '/wardrobe': typeof WardrobeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -134,6 +142,7 @@ export interface FileRoutesById {
   '/rhythm': typeof RhythmRoute
   '/square': typeof SquareRoute
   '/terms': typeof TermsRoute
+  '/wardrobe': typeof WardrobeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -151,6 +160,7 @@ export interface FileRouteTypes {
     | '/rhythm'
     | '/square'
     | '/terms'
+    | '/wardrobe'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -166,6 +176,7 @@ export interface FileRouteTypes {
     | '/rhythm'
     | '/square'
     | '/terms'
+    | '/wardrobe'
   id:
     | '__root__'
     | '/'
@@ -181,6 +192,7 @@ export interface FileRouteTypes {
     | '/rhythm'
     | '/square'
     | '/terms'
+    | '/wardrobe'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -197,10 +209,18 @@ export interface RootRouteChildren {
   RhythmRoute: typeof RhythmRoute
   SquareRoute: typeof SquareRoute
   TermsRoute: typeof TermsRoute
+  WardrobeRoute: typeof WardrobeRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/wardrobe': {
+      id: '/wardrobe'
+      path: '/wardrobe'
+      fullPath: '/wardrobe'
+      preLoaderRoute: typeof WardrobeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terms': {
       id: '/terms'
       path: '/terms'
@@ -309,6 +329,7 @@ const rootRouteChildren: RootRouteChildren = {
   RhythmRoute: RhythmRoute,
   SquareRoute: SquareRoute,
   TermsRoute: TermsRoute,
+  WardrobeRoute: WardrobeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

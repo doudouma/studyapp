@@ -36,6 +36,13 @@
       "when": 1783429721071,
       "tag": "0004_amusing_wallow",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1787360758501,
+      "tag": "0005_thankful_wendigo",
+      "breakpoints": true
     }
   ]
 }
