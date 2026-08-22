@@ -13,7 +13,7 @@ import {
 } from "../app/lib/lang";
 import { MAX_SIZE } from "./r2";
 import { createDb } from "./db";
-import { page, user, membership, pomodoroSession, wardrobeItem, wardrobeJob } from "./db/schema";
+import { page, user, membership, pomodoroSession, wardrobeItem, wardrobeJob, wardrobeOutfit } from "./db/schema";
 
 type Variables = {
   user: { id: string; name: string; email: string; image?: string; role?: string } | null;
@@ -1243,6 +1243,7 @@ export { cleanupAnonymousUploads };
 
 // AI 模型配置
 const VISION_MODEL = "@cf/meta/llama-3.2-11b-vision-instruct";
+const IMAGE_MODEL = "@cf/black-forest-labs/flux-2-klein-4b";
 
 // 视觉分析提示词
 const ANALYSIS_PROMPT = `Analyze this image and identify all clothing items.
@@ -1762,7 +1763,7 @@ api.post("/api/wardrobe/jobs/:id/extract/:itemIndex", async (c) => {
           color: item.color,
           secondaryColor: item.secondaryColor,
           tags: item.tags,
-          imageUrl: itemImageUrl,
+          image: itemImageUrl,
         },
       });
     } catch (error: any) {
@@ -1817,8 +1818,8 @@ api.get("/api/wardrobe/items", async (c) => {
       color: item.color,
       secondaryColor: item.secondaryColor,
       tags: item.tags ? JSON.parse(item.tags) : [],
-      imageUrl: item.imageUrl,
-      thumbnailUrl: item.thumbnailUrl,
+      image: item.imageUrl,
+      thumbnail: item.thumbnailUrl || item.imageUrl,
       createdAt: item.createdAt,
     })),
   });
@@ -1896,6 +1897,242 @@ api.get("/api/wardrobe/assets/*", async (c) => {
   headers.set("cache-control", "public, max-age=31536000, immutable");
 
   return c.body(object.body, { headers });
+});
+
+// ==================== Outfit API ====================
+
+// 获取用户的 outfit 列表
+api.get("/api/wardrobe/outfits", async (c) => {
+  const user = c.get("user");
+  if (!user) return c.json({ error: "Unauthorized" }, 401);
+
+  const db = createDb(c.env.D1!);
+  const outfits = await db.select()
+    .from(wardrobeOutfit)
+    .where(eq(wardrobeOutfit.userId, user.id))
+    .orderBy(desc(wardrobeOutfit.createdAt))
+    .all();
+
+  return c.json({
+    outfits: outfits.map((outfit) => ({
+      id: outfit.id,
+      name: outfit.name,
+      occasion: outfit.occasion,
+      itemIds: outfit.itemIds ? JSON.parse(outfit.itemIds) : [],
+      imageUrl: outfit.imageUrl,
+      status: outfit.status,
+      createdAt: outfit.createdAt,
+    })),
+  });
+});
+
+// 创建 outfit
+api.post("/api/wardrobe/outfits", async (c) => {
+  const user = c.get("user");
+  if (!user) return c.json({ error: "Unauthorized" }, 401);
+
+  const body = await c.req.json();
+  const { name, occasion, itemIds } = body;
+
+  if (!name || !itemIds || !Array.isArray(itemIds) || itemIds.length < 2) {
+    return c.json({ error: "Name and at least 2 items required" }, 400);
+  }
+
+  const db = createDb(c.env.D1!);
+  
+  // 验证所有 items 属于当前用户
+  const items = await db.select()
+    .from(wardrobeItem)
+    .where(
+      and(
+        eq(wardrobeItem.userId, user.id),
+        sql`${wardrobeItem.id} IN (${sql.join(itemIds.map((id: string) => sql`${id}`), sql`, `)})`
+      )
+    )
+    .all();
+
+  if (items.length !== itemIds.length) {
+    return c.json({ error: "Some items not found" }, 400);
+  }
+
+  const outfitId = nanoid(10);
+  
+  // 生成 outfit 图片提示词
+  const itemDescriptions = items.map((item) => `${item.name} (${item.part}, ${item.color})`).join(", ");
+  const prompt = `Create a stylish outfit combination photo featuring: ${itemDescriptions}. 
+Professional fashion photography, clean white background, well-lit, high quality product styling.`;
+
+  // 创建 outfit 记录
+  await db.insert(wardrobeOutfit).values({
+    id: outfitId,
+    userId: user.id,
+    name,
+    occasion: occasion || null,
+    itemIds: JSON.stringify(itemIds),
+    status: "planned",
+  });
+
+  // 异步生成图片
+  if (c.env.AI) {
+    c.executionCtx.waitUntil(
+      (async () => {
+        try {
+          await db.update(wardrobeOutfit)
+            .set({ status: "generating" })
+            .where(eq(wardrobeOutfit.id, outfitId));
+
+          // FLUX.2 [klein] 4B 要求 multipart form data 输入（固定 4 步，无 num_steps 参数）
+          const form = new FormData();
+          form.append("prompt", prompt);
+          form.append("width", "1024");
+          form.append("height", "1024");
+
+          // FormData 不暴露序列化后的 body 和 boundary，通过 Response 构造函数生成 Content-Type
+          const formResponse = new Response(form);
+          const formStream = formResponse.body;
+          const formContentType = formResponse.headers.get("content-type") || "multipart/form-data";
+
+          const response = await (c.env.AI as any).run(IMAGE_MODEL, {
+            multipart: {
+              body: formStream,
+              contentType: formContentType,
+            },
+          });
+
+          let imageBuffer: ArrayBuffer;
+          if (response instanceof ArrayBuffer) {
+            imageBuffer = response;
+          } else if (response instanceof Uint8Array) {
+            imageBuffer = response.buffer as ArrayBuffer;
+          } else if (response && typeof response === "object" && typeof response.image === "string") {
+            // klein-4b 输出为 { image: "<base64>" }
+            const binary = atob(response.image);
+            const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) {
+              bytes[i] = binary.charCodeAt(i);
+            }
+            imageBuffer = bytes.buffer as ArrayBuffer;
+          } else {
+            throw new Error("Invalid response format");
+          }
+
+          const imageKey = `wardrobe/outfits/${outfitId}.png`;
+          await c.env.BUCKET!.put(imageKey, imageBuffer, {
+            httpMetadata: { contentType: "image/png" },
+          });
+
+          const imageUrl = `/api/wardrobe/assets/outfits/${outfitId}.png`;
+          
+          await db.update(wardrobeOutfit)
+            .set({ 
+              status: "completed", 
+              imageUrl,
+              updatedAt: new Date() 
+            })
+            .where(eq(wardrobeOutfit.id, outfitId));
+        } catch (error: any) {
+          console.error("[outfit] Generation failed:", error.message);
+          await db.update(wardrobeOutfit)
+            .set({ 
+              status: "failed", 
+              error: error.message,
+              updatedAt: new Date() 
+            })
+            .where(eq(wardrobeOutfit.id, outfitId));
+        }
+      })()
+    );
+  }
+
+  return c.json({ 
+    outfit: { 
+      id: outfitId, 
+      name, 
+      occasion, 
+      itemIds, 
+      status: "planned" 
+    } 
+  });
+});
+
+// 获取 outfit 详情
+api.get("/api/wardrobe/outfits/:id", async (c) => {
+  const user = c.get("user");
+  if (!user) return c.json({ error: "Unauthorized" }, 401);
+
+  const outfitId = c.req.param("id");
+  const db = createDb(c.env.D1!);
+
+  const outfit = await db.select()
+    .from(wardrobeOutfit)
+    .where(eq(wardrobeOutfit.id, outfitId))
+    .get();
+
+  if (!outfit || outfit.userId !== user.id) {
+    return c.json({ error: "Outfit not found" }, 404);
+  }
+
+  // 获取关联的服装项
+  const itemIds = outfit.itemIds ? JSON.parse(outfit.itemIds) : [];
+  const items = itemIds.length > 0
+    ? await db.select()
+        .from(wardrobeItem)
+        .where(
+          and(
+            eq(wardrobeItem.userId, user.id),
+            sql`${wardrobeItem.id} IN (${sql.join(itemIds.map((id: string) => sql`${id}`), sql`, `)})`
+          )
+        )
+        .all()
+    : [];
+
+  return c.json({
+    outfit: {
+      id: outfit.id,
+      name: outfit.name,
+      occasion: outfit.occasion,
+      itemIds,
+      imageUrl: outfit.imageUrl,
+      status: outfit.status,
+      error: outfit.error,
+      items: items.map((item) => ({
+        id: item.id,
+        name: item.name,
+        part: item.part,
+        color: item.color,
+        image: item.imageUrl,
+      })),
+      createdAt: outfit.createdAt,
+    },
+  });
+});
+
+// 删除 outfit
+api.delete("/api/wardrobe/outfits/:id", async (c) => {
+  const user = c.get("user");
+  if (!user) return c.json({ error: "Unauthorized" }, 401);
+
+  const outfitId = c.req.param("id");
+  const db = createDb(c.env.D1!);
+
+  const outfit = await db.select()
+    .from(wardrobeOutfit)
+    .where(eq(wardrobeOutfit.id, outfitId))
+    .get();
+
+  if (!outfit || outfit.userId !== user.id) {
+    return c.json({ error: "Outfit not found" }, 404);
+  }
+
+  // 删除 R2 中的图片
+  if (outfit.imageUrl) {
+    const key = outfit.imageUrl.replace("/api/wardrobe/assets/", "wardrobe/");
+    await c.env.BUCKET!.delete(key);
+  }
+
+  await db.delete(wardrobeOutfit).where(eq(wardrobeOutfit.id, outfitId));
+
+  return c.json({ success: true });
 });
 
 export default api;

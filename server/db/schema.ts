@@ -123,3 +123,18 @@ export const wardrobeJob = sqliteTable("wardrobe_job", {
   createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`CURRENT_TIMESTAMP`),
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull().default(sql`CURRENT_TIMESTAMP`),
 });
+
+export const wardrobeOutfit = sqliteTable("wardrobe_outfit", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  occasion: text("occasion"), // casual, smart-casual, office, party, etc.
+  itemIds: text("item_ids").notNull(), // JSON array of wardrobe_item IDs
+  imageUrl: text("image_url"), // generated outfit image
+  status: text("status").notNull().default("planned"), // planned, generating, completed, failed
+  error: text("error"),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull().default(sql`CURRENT_TIMESTAMP`),
+});
