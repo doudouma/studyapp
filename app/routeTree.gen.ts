@@ -17,6 +17,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PomodoroRouteImport } from './routes/pomodoro'
 import { Route as Md2htmlRouteImport } from './routes/md2html'
 import { Route as LinksRouteImport } from './routes/links'
+import { Route as IdphotoRouteImport } from './routes/idphoto'
 import { Route as FreetoolRouteImport } from './routes/freetool'
 import { Route as CookieRouteImport } from './routes/cookie'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -64,6 +65,11 @@ const LinksRoute = LinksRouteImport.update({
   path: '/links',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IdphotoRoute = IdphotoRouteImport.update({
+  id: '/idphoto',
+  path: '/idphoto',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FreetoolRoute = FreetoolRouteImport.update({
   id: '/freetool',
   path: '/freetool',
@@ -102,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/cookie': typeof CookieRoute
   '/freetool': typeof FreetoolRoute
+  '/idphoto': typeof IdphotoRoute
   '/links': typeof LinksRoute
   '/md2html': typeof Md2htmlRoute
   '/pomodoro': typeof PomodoroRoute
@@ -118,6 +125,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/cookie': typeof CookieRoute
   '/freetool': typeof FreetoolRoute
+  '/idphoto': typeof IdphotoRoute
   '/links': typeof LinksRoute
   '/md2html': typeof Md2htmlRoute
   '/pomodoro': typeof PomodoroRoute
@@ -135,6 +143,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/cookie': typeof CookieRoute
   '/freetool': typeof FreetoolRoute
+  '/idphoto': typeof IdphotoRoute
   '/links': typeof LinksRoute
   '/md2html': typeof Md2htmlRoute
   '/pomodoro': typeof PomodoroRoute
@@ -153,6 +162,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cookie'
     | '/freetool'
+    | '/idphoto'
     | '/links'
     | '/md2html'
     | '/pomodoro'
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cookie'
     | '/freetool'
+    | '/idphoto'
     | '/links'
     | '/md2html'
     | '/pomodoro'
@@ -185,6 +196,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cookie'
     | '/freetool'
+    | '/idphoto'
     | '/links'
     | '/md2html'
     | '/pomodoro'
@@ -202,6 +214,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   CookieRoute: typeof CookieRoute
   FreetoolRoute: typeof FreetoolRoute
+  IdphotoRoute: typeof IdphotoRoute
   LinksRoute: typeof LinksRoute
   Md2htmlRoute: typeof Md2htmlRoute
   PomodoroRoute: typeof PomodoroRoute
@@ -270,6 +283,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LinksRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/idphoto': {
+      id: '/idphoto'
+      path: '/idphoto'
+      fullPath: '/idphoto'
+      preLoaderRoute: typeof IdphotoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/freetool': {
       id: '/freetool'
       path: '/freetool'
@@ -322,6 +342,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   CookieRoute: CookieRoute,
   FreetoolRoute: FreetoolRoute,
+  IdphotoRoute: IdphotoRoute,
   LinksRoute: LinksRoute,
   Md2htmlRoute: Md2htmlRoute,
   PomodoroRoute: PomodoroRoute,
