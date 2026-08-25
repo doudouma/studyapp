@@ -8,3 +8,8 @@ test("idphoto 工作台渲染", async ({ page }) => {
     /打开照片|Open a Photo|Ouvrir|Abre|Abra/i,
   );
 });
+
+test("规格选择联动", async ({ page }) => {
+  await page.goto("/idphoto");
+  await expect(page.getByText("295×413px").first()).toBeVisible();
+});

@@ -4,7 +4,9 @@ import { useTranslation } from "react-i18next";
 import { Button } from "~/components/ui/button";
 import { PhotoDropzone } from "./PhotoDropzone";
 import { PreviewCanvas } from "./PreviewCanvas";
-import { SIZE_PRESETS, currentSize, headRange, headTarget } from "~/lib/idphoto/specs";
+import { SpecPicker } from "./SpecPicker";
+import { BgColorPicker } from "./BgColorPicker";
+import { DIGITAL, SIZE_PRESETS, currentSize, headRange, headTarget } from "~/lib/idphoto/specs";
 import { complianceRatio, computeBase, drawRuler, renderCompose } from "~/lib/idphoto/compose";
 import { detectFace } from "~/lib/idphoto/face";
 import { segmentImage, type SegEvent } from "~/lib/idphoto/segmentation";
@@ -171,6 +173,40 @@ export function IdPhotoWorkbench() {
     setStatusOk(t("idphoto.status.cropOnlyDone"));
   }, [srcImg, t, resetAdjust, setStatusOk, setStatusErr]);
 
+  /** 选中规格：重置底色/保留背景，并按规格同步数字提交预设 */
+  const selectSpec = useCallback(
+    (i: number) => {
+      const p = SIZE_PRESETS[i];
+      setPresetIdx(i);
+      setKeepBg(false);
+      if (p.key !== "custom") {
+        setCustomW(p.w);
+        setCustomH(p.h);
+      }
+      if (p.digitalKey) {
+        setDigitalKey(p.digitalKey);
+        setSizeLimitKB(DIGITAL[p.digitalKey].maxKB);
+      } else {
+        setDigitalKey("");
+        setSizeLimitKB(0);
+      }
+      setBgColor(p.bgDefault ?? "#FFFFFF");
+    },
+    [],
+  );
+
+  /** 换底色：立即生效；未抠图时提示需先 AI 生成 */
+  const handleBgColor = useCallback(
+    (hex: string) => {
+      setBgColor(hex);
+      setKeepBg(false);
+      if (srcImg && !cutImg && !keepBg && !aiBusy) {
+        setStatusOk(t("idphoto.status.needAiFirst"));
+      }
+    },
+    [srcImg, cutImg, keepBg, aiBusy, t, setStatusOk],
+  );
+
   // TASK7: runAI 在此追加
 
   // segEvent → 状态文案（Task 7 接入 AI 按钮后生效）
@@ -201,8 +237,32 @@ export function IdPhotoWorkbench() {
           <PhotoDropzone selectedLabel={fileLabel} onFile={loadPhotoFile} />
         </section>
 
-        {/* TASK6: 规格选择 SpecPicker（含自定义宽高） */}
-        {/* TASK6: 底色选择 BgColorPicker */}
+        <section className="rounded-2xl border border-border bg-card p-4">
+          <StepTitle n={2}>{t("idphoto.step.spec")}</StepTitle>
+          <SpecPicker
+            presetIdx={presetIdx}
+            regionFilter={regionFilter}
+            customW={customW}
+            customH={customH}
+            onRegion={(v) => setRegionFilter(v)}
+            onSelect={selectSpec}
+            onCustomSize={(w, h) => {
+              setCustomW(w);
+              setCustomH(h);
+            }}
+          />
+        </section>
+
+        <section className="rounded-2xl border border-border bg-card p-4">
+          <StepTitle n={3}>{t("idphoto.step.bg")}</StepTitle>
+          <BgColorPicker
+            preset={preset}
+            bgColor={bgColor}
+            keepBg={keepBg}
+            onColor={handleBgColor}
+            onKeepBg={(v) => setKeepBg(v)}
+          />
+        </section>
 
         <section className="rounded-2xl border border-border bg-card p-4">
           <StepTitle n={4}>{t("idphoto.step.ai")}</StepTitle>
