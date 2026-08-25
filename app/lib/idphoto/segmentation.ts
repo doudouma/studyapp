@@ -26,13 +26,42 @@ async function importTransformers(): Promise<any> {
   throw lastErr ?? new Error("AI runtime load failed");
 }
 
-let segPipe: any = null;
+let segPipePromise: Promise<any> | null = null;
 
 export interface SegmentResult {
   cut: HTMLImageElement;
   personTopSrc: number | null;
 }
 
+/** 加载 RMBG-1.4 pipeline：hf-mirror 国内可达优先，失败换 huggingface.co；fp16 失败回退 q8 */
+async function loadPipeline(T: any, onEvent?: (e: SegEvent) => void): Promise<any> {
+  const progress = (p: any) => {
+    if (p.status === "progress" && p.total)
+      onEvent?.({ kind: "modelDownloading", pct: Math.round(((p.loaded || 0) / p.total) * 100) });
+    else if (p.status === "done") onEvent?.({ kind: "modelCompiling" });
+    else if (p.status === "initiate") onEvent?.({ kind: "runtimeLoading" });
+  };
+  const HOSTS = ["https://hf-mirror.com", "https://huggingface.co"];
+  const DTYPES = ["fp16", "q8"];
+  let lastErr: unknown = null;
+  outer: for (const host of HOSTS) {
+    T.env.remoteHost = host;
+    for (const dtype of DTYPES) {
+      try {
+        return await T.pipeline("background-removal", "briaai/RMBG-1.4", { dtype, progress_callback: progress });
+      } catch (e) {
+        lastErr = e;
+        console.warn(`抠图模型加载失败（${host} / ${dtype}），换源重试`, e);
+      }
+    }
+  }
+  throw lastErr ?? new Error("segmentation model load failed");
+}
+
+/**
+ * 对图片执行 AI 抠图，返回去背 cut 图与人物头顶行（原图坐标）。
+ * 可能抛错（AI 组件下载失败/跨域污染画布/cut 解码失败），调用方须 try/catch 并回退「仅裁剪排版」路径。
+ */
 export async function segmentImage(
   img: HTMLImageElement,
   onEvent?: (e: SegEvent) => void,
@@ -40,31 +69,14 @@ export async function segmentImage(
   onEvent?.({ kind: "runtimeLoading" });
   const T = await importTransformers();
   T.env.allowLocalModels = false;
-  if (!segPipe) {
-    const progress = (p: any) => {
-      if (p.status === "progress" && p.total)
-        onEvent?.({ kind: "modelDownloading", pct: Math.round(((p.loaded || 0) / p.total) * 100) });
-      else if (p.status === "done") onEvent?.({ kind: "modelCompiling" });
-      else if (p.status === "initiate") onEvent?.({ kind: "runtimeLoading" });
-    };
-    // RMBG-1.4：hf-mirror 国内可达优先，失败换 huggingface.co；fp16 失败回退 q8
-    const HOSTS = ["https://hf-mirror.com", "https://huggingface.co"];
-    const DTYPES = ["fp16", "q8"];
-    let lastErr: unknown = null;
-    outer: for (const host of HOSTS) {
-      T.env.remoteHost = host;
-      for (const dtype of DTYPES) {
-        try {
-          segPipe = await T.pipeline("background-removal", "briaai/RMBG-1.4", { dtype, progress_callback: progress });
-          break outer;
-        } catch (e) {
-          lastErr = e;
-          console.warn(`抠图模型加载失败（${host} / ${dtype}），换源重试`, e);
-        }
-      }
-    }
-    if (!segPipe) throw lastErr ?? new Error("segmentation model load failed");
+  // 缓存 Promise 防并发竞态：并发调用复用同一次模型加载（进度事件只发给首个触发者）
+  if (!segPipePromise) {
+    segPipePromise = loadPipeline(T, onEvent).catch((e) => {
+      segPipePromise = null; // 失败后允许下次重试
+      throw e;
+    });
   }
+  const segPipe = await segPipePromise;
   onEvent?.({ kind: "inferring" });
 
   // 超大照片先降采样到最长边 1600 再推理
