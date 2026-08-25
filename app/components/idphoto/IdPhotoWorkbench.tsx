@@ -9,6 +9,8 @@ import { GeneratePanel } from "./GeneratePanel";
 import { CompliancePanel } from "./CompliancePanel";
 import { AdjustPanel } from "./AdjustPanel";
 import { ExportPanel } from "./ExportPanel";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { PrintLayoutPanel } from "./PrintLayoutPanel";
 import { DIGITAL, SIZE_PRESETS, currentSize, headRange, headTarget } from "~/lib/idphoto/specs";
 import { canvasToBlobLimit, downloadBlob } from "~/lib/idphoto/exportImage";
 import { complianceRatio, computeBase, drawRuler, renderCompose } from "~/lib/idphoto/compose";
@@ -369,8 +371,18 @@ export function IdPhotoWorkbench() {
 
       {/* 右：预览区 */}
       <div className="min-w-0">
-        {/* TASK9: Tabs 包裹（photo/print），print 内容为 PrintLayoutPanel */}
-        <PreviewCanvas resultRef={resultRef} rulerRef={rulerRef} W={effectiveSize.w} H={effectiveSize.h} />
+        <Tabs defaultValue="photo">
+          <TabsList className="mx-auto mb-4">
+            <TabsTrigger value="photo">{t("idphoto.tab.photo")}</TabsTrigger>
+            <TabsTrigger value="print">{t("idphoto.tab.print")}</TabsTrigger>
+          </TabsList>
+          <TabsContent value="photo" className="mt-0">
+            <PreviewCanvas resultRef={resultRef} rulerRef={rulerRef} W={effectiveSize.w} H={effectiveSize.h} />
+          </TabsContent>
+          <TabsContent value="print" className="mt-0">
+            <PrintLayoutPanel sourceRef={resultRef} size={effectiveSize} resultReady={resultReady} />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

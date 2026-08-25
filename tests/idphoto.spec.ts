@@ -13,3 +13,13 @@ test("规格选择联动", async ({ page }) => {
   await page.goto("/idphoto");
   await expect(page.getByText("295×413px").first()).toBeVisible();
 });
+
+test("排版 tab 可切换", async ({ page }) => {
+  await page.goto("/idphoto");
+  const printTab = page.getByRole("tab", { name: /相纸排版|Print Layout|impression|impresión|impressão/i });
+  // 开发环境点击可能早于 React hydration 完成，重试点击直至面板出现
+  await expect(async () => {
+    await printTab.click();
+    await expect(page.getByTestId("idphoto-print-info")).toBeVisible();
+  }).toPass();
+});
