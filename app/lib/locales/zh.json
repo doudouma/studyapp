@@ -173,6 +173,7 @@
   "idphoto.bg.beige": "米色",
   "idphoto.bg.lightBlue": "浅蓝",
   "idphoto.bg.keep": "保留原背景",
+  "idphoto.bg.hex": "十六进制色值",
   "idphoto.bgNote.us": "⚠️ 美国护照数字提交不允许修改背景（国务院规定），请使用白底原图，勿用 AI 换底。",
   "idphoto.bgNote.in": "⚠️ 印度多数门户要求纯白底、双耳露出，且文件常限 20–50KB。",
   "idphoto.bgNote.kr": "⚠️ 韩国只认纯白底，奶油色/浅灰会被拒，请保持白色。",

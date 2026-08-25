@@ -173,6 +173,7 @@
   "idphoto.bg.beige": "Beige",
   "idphoto.bg.lightBlue": "Light blue",
   "idphoto.bg.keep": "Keep original background",
+  "idphoto.bg.hex": "Hex color",
   "idphoto.bgNote.us": "⚠️ US digital passport submissions must keep the original white background (State Dept rule) — do not use the AI background swap.",
   "idphoto.bgNote.in": "⚠️ Most Indian portals require pure white background and visible ears; files are often limited to 20–50KB.",
   "idphoto.bgNote.kr": "⚠️ Korea only accepts pure white — cream/light gray will be rejected.",

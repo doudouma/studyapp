@@ -174,6 +174,7 @@
   "idphoto.bg.beige": "Beige",
   "idphoto.bg.lightBlue": "Bleu clair",
   "idphoto.bg.keep": "Garder le fond d'origine",
+  "idphoto.bg.hex": "Couleur hexadécimale",
   "idphoto.bgNote.us": "⚠️ Les demandes numériques US exigent le fond blanc d'origine (règle du Département d'État) — n'utilisez pas le remplacement IA.",
   "idphoto.bgNote.in": "⚠️ La plupart des portails indiens exigent un fond blanc pur et les oreilles visuelles ; fichiers souvent limités à 20–50 Ko.",
   "idphoto.bgNote.kr": "⚠️ La Corée n'accepte que le blanc pur — crème/gris clair refusé.",

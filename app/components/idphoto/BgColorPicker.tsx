@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { BG_COLORS, type SizePreset } from "~/lib/idphoto/specs";
 import { cn } from "~/lib/utils";
@@ -13,6 +14,9 @@ interface BgColorPickerProps {
 export function BgColorPicker({ preset, bgColor, keepBg, onColor, onKeepBg }: BgColorPickerProps) {
   const { t } = useTranslation();
   const list = preset.bgOptions ?? BG_COLORS.map((c) => c.value);
+  const [hexDraft, setHexDraft] = useState(bgColor.toUpperCase());
+
+  useEffect(() => setHexDraft(bgColor.toUpperCase()), [bgColor]);
 
   return (
     <div>
@@ -51,12 +55,14 @@ export function BgColorPicker({ preset, bgColor, keepBg, onColor, onKeepBg }: Bg
         />
         <input
           type="text"
-          value={bgColor.toUpperCase()}
+          value={hexDraft}
           maxLength={7}
           spellCheck={false}
+          aria-label={t("idphoto.bg.hex")}
           onChange={(e) => {
             let v = e.target.value.trim();
             if (!v.startsWith("#")) v = "#" + v;
+            setHexDraft(v);
             if (/^#[0-9a-fA-F]{6}$/.test(v)) onColor(v);
           }}
           className="w-24 rounded-lg border border-input bg-background px-2 py-1.5 font-mono text-xs uppercase"
