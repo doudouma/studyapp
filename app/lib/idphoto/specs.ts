@@ -105,6 +105,7 @@ export function headRange(s: Pick<SizePreset, "headMin" | "headMax" | "hmm">): [
     min = s.hmm * 0.55;
     max = s.hmm * 0.72;
   }
+  if (!s.hmm) return [0, 1];
   return [min / s.hmm, max / s.hmm];
 }
 
