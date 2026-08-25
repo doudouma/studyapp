@@ -237,6 +237,7 @@ export function IdPhotoWorkbench() {
       setStatusErr(parts.join("\n"));
     } finally {
       setAiBusy(false);
+      setSegEvent(null);
     }
   }, [srcImg, aiBusy, keepBg, t, resetAdjust, setStatusOk, setStatusErr]);
 
