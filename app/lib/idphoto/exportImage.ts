@@ -1,5 +1,5 @@
 // 导出压缩与相纸排版网格。移植自 template/证件照工具.html L1080-1186。
-import { DPI, mm2px } from "./specs";
+import { mm2px } from "./specs";
 
 /** 按质量递减搜索把 canvas 压到 maxKB 以内（PNG 或不限时一次导出） */
 export function canvasToBlobLimit(
@@ -112,5 +112,3 @@ export function drawPrintLayout(canvas: HTMLCanvasElement, src: HTMLCanvasElemen
     }
   }
 }
-
-export { DPI };
