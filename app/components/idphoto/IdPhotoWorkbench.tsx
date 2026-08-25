@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Button } from "~/components/ui/button";
 import { PhotoDropzone } from "./PhotoDropzone";
 import { PreviewCanvas } from "./PreviewCanvas";
 import { SpecPicker } from "./SpecPicker";
 import { BgColorPicker } from "./BgColorPicker";
+import { GeneratePanel } from "./GeneratePanel";
+import { CompliancePanel } from "./CompliancePanel";
+import { AdjustPanel } from "./AdjustPanel";
 import { DIGITAL, SIZE_PRESETS, currentSize, headRange, headTarget } from "~/lib/idphoto/specs";
 import { complianceRatio, computeBase, drawRuler, renderCompose } from "~/lib/idphoto/compose";
 import { detectFace } from "~/lib/idphoto/face";
@@ -207,7 +209,36 @@ export function IdPhotoWorkbench() {
     [srcImg, cutImg, keepBg, aiBusy, t, setStatusOk],
   );
 
-  // TASK7: runAI 在此追加
+  const runAI = useCallback(async () => {
+    if (!srcImg || aiBusy) return;
+    setAiBusy(true);
+    try {
+      setStatusOk(t("idphoto.status.faceModel"));
+      const fb = await detectFace(srcImg);
+      setFaceBox(fb);
+      if (!keepBg) {
+        const seg = await segmentImage(srcImg, setSegEvent);
+        setCutImg(seg.cut);
+        setPersonTop(seg.personTopSrc);
+      } else {
+        setCutImg(null);
+        setPersonTop(null);
+      }
+      resetAdjust();
+      setResultReady(true);
+      setStatusOk(t("idphoto.status.done"));
+    } catch (e) {
+      console.error(e);
+      const msg = e instanceof Error ? e.message : String(e);
+      const isNet = /fetch|network|网络/i.test(msg);
+      const parts = [t("idphoto.ai.failPrefix") + msg];
+      if (isNet) parts.push(t("idphoto.ai.netHint"));
+      parts.push(t("idphoto.ai.offlineHint"));
+      setStatusErr(parts.join("\n"));
+    } finally {
+      setAiBusy(false);
+    }
+  }, [srcImg, aiBusy, keepBg, t, resetAdjust, setStatusOk, setStatusErr]);
 
   // segEvent → 状态文案（Task 7 接入 AI 按钮后生效）
   useEffect(() => {
@@ -266,19 +297,29 @@ export function IdPhotoWorkbench() {
 
         <section className="rounded-2xl border border-border bg-card p-4">
           <StepTitle n={4}>{t("idphoto.step.ai")}</StepTitle>
-          <Button
-            className="w-full"
-            disabled={!srcImg || aiBusy}
-            onClick={runCropOnly}
-            variant="secondary"
-          >
-            {t("idphoto.btn.cropOnly")}
-          </Button>
-          {/* TASK7: 「一键 AI 生成」按钮 + ai.hint 提示替换本节内容 */}
+          <GeneratePanel
+            disabled={!srcImg}
+            busy={aiBusy}
+            keepBg={keepBg}
+            onAI={runAI}
+            onCropOnly={runCropOnly}
+          />
         </section>
 
-        {/* TASK7: 合规检测 CompliancePanel */}
-        {/* TASK7: 微调 AdjustPanel */}
+        <section className="rounded-2xl border border-border bg-card p-4">
+          <StepTitle n={5}>{t("idphoto.step.compliance")}</StepTitle>
+          <CompliancePanel
+            ready={resultReady && headRatioPct != null}
+            ratioPct={headRatioPct}
+            rangePct={[Math.round(loRatio * 100), Math.round(hiRatio * 100)]}
+            showRuler={showRuler}
+            onToggleRuler={setShowRuler}
+          />
+        </section>
+        <section className="rounded-2xl border border-border bg-card p-4">
+          <StepTitle n={6}>{t("idphoto.step.adjust")}</StepTitle>
+          <AdjustPanel adjust={adjust} onChange={setAdjust} onReset={resetAdjust} />
+        </section>
         {/* TASK8: 导出 ExportPanel */}
 
         <div
@@ -298,7 +339,6 @@ export function IdPhotoWorkbench() {
       <div className="min-w-0">
         {/* TASK9: Tabs 包裹（photo/print），print 内容为 PrintLayoutPanel */}
         <PreviewCanvas resultRef={resultRef} rulerRef={rulerRef} W={effectiveSize.w} H={effectiveSize.h} />
-        <p className="mt-3 text-center text-xs text-muted-foreground">{t("idphoto.ruler.show")}</p>
       </div>
     </div>
   );
