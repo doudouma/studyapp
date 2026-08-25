@@ -8,7 +8,9 @@ import { BgColorPicker } from "./BgColorPicker";
 import { GeneratePanel } from "./GeneratePanel";
 import { CompliancePanel } from "./CompliancePanel";
 import { AdjustPanel } from "./AdjustPanel";
+import { ExportPanel } from "./ExportPanel";
 import { DIGITAL, SIZE_PRESETS, currentSize, headRange, headTarget } from "~/lib/idphoto/specs";
+import { canvasToBlobLimit, downloadBlob } from "~/lib/idphoto/exportImage";
 import { complianceRatio, computeBase, drawRuler, renderCompose } from "~/lib/idphoto/compose";
 import { detectFace } from "~/lib/idphoto/face";
 import { segmentImage, type SegEvent } from "~/lib/idphoto/segmentation";
@@ -49,6 +51,8 @@ export function IdPhotoWorkbench() {
   const [resultReady, setResultReady] = useState(false);
   const [aiBusy, setAiBusy] = useState(false);
   const [showRuler, setShowRuler] = useState(true);
+  const [exportFormat, setExportFormat] = useState<"jpeg" | "png">("jpeg");
+  const [exportNote, setExportNote] = useState("");
   const [segEvent, setSegEvent] = useState<SegEvent | null>(null);
   const [status, setStatus] = useState<{ kind: "ok" | "err"; text: string }>({ kind: "ok", text: "" });
 
@@ -241,6 +245,17 @@ export function IdPhotoWorkbench() {
     }
   }, [srcImg, aiBusy, keepBg, t, resetAdjust, setStatusOk, setStatusErr]);
 
+  const runExport = useCallback(async () => {
+    if (!resultReady) return;
+    const canvas = resultRef.current;
+    if (!canvas) return;
+    const s = effectiveSize;
+    const { blob, note } = await canvasToBlobLimit(canvas, exportFormat, sizeLimitKB);
+    const ext = exportFormat === "png" ? "png" : "jpg";
+    downloadBlob(blob, `${t("idphoto.file.photo")}_${t(`idphoto.spec.${s.key}.name`)}_${s.w}x${s.h}.${ext}`);
+    setExportNote(t("idphoto.export.done", { info: `${s.w}×${s.h}px ${note}` }));
+  }, [resultReady, effectiveSize, exportFormat, sizeLimitKB, t]);
+
   // segEvent → 状态文案（Task 7 接入 AI 按钮后生效）
   useEffect(() => {
     if (!segEvent) return;
@@ -321,7 +336,23 @@ export function IdPhotoWorkbench() {
           <StepTitle n={6}>{t("idphoto.step.adjust")}</StepTitle>
           <AdjustPanel adjust={adjust} onChange={setAdjust} onReset={resetAdjust} />
         </section>
-        {/* TASK8: 导出 ExportPanel */}
+        <section className="rounded-2xl border border-border bg-card p-4">
+          <StepTitle n={7}>{t("idphoto.step.export")}</StepTitle>
+          <ExportPanel
+            digitalKey={digitalKey}
+            sizeLimitKB={sizeLimitKB}
+            format={exportFormat}
+            note={exportNote}
+            disabled={!resultReady || aiBusy}
+            onDigital={(v) => {
+              setDigitalKey(v);
+              setSizeLimitKB(v && DIGITAL[v as keyof typeof DIGITAL] ? DIGITAL[v as keyof typeof DIGITAL].maxKB : 0);
+            }}
+            onSizeLimit={setSizeLimitKB}
+            onFormat={setExportFormat}
+            onExport={runExport}
+          />
+        </section>
 
         <div
           data-testid="idphoto-status"
