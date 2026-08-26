@@ -69,7 +69,8 @@ function ToolsDropdown() {
     location.pathname.startsWith("/rhythm") ||
     location.pathname.startsWith("/md2html") ||
     location.pathname.startsWith("/any2md") ||
-    location.pathname.startsWith("/freetool");
+    location.pathname.startsWith("/freetool") ||
+    location.pathname.startsWith("/idphoto");
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -112,6 +113,9 @@ function ToolsDropdown() {
           </DropdownLink>
           <DropdownLink href="/any2md" onClick={() => setOpen(false)}>
             {t("nav.any2md")}
+          </DropdownLink>
+          <DropdownLink href="/idphoto" onClick={() => setOpen(false)}>
+            {t("nav.idphoto")}
           </DropdownLink>
         </div>
       )}
@@ -285,7 +289,9 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
               <MobileNavLink href="/pomodoro" onClick={() => setMobileNavOpen(false)}>{t("nav.pomodoro")}</MobileNavLink>
               <MobileNavLink href="/rhythm" onClick={() => setMobileNavOpen(false)}>{t("nav.rhythm")}</MobileNavLink>
               <MobileNavLink href="/md2html" onClick={() => setMobileNavOpen(false)}>{t("nav.md2html")}</MobileNavLink>
-              <MobileNavLink href="/any2md" onClick={() => setMobileNavOpen(false)}>{t("nav.any2md")}</MobileNavLink>
+            <MobileNavLink href="/any2md" onClick={() => setMobileNavOpen(false)}>{t("nav.any2md")}</MobileNavLink>
+            <MobileNavLink href="/idphoto" onClick={() => setMobileNavOpen(false)}>{t("nav.idphoto")}</MobileNavLink>
+              <MobileNavLink href="/idphoto" onClick={() => setMobileNavOpen(false)}>{t("nav.idphoto")}</MobileNavLink>
               <div className="px-4 pt-2">
                 <LangSwitcher />
               </div>

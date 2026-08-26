@@ -49,3 +49,10 @@ test("裁剪后切排版 tab 可生成排版且预览往返不丢", async ({ pag
   await page.getByRole("tab", { name: /证件照预览|Photo Preview|Aperçu photo|Vista previa|Prévia da foto/i }).click();
   await expect(page.locator("canvas").first()).toBeVisible();
 });
+
+test("freetool 列表包含证件照入口", async ({ page }) => {
+  await page.goto("/freetool");
+  await expect(
+    page.getByRole("link").filter({ hasText: /AI 证件照工具|AI ID Photo Tool|identité|identificación|identificação/ }).first(),
+  ).toBeVisible();
+});

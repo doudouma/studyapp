@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Timer, Music, FileText, FileCode2, ArrowRight, Sparkles } from "lucide-react";
+import { Timer, Music, FileText, FileCode2, Camera, ArrowRight, Sparkles } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { useTranslation } from "react-i18next";
@@ -59,6 +59,12 @@ export const Route = createFileRoute("/freetool")({
                 name: i18n.t("freetool.item.any2md.title"),
                 url: "https://100mini.com/any2md",
               },
+              {
+                "@type": "ListItem",
+                position: 5,
+                name: i18n.t("freetool.item.idphoto.title"),
+                url: "https://100mini.com/idphoto",
+              },
             ],
           }),
         },
@@ -95,6 +101,12 @@ function FreeToolPage() {
       icon: FileCode2,
       title: t("freetool.item.any2md.title"),
       desc: t("freetool.item.any2md.desc"),
+    },
+    {
+      href: "/idphoto" as const,
+      icon: Camera,
+      title: t("freetool.item.idphoto.title"),
+      desc: t("freetool.item.idphoto.desc"),
     },
   ];
 

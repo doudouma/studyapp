@@ -187,6 +187,7 @@ const STATIC_PAGES: { loc: string; changefreq: string; priority: string }[] = [
   { loc: "/md2html", changefreq: "weekly", priority: "0.8" },
   { loc: "/any2md", changefreq: "weekly", priority: "0.8" },
   { loc: "/freetool", changefreq: "weekly", priority: "0.7" },
+  { loc: "/idphoto", changefreq: "weekly", priority: "0.7" },
   { loc: "/links", changefreq: "weekly", priority: "0.7" },
   { loc: "/pomodoro", changefreq: "weekly", priority: "0.6" },
   { loc: "/rhythm", changefreq: "weekly", priority: "0.6" },
