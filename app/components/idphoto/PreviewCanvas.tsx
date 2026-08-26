@@ -11,7 +11,7 @@ interface PreviewCanvasProps {
 export function PreviewCanvas({ resultRef, rulerRef, W, H }: PreviewCanvasProps) {
   return (
     <div
-      className="relative mx-auto inline-block max-w-full overflow-hidden rounded-xl border border-border"
+      className="relative mx-auto block w-fit max-w-full overflow-hidden rounded-xl border border-border"
       style={{
         backgroundImage: "repeating-conic-gradient(#d1d5db 0% 25%, #ffffff 0% 50%)",
         backgroundSize: "20px 20px",
