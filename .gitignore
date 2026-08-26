@@ -18,3 +18,4 @@ anydoc/
 *.key
 .env.local
 .env.*.local
+template/
