@@ -39,7 +39,10 @@ export function PrintLayoutPanel({ sourceRef, size, resultReady }: PrintLayoutPa
     }
     const canvas = printRef.current;
     const src = sourceRef.current;
-    if (!canvas || !src) return;
+    if (!canvas || !src) {
+      setInfo({ kind: "error", text: t("idphoto.print.needGenerate") });
+      return;
+    }
     drawPrintLayout(canvas, src, l, photoOrient === "landscape");
     setLayout(l);
     setInfo({

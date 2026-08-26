@@ -23,3 +23,29 @@ test("排版 tab 可切换", async ({ page }) => {
     await expect(page.getByTestId("idphoto-print-info")).toBeVisible();
   }).toPass();
 });
+
+test("裁剪后切排版 tab 可生成排版且预览往返不丢", async ({ page }) => {
+  await page.goto("/idphoto");
+  const png = Buffer.from(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+    "base64",
+  );
+  const cropBtn = page.getByRole("button", { name: /仅裁剪排版|Crop Only|Recadrer seulement|Solo recortar|Somente recortar/i });
+  // 开发环境 change 事件可能早于 React hydration 被丢弃，重试上传直至按钮可用
+  await expect(async () => {
+    await page.setInputFiles('input[type="file"]', { name: "t.png", mimeType: "image/png", buffer: png });
+    await expect(cropBtn).toBeEnabled({ timeout: 2000 });
+  }).toPass();
+  await cropBtn.click();
+  // 切到排版 tab 并生成排版
+  await page.getByRole("tab", { name: /相纸排版|Print Layout|impression|impresión|impressão/i }).click();
+  await expect(async () => {
+    await page
+      .getByRole("button", { name: /生成排版|Build layout|Créer la planche|Crear hoja|Criar folha/i })
+      .click();
+    await expect(page.getByTestId("idphoto-print-info")).toContainText(/300DPI/);
+  }).toPass({ timeout: 10_000 });
+  // 切回照片 tab，预览画布仍在且可见
+  await page.getByRole("tab", { name: /证件照预览|Photo Preview|Aperçu photo|Vista previa|Prévia da foto/i }).click();
+  await expect(page.locator("canvas").first()).toBeVisible();
+});

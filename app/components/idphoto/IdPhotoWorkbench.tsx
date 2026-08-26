@@ -376,10 +376,10 @@ export function IdPhotoWorkbench() {
             <TabsTrigger value="photo">{t("idphoto.tab.photo")}</TabsTrigger>
             <TabsTrigger value="print">{t("idphoto.tab.print")}</TabsTrigger>
           </TabsList>
-          <TabsContent value="photo" className="mt-0">
+          <TabsContent value="photo" className="mt-0" keepMounted>
             <PreviewCanvas resultRef={resultRef} rulerRef={rulerRef} W={effectiveSize.w} H={effectiveSize.h} />
           </TabsContent>
-          <TabsContent value="print" className="mt-0">
+          <TabsContent value="print" className="mt-0" keepMounted>
             <PrintLayoutPanel sourceRef={resultRef} size={effectiveSize} resultReady={resultReady} />
           </TabsContent>
         </Tabs>
