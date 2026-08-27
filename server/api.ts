@@ -209,7 +209,7 @@ api.get("/robots.txt", (c) => {
   const sitemapLines = LANGS.map((l) => `Sitemap: ${BASE_URL}/sitemap-${l}.xml`).join("\n");
   return c.text(`User-agent: *
 Allow: /
-Disallow: /p/
+Allow: /p/
 Disallow: /api/
 Disallow: /admin
 
