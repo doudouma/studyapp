@@ -5,6 +5,7 @@ import { AuthDialog } from "~/components/AuthDialog";
 import { useTranslation } from "react-i18next";
 import i18n, { getBcp47 } from "~/lib/i18n";
 import { withLangPrefix, currentLang, BASE_URL } from "~/lib/seo";
+import { recordPomodoroSession, fetchTodayTomatoCount } from "~/features/pomodoro/api";
 
 export const Route = createFileRoute("/pomodoro")({
   head: () => {
@@ -478,9 +479,8 @@ function PomodoroTimer() {
 
   useEffect(() => {
     if (!user) return;
-    fetch("/api/pomodoro/today-count")
-      .then(r => r.json())
-      .then((d: any) => { if (typeof d.today === 'number') setTodayTomatoes(d.today); if (typeof d.total === 'number') setTotalTomatoes(d.total); })
+    fetchTodayTomatoCount()
+      .then((d) => { if (typeof d.today === 'number') setTodayTomatoes(d.today); if (typeof d.total === 'number') setTotalTomatoes(d.total); })
       .catch(() => {});
   }, [user]);
 
@@ -488,11 +488,7 @@ function PomodoroTimer() {
     if (!user || recordedRef.current) return;
     recordedRef.current = true;
     try {
-      await fetch("/api/pomodoro/sessions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ duration }),
-      });
+      await recordPomodoroSession(duration);
     } catch {}
   }
 

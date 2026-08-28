@@ -10,11 +10,12 @@ import {
   getBcp47,
   type Lang,
 } from "../app/lib/lang";
-import { page, user, pomodoroSession, wardrobeItem, wardrobeJob, wardrobeOutfit } from "./db/schema";
+import { page, user, wardrobeItem, wardrobeJob, wardrobeOutfit } from "./db/schema";
 import { createDb } from "./db";
 import { squareRoutes } from "./features/square/square.routes";
 import { pagesRoutes } from "./features/pages/pages.routes";
 import { adminRoutes } from "./features/admin/admin.routes";
+import { pomodoroRoutes } from "./features/pomodoro/pomodoro.routes";
 
 type Variables = {
   user: { id: string; name: string; email: string; image?: string; role?: string } | null;
@@ -143,51 +144,6 @@ for (const lang of LANGS) {
   });
 }
 
-
-// Record a completed pomodoro session
-api.post("/api/pomodoro/sessions", async (c) => {
-  const user = c.get("user");
-  if (!user) return c.json({ error: "未登录" }, 401);
-  if (!c.env.D1) return c.json({ error: "database unavailable" }, 503);
-
-  const { duration } = await c.req.json<{ duration: number }>();
-  if (!duration || duration <= 0) return c.json({ error: "无效的时长" }, 400);
-
-  const db = createDb(c.env.D1);
-  await db.insert(pomodoroSession).values({
-    id: nanoid(12),
-    userId: user.id,
-    duration,
-    completedAt: new Date(),
-  });
-
-  return c.json({ success: true });
-});
-
-// Get today's pomodoro count
-api.get("/api/pomodoro/today-count", async (c) => {
-  const user = c.get("user");
-  if (!user) return c.json({ today: 0, total: 0 });
-  if (!c.env.D1) return c.json({ today: 0, total: 0 });
-
-  const db = createDb(c.env.D1);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-
-  const [todayResult, totalResult] = await Promise.all([
-    db.select({ count: sql<number>`count(*)` }).from(pomodoroSession).where(
-      and(eq(pomodoroSession.userId, user.id), gte(pomodoroSession.completedAt, today), lt(pomodoroSession.completedAt, tomorrow)),
-    ),
-    db.select({ count: sql<number>`count(*)` }).from(pomodoroSession).where(eq(pomodoroSession.userId, user.id)),
-  ]);
-
-  return c.json({
-    today: Number(todayResult[0]?.count || 0),
-    total: Number(totalResult[0]?.count || 0),
-  });
-});
 
 // ==================== Wardrobe API ====================
 
@@ -1239,7 +1195,7 @@ api.delete("/api/wardrobe/outfits/:id", async (c) => {
 });
 
 // Mount feature routers (server/features/*，各自按 repo/service/routes 分层)
-const apiWithFeatures = api.route("/", squareRoutes).route("/", pagesRoutes).route("/", adminRoutes);
+const apiWithFeatures = api.route("/", squareRoutes).route("/", pagesRoutes).route("/", adminRoutes).route("/", pomodoroRoutes);
 
 // Hono RPC 类型：前端通过 hc<AppType> 获得端到端类型安全的客户端
 export type AppType = typeof apiWithFeatures;
