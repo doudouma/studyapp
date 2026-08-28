@@ -21,7 +21,7 @@ async function gotoAndWaitReady(page: import("@playwright/test").Page) {
 test.describe("Any to MD", () => {
   test("should render the page and load the engine", async ({ page }) => {
     await gotoAndWaitReady(page);
-    await expect(page.getByText("Any 转 MD")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Any to MD", exact: true })).toBeVisible();
   });
 
   test("should reject unsupported file type", async ({ page }) => {

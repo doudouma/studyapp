@@ -12,6 +12,7 @@ export default defineConfig({
     baseURL: "http://localhost:5173",
     trace: "on-first-retry",
     channel: "chrome",
+    locale: "zh-CN",
   },
   webServer: {
     command: "npm run dev",
