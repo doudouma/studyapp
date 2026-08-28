@@ -321,15 +321,28 @@ export async function createUpload(input: CreateUploadInput): Promise<UploadResu
     throw new ServiceError(400, "请提供 HTML 内容或上传文件");
   }
 
-  // 恶意 HTML 检测（规则 + AI）
-  const { detectMaliciousHtml, detectWithAi } = await import("./html-guard");
-  const guard = detectMaliciousHtml(html);
+  // 恶意 HTML 检测 + 净化（sanitize-html + 钓鱼关键词 + PhishDestroy + AI）
+  const { detectAndSanitizeHtml, extractDomains, checkDomainsWithPhishDestroy, detectWithAi } = await import("./html-guard");
+  const guard = detectAndSanitizeHtml(html);
   if (!guard.safe) {
     const detail = guard.threats.map((t) => `${t.label}(${t.count})`).join(", ");
     throw new ServiceError(400, `检测到不安全内容：${detail}`);
   }
-  // AI 辅助检测（仅匿名上传触发，已登录用户跳过以降低延迟）
-  if (!user && input.ai) {
+  // 使用净化后的 HTML 存储（剥离 iframe/object/embed 等）
+  html = guard.sanitizedHtml || html;
+
+  // PhishDestroy 域名检查（提取 HTML 中的外部域名，检查是否为钓鱼站点）
+  const domains = extractDomains(html);
+  if (domains.length > 0) {
+    const domainCheck = await checkDomainsWithPhishDestroy(domains);
+    if (!domainCheck.safe) {
+      const detail = domainCheck.threats.map((t) => `${t.domain}(${t.severity}, ${t.score}分)`).join(", ");
+      throw new ServiceError(400, `检测到钓鱼域名：${detail}`);
+    }
+  }
+
+  // AI 辅助检测（所有用户上传均触发）
+  if (input.ai) {
     const aiResult = await detectWithAi(input.ai, html);
     if (!aiResult.safe) {
       throw new ServiceError(400, `AI 检测到不安全内容：${aiResult.verdict}`);
