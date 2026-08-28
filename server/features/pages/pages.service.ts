@@ -320,6 +320,14 @@ export async function createUpload(input: CreateUploadInput): Promise<UploadResu
     throw new ServiceError(400, "请提供 HTML 内容或上传文件");
   }
 
+  // 恶意 HTML 检测
+  const { detectMaliciousHtml } = await import("./html-guard");
+  const guard = detectMaliciousHtml(html);
+  if (!guard.safe) {
+    const detail = guard.threats.map((t) => `${t.label}(${t.count})`).join(", ");
+    throw new ServiceError(400, `检测到不安全内容：${detail}`);
+  }
+
   const id = nanoid(7);
   const now = Date.now();
   const isAnonymous = !user;
