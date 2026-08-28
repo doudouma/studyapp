@@ -3,6 +3,18 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useAuth } from "~/lib/auth-context";
 import { Check, Plus, Trash2, X, Upload, Loader2, AlertCircle, Sparkles } from "lucide-react";
 import { cn } from "~/lib/utils";
+import {
+  uploadWardrobeImage,
+  analyzeWardrobeImage,
+  extractWardrobeItem,
+  fetchWardrobeItems,
+  updateWardrobeItem,
+  deleteWardrobeItem,
+  fetchWardrobeOutfits,
+  createWardrobeOutfit,
+  autoCreateWardrobeOutfits,
+  deleteWardrobeOutfit,
+} from "~/features/wardrobe/api";
 import "./wardrobe.css";
 
 export const Route = createFileRoute("/wardrobe")({
@@ -445,14 +457,7 @@ function WardrobeImportFlow({ onGarmentApproved }: { onGarmentApproved: (item: G
     setError("");
     for (const file of images) {
       try {
-        const formData = new FormData();
-        formData.append("image", file);
-        const response = await fetch("/api/wardrobe/upload", { method: "POST", body: formData });
-        if (!response.ok) {
-          const errData = await response.json().catch(() => ({})) as { error?: string };
-          throw new Error(errData.error || "Upload failed");
-        }
-        const data = await response.json() as { jobId: string; imageUrl: string };
+        const data = await uploadWardrobeImage(file);
         const newJob: WardrobeJob = { id: data.jobId, status: "pending", originalImageUrl: data.imageUrl };
         setJobs((current) => [...current, newJob]);
         setOpen(true);
@@ -466,14 +471,8 @@ function WardrobeImportFlow({ onGarmentApproved }: { onGarmentApproved: (item: G
   const analyzeJob = async (jobId: string) => {
     setJobs((current) => current.map((job) => job.id === jobId ? { ...job, status: "analyzing" } : job));
     try {
-      const response = await fetch(`/api/wardrobe/jobs/${jobId}/analyze`, { method: "POST" });
-      if (response.ok) {
-        const data = await response.json() as { items: AnalysisItem[] };
-        setJobs((current) => current.map((job) => job.id === jobId ? { ...job, status: "completed", analysisResult: data.items } : job));
-      } else {
-        const errData = await response.json().catch(() => ({})) as { error?: string };
-        setJobs((current) => current.map((job) => job.id === jobId ? { ...job, status: "failed", error: errData.error } : job));
-      }
+      const data = await analyzeWardrobeImage(jobId);
+      setJobs((current) => current.map((job) => job.id === jobId ? { ...job, status: "completed", analysisResult: data.items as AnalysisItem[] } : job));
     } catch (err: unknown) {
       setJobs((current) => current.map((job) => job.id === jobId ? { ...job, status: "failed", error: err instanceof Error ? err.message : "Analysis failed" } : job));
     }
@@ -482,12 +481,9 @@ function WardrobeImportFlow({ onGarmentApproved }: { onGarmentApproved: (item: G
   const handleExtract = async (jobId: string, itemIndex: number) => {
     setBusyId(jobId);
     try {
-      const response = await fetch(`/api/wardrobe/jobs/${jobId}/extract/${itemIndex}`, { method: "POST" });
-      if (response.ok) {
-        const data = await response.json() as { item: GarmentItem };
-        onGarmentApproved(data.item);
-        setJobs((current) => current.filter((job) => job.id !== jobId));
-      }
+      const data = await extractWardrobeItem(jobId, itemIndex);
+      onGarmentApproved(data.item as GarmentItem);
+      setJobs((current) => current.filter((job) => job.id !== jobId));
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Extraction failed");
     } finally {
@@ -498,7 +494,7 @@ function WardrobeImportFlow({ onGarmentApproved }: { onGarmentApproved: (item: G
   const deleteJob = async (jobId: string) => {
     setBusyId(jobId);
     try {
-      await fetch(`/api/wardrobe/jobs/${jobId}`, { method: "DELETE" });
+      // Note: deleteJob endpoint doesn't exist in the new API, so we just remove from state
       setJobs((current) => current.filter((job) => job.id !== jobId));
     } catch { /* ignore */ }
     finally { setBusyId(null); }
@@ -682,19 +678,14 @@ function WardrobePage() {
 
   useEffect(() => {
     if (!user) return;
-    fetch("/api/wardrobe/items", { cache: "no-store" })
-      .then((response) => {
-        if (!response.ok) throw new Error("Could not load the wardrobe.");
-        return response.json();
-      })
-      .then((data) => { setItems((data as { items: GarmentItem[] }).items || []); })
+    fetchWardrobeItems()
+      .then((data) => { setItems(data.items as GarmentItem[] || []); })
       .catch((err: unknown) => setError(err instanceof Error ? err.message : "Failed to load"))
       .finally(() => setLoading(false));
     
     // 加载 outfits
-    fetch("/api/wardrobe/outfits", { cache: "no-store" })
-      .then((response) => response.ok ? response.json() : Promise.reject())
-      .then((data) => { setOutfits((data as { outfits: any[] }).outfits || []); })
+    fetchWardrobeOutfits()
+      .then((data) => { setOutfits(data.outfits || []); })
       .catch(() => {});
   }, [user]);
 
@@ -718,30 +709,22 @@ function WardrobePage() {
 
   const saveItem = async (updatedItem: GarmentItem) => {
     try {
-      const response = await fetch(`/api/wardrobe/items/${updatedItem.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: updatedItem.name,
-          part: updatedItem.part,
-          color: updatedItem.color,
-          secondaryColor: updatedItem.secondaryColor,
-          tags: updatedItem.tags,
-        }),
+      await updateWardrobeItem(updatedItem.id, {
+        name: updatedItem.name,
+        part: updatedItem.part as any,
+        color: updatedItem.color || "#808080",
+        secondaryColor: updatedItem.secondaryColor,
+        tags: updatedItem.tags,
       });
-      if (response.ok) {
-        setItems((current) => current.map((item) => item.id === updatedItem.id ? updatedItem : item));
-      }
+      setItems((current) => current.map((item) => item.id === updatedItem.id ? updatedItem : item));
     } catch { /* ignore */ }
   };
 
   const deleteItem = async (id: string) => {
     try {
-      const response = await fetch(`/api/wardrobe/items/${id}`, { method: "DELETE" });
-      if (response.ok || response.status === 404) {
-        setItems((current) => current.filter((item) => item.id !== id));
-        setSelectedId(null);
-      }
+      await deleteWardrobeItem(id);
+      setItems((current) => current.filter((item) => item.id !== id));
+      setSelectedId(null);
     } catch { /* ignore */ }
   };
 
@@ -760,22 +743,15 @@ function WardrobePage() {
     if (!outfitName.trim() || selectedItems.length < 2) return;
     setGenerating(true);
     try {
-      const response = await fetch("/api/wardrobe/outfits", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: outfitName.trim(),
-          occasion: occasion.trim() || null,
-          itemIds: selectedItems,
-        }),
+      const data = await createWardrobeOutfit({
+        name: outfitName.trim(),
+        occasion: occasion.trim() || undefined,
+        itemIds: selectedItems,
       });
-      if (response.ok) {
-        const data = (await response.json()) as { outfit: any };
-        setOutfits((prev) => [data.outfit, ...prev]);
-        setSelectedItems([]);
-        setOutfitName("");
-        setOccasion("");
-      }
+      setOutfits((prev) => [data.outfit, ...prev]);
+      setSelectedItems([]);
+      setOutfitName("");
+      setOccasion("");
     } catch { /* ignore */ }
     finally { setGenerating(false); }
   };
@@ -784,27 +760,17 @@ function WardrobePage() {
     if (autoGenerating) return;
     setAutoGenerating(true);
     try {
-      const response = await fetch("/api/wardrobe/outfits/auto", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ count: autoCount }),
-      });
-      const data = (await response.json()) as { outfits?: any[]; error?: string };
-      if (response.ok && data.outfits) {
-        setOutfits((prev) => [...data.outfits!, ...prev]);
-      } else {
-        alert(data.error || "Failed to generate outfits");
-      }
-    } catch { /* ignore */ }
-    finally { setAutoGenerating(false); }
+      const data = await autoCreateWardrobeOutfits({ count: autoCount });
+      setOutfits((prev) => [...data.outfits, ...prev]);
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Failed to generate outfits");
+    } finally { setAutoGenerating(false); }
   };
 
   const handleDeleteOutfit = async (id: string) => {
     try {
-      const response = await fetch(`/api/wardrobe/outfits/${id}`, { method: "DELETE" });
-      if (response.ok) {
-        setOutfits((prev) => prev.filter((o) => o.id !== id));
-      }
+      await deleteWardrobeOutfit(id);
+      setOutfits((prev) => prev.filter((o) => o.id !== id));
     } catch { /* ignore */ }
   };
 
