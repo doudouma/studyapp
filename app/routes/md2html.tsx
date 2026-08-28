@@ -15,6 +15,8 @@ import { useAuth } from "~/lib/auth-context";
 import { useTranslation } from "react-i18next";
 import i18n from "~/lib/i18n";
 import { TagInput } from "~/components/TagInput";
+import { uploadPage } from "~/features/pages/api";
+import type { UploadResult } from "@shared/types/pages";
 import { PUBLISH_LIMIT } from "~/lib/any2md/convert";
 import {
   Dialog,
@@ -571,15 +573,6 @@ function getDefaultMd(lang: string): string {
   return DEFAULT_MD_BY_LANG[lang] ?? DEFAULT_MD_EN;
 }
 
-interface UploadResult {
-  id: string;
-  url: string;
-  expiresAt: string | null;
-  isPermanent?: boolean;
-  title?: string;
-  isSharedToSquare?: boolean;
-}
-
 function Md2HtmlPage() {
   const { t, i18n: i18nInstance } = useTranslation();
   const { user } = useAuth();
@@ -717,13 +710,9 @@ function Md2HtmlPage() {
     formData.append("tags", tags.join(","));
     formData.append("shareToSquare", String(shareToSquare));
 
-    const res = await fetch("/api/upload", {
-      method: "POST",
-      body: formData,
-    });
-    const json = (await res.json()) as { error?: string } & UploadResult;
-    if (!res.ok) throw new Error(json.error || t("common.error"));
-    setResult(json);
+    const result = await uploadPage(formData);
+    if (!result.ok) throw new Error(result.error || t("common.error"));
+    setResult(result.data);
   };
 
   const doAnonymousUpload = async () => {

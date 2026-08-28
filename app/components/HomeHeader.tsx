@@ -8,7 +8,7 @@ import { Button } from "~/components/ui/button";
 import { AuthDialog } from "~/components/AuthDialog";
 import { useTranslation } from "react-i18next";
 import { LangSwitcher } from "~/components/LangSwitcher";
-import { fetchSquareData } from "~/lib/square-server";
+import { fetchSquareItems } from "~/features/square/api";
 
 interface AppNavProps {
   searchQuery?: string;
@@ -169,7 +169,7 @@ let _prefetching = false;
 function prefetchSquare() {
   if (_prefetching) return;
   _prefetching = true;
-  fetchSquareData({ data: { offset: 0 } }).catch(() => {}).finally(() => { _prefetching = false; });
+  fetchSquareItems(0).catch(() => {}).finally(() => { _prefetching = false; });
 }
 
 export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {

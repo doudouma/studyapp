@@ -15,6 +15,7 @@ import {
   DialogClose,
 } from "~/components/ui/dialog";
 import { useTranslation } from "react-i18next";
+import { deleteMyPage, fetchPageContent, updatePageFile, updatePageMeta } from "~/features/pages/api";
 
 export interface PageLink {
   id: string;
@@ -126,10 +127,9 @@ export function LinksTable({ pages, total, limit, page = 1, totalPages = 1, onPa
     setDeleteError("");
     setDeletingId(id);
     try {
-      const res = await fetch(`/api/pages/${id}`, { method: "DELETE" });
-      if (!res.ok) {
-        const data: { error?: string } = await res.json();
-        setDeleteError(data.error || t("components.linksTable.deleteFailed"));
+      const result = await deleteMyPage(id);
+      if (!result.ok) {
+        setDeleteError(result.error || t("components.linksTable.deleteFailed"));
         return;
       }
       onDelete(id);
@@ -380,9 +380,7 @@ function EditDialog({
     setContentLoading(true);
     setContentFile(null);
     try {
-      const res = await fetch(`/api/pages/${page.id}/content`);
-      if (!res.ok) throw new Error(t("common.loadFailed"));
-      const data = await res.json() as { content: string };
+      const data = await fetchPageContent(page.id);
       setContent(data.content);
     } catch {
       setError(t("common.loadFailed"));
@@ -411,29 +409,21 @@ function EditDialog({
     setError("");
     setSaving(true);
     try {
-      let res: Response;
+      let result: { ok: boolean; error?: string };
       if (contentFile) {
         const formData = new FormData();
         formData.append("file", contentFile);
         formData.append("title", title);
         formData.append("category", category);
         formData.append("tags", tags.join(","));
-        res = await fetch(`/api/pages/${page.id}`, {
-          method: "PATCH",
-          body: formData,
-        });
+        result = await updatePageFile(page.id, formData);
       } else {
         const body: { title: string; category: string; tags: string; content?: string } = { title, category, tags: tags.join(",") };
         if (content) body.content = content;
-        res = await fetch(`/api/pages/${page.id}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        });
+        result = await updatePageMeta(page.id, body);
       }
-      if (!res.ok) {
-        const data: { error?: string } = await res.json();
-        throw new Error(data.error || t("components.linksTable.editDialog.saveFailed"));
+      if (!result.ok) {
+        throw new Error(result.error || t("components.linksTable.editDialog.saveFailed"));
       }
       onSaved();
     } catch (err) {

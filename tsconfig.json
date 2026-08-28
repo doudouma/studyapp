@@ -13,8 +13,10 @@
     "noEmit": true,
     "paths": {
       "~/*": ["./app/*"],
-      "@/*": ["./app/*"]
+      "@/*": ["./app/*"],
+      "@shared/*": ["./shared/*"],
+      "@server/*": ["./server/*"]
     }
   },
-  "include": ["app/**/*", "server/**/*", "app.config.ts", ".tanstack/**/*"]
+  "include": ["app/**/*", "server/**/*", "shared/**/*", "app.config.ts", ".tanstack/**/*"]
 }

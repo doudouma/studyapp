@@ -1,18 +1,7 @@
 import { useState } from "react";
 import { FileText, Eye } from "lucide-react";
 import { useTranslation } from "react-i18next";
-
-interface SquareItem {
-  id: string;
-  title: string;
-  category: string;
-  tags: string;
-  viewCount: number;
-  sharedAt: number;
-  previewPath: string | null;
-  userName: string | null;
-  userImage: string | null;
-}
+import type { SquareItem } from "@shared/types/square";
 
 interface SquareGridProps {
   items: SquareItem[];

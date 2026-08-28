@@ -8,7 +8,8 @@ import { useTranslation } from "react-i18next";
 
 interface SuccessCardProps {
   url: string;
-  expiresAt?: string;
+  /** Unix 毫秒时间戳，null/undefined 表示永久 */
+  expiresAt?: number | null;
   isPermanent?: boolean;
   pageId: string;
   onReset: () => void;

@@ -5,6 +5,8 @@ import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { LinksTable } from "~/components/LinksTable";
 import { useAuth } from "~/lib/auth-context";
+import { fetchMyPages } from "~/features/pages/api";
+import type { PagesListResponse } from "@shared/types/pages";
 import { useTranslation } from "react-i18next";
 import i18n from "~/lib/i18n";
 
@@ -20,21 +22,6 @@ export const Route = createFileRoute("/links")({
   }),
   component: LinksPage,
 });
-
-interface PageData {
-  id: string;
-  title: string;
-  category: string;
-  tags: string;
-  viewCount: number;
-  createdAt: number;
-}
-
-interface PagesResponse {
-  pages: PageData[];
-  total: number;
-  limit: number;
-}
 
 interface PomodoroCount {
   today: number;
@@ -58,7 +45,7 @@ function StatCard({ icon, label, value, accent }: { icon: React.ReactNode; label
 function LinksPage() {
   const { t, i18n: i18nInstance } = useTranslation();
   const { user, authLoading, isMember, membershipExpiresAt, refreshAuth } = useAuth();
-  const [data, setData] = useState<PagesResponse | null>(null);
+  const [data, setData] = useState<PagesListResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pomoCount, setPomoCount] = useState<PomodoroCount>({ today: 0, total: 0 });
@@ -69,12 +56,7 @@ function LinksPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/pages?page=${page}&pageSize=${pageSize}`);
-      if (!res.ok) {
-        const json = (await res.json()) as { error?: string };
-        throw new Error(json.error || t("common.loadFailed"));
-      }
-      const json = (await res.json()) as PagesResponse;
+      const json = await fetchMyPages(page, pageSize);
       setData(json);
     } catch (err) {
       setError(err instanceof Error ? err.message : t("common.loadFailed"));

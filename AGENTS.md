@@ -20,18 +20,35 @@
 ## 项目结构
 
 ```
-app/               # 前端代码 (TanStack Start)
+shared/             # 前后端共享代码（物理隔离，唯一数据契约来源）
+  types/            # DTO 类型 + 共享常量 (如 square.ts)
+app/                # 前端代码 (TanStack Start)
   routes/           # 页面路由 (文件路由)
-  components/       # React 组件
+  components/       # 跨页面共享的 React 组件
     ui/             # shadcn/ui 基础组件
-  lib/              # 工具函数、auth client/context
+  features/         # 按业务功能组织的前端模块
+    square/api.ts   # 该功能的 Hono RPC 类型化客户端
+  lib/              # 全局工具函数、auth client/context、i18n
   styles/           # 全局 CSS
 server/             # 服务端代码 (Cloudflare Worker)
-  api.ts            # 所有 API 路由 (Hono)
+  api.ts            # Hono 入口：中间件 + 挂载各 feature 路由，导出 AppType
+  types.ts          # 服务端共享 Env 类型 (AppBindings/AppVariables/AppEnv)
+  features/         # 按业务功能组织的后端模块，内部三层：
+    square/         #   *.repo.ts     数据访问 (Drizzle，不感知 HTTP)
+                    #   *.service.ts  业务逻辑 + DTO 转换
+                    #   *.routes.ts   HTTP 边界 (参数解析/认证/响应映射)
   auth.ts           # better-auth 服务端配置
   db/               # Drizzle schema + client
 drizzle/            # Drizzle Kit 迁移产物
 ```
+
+### 路径别名
+
+| 别名 | 指向 | 规则 |
+|---|---|---|
+| `~/`, `@/` | `app/` | 前端内部 |
+| `@shared/*` | `shared/*` | 前后端均可运行时引用 |
+| `@server/*` | `server/*` | **仅允许 `import type`**（类型擦除后不影响客户端 bundle；运行时 import 会把服务端依赖打进前端） |
 
 ## Auth 流程
 
@@ -48,15 +65,23 @@ drizzle/            # Drizzle Kit 迁移产物
 
 ## API 模式
 
-- 所有 API 路由集中定义在 `server/api.ts`，导出 Hono 实例
-- `app/server.tsx` 中创建根 Hono app，挂载 API 路由
-- 非 API 请求 fallback 到 TanStack SSR handler
+- API 路由按业务功能拆分到 `server/features/<feature>/<feature>.routes.ts`，由 `server/api.ts` 统一挂载 (`api.route("/", featureRoutes)`)
+- `server/api.ts` 仍承载未迁移的遗留路由与全局中间件/onError，新功能一律建 feature 模块
+- `app/server.tsx` 中创建根 Hono app，挂载 API 路由；非 API 请求 fallback 到 TanStack SSR handler
+- `api.ts` 导出 `AppType`，供前端 `hc<AppType>` 生成端到端类型安全的 RPC 客户端
+
+### 前后端数据流 (Hono RPC)
+
+- 前端每个 feature 在 `app/features/<feature>/api.ts` 中封装 `hc<AppType>()` 调用，页面/组件只依赖该模块，不直接 fetch
+- 类型链路：`*.routes.ts` handler 返回值 → `AppType` → 前端 `res.json()` 自动推导；DTO 定义在 `shared/types/`
+- SSR loader 中 RPC fetch 需要绝对 URL：`app/server.tsx` 已把请求 origin 写入 `globalThis.__SSR_ORIGIN__`
+- **遗留限制**：SSR 自取 API 是同 isolate 内 fetch 自身 origin；公开只读接口无影响，迁移需要鉴权的接口时必须按请求透传 cookie（不得依赖 `__SSR_ORIGIN__` 全局变量）
 
 ## 状态管理
 
 - **无外部状态库**（无 React Query、Zustand）
 - Auth 状态: React Context
-- 页面数据: `createServerFn()` + `useLoaderData()` (TanStack Router)
+- 页面数据: route `loader` + `useLoaderData()` (TanStack Router)，loader 内经 `app/features/<feature>/api.ts` 取数
 - 表单/UI 状态: 本地 `useState`
 
 ## 样式约定

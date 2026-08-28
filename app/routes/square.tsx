@@ -4,18 +4,18 @@ import { Globe, Loader2 } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { SquareGrid } from "~/components/SquareGrid";
-import { fetchSquareData, type SquareItem } from "~/lib/square-server";
+import { fetchSquareItems } from "~/features/square/api";
+import type { SquareItem } from "@shared/types/square";
+import { SQUARE_PAGE_SIZE } from "@shared/types/square";
 import { useTranslation } from "react-i18next";
 import i18n from "~/lib/i18n";
-
-const PAGE_SIZE = 12;
 
 export const Route = createFileRoute("/square")({
   validateSearch: (search: Record<string, string | undefined>) => ({
     q: search.q || "",
   }),
   loader: async () => {
-    return fetchSquareData({ data: { offset: 0 } });
+    return fetchSquareItems(0);
   },
   head: () => ({
     meta: [
@@ -89,7 +89,7 @@ function SquarePage() {
           setLoading(true);
           try {
             const offset = allItemsRef.current.length;
-            const result = await fetchSquareData({ data: { offset } });
+            const result = await fetchSquareItems(offset);
             setAllItems((prev) => {
               const next = [...prev, ...result.items];
               allItemsRef.current = next;
@@ -211,7 +211,7 @@ function SquarePage() {
               <span className="ml-2 text-sm text-muted-foreground">{t("common.loading")}</span>
             </div>
           )}
-          {!hasMore && allItems.length > PAGE_SIZE && (
+          {!hasMore && allItems.length > SQUARE_PAGE_SIZE && (
             <p className="py-8 text-center text-sm text-muted-foreground">
               {t("square.loadedAll")}
             </p>

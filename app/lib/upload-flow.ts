@@ -1,4 +1,5 @@
 import { snapdom } from "@zumer/snapdom";
+import { uploadPageThumbnail } from "~/features/pages/api";
 
 const THUMBNAIL_WIDTH = 400;
 const THUMBNAIL_HEIGHT = 600;
@@ -78,14 +79,9 @@ async function uploadThumbnail(pageId: string, blob: Blob) {
   formData.append("pageId", pageId);
   formData.append("thumbnail", blob, `${pageId}.webp`);
 
-  const res = await fetch("/api/upload-thumbnail", {
-    method: "POST",
-    body: formData,
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`缩略图上传失败: ${text}`);
+  const result = await uploadPageThumbnail(formData);
+  if (!result.ok) {
+    throw new Error(`缩略图上传失败: ${result.error || "未知错误"}`);
   }
 }
 

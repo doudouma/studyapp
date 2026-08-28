@@ -21,6 +21,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useAuth } from "~/lib/auth-context";
 import { useTranslation } from "react-i18next";
 import i18n from "~/lib/i18n";
+import { uploadPage } from "~/features/pages/api";
+import type { UploadResult } from "@shared/types/pages";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -36,15 +38,6 @@ export const Route = createFileRoute("/")({
 });
 
 type TabMode = "paste" | "drop";
-
-interface UploadResult {
-  id: string;
-  url: string;
-  expiresAt: string | null;
-  isPermanent?: boolean;
-  title?: string;
-  isSharedToSquare?: boolean;
-}
 
 function UploadForm({
   mode,
@@ -351,17 +344,12 @@ function HomePage() {
       formData.append("tags", tags.join(","));
       formData.append("shareToSquare", String(shareToSquare));
 
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const json = await res.json() as { error?: string } & UploadResult;
-      if (!res.ok) {
-        throw new Error(json.error || t("common.error"));
+      const result = await uploadPage(formData);
+      if (!result.ok) {
+        throw new Error(result.error || t("common.error"));
       }
 
-      setResult(json);
+      setResult(result.data);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : t("common.errorRetry")

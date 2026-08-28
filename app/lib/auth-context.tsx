@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
 import { authClient } from "~/lib/auth-client";
+import { fetchMe } from "~/features/pages/api";
 
 interface User {
   id: string;
@@ -38,8 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(sessionUser);
 
       if (sessionUser) {
-        const res = await fetch("/api/me");
-        const data = await res.json() as { isMember?: boolean; membershipExpiresAt?: string | null };
+        const data = await fetchMe();
         setIsMember(data.isMember ?? false);
         setMembershipExpiresAt(data.membershipExpiresAt ?? null);
       } else {

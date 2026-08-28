@@ -14,6 +14,18 @@ import {
 } from "~/components/ui/dialog";
 import { useTranslation } from "react-i18next";
 import i18n from "~/lib/i18n";
+import {
+  fetchAdminUsers,
+  fetchAdminPages,
+  setMembership as setMembershipApi,
+  cancelMembership as cancelMembershipApi,
+  deleteAdminPage,
+} from "~/features/admin/api";
+import type {
+  AdminUserData,
+  AdminPageData,
+  MembershipDuration,
+} from "@shared/types/admin";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -25,47 +37,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-interface MembershipInfo {
-  expiresAt: number;
-  isActive: boolean;
-  startedAt: number;
-}
-
-interface UserData {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  createdAt: number;
-  membership: MembershipInfo | null;
-}
-
-interface AdminUsersResponse {
-  users: UserData[];
-  total: number;
-  page: number;
-  pageSize: number;
-}
-
-interface AdminPageData {
-  id: string;
-  title: string;
-  category: string;
-  viewCount: number;
-  isSharedToSquare: boolean;
-  createdAt: number;
-  userName: string | null;
-  userEmail: string | null;
-}
-
-interface AdminPagesResponse {
-  items: AdminPageData[];
-  total: number;
-  page: number;
-  pageSize: number;
-}
-
-type DurationOption = 1 | 3 | 6 | 12;
+type DurationOption = MembershipDuration;
 
 function AdminPage() {
   const { t } = useTranslation();
@@ -74,7 +46,7 @@ function AdminPage() {
   const [tab, setTab] = useState<"users" | "pages">("users");
 
   // User list state
-  const [users, setUsers] = useState<UserData[]>([]);
+  const [users, setUsers] = useState<AdminUserData[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -87,16 +59,16 @@ function AdminPage() {
   const [pagesLoading, setPagesLoading] = useState(false);
 
   // Membership dialog state
-  const [membershipUser, setMembershipUser] = useState<UserData | null>(null);
+  const [membershipUser, setMembershipUser] = useState<AdminUserData | null>(null);
   const [selectedDuration, setSelectedDuration] = useState<DurationOption>(3);
   const [dialogLoading, setDialogLoading] = useState(false);
 
   // Cancel dialog state
-  const [cancelUser, setCancelUser] = useState<UserData | null>(null);
+  const [cancelUser, setCancelUser] = useState<AdminUserData | null>(null);
   const [cancelLoading, setCancelLoading] = useState(false);
 
   // Delete page dialog
-  const [deletePage, setDeletePage] = useState<AdminPageData | null>(null);
+  const [deletePageState, setDeletePageState] = useState<AdminPageData | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const pageSize = 10;
@@ -114,9 +86,7 @@ function AdminPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/users?page=${p}&pageSize=${pageSize}`);
-      if (!res.ok) throw new Error(((await res.json()) as { error?: string }).error || i18n.t("common.loadFailed"));
-      const data: AdminUsersResponse = await res.json();
+      const data = await fetchAdminUsers(p, pageSize);
       setUsers(data.users);
       setTotal(data.total);
       setPage(data.page);
@@ -137,9 +107,7 @@ function AdminPage() {
   const fetchPages = async (p: number) => {
     setPagesLoading(true);
     try {
-      const res = await fetch(`/api/admin/pages?page=${p}&pageSize=${pageSize}&scope=all`);
-      if (!res.ok) throw new Error(i18n.t("common.loadFailed"));
-      const data: AdminPagesResponse = await res.json();
+      const data = await fetchAdminPages(p, pageSize, "all");
       setPages(data.items);
       setPagesTotal(data.total);
       setPagesPage(data.page);
@@ -151,12 +119,12 @@ function AdminPage() {
   };
 
   const handleDeletePage = async () => {
-    if (!deletePage) return;
+    if (!deletePageState) return;
     setDeleteLoading(true);
     try {
-      const res = await fetch(`/api/admin/pages/${deletePage.id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error(i18n.t("admin.page.deleteFailed"));
-      setDeletePage(null);
+      const result = await deleteAdminPage(deletePageState.id);
+      if (!result.ok) throw new Error(result.error || i18n.t("admin.page.deleteFailed"));
+      setDeletePageState(null);
       fetchPages(pagesPage);
     } catch (err) {
       alert(err instanceof Error ? err.message : i18n.t("admin.page.deleteFailed"));
@@ -169,12 +137,8 @@ function AdminPage() {
     if (!membershipUser) return;
     setDialogLoading(true);
     try {
-      const res = await fetch(`/api/admin/users/${membershipUser.id}/membership`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ durationMonths: selectedDuration }),
-      });
-      if (!res.ok) throw new Error(((await res.json()) as { error?: string }).error || i18n.t("admin.page.actionFailed"));
+      const result = await setMembershipApi(membershipUser.id, selectedDuration);
+      if (!result.ok) throw new Error(result.error || i18n.t("admin.page.actionFailed"));
       setMembershipUser(null);
       fetchUsers(page);
     } catch (err) {
@@ -188,10 +152,8 @@ function AdminPage() {
     if (!cancelUser) return;
     setCancelLoading(true);
     try {
-      const res = await fetch(`/api/admin/users/${cancelUser.id}/membership`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error(((await res.json()) as { error?: string }).error || i18n.t("admin.page.actionFailed"));
+      const result = await cancelMembershipApi(cancelUser.id);
+      if (!result.ok) throw new Error(result.error || i18n.t("admin.page.actionFailed"));
       setCancelUser(null);
       fetchUsers(page);
     } catch (err) {
@@ -379,7 +341,7 @@ function AdminPage() {
                                   <Eye className="size-3.5" />
                                 </Button>
                               </a>
-                              <Button variant="destructive" size="sm" onClick={() => setDeletePage(p)}>
+                              <Button variant="destructive" size="sm" onClick={() => setDeletePageState(p)}>
                                 <Trash2 className="size-3.5" />
                               </Button>
                             </div>
@@ -467,16 +429,16 @@ function AdminPage() {
       </Dialog>
 
       {/* Delete Page Confirmation Dialog */}
-      <Dialog open={!!deletePage} onOpenChange={(open) => !open && setDeletePage(null)}>
+      <Dialog open={!!deletePageState} onOpenChange={(open) => !open && setDeletePageState(null)}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>{t("admin.page.deleteTitle")}</DialogTitle>
             <DialogDescription>
-              {t("admin.page.deleteDesc", { name: deletePage?.title || t("admin.unnamed") })}
+              {t("admin.page.deleteDesc", { name: deletePageState?.title || t("admin.unnamed") })}
             </DialogDescription>
           </DialogHeader>
           <div className="flex gap-2 justify-end pt-2">
-            <Button variant="outline" onClick={() => setDeletePage(null)}>{t("admin.return")}</Button>
+            <Button variant="outline" onClick={() => setDeletePageState(null)}>{t("admin.return")}</Button>
             <Button variant="destructive" disabled={deleteLoading} onClick={handleDeletePage}>
               {deleteLoading ? t("common.deleting") : t("admin.page.confirmDelete")}
             </Button>

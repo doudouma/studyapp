@@ -1,6 +1,7 @@
 /// <reference types="@cloudflare/workers-types" />
 import { createStartHandler, defaultStreamHandler } from "@tanstack/react-start/server";
-import api, { cleanupAnonymousUploads } from "~/../server/api";
+import api from "~/../server/api";
+import { cleanupAnonymousUploads } from "~/../server/features/pages/pages.storage";
 import { createAuth } from "~/../server/auth";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
@@ -116,6 +117,11 @@ app.route("/", api);
 // aren't duplicated across language prefixes.
 app.all("*", async (c) => {
   const url = new URL(c.req.url);
+
+  // SSR 期间 route loader 通过 Hono RPC 客户端自取 /api/*（fetch 需要绝对 URL）。
+  // 注：同 isolate 并发请求会互相覆盖，对公开只读接口无影响；
+  // 迁移需要鉴权的 SSR 接口时须改为按请求透传 cookie。
+  (globalThis as any).__SSR_ORIGIN__ = url.origin;
 
   // Migration: English was previously the prefixed language (/en/...). It is
   // now the default served at root with no prefix. 301-redirect legacy /en URLs
