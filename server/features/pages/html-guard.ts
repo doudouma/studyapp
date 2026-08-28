@@ -1,41 +1,17 @@
 /**
  * 恶意 HTML 检测 + 净化中间件
- * sanitize-html 净化 + 钓鱼关键词检测 + PhishDestroy 域名检查 + AI 辅助检测
+ * 正则净化 + PhishDestroy 域名检查 + AI 辅助检测
  */
-import sanitizeHtml from "sanitize-html";
 
 const PHISH_DESTROY_API = "https://api.destroy.tools/v1/check";
 
-// sanitize-html 配置：保留正常标签，剥离 iframe/object/embed/applet
-const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
-  allowedTags: sanitizeHtml.defaults.allowedTags.concat([
-    "img", "video", "source", "svg", "path", "circle", "line", "polyline",
-    "rect", "polygon", "defs", "use", "g", "clipPath", "mask",
-    "details", "summary", "mark", "kbd", "sub", "sup", "small",
-    "figure", "figcaption", "picture", "dialog", "template", "slot",
-  ]),
-  allowedAttributes: {
-    ...sanitizeHtml.defaults.allowedAttributes,
-    "*": ["class", "id", "style", "role", "aria-*", "data-*", "tabindex"],
-    "a": ["href", "target", "rel", "download"],
-    "img": ["src", "alt", "width", "height", "loading", "fetchpriority"],
-    "video": ["src", "controls", "autoplay", "muted", "loop", "poster"],
-    "source": ["src", "type", "media"],
-    "input": ["type", "name", "value", "placeholder", "checked", "disabled", "required"],
-    "select": ["name", "value", "disabled"],
-    "option": ["value", "selected", "disabled"],
-    "textarea": ["name", "placeholder", "rows", "cols", "disabled"],
-    "button": ["type", "disabled"],
-    "form": ["action", "method", "enctype", "target"],
-    "label": ["for"],
-  },
-  exclusiveFilter: (frame) => {
-    return ["iframe", "object", "embed", "applet"].includes(frame.tag);
-  },
-};
-
-// 明确禁止的标签（sanitize-html 会自动丢弃）
+// 需要剥离的危险标签
 const BLOCKED_TAGS = ["iframe", "object", "embed", "applet"];
+
+// 正则：匹配开标签、闭标签、自闭合标签
+function buildTagRegex(tag: string): RegExp {
+  return new RegExp(`<${tag}[\\s>][\\s\\S]*?<\\/${tag}>|<${tag}[\\s/>]`, "gi");
+}
 
 export interface ThreatInfo {
   label: string;
@@ -51,26 +27,21 @@ export interface HtmlGuardResult {
 
 /**
  * 检测并净化 HTML 内容
- * 1. sanitize-html 剥离 iframe/object/embed 等危险标签
- * 2. 钓鱼关键词检测（表单 + 多关键词 = 高风险）
+ * 正则剥离 iframe/object/embed/applet 标签
  */
 export function detectAndSanitizeHtml(html: string): HtmlGuardResult {
   const threats: ThreatInfo[] = [];
+  let sanitizedHtml = html;
 
-  // 检测被剥离的危险标签
+  // 检测并剥离危险标签
   for (const tag of BLOCKED_TAGS) {
-    const regex = new RegExp(`<${tag}[\\s>][\\s\\S]*?<\\/${tag}>|<${tag}[\\s/>]`, "gi");
-    const matches = html.match(regex);
+    const regex = buildTagRegex(tag);
+    const matches = sanitizedHtml.match(regex);
     if (matches) {
       threats.push({ label: tag, count: matches.length });
+      sanitizedHtml = sanitizedHtml.replace(regex, "");
     }
   }
-
-  // 净化 HTML：剥离危险标签，保留其余内容
-  const sanitizedHtml = sanitizeHtml(html, {
-    ...SANITIZE_OPTIONS,
-    disallowedTagsMode: "discard",
-  });
 
   return {
     safe: threats.length === 0,
@@ -89,7 +60,6 @@ export function extractDomains(html: string): string[] {
   while ((match = urlPattern.exec(html)) !== null) {
     try {
       const url = new URL(match[1]);
-      // 排除 localhost 和内网地址
       if (!url.hostname.match(/^(localhost|127\.|192\.|10\.|172\.)/)) {
         domains.add(url.hostname);
       }
@@ -107,7 +77,6 @@ export async function checkDomainsWithPhishDestroy(
 ): Promise<{ safe: boolean; threats: { domain: string; severity: string; score: number; keywords: string[] }[] }> {
   const threats: { domain: string; severity: string; score: number; keywords: string[] }[] = [];
 
-  // 并发检查所有域名，单个失败不阻塞
   const results = await Promise.allSettled(
     domains.map(async (domain) => {
       const res = await fetch(`${PHISH_DESTROY_API}?domain=${encodeURIComponent(domain)}`, {
