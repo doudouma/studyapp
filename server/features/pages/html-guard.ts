@@ -4,16 +4,7 @@
  */
 
 const MALICIOUS_PATTERNS: { pattern: RegExp; label: string }[] = [
-  { pattern: /<script[\s\S]*?<\/script>/gi, label: "script标签" },
-  { pattern: /\son\w+\s*=\s*["']?[^"'>]+/gi, label: "事件处理器" },
-  { pattern: /javascript:\s*[^\s"'>]+/gi, label: "javascript协议" },
   { pattern: /<iframe[\s\S]*?<\/iframe>/gi, label: "iframe嵌套" },
-  { pattern: /<object[\s\S]*?<\/object>/gi, label: "object标签" },
-  { pattern: /<embed[\s\S]*?>/gi, label: "embed标签" },
-  { pattern: /eval\s*\(/gi, label: "eval调用" },
-  { pattern: /document\.(cookie|write|location)/gi, label: "危险DOM操作" },
-  { pattern: /expression\s*\(/gi, label: "CSS expression" },
-  { pattern: /<meta[^>]+http-equiv[^>]+refresh/gi, label: "meta刷新重定向" },
 ];
 
 // 钓鱼关键词（出现在表单相关上下文中）
