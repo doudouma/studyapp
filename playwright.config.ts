@@ -2,6 +2,7 @@ import { defineConfig } from "playwright/test";
 
 export default defineConfig({
   testDir: "./tests",
+  testIgnore: ["**/*.unit.spec.ts", "**/html-guard.spec.ts"],
   timeout: 30000,
   fullyParallel: true,
   forbidOnly: !!process.env.CI,

@@ -13,6 +13,7 @@ import {
   serveThumbnail,
   normalizeTags,
 } from "./pages.service";
+import { detectLangFromHeader } from "./pages.render";
 import { cleanupAnonymousUploads, deletePageObjects } from "./pages.storage";
 
 /**
@@ -119,6 +120,35 @@ export const pagesRoutes = new Hono<AppEnv>()
     const user = c.get("user");
     const body = await c.req.parseBody();
     const file = body.file;
+
+    // 匿名上传频率限制：同一 IP 每天最多 5 次
+    if (!user && c.env.D1) {
+      const ip = c.req.header("cf-connecting-ip") || c.req.header("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+      const dayStart = new Date();
+      dayStart.setUTCHours(0, 0, 0, 0);
+      const ts = dayStart.getTime();
+
+      const row = await c.env.D1.prepare(
+        "SELECT COUNT(*) as cnt FROM upload_rate_log WHERE ip = ? AND created_at > ?"
+      ).bind(ip, ts).first<{ cnt: number }>();
+
+      if (row && row.cnt >= 5) {
+        const lang = detectLangFromHeader(c.req.header("accept-language"));
+        const msg: Record<string, string> = {
+          zh: "匿名上传已达今日上限（5次/天），请明天再试或登录后上传",
+          en: "Anonymous upload limit reached (5/day). Try again tomorrow or log in to upload.",
+          es: "Límite de carga anónima alcanzado (5/día). Inténtelo mañana o inicie sesión para subir.",
+          fr: "Limite d\'upload anonyme atteinte (5/jour). Réessayez demain ou connectez-vous.",
+          pt: "Limite de upload anônimo atingido (5/dia). Tente amanhã ou faça login para enviar.",
+        };
+        return c.json({ error: msg[lang] || msg.en }, 429);
+      }
+
+      // 记录本次上传
+      await c.env.D1.prepare(
+        "INSERT INTO upload_rate_log (ip, created_at) VALUES (?, ?)"
+      ).bind(ip, Date.now()).run();
+    }
 
     let fileInput: { bytes: Uint8Array; filename: string } | undefined;
     if (file instanceof File) {
