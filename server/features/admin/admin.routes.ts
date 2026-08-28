@@ -31,7 +31,7 @@ export const adminRoutes = new Hono<AppEnv>()
     }
     throw err;
   })
-  .use("*", async (c, next) => {
+  .use("/api/admin/*", async (c, next) => {
     if (!requireAdmin(c)) {
       return c.json({ error: "无权访问" }, 403);
     }
