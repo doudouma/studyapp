@@ -252,6 +252,7 @@ async function replacePageObjects(bucket: R2Bucket, pageId: string, file: PageFi
 export interface CreateUploadInput {
   d1: D1Database | undefined;
   bucket: R2Bucket | undefined;
+  ai?: Ai | undefined;
   user: PageOwnerInfo | null;
   title: string;
   category: string;
@@ -320,12 +321,19 @@ export async function createUpload(input: CreateUploadInput): Promise<UploadResu
     throw new ServiceError(400, "请提供 HTML 内容或上传文件");
   }
 
-  // 恶意 HTML 检测
-  const { detectMaliciousHtml } = await import("./html-guard");
+  // 恶意 HTML 检测（规则 + AI）
+  const { detectMaliciousHtml, detectWithAi } = await import("./html-guard");
   const guard = detectMaliciousHtml(html);
   if (!guard.safe) {
     const detail = guard.threats.map((t) => `${t.label}(${t.count})`).join(", ");
     throw new ServiceError(400, `检测到不安全内容：${detail}`);
+  }
+  // AI 辅助检测（仅匿名上传触发，已登录用户跳过以降低延迟）
+  if (!user && input.ai) {
+    const aiResult = await detectWithAi(input.ai, html);
+    if (!aiResult.safe) {
+      throw new ServiceError(400, `AI 检测到不安全内容：${aiResult.verdict}`);
+    }
   }
 
   const id = nanoid(7);

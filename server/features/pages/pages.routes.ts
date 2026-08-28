@@ -128,6 +128,7 @@ export const pagesRoutes = new Hono<AppEnv>()
     const result = await createUpload({
       d1: c.env.D1,
       bucket: c.env?.BUCKET,
+      ai: c.env?.AI,
       user,
       title: ((body.title as string) || "").trim(),
       category: (body.category as string) || "general",

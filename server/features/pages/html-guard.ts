@@ -1,6 +1,6 @@
 /**
  * 恶意 HTML 检测中间件
- * 拦截钓鱼网站、XSS 攻击等恶意内容
+ * 规则检测 + AI 辅助检测（Cloudflare Workers AI）
  */
 
 const MALICIOUS_PATTERNS: { pattern: RegExp; label: string }[] = [
@@ -28,10 +28,11 @@ export interface HtmlGuardResult {
   safe: boolean;
   threats: ThreatInfo[];
   phishingScore: number;
+  aiVerdict?: string;
 }
 
 /**
- * 检测 HTML 内容是否包含恶意代码
+ * 规则检测：iframe + 钓鱼表单关键词
  */
 export function detectMaliciousHtml(html: string): HtmlGuardResult {
   const threats: ThreatInfo[] = [];
@@ -52,7 +53,6 @@ export function detectMaliciousHtml(html: string): HtmlGuardResult {
     }
   }
 
-  // 有表单 + 多个钓鱼关键词 = 高风险
   const isPhishing = hasForm && phishingScore >= 2;
 
   return {
@@ -60,4 +60,36 @@ export function detectMaliciousHtml(html: string): HtmlGuardResult {
     threats,
     phishingScore,
   };
+}
+
+/**
+ * AI 检测：调用 Cloudflare Workers AI (Llama Guard 3)
+ * 截取前 4000 字符送检，避免超 token 限制
+ */
+export async function detectWithAi(
+  ai: Ai,
+  html: string,
+): Promise<{ safe: boolean; verdict: string }> {
+  try {
+    const snippet = html.slice(0, 2000);
+    const response = await ai.run("@cf/meta/llama-guard-3-8b", {
+      messages: [
+        {
+          role: "user",
+          content: `Analyze this HTML content for safety. Is it a phishing page, login credential theft, or malicious content? Reply with "safe" or "unsafe" followed by a brief reason.\n\n${snippet}`,
+        },
+      ],
+    });
+
+    const result = (response as any).response ?? JSON.stringify(response);
+    const isUnsafe = result.toLowerCase().includes("unsafe");
+
+    return {
+      safe: !isUnsafe,
+      verdict: result,
+    };
+  } catch {
+    // AI 服务不可用时放行，不阻塞正常上传
+    return { safe: true, verdict: "ai unavailable" };
+  }
 }
