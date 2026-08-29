@@ -33,7 +33,7 @@ export interface SegmentResult {
   personTopSrc: number | null;
 }
 
-/** 加载 RMBG-1.4 pipeline：hf-mirror 国内可达优先，失败换 huggingface.co；fp16 失败回退 q8 */
+/** 加载 RMBG-1.4 pipeline：huggingface.co 优先，失败换 hf-mirror；fp16 失败回退 q8 */
 async function loadPipeline(T: any, onEvent?: (e: SegEvent) => void): Promise<any> {
   const progress = (p: any) => {
     if (p.status === "progress" && p.total)
@@ -41,7 +41,7 @@ async function loadPipeline(T: any, onEvent?: (e: SegEvent) => void): Promise<an
     else if (p.status === "done") onEvent?.({ kind: "modelCompiling" });
     else if (p.status === "initiate") onEvent?.({ kind: "runtimeLoading" });
   };
-  const HOSTS = ["https://hf-mirror.com", "https://huggingface.co"];
+  const HOSTS = ["https://huggingface.co", "https://hf-mirror.com"];
   const DTYPES = ["fp16", "q8"];
   let lastErr: unknown = null;
   outer: for (const host of HOSTS) {
