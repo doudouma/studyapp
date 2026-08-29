@@ -6,6 +6,26 @@ import type { PagesListResponse, PageContentResponse } from "@shared/types/pages
  * 页面/组件只依赖此模块，不直接 fetch
  */
 
+/**
+ * Hono RPC 客户端的 { form } 期望纯对象而非 FormData 实例：
+ * 其内部用 Object.entries(args.form) 遍历，而 FormData 的字段并非自身可枚举属性，
+ * Object.entries(formData) 会得到空数组，导致所有字段丢失、服务端收到空 body
+ * （表现为「标题不能为空」/ 内容为空）。这里把 FormData 转为纯对象再传给 RPC 客户端。
+ */
+function formDataToObject(fd: FormData): Record<string, string | File | File[]> {
+  const obj: Record<string, string | File | File[]> = {};
+  fd.forEach((value, key) => {
+    if (key in obj) {
+      const existing = obj[key];
+      if (Array.isArray(existing)) existing.push(value as File);
+      else obj[key] = [existing as File, value as File];
+    } else {
+      obj[key] = value;
+    }
+  });
+  return obj;
+}
+
 /** 获取当前用户信息与配额（未登录返回匿名态） */
 export async function fetchMe() {
   const res = await apiClient().api.me.$get();
@@ -54,7 +74,7 @@ export async function updatePageMeta(
 /** 以文件替换页面内容（multipart：.html 或 .zip） */
 export async function updatePageFile(pageId: string, formData: FormData): Promise<{ ok: boolean; error?: string }> {
   const client = apiClient().api.pages[":id"];
-  const arg = { param: { id: pageId }, form: formData };
+  const arg = { param: { id: pageId }, form: formDataToObject(formData) };
   const res = await client.$patch(arg);
   if (!res.ok) return { ok: false, error: await rpcErrorMessage(res) };
   return { ok: true };
@@ -62,7 +82,7 @@ export async function updatePageFile(pageId: string, formData: FormData): Promis
 
 /** 上传新页面（匿名 = 7 天临时；登录 = 永久）。调用方负责组装 FormData */
 export async function uploadPage(formData: FormData) {
-  const res = await apiClient().api.upload.$post({ form: formData });
+  const res = await apiClient().api.upload.$post({ form: formDataToObject(formData) });
   const json = await res.json();
   if (!res.ok) {
     return { ok: false as const, error: (json as { error?: string }).error };
@@ -72,7 +92,7 @@ export async function uploadPage(formData: FormData) {
 
 /** 上传页面缩略图（SnapDOM WebP）。调用方负责组装 FormData */
 export async function uploadPageThumbnail(formData: FormData): Promise<{ ok: boolean; error?: string }> {
-  const res = await apiClient().api["upload-thumbnail"].$post({ form: formData });
+  const res = await apiClient().api["upload-thumbnail"].$post({ form: formDataToObject(formData) });
   if (!res.ok) return { ok: false, error: await rpcErrorMessage(res) };
   return { ok: true };
 }

@@ -79,8 +79,10 @@ export async function checkDomainsWithPhishDestroy(
 
   const results = await Promise.allSettled(
     domains.map(async (domain) => {
+      // 加超时：外部服务慢/不可达时不能阻塞整个上传请求（超时按“安全”处理）
       const res = await fetch(`${PHISH_DESTROY_API}?domain=${encodeURIComponent(domain)}`, {
         headers: { Accept: "application/json" },
+        signal: AbortSignal.timeout(5000),
       });
       if (!res.ok) return null;
       const data = await res.json() as any;
@@ -115,14 +117,20 @@ export async function detectWithAi(
 ): Promise<{ safe: boolean; verdict: string }> {
   try {
     const snippet = html.slice(0, 2000);
-    const response = await ai.run("@cf/meta/llama-guard-3-8b", {
-      messages: [
-        {
-          role: "user",
-          content: `Analyze this HTML content for safety. Is it a phishing page, login credential theft, or malicious content? Reply with "safe" or "unsafe" followed by a brief reason.\n\n${snippet}`,
-        },
-      ],
-    });
+    // 超时保护：AI 推理慢时不阻塞整个上传（超时按“安全”处理）
+    const response = await Promise.race([
+      ai.run("@cf/meta/llama-guard-3-8b", {
+        messages: [
+          {
+            role: "user",
+            content: `Analyze this HTML content for safety. Is it a phishing page, login credential theft, or malicious content? Reply with "safe" or "unsafe" followed by a brief reason.\n\n${snippet}`,
+          },
+        ],
+      }),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("ai timeout")), 8000)
+      ),
+    ]);
 
     const result = (response as any).response ?? JSON.stringify(response);
     const isUnsafe = result.toLowerCase().includes("unsafe");

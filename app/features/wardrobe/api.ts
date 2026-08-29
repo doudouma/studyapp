@@ -21,9 +21,8 @@ import type {
 
 /** 上传图片并创建任务 */
 export async function uploadWardrobeImage(file: File): Promise<UploadResponse> {
-  const formData = new FormData();
-  formData.append("image", file);
-  const res = await apiClient().api.wardrobe.upload.$post({ form: formData });
+  // Hono RPC 的 { form } 期望纯对象而非 FormData 实例，直接传 FormData 会导致字段丢失
+  const res = await apiClient().api.wardrobe.upload.$post({ form: { image: file } });
   if (!res.ok) throw new Error("Upload failed");
   return (await res.json()) as UploadResponse;
 }
