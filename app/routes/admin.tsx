@@ -20,6 +20,7 @@ import {
   setMembership as setMembershipApi,
   cancelMembership as cancelMembershipApi,
   deleteAdminPage,
+  setPoints as setPointsApi,
 } from "~/features/admin/api";
 import type {
   AdminUserData,
@@ -66,6 +67,11 @@ function AdminPage() {
   // Cancel dialog state
   const [cancelUser, setCancelUser] = useState<AdminUserData | null>(null);
   const [cancelLoading, setCancelLoading] = useState(false);
+
+  // Points dialog state
+  const [pointsUser, setPointsUser] = useState<AdminUserData | null>(null);
+  const [pointsValue, setPointsValue] = useState("");
+  const [pointsLoading, setPointsLoading] = useState(false);
 
   // Delete page dialog
   const [deletePageState, setDeletePageState] = useState<AdminPageData | null>(null);
@@ -163,6 +169,26 @@ function AdminPage() {
     }
   };
 
+  const handleSetPoints = async () => {
+    if (!pointsUser) return;
+    const pts = parseInt(pointsValue, 10);
+    if (isNaN(pts) || pts < 0) {
+      alert(i18n.t("admin.points.invalid"));
+      return;
+    }
+    setPointsLoading(true);
+    try {
+      const result = await setPointsApi(pointsUser.id, pts);
+      if (!result.ok) throw new Error(result.error || i18n.t("admin.page.actionFailed"));
+      setPointsUser(null);
+      fetchUsers(page);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : i18n.t("admin.page.actionFailed"));
+    } finally {
+      setPointsLoading(false);
+    }
+  };
+
   const formatDate = (ts: number) => {
     return new Date(ts).toLocaleDateString("zh-CN", {
       year: "numeric",
@@ -245,6 +271,7 @@ function AdminPage() {
                       <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.col.role")}</th>
                       <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.col.memberStatus")}</th>
                       <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95] hidden md:table-cell">{t("admin.col.expiry")}</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.col.points")}</th>
                       <th className="px-4 py-3 text-right font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.col.action")}</th>
                     </tr>
                   </thead>
@@ -271,12 +298,20 @@ function AdminPage() {
                         <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">
                           {u.membership?.expiresAt ? formatDate(u.membership.expiresAt) : "-"}
                         </td>
+                        <td className="px-4 py-3">
+                          <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
+                            {u.points} {t("admin.points.unit")}
+                          </span>
+                        </td>
                         <td className="px-4 py-3 text-right">
-                          {u.membership?.isActive ? (
-                            <Button variant="destructive" size="sm" onClick={() => setCancelUser(u)}>{t("admin.member.cancel")}</Button>
-                          ) : (
-                            <Button variant="outline" size="sm" onClick={() => { setMembershipUser(u); setSelectedDuration(3); }}>{t("admin.member.set")}</Button>
-                          )}
+                          <div className="flex items-center justify-end gap-2">
+                            <Button variant="outline" size="sm" onClick={() => { setPointsUser(u); setPointsValue(String(u.points)); }}>{t("admin.points.set")}</Button>
+                            {u.membership?.isActive ? (
+                              <Button variant="destructive" size="sm" onClick={() => setCancelUser(u)}>{t("admin.member.cancel")}</Button>
+                            ) : (
+                              <Button variant="outline" size="sm" onClick={() => { setMembershipUser(u); setSelectedDuration(3); }}>{t("admin.member.set")}</Button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -441,6 +476,42 @@ function AdminPage() {
             <Button variant="outline" onClick={() => setDeletePageState(null)}>{t("admin.return")}</Button>
             <Button variant="destructive" disabled={deleteLoading} onClick={handleDeletePage}>
               {deleteLoading ? t("common.deleting") : t("admin.page.confirmDelete")}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Set Points Dialog */}
+      <Dialog open={!!pointsUser} onOpenChange={(open) => !open && setPointsUser(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>{t("admin.points.set")}</DialogTitle>
+            <DialogDescription>
+              {t("admin.member.setDesc", { name: pointsUser?.name })}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <label className="text-sm font-medium">{t("admin.points.set")}</label>
+              <input
+                type="number"
+                min="0"
+                className="mt-1 flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
+                value={pointsValue}
+                onChange={(e) => setPointsValue(e.target.value)}
+                placeholder="0"
+              />
+            </div>
+          </div>
+          <div className="flex gap-2 justify-end pt-2">
+            <Button variant="outline" onClick={() => setPointsUser(null)}>
+              {t("admin.return")}
+            </Button>
+            <Button
+              disabled={pointsLoading}
+              onClick={handleSetPoints}
+            >
+              {pointsLoading ? t("admin.member.setting") : t("admin.points.set")}
             </Button>
           </div>
         </DialogContent>

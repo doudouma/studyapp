@@ -20,6 +20,7 @@ export interface UserWithMembershipRow {
   membershipId: string | null;
   membershipStartedAt: Date | null;
   membershipExpiresAt: Date | null;
+  points: number;
 }
 
 /** 统计用户总数 */
@@ -46,6 +47,7 @@ export async function listUsersWithMembership(
       membershipId: membership.id,
       membershipStartedAt: membership.startedAt,
       membershipExpiresAt: membership.expiresAt,
+      points: user.points,
     })
     .from(user)
     .leftJoin(membership, eq(membership.userId, user.id))

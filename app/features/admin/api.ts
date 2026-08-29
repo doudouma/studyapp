@@ -59,6 +59,18 @@ export async function cancelMembership(
   return { ok: true };
 }
 
+/** 设置用户积分 */
+export async function setPoints(
+  userId: string,
+  points: number
+): Promise<{ ok: boolean; error?: string }> {
+  const client = apiClient().api.admin.users[":id"].points;
+  const arg = { param: { id: userId }, json: { points } };
+  const res = await client.$post(arg);
+  if (!res.ok) return { ok: false, error: await rpcErrorMessage(res) };
+  return { ok: true };
+}
+
 /** 删除任意页面（管理员权限） */
 export async function deleteAdminPage(
   pageId: string

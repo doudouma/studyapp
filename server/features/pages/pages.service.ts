@@ -2,6 +2,8 @@
 import { nanoid } from "nanoid";
 import {
   FREE_PERMANENT_LIMIT,
+  DEFAULT_POINTS,
+  POINTS_PER_UPLOAD,
   MAX_CONTENT_SIZE,
   type MeResponse,
   type PagesListResponse,
@@ -30,6 +32,7 @@ import {
   insertPageRecord,
   updatePageRecord,
   deletePageRecord,
+  getUserPoints,
   incrementPageViewCount,
   getPageMeta,
   type UserPageRow,
@@ -73,19 +76,24 @@ export async function getMeInfo(
   user: PageOwnerInfo | null
 ): Promise<MeResponse> {
   if (!user || !d1) {
-    return { user: user ?? null, pageCount: 0, isMember: false, membershipExpiresAt: null, limit: 0 };
+    return { user: user ?? null, pageCount: 0, isMember: false, membershipExpiresAt: null, limit: 0, points: 0, extraUploads: 0 };
   }
 
   const pageCount = await countUserPages(d1, user.id);
   const expiresAt = await getMembershipExpiresAt(d1, user.id);
   const isMember = expiresAt !== null && expiresAt > Date.now();
+  const points = await getUserPoints(d1, user.id);
+  const extraUploads = Math.floor(points / POINTS_PER_UPLOAD);
+  const limit = isMember ? -1 : FREE_PERMANENT_LIMIT + extraUploads;
 
   return {
     user,
     pageCount,
     isMember,
     membershipExpiresAt: isMember ? new Date(expiresAt).toISOString() : null,
-    limit: isMember ? -1 : FREE_PERMANENT_LIMIT,
+    limit,
+    points,
+    extraUploads,
   };
 }
 
@@ -108,7 +116,9 @@ export async function listMyPages(
   ]);
 
   const member = await isMemberByUserId(d1, user.id);
-  return { pages: rows.map(toUserPageItem), total, limit: member ? -1 : FREE_PERMANENT_LIMIT };
+  const points = await getUserPoints(d1, user.id);
+  const extraUploads = member ? 0 : Math.floor(points / POINTS_PER_UPLOAD);
+  return { pages: rows.map(toUserPageItem), total, limit: member ? -1 : FREE_PERMANENT_LIMIT + extraUploads, points };
 }
 
 // ---------- 删除 ----------
@@ -276,10 +286,13 @@ export async function createUpload(input: CreateUploadInput): Promise<UploadResu
     if (!member) {
       if (!d1) throw new ServiceError(503, "database unavailable");
       const pageCount = await countUserPages(d1, user.id);
-      if (pageCount >= FREE_PERMANENT_LIMIT) {
+      const points = await getUserPoints(d1, user.id);
+      const extraUploads = Math.floor(points / POINTS_PER_UPLOAD);
+      const uploadLimit = FREE_PERMANENT_LIMIT + extraUploads;
+      if (pageCount >= uploadLimit) {
         throw new ServiceError(
           403,
-          `免费额度已用完（${FREE_PERMANENT_LIMIT}/${FREE_PERMANENT_LIMIT}），请删除旧页面后重试`
+          `免费额度已用完（${pageCount}/${uploadLimit}），请删除旧页面或充值积分后重试`
         );
       }
     }

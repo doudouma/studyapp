@@ -1,5 +1,8 @@
 /// <reference types="@cloudflare/workers-types" />
 import { nanoid } from "nanoid";
+import { eq } from "drizzle-orm";
+import { createDb } from "../../db";
+import { user } from "../../db/schema";
 import type {
   AdminUsersResponse,
   AdminPagesResponse,
@@ -62,6 +65,7 @@ function toAdminUserData(row: Awaited<ReturnType<typeof listUsersWithMembership>
           startedAt: row.membershipStartedAt!.getTime(),
         }
       : null,
+    points: row.points,
   };
 }
 
@@ -125,6 +129,19 @@ export async function cancelMembership(
   }
   await deleteMembershipByUserId(d1, userId);
   return { success: true, message: "会员已取消" };
+}
+
+/** 设置用户积分 */
+export async function setUserPoints(
+  d1: D1Database,
+  userId: string,
+  points: number
+): Promise<{ success: boolean; points: number }> {
+  const exists = await findUserById(d1, userId);
+  if (!exists) throw new ServiceError(404, "用户不存在");
+  const db = createDb(d1);
+  await db.update(user).set({ points }).where(eq(user.id, userId));
+  return { success: true, points };
 }
 
 /** 将 repo 页面行（Date）转换为 DTO（Unix 毫秒） */

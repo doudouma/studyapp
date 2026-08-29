@@ -1,6 +1,6 @@
 import { and, count, desc, eq, sql } from "drizzle-orm";
 import { createDb } from "../../db";
-import { page } from "../../db/schema";
+import { page, user } from "../../db/schema";
 
 /**
  * Pages 数据访问层 (Repository)
@@ -19,6 +19,13 @@ export async function getMembershipExpiresAt(d1: D1Database, userId: string): Pr
 export async function isMemberByUserId(d1: D1Database, userId: string): Promise<boolean> {
   const expiresAt = await getMembershipExpiresAt(d1, userId);
   return expiresAt !== null && expiresAt > Date.now();
+}
+
+/** 获取用户积分 */
+export async function getUserPoints(d1: D1Database, userId: string): Promise<number> {
+  const db = createDb(d1);
+  const rows = await db.select({ points: user.points }).from(user).where(eq(user.id, userId)).limit(1);
+  return rows[0]?.points ?? 0;
 }
 
 export async function countUserPages(d1: D1Database, userId: string): Promise<number> {

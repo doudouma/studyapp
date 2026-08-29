@@ -1,0 +1,2 @@
+-- 添加积分字段到 user 表
+ALTER TABLE user ADD COLUMN points INTEGER NOT NULL DEFAULT 50;

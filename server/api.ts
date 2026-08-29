@@ -151,4 +151,4 @@ const apiWithFeatures = api.route("/", squareRoutes).route("/", pagesRoutes).rou
 // Hono RPC 类型：前端通过 hc<AppType> 获得端到端类型安全的客户端
 export type AppType = typeof apiWithFeatures;
 
-export default api;
+export default apiWithFeatures;

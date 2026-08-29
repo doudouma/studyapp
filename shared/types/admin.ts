@@ -22,6 +22,8 @@ export interface AdminUserData {
   /** Unix 毫秒 */
   createdAt: number;
   membership: MembershipInfo | null;
+  /** 用户积分 */
+  points: number;
 }
 
 /** GET /api/admin/users 响应 */
@@ -83,6 +85,17 @@ export interface CancelMembershipResponse {
 export interface CleanupTmpResponse {
   success: boolean;
   deleted: number;
+}
+
+/** POST /api/admin/users/:id/points 请求体 */
+export interface SetPointsRequest {
+  points: number;
+}
+
+/** POST /api/admin/users/:id/points 响应 */
+export interface SetPointsResponse {
+  success: boolean;
+  points: number;
 }
 
 /** DELETE /api/admin/pages/:id 响应 */

@@ -10,6 +10,7 @@ import {
   listPages,
   cleanupTmp,
   deletePage,
+  setUserPoints,
 } from "./admin.service";
 
 /**
@@ -63,6 +64,17 @@ export const adminRoutes = new Hono<AppEnv>()
   .delete("/api/admin/users/:id/membership", async (c) => {
     if (!c.env.D1) return c.json({ error: "database unavailable" }, 503);
     return c.json(await cancelMembership(c.env.D1, c.req.param("id")));
+  })
+
+  // 设置用户积分
+  .post("/api/admin/users/:id/points", async (c) => {
+    if (!c.env.D1) return c.json({ error: "database unavailable" }, 503);
+    const userId = c.req.param("id");
+    const body = await c.req.json<{ points: unknown }>();
+    if (typeof body.points !== "number" || body.points < 0 || !Number.isInteger(body.points)) {
+      return c.json({ error: "积分必须为非负整数" }, 400);
+    }
+    return c.json(await setUserPoints(c.env.D1, userId, body.points));
   })
 
   // 页面列表（含作者信息，可选 scope=square）
