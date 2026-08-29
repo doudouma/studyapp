@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Link as LinkIcon, User, Crown, Clock, Hash, ArrowUpRight } from "lucide-react";
+import { Link as LinkIcon, User, Crown, Coins } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { LinksTable } from "~/components/LinksTable";
@@ -44,7 +44,7 @@ function StatCard({ icon, label, value, accent }: { icon: React.ReactNode; label
 
 function LinksPage() {
   const { t, i18n: i18nInstance } = useTranslation();
-  const { user, authLoading, isMember, membershipExpiresAt, refreshAuth } = useAuth();
+  const { user, authLoading, isMember, membershipExpiresAt, refreshAuth, points } = useAuth();
   const [data, setData] = useState<PagesListResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -151,12 +151,6 @@ function LinksPage() {
 
           {/* Stats Grid */}
           <div className="mb-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatCard
-              icon={<Crown className="size-5 text-amber-600 dark:text-amber-400" />}
-              label={t("profile.stat.member")}
-              value={isMember ? t("profile.stat.memberActive") : t("profile.stat.memberInactive")}
-              accent="bg-amber-100 dark:bg-amber-900/20"
-            />
             <div className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] p-5 flex items-center gap-4 col-span-2 md:col-span-1">
               <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-[#006c49]/10 dark:bg-[#4edea3]/10">
                 <span className="text-lg">🍅</span>
@@ -179,6 +173,12 @@ function LinksPage() {
               icon={<LinkIcon className="size-5 text-[#006c49] dark:text-[#4edea3]" />}
               label={t("profile.stat.links")}
               value={data?.total ?? "-"}
+            />
+            <StatCard
+              icon={<Coins className="size-5 text-amber-600 dark:text-amber-400" />}
+              label={t("profile.stat.points")}
+              value={points}
+              accent="bg-amber-100 dark:bg-amber-900/20"
             />
           </div>
 

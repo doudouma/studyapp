@@ -174,7 +174,7 @@ function prefetchSquare() {
 
 export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
   const { t } = useTranslation();
-  const { user, refreshAuth, isMember, membershipExpiresAt } = useAuth();
+  const { user, refreshAuth, points } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -383,18 +383,10 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
                   {user.name}
                 </div>
                 <div className="border-b px-3 py-2">
-                  {isMember ? (
-                    <div className="flex items-center gap-1.5">
-                      <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
-                        {t("nav.member")}
-                      </span>
-                      <span className="text-[11px] text-muted-foreground">
-                        {t("nav.memberExpire", { date: membershipExpiresAt ? new Date(membershipExpiresAt).toLocaleDateString("zh-CN") : "" })}
-                      </span>
-                    </div>
-                  ) : (
-                    <span className="text-xs text-muted-foreground">{t("nav.normalUser")}</span>
-                  )}
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">{t("nav.points")}</span>
+                    <span className="text-sm font-semibold text-foreground">{points}</span>
+                  </div>
                 </div>
                 {user.role === "admin" && (
                   <button

@@ -11,6 +11,7 @@ export const user = sqliteTable("user", {
   image: text("image"),
   role: text("role").notNull().default("user"),
   points: integer("points").notNull().default(50),
+  linksLimitBonus: integer("links_limit_bonus").notNull().default(0),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
 });

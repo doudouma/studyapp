@@ -33,6 +33,8 @@ import {
   updatePageRecord,
   deletePageRecord,
   getUserPoints,
+  getUserLinksLimitBonus,
+  deductPointsAndAddBonus,
   incrementPageViewCount,
   getPageMeta,
   type UserPageRow,
@@ -83,8 +85,8 @@ export async function getMeInfo(
   const expiresAt = await getMembershipExpiresAt(d1, user.id);
   const isMember = expiresAt !== null && expiresAt > Date.now();
   const points = await getUserPoints(d1, user.id);
-  const extraUploads = Math.floor(points / POINTS_PER_UPLOAD);
-  const limit = isMember ? -1 : FREE_PERMANENT_LIMIT + extraUploads;
+  const linksLimitBonus = await getUserLinksLimitBonus(d1, user.id);
+  const limit = isMember ? -1 : FREE_PERMANENT_LIMIT + linksLimitBonus;
 
   return {
     user,
@@ -93,7 +95,7 @@ export async function getMeInfo(
     membershipExpiresAt: isMember ? new Date(expiresAt).toISOString() : null,
     limit,
     points,
-    extraUploads,
+    extraUploads: linksLimitBonus,
   };
 }
 
@@ -117,8 +119,8 @@ export async function listMyPages(
 
   const member = await isMemberByUserId(d1, user.id);
   const points = await getUserPoints(d1, user.id);
-  const extraUploads = member ? 0 : Math.floor(points / POINTS_PER_UPLOAD);
-  return { pages: rows.map(toUserPageItem), total, limit: member ? -1 : FREE_PERMANENT_LIMIT + extraUploads, points };
+  const linksLimitBonus = member ? 0 : await getUserLinksLimitBonus(d1, user.id);
+  return { pages: rows.map(toUserPageItem), total, limit: member ? -1 : FREE_PERMANENT_LIMIT + linksLimitBonus, points };
 }
 
 // ---------- 删除 ----------
@@ -278,22 +280,27 @@ export async function createUpload(input: CreateUploadInput): Promise<UploadResu
 
   if (user && !title) throw new ServiceError(400, "标题不能为空");
 
-  // Check quota for logged-in users requesting permanent storage
+  // Check quota for logged-in users requesting permanent storage.
+  // Points are deducted only AFTER the page is successfully inserted (see below),
+  // so a failed upload never consumes points.
   const wantPermanent = !!user;
+  let needsDeduct = false;
   if (wantPermanent && user) {
     const expiresAt = d1 ? await getMembershipExpiresAt(d1, user.id) : null;
     const member = expiresAt !== null && expiresAt > Date.now();
     if (!member) {
       if (!d1) throw new ServiceError(503, "database unavailable");
       const pageCount = await countUserPages(d1, user.id);
-      const points = await getUserPoints(d1, user.id);
-      const extraUploads = Math.floor(points / POINTS_PER_UPLOAD);
-      const uploadLimit = FREE_PERMANENT_LIMIT + extraUploads;
-      if (pageCount >= uploadLimit) {
-        throw new ServiceError(
-          403,
-          `免费额度已用完（${pageCount}/${uploadLimit}），请删除旧页面或充值积分后重试`
-        );
+      if (pageCount >= FREE_PERMANENT_LIMIT) {
+        // Beyond free limit, need to spend points
+        const points = await getUserPoints(d1, user.id);
+        if (points < POINTS_PER_UPLOAD) {
+          throw new ServiceError(
+            403,
+            `免费额度已用完（${pageCount}/${FREE_PERMANENT_LIMIT}），积分不足（当前 ${points}，需要 ${POINTS_PER_UPLOAD}）`
+          );
+        }
+        needsDeduct = true;
       }
     }
   }
@@ -411,6 +418,10 @@ export async function createUpload(input: CreateUploadInput): Promise<UploadResu
       createdAt: new Date(now),
       expiresAt: expiresAt ? new Date(expiresAt) : null,
     });
+    // Deduct points and increase link limit bonus after the page is successfully persisted
+    if (needsDeduct) {
+      await deductPointsAndAddBonus(d1, user.id, POINTS_PER_UPLOAD);
+    }
   }
 
   return {

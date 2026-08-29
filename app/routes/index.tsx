@@ -8,6 +8,7 @@ import { StatsSection } from "~/components/StatsSection";
 import { GuideSection } from "~/components/GuideSection";
 import { AppFooter } from "~/components/AppFooter";
 import { Card, CardContent } from "~/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "~/components/ui/dialog";
 
 const MemoStatsSection = memo(StatsSection);
 const MemoGuideSection = memo(GuideSection);
@@ -22,6 +23,7 @@ import { useAuth } from "~/lib/auth-context";
 import { useTranslation } from "react-i18next";
 import i18n from "~/lib/i18n";
 import { uploadPage } from "~/features/pages/api";
+import { FREE_PERMANENT_LIMIT, POINTS_PER_UPLOAD } from "@shared/types/pages";
 import type { UploadResult } from "@shared/types/pages";
 
 export const Route = createFileRoute("/")({
@@ -296,7 +298,7 @@ const MemoHero = memo(HeroSection);
 function HomePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isMember, points, pageCount, refreshAuth } = useAuth();
   const uploadRef = useRef<HTMLElement>(null);
 
   const [mode, setMode] = useState<TabMode>("paste");
@@ -309,6 +311,8 @@ function HomePage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<UploadResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showPointsConfirm, setShowPointsConfirm] = useState(false);
+  const [pendingSubmit, setPendingSubmit] = useState(false);
 
   const contentSize = useMemo(
     () => (mode === "paste" ? new Blob([htmlContent]).size : file?.size ?? 0),
@@ -325,10 +329,14 @@ function HomePage() {
     (mode === "paste" ? htmlContent.trim().length > 0 : file !== null) &&
     (!user || title.trim().length > 0);
 
-  const handleSubmit = async () => {
-    if (!canSubmit) return;
+  // Check if user needs to spend points (beyond free limit and not a member)
+  const needsPoints = user && !isMember && pageCount >= FREE_PERMANENT_LIMIT;
+  const canAffordPoints = points >= POINTS_PER_UPLOAD;
+
+  const doSubmit = async () => {
     setLoading(true);
     setError(null);
+    setShowPointsConfirm(false);
 
     try {
       const formData = new FormData();
@@ -350,13 +358,31 @@ function HomePage() {
       }
 
       setResult(result.data);
+      // Refresh auth to update points and pageCount (await so the
+      // deduction is reflected in the UI before we show success)
+      await refreshAuth();
     } catch (err) {
       setError(
         err instanceof Error ? err.message : t("common.errorRetry")
       );
     } finally {
       setLoading(false);
+      setPendingSubmit(false);
     }
+  };
+
+  const handleSubmit = async () => {
+    if (!canSubmit) return;
+    if (needsPoints) {
+      if (!canAffordPoints) {
+        setError(t("home.points.insufficient"));
+        return;
+      }
+      setShowPointsConfirm(true);
+      setPendingSubmit(true);
+      return;
+    }
+    await doSubmit();
   };
 
   const handleReset = () => {
@@ -439,6 +465,26 @@ function HomePage() {
         <MemoGuideSection />
       </main>
       <MemoAppFooter />
+
+      {/* Points deduction confirmation dialog */}
+      <Dialog open={showPointsConfirm} onOpenChange={setShowPointsConfirm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("home.points.confirmTitle")}</DialogTitle>
+            <DialogDescription>
+              {t("home.points.confirmDesc", { points: POINTS_PER_UPLOAD, remain: points - POINTS_PER_UPLOAD })}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setShowPointsConfirm(false); setPendingSubmit(false); }}>
+              {t("common.cancel")}
+            </Button>
+            <Button onClick={doSubmit} disabled={loading}>
+              {loading ? t("common.submitting") : t("home.points.confirmBtn")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

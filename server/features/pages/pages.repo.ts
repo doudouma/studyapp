@@ -28,6 +28,26 @@ export async function getUserPoints(d1: D1Database, userId: string): Promise<num
   return rows[0]?.points ?? 0;
 }
 
+/** 获取用户链接上限奖励（每花10积分+1，永久生效） */
+export async function getUserLinksLimitBonus(d1: D1Database, userId: string): Promise<number> {
+  const db = createDb(d1);
+  const rows = await db.select({ linksLimitBonus: user.linksLimitBonus }).from(user).where(eq(user.id, userId)).limit(1);
+  return rows[0]?.linksLimitBonus ?? 0;
+}
+
+/** 扣除用户积分并增加链接上限奖励，返回扣除后余额。原子操作 */
+export async function deductPointsAndAddBonus(d1: D1Database, userId: string, amount: number): Promise<number> {
+  await d1
+    .prepare("UPDATE user SET points = MAX(0, points - ?), links_limit_bonus = links_limit_bonus + 1 WHERE id = ?")
+    .bind(amount, userId)
+    .run();
+  const rows = await d1
+    .prepare("SELECT points FROM user WHERE id = ?")
+    .bind(userId)
+    .all<{ points: number }>();
+  return rows.results[0]?.points ?? 0;
+}
+
 export async function countUserPages(d1: D1Database, userId: string): Promise<number> {
   const db = createDb(d1);
   const [result] = await db.select({ count: count() }).from(page).where(eq(page.userId, userId));

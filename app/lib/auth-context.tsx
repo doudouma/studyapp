@@ -16,6 +16,8 @@ interface AuthContextValue {
   refreshAuth: () => Promise<void>;
   isMember: boolean;
   membershipExpiresAt: string | null;
+  points: number;
+  pageCount: number;
 }
 
 const AuthContext = createContext<AuthContextValue>({
@@ -24,6 +26,8 @@ const AuthContext = createContext<AuthContextValue>({
   refreshAuth: async () => {},
   isMember: false,
   membershipExpiresAt: null,
+  points: 0,
+  pageCount: 0,
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -31,25 +35,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [authLoading, setAuthLoading] = useState(true);
   const [isMember, setIsMember] = useState(false);
   const [membershipExpiresAt, setMembershipExpiresAt] = useState<string | null>(null);
+  const [points, setPoints] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
 
   const refreshAuth = useCallback(async () => {
+    setAuthLoading(true);
     try {
       const session = await authClient.getSession();
       const sessionUser = session?.data?.user ?? null;
       setUser(sessionUser);
-
-      if (sessionUser) {
-        const data = await fetchMe();
-        setIsMember(data.isMember ?? false);
-        setMembershipExpiresAt(data.membershipExpiresAt ?? null);
-      } else {
+      if (!sessionUser) {
         setIsMember(false);
         setMembershipExpiresAt(null);
+        setPoints(0);
+        setPageCount(0);
+        return;
       }
     } catch {
       setUser(null);
       setIsMember(false);
       setMembershipExpiresAt(null);
+      return;
+    }
+    // Session valid — fetch profile. A transient /api/me failure must NOT
+    // log the user out or leave points stale; keep the existing session.
+    try {
+      const data = await fetchMe();
+      setIsMember(data.isMember ?? false);
+      setMembershipExpiresAt(data.membershipExpiresAt ?? null);
+      setPoints(data.points ?? 0);
+      setPageCount(data.pageCount ?? 0);
+    } catch {
+      // keep current session; points will refresh on next refreshAuth
     } finally {
       setAuthLoading(false);
     }
@@ -60,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [refreshAuth]);
 
   return (
-    <AuthContext.Provider value={{ user, authLoading, refreshAuth, isMember, membershipExpiresAt }}>
+    <AuthContext.Provider value={{ user, authLoading, refreshAuth, isMember, membershipExpiresAt, points, pageCount }}>
       {children}
     </AuthContext.Provider>
   );
