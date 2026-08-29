@@ -18,6 +18,7 @@ interface AuthContextValue {
   membershipExpiresAt: string | null;
   points: number;
   pageCount: number;
+  limit: number;
 }
 
 const AuthContext = createContext<AuthContextValue>({
@@ -28,6 +29,7 @@ const AuthContext = createContext<AuthContextValue>({
   membershipExpiresAt: null,
   points: 0,
   pageCount: 0,
+  limit: 0,
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -37,6 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [membershipExpiresAt, setMembershipExpiresAt] = useState<string | null>(null);
   const [points, setPoints] = useState(0);
   const [pageCount, setPageCount] = useState(0);
+  const [limit, setLimit] = useState(0);
 
   const refreshAuth = useCallback(async () => {
     setAuthLoading(true);
@@ -63,8 +66,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = await fetchMe();
       setIsMember(data.isMember ?? false);
       setMembershipExpiresAt(data.membershipExpiresAt ?? null);
-      setPoints(data.points ?? 0);
-      setPageCount(data.pageCount ?? 0);
+        setPoints(data.points ?? 0);
+        setPageCount(data.pageCount ?? 0);
+        setLimit(data.limit ?? 0);
     } catch {
       // keep current session; points will refresh on next refreshAuth
     } finally {
@@ -77,7 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [refreshAuth]);
 
   return (
-    <AuthContext.Provider value={{ user, authLoading, refreshAuth, isMember, membershipExpiresAt, points, pageCount }}>
+    <AuthContext.Provider value={{ user, authLoading, refreshAuth, isMember, membershipExpiresAt, points, pageCount, limit }}>
       {children}
     </AuthContext.Provider>
   );

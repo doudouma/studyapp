@@ -1,5 +1,5 @@
 import { useState, useRef, memo, useMemo, useCallback } from "react";
-import { ArrowDown, Code2, Clock, Infinity, Tags, Share2, List, Crown, LogIn } from "lucide-react";
+import { ArrowDown, Code2, Clock, Infinity, Tags, Share2, List, Crown, LogIn, Loader2 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { DropZone } from "~/components/DropZone";
 import { SuccessCard } from "~/components/SuccessCard";
@@ -23,7 +23,7 @@ import { useAuth } from "~/lib/auth-context";
 import { useTranslation } from "react-i18next";
 import i18n from "~/lib/i18n";
 import { uploadPage } from "~/features/pages/api";
-import { FREE_PERMANENT_LIMIT, POINTS_PER_UPLOAD } from "@shared/types/pages";
+import { POINTS_PER_UPLOAD } from "@shared/types/pages";
 import type { UploadResult } from "@shared/types/pages";
 
 export const Route = createFileRoute("/")({
@@ -252,7 +252,7 @@ function UploadForm({
           disabled={!canSubmit || loading}
           onClick={handleSubmit}
         >
-          {loading ? t("common.submitting") : t("common.submit")}
+          {loading ? <><Loader2 className="size-4 animate-spin" /> {t("common.submitting")}</> : t("common.submit")}
         </Button>
       </CardContent>
     </Card>
@@ -298,7 +298,7 @@ const MemoHero = memo(HeroSection);
 function HomePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { user, isMember, points, pageCount, refreshAuth } = useAuth();
+  const { user, isMember, points, pageCount, limit, refreshAuth } = useAuth();
   const uploadRef = useRef<HTMLElement>(null);
 
   const [mode, setMode] = useState<TabMode>("paste");
@@ -329,8 +329,8 @@ function HomePage() {
     (mode === "paste" ? htmlContent.trim().length > 0 : file !== null) &&
     (!user || title.trim().length > 0);
 
-  // Check if user needs to spend points (beyond free limit and not a member)
-  const needsPoints = user && !isMember && pageCount >= FREE_PERMANENT_LIMIT;
+  // Check if user needs to spend points (beyond their limit and not a member)
+  const needsPoints = user && !isMember && limit > 0 && pageCount >= limit;
   const canAffordPoints = points >= POINTS_PER_UPLOAD;
 
   const doSubmit = async () => {
@@ -480,7 +480,7 @@ function HomePage() {
               {t("common.cancel")}
             </Button>
             <Button onClick={doSubmit} disabled={loading}>
-              {loading ? t("common.submitting") : t("home.points.confirmBtn")}
+              {loading ? <><Loader2 className="size-4 animate-spin" /> {t("common.submitting")}</> : t("home.points.confirmBtn")}
             </Button>
           </DialogFooter>
         </DialogContent>

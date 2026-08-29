@@ -291,13 +291,15 @@ export async function createUpload(input: CreateUploadInput): Promise<UploadResu
     if (!member) {
       if (!d1) throw new ServiceError(503, "database unavailable");
       const pageCount = await countUserPages(d1, user.id);
-      if (pageCount >= FREE_PERMANENT_LIMIT) {
+      const linksLimitBonus = await getUserLinksLimitBonus(d1, user.id);
+      const userLimit = FREE_PERMANENT_LIMIT + linksLimitBonus;
+      if (pageCount >= userLimit) {
         // Beyond free limit, need to spend points
         const points = await getUserPoints(d1, user.id);
         if (points < POINTS_PER_UPLOAD) {
           throw new ServiceError(
             403,
-            `免费额度已用完（${pageCount}/${FREE_PERMANENT_LIMIT}），积分不足（当前 ${points}，需要 ${POINTS_PER_UPLOAD}）`
+            `免费额度已用完（${pageCount}/${userLimit}），积分不足（当前 ${points}，需要 ${POINTS_PER_UPLOAD}）`
           );
         }
         needsDeduct = true;
