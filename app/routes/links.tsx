@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Link as LinkIcon, User, Crown, Coins } from "lucide-react";
+import { Link as LinkIcon, User, Crown, Coins, HelpCircle } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { LinksTable } from "~/components/LinksTable";
@@ -28,14 +28,24 @@ interface PomodoroCount {
   total: number;
 }
 
-function StatCard({ icon, label, value, accent }: { icon: React.ReactNode; label: string; value: string | number; accent?: string }) {
+function StatCard({ icon, label, value, accent, tip }: { icon: React.ReactNode; label: string; value: string | number; accent?: string; tip?: string }) {
   return (
     <div className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] p-5 flex items-center gap-4">
       <div className={`flex size-12 shrink-0 items-center justify-center rounded-xl ${accent || "bg-[#006c49]/10 dark:bg-[#4edea3]/10"}`}>
         {icon}
       </div>
       <div className="min-w-0">
-        <p className="text-xs text-muted-foreground">{label}</p>
+        <p className="text-xs text-muted-foreground flex items-center gap-1">
+          {label}
+          {tip && (
+            <span className="group relative">
+              <HelpCircle className="size-3 cursor-help text-muted-foreground/60 hover:text-muted-foreground" />
+              <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 whitespace-nowrap rounded-lg bg-foreground px-3 py-1.5 text-xs text-background opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
+                {tip}
+              </span>
+            </span>
+          )}
+        </p>
         <p className="text-xl font-bold text-foreground truncate">{value}</p>
       </div>
     </div>
@@ -156,7 +166,15 @@ function LinksPage() {
                 <span className="text-lg">🍅</span>
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs text-muted-foreground">{t("profile.stat.tomato")}</p>
+                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                  {t("profile.stat.tomato")}
+                  <span className="group relative">
+                    <HelpCircle className="size-3 cursor-help text-muted-foreground/60 hover:text-muted-foreground" />
+                    <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 whitespace-nowrap rounded-lg bg-foreground px-3 py-1.5 text-xs text-background opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
+                      {t("profile.stat.tomatoTip")}
+                    </span>
+                  </span>
+                </p>
                 <div className="flex gap-4 mt-0.5">
                   <div>
                     <span className="text-xl font-bold text-foreground">{pomoCount.today}</span>
@@ -179,6 +197,7 @@ function LinksPage() {
               label={t("profile.stat.points")}
               value={points}
               accent="bg-amber-100 dark:bg-amber-900/20"
+              tip={t("profile.stat.pointsTip")}
             />
           </div>
 
