@@ -8,12 +8,14 @@ export function AgentSection() {
   const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
+  const copyText = `Tell your agent to load 100mini-upload\n${SKILL_URL}`;
+
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(SKILL_URL);
+      await navigator.clipboard.writeText(copyText);
     } catch {
       const el = document.createElement("textarea");
-      el.value = SKILL_URL;
+      el.value = copyText;
       document.body.appendChild(el);
       el.select();
       document.execCommand("copy");
@@ -34,7 +36,7 @@ export function AgentSection() {
           <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
             {t("home.agent.desc")}{" "}
             <code className="inline-block rounded bg-muted px-1.5 py-0.5 text-xs font-mono font-semibold text-foreground">
-              100mini-upload
+              100mini-skill
             </code>
           </p>
           <div className="mt-2 flex items-center gap-2">
