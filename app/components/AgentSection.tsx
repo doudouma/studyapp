@@ -8,7 +8,7 @@ export function AgentSection() {
   const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
-  const copyText = `Tell your agent to load 100mini-upload\n${SKILL_URL}`;
+  const copyText = `Tell your agent to load 100mini-skill\n${SKILL_URL}`;
 
   const handleCopy = async () => {
     try {
