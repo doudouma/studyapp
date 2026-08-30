@@ -1,10 +1,27 @@
-import { Bot, ExternalLink } from "lucide-react";
+import { useState } from "react";
+import { Bot, ExternalLink, Copy, Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const SKILL_URL = "https://www.100mini.com/skill/100mini-upload";
 
 export function AgentSection() {
   const { t } = useTranslation();
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(SKILL_URL);
+    } catch {
+      const el = document.createElement("textarea");
+      el.value = SKILL_URL;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <section className="mx-auto max-w-2xl px-6 py-8">
@@ -20,15 +37,24 @@ export function AgentSection() {
               100mini-upload
             </code>
           </p>
-          <a
-            href={SKILL_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-2 inline-flex items-center gap-1.5 text-xs font-mono text-muted-foreground hover:text-[#006c49] dark:hover:text-[#4edea3] transition-colors"
-          >
-            <ExternalLink className="size-3 shrink-0" />
-            {SKILL_URL}
-          </a>
+          <div className="mt-2 flex items-center gap-2">
+            <a
+              href={SKILL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-mono text-muted-foreground hover:text-[#006c49] dark:hover:text-[#4edea3] transition-colors"
+            >
+              <ExternalLink className="size-3 shrink-0" />
+              {SKILL_URL}
+            </a>
+            <button
+              onClick={handleCopy}
+              className="size-6 inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              title={t("common.copy")}
+            >
+              {copied ? <Check className="size-3.5 text-green-600 dark:text-green-400" /> : <Copy className="size-3.5" />}
+            </button>
+          </div>
         </div>
       </div>
     </section>
