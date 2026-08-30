@@ -3,6 +3,7 @@ import { createStartHandler, defaultStreamHandler } from "@tanstack/react-start/
 import api from "~/../server/api";
 import { cleanupAnonymousUploads } from "~/../server/features/pages/pages.storage";
 import { createAuth } from "~/../server/auth";
+import { getUserByApiKey } from "~/../server/features/pages/apikey.service";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import i18n from "~/lib/i18n";
@@ -87,15 +88,34 @@ app.use("/api/*", async (c, next) => {
   // Skip auth routes (already handled above)
   if (c.req.path.startsWith("/api/auth")) return next();
 
+  // 1. Try cookie session (better-auth)
   const auth = getAuth(c.env ?? {}, c.req.url);
-  if (!auth) {
-    c.set("user", null);
-    c.set("session", null);
-    return next();
+  if (auth) {
+    const session = await auth.api.getSession({ headers: c.req.raw.headers });
+    if (session?.user) {
+      c.set("user", session.user);
+      c.set("session", session.session);
+      return next();
+    }
   }
-  const session = await auth.api.getSession({ headers: c.req.raw.headers });
-  c.set("user", session?.user ?? null);
-  c.set("session", session?.session ?? null);
+
+  // 2. Try API key (Bearer token)
+  const bearer = c.req.header("authorization")?.replace(/^Bearer\s+/i, "");
+  if (bearer && c.env?.D1) {
+    try {
+      const user = await getUserByApiKey(c.env.D1, bearer);
+      if (user) {
+        c.set("user", user);
+        c.set("session", null);
+        return next();
+      }
+    } catch (e) {
+      console.error("API key lookup failed:", e);
+    }
+  }
+
+  c.set("user", null);
+  c.set("session", null);
   return next();
 });
 

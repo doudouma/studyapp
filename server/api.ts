@@ -144,6 +144,12 @@ for (const lang of LANGS) {
   });
 }
 
+// --- Agent Skill ---
+import skillMd from "../.claude/skills/100mini-upload/SKILL.md?raw";
+api.get("/skill/100mini-upload", (c) => {
+  return c.text(skillMd, 200, { "Content-Type": "text/markdown; charset=utf-8" });
+});
+
 
 // Mount feature routers (server/features/*，各自按 repo/service/routes 分层)
 const apiWithFeatures = api.route("/", squareRoutes).route("/", pagesRoutes).route("/", adminRoutes).route("/", pomodoroRoutes).route("/", wardrobeRoutes);

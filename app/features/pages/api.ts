@@ -96,3 +96,38 @@ export async function uploadPageThumbnail(formData: FormData): Promise<{ ok: boo
   if (!res.ok) return { ok: false, error: await rpcErrorMessage(res) };
   return { ok: true };
 }
+
+// --- API Key management ---
+
+export interface ApiKeyInfo {
+  id: string;
+  name: string;
+  prefix: string;
+  createdAt: string; // ISO from JSON
+  lastUsedAt: string | null;
+}
+
+export interface CreatedApiKey extends ApiKeyInfo {
+  key: string;
+}
+
+/** Create a new API key (raw key shown once). */
+export async function createApiKey(name: string): Promise<{ ok: boolean; data?: CreatedApiKey; error?: string }> {
+  const res = await apiClient().api.me["api-keys"].$post({ json: { name } });
+  if (!res.ok) return { ok: false, error: await rpcErrorMessage(res) };
+  return { ok: true, data: await res.json() };
+}
+
+/** List all active API keys for the current user. */
+export async function listApiKeys(): Promise<{ ok: boolean; keys?: ApiKeyInfo[]; error?: string }> {
+  const res = await apiClient().api.me["api-keys"].$get();
+  if (!res.ok) return { ok: false, error: await rpcErrorMessage(res) };
+  return { ok: true, ...(await res.json()) };
+}
+
+/** Revoke an API key. */
+export async function revokeApiKey(keyId: string): Promise<{ ok: boolean; error?: string }> {
+  const res = await apiClient().api.me["api-keys"][":id"].$delete({ param: { id: keyId } });
+  if (!res.ok) return { ok: false, error: await rpcErrorMessage(res) };
+  return { ok: true };
+}

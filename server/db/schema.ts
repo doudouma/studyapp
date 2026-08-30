@@ -56,6 +56,20 @@ export const verification = sqliteTable("verification", {
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
 });
 
+// --- API keys ---
+
+export const apiKey = sqliteTable("api_key", {
+  id: text("id").primaryKey(),              // nanoid
+  userId: text("user_id").notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),             // user label
+  keyHash: text("key_hash").notNull().unique(), // SHA-256 hex
+  prefix: text("prefix").notNull(),         // first 8 chars, for display
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+  lastUsedAt: integer("last_used_at", { mode: "timestamp" }),
+  revokedAt: integer("revoked_at", { mode: "timestamp" }),
+});
+
 // --- Custom app tables ---
 
 export const page = sqliteTable("page", {

@@ -11,6 +11,7 @@
     "cf:preview": "npx wrangler dev",
     "test": "npx playwright test",
     "test:unit": "vitest run",
+    "test:e2e": "vitest run --config vitest.e2e.config.ts",
     "test:ui": "npx playwright test --ui"
   },
   "dependencies": {

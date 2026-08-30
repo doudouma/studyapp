@@ -4,6 +4,7 @@ import { Link as LinkIcon, User, Crown, Coins, HelpCircle } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { LinksTable } from "~/components/LinksTable";
+import { ApiKeyManager } from "~/components/ApiKeyManager";
 import { useAuth } from "~/lib/auth-context";
 import { fetchMyPages } from "~/features/pages/api";
 import type { PagesListResponse } from "@shared/types/pages";
@@ -254,6 +255,11 @@ function LinksPage() {
               }}
             />
           )}
+
+          {/* API Keys Section */}
+          <div className="mt-8">
+            <ApiKeyManager />
+          </div>
         </div>
       </main>
 

@@ -13,6 +13,7 @@ import {
   serveThumbnail,
   normalizeTags,
 } from "./pages.service";
+import { createApiKey, listApiKeys, revokeApiKey } from "./apikey.service";
 import { detectLangFromHeader } from "./pages.render";
 import { cleanupAnonymousUploads, deletePageObjects } from "./pages.storage";
 
@@ -174,6 +175,38 @@ export const pagesRoutes = new Hono<AppEnv>()
       file: fileInput,
     });
     return c.json(result);
+  })
+
+  // --- API Key management ---
+
+  .post("/api/me/api-keys", async (c) => {
+    const user = c.get("user");
+    if (!user) return c.json({ error: "未登录" }, 401);
+    const body = (await c.req.json<{ name?: string }>().catch(() => ({}))) as { name?: string };
+    const name = (body.name || "").trim().slice(0, 64);
+    if (!name) return c.json({ error: "名称不能为空" }, 400);
+    try {
+      const result = await createApiKey(c.env.D1!, user.id, name);
+      return c.json(result);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "创建失败";
+      return c.json({ error: msg }, 400);
+    }
+  })
+
+  .get("/api/me/api-keys", async (c) => {
+    const user = c.get("user");
+    if (!user) return c.json({ error: "未登录" }, 401);
+    const keys = await listApiKeys(c.env.D1!, user.id);
+    return c.json({ keys });
+  })
+
+  .delete("/api/me/api-keys/:id", async (c) => {
+    const user = c.get("user");
+    if (!user) return c.json({ error: "未登录" }, 401);
+    const ok = await revokeApiKey(c.env.D1!, user.id, c.req.param("id"));
+    if (!ok) return c.json({ error: "Key not found or already revoked" }, 404);
+    return c.json({ success: true });
   })
 
   // 上传页面缩略图（SnapDOM 生成的 WebP）

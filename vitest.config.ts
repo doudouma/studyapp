@@ -8,6 +8,8 @@ export default defineConfig({
       "tests/idphoto.spec.ts",
       "tests/md2html-publish.spec.ts",
       "tests/pomodoro.spec.ts",
+      "tests/upload-cli.e2e.spec.ts",
+      "tests/**/*-ui.spec.ts",
     ],
   },
 });

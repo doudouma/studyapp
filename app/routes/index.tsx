@@ -6,6 +6,7 @@ import { SuccessCard } from "~/components/SuccessCard";
 import { AppNav } from "~/components/HomeHeader";
 import { StatsSection } from "~/components/StatsSection";
 import { GuideSection } from "~/components/GuideSection";
+import { AgentSection } from "~/components/AgentSection";
 import { AppFooter } from "~/components/AppFooter";
 import { Card, CardContent } from "~/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "~/components/ui/dialog";
@@ -460,6 +461,8 @@ function HomePage() {
             user={user}
           />
         </section>
+
+        <AgentSection />
 
         <MemoStatsSection />
         <MemoGuideSection />
