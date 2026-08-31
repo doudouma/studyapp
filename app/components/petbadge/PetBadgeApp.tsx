@@ -77,9 +77,9 @@ function BarcodeSVG({ seed }: { seed: string }) {
 function BadgeClip() {
   return (
     <div className="relative z-[3] flex h-[72px] flex-col items-center pointer-events-none">
-      <div className="w-[42px] h-[52px] rounded-t-xl rounded-b-[7px] bg-gradient-to-b from-[#3E4B5C] to-[#212B39] shadow-[inset_0_2px_2px_rgba(255,255,255,.28),0_6px_10px_-6px_rgba(20,30,45,.5)]" />
-      <div className="w-[76px] h-[15px] -mt-[3px] bg-gradient-to-b from-[#EFF2F6] to-[#A9B4C1] rounded-[8px] shadow-[0_3px_5px_rgba(20,30,45,.25)]" />
-      <div className="w-[88px] h-[10px] mt-[1px] bg-[#242E3C] rounded-[6px]" />
+      <div className="w-[42px] h-[52px] rounded-t-xl rounded-b-[7px] bg-gradient-to-b from-[#D47A2E] to-[#B8652A] shadow-[inset_0_2px_2px_rgba(255,255,255,.28),0_6px_10px_-6px_rgba(180,100,42,.5)]" />
+      <div className="w-[76px] h-[15px] -mt-[3px] bg-gradient-to-b from-[#FFF0E0] to-[#F0C9A0] rounded-[8px] shadow-[0_3px_5px_rgba(180,100,42,.25)]" />
+      <div className="w-[88px] h-[10px] mt-[1px] bg-[#D47A2E] rounded-[6px]" />
     </div>
   );
 }
@@ -90,7 +90,7 @@ function LandingScreen({ onStart }: { onStart: () => void }) {
   const { t } = useTranslation();
   return (
     <div className="flex flex-col items-center overflow-hidden pt-[5vh]">
-      <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(226,120,60,.25)] bg-[rgba(255,255,255,.72)] px-5 py-[11px] text-[14px] font-extrabold tracking-[.14em] text-[#D95B2B] shadow-[0_8px_20px_-12px_rgba(220,120,60,.4)] backdrop-blur-sm">
+      <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(255,157,77,.25)] bg-[rgba(255,255,255,.72)] px-5 py-[11px] text-[14px] font-extrabold tracking-[.14em] text-[#D47A2E] shadow-[0_8px_20px_-12px_rgba(255,157,77,.4)] backdrop-blur-sm">
         🐾&nbsp;<span className="uppercase font-extrabold text-[13px]">{t("petbadge.landing.pill")}</span>
       </div>
       <h1 className="mt-[44px] text-center text-[46px] font-black leading-[1.24] tracking-[.02em]">
@@ -103,7 +103,7 @@ function LandingScreen({ onStart }: { onStart: () => void }) {
       </p>
       <button
         onClick={onStart}
-        className="mt-[36px] h-[64px] w-[min(320px,86%)] rounded-full bg-gradient-to-br from-[#FF7A3D] to-[#FF9D4D] text-[21px] font-bold tracking-[.2em] text-white shadow-[0_16px_30px_-10px_rgba(247,140,60,.55),inset_0_1px_0_rgba(255,255,255,.35)] active:scale-[.96] transition-transform"
+        className="mt-[36px] h-[64px] w-[min(320px,86%)] rounded-full bg-gradient-to-br from-[#FF9D4D] to-[#E8893A] text-[21px] font-bold tracking-[.2em] text-white shadow-[0_16px_30px_-10px_rgba(255,157,77,.55),inset_0_1px_0_rgba(255,255,255,.35)] active:scale-[.96] transition-transform"
       >
         {t("petbadge.landing.cta")}
       </button>
@@ -146,29 +146,29 @@ function UploadScreen({
       <h1 className="text-[31px] font-black tracking-[.01em] leading-[1.3]" dangerouslySetInnerHTML={{ __html: t("petbadge.upload.title") }} />
       <p className="mt-3 text-[16.5px] leading-[1.85] text-[#5D6D7A]" dangerouslySetInnerHTML={{ __html: t("petbadge.upload.sub") }} />
       <div className="my-[18px] flex justify-center">
-        <span className="inline-flex items-center gap-[7px] rounded-full bg-[#F6EBDB] px-4 py-[9px] text-[13.5px] font-bold text-[#A3835B]">
+        <span className="inline-flex items-center gap-[7px] rounded-full bg-[#FFF0E0] px-4 py-[9px] text-[13.5px] font-bold text-[#D47A2E]">
           {t("petbadge.upload.privacy")}
         </span>
       </div>
 
       <div className="relative mt-[22px]">
         <BadgeClip />
-        <div className="relative rounded-[26px] bg-white p-[22px_20px_24px] shadow-[0_30px_60px_-24px_rgba(160,95,45,.35)]">
+        <div className="relative rounded-[26px] bg-white p-[22px_20px_24px] shadow-[0_30px_60px_-24px_rgba(255,157,77,.35)]">
           <div className="flex justify-between items-center gap-[10px] py-[2px] px-1 pb-[14px]">
-            <span className="text-[12.5px] text-[#6E8CA0] flex items-center gap-[6px]">🐾 <b>PET BADGE · CANDIDATE</b></span>
-            <span className="text-[12.5px] text-[#8FA3B2] tracking-[.08em] font-semibold">PCP-{todayStr()}-001</span>
+            <span className="text-[12.5px] text-[#718096] flex items-center gap-[6px]">🐾 <b>PET BADGE · CANDIDATE</b></span>
+            <span className="text-[12.5px] text-[#A0AEC0] tracking-[.08em] font-semibold">PCP-{todayStr()}-001</span>
           </div>
 
           <div
-            className={`mt-[6px] rounded-[20px] border-2 border-dashed bg-[#FDf7ee] p-[34px_18px_30px] flex flex-col items-center gap-4 ${
-              hasImage ? "border-solid border-[#EBD9C2] !p-3" : "border-[#D9BFA2]"
+            className={`mt-[6px] rounded-[20px] border-2 border-dashed bg-[#FFF7EE] p-[34px_18px_30px] flex flex-col items-center gap-4 ${
+              hasImage ? "border-solid border-[#F0C9A0] !p-3" : "border-[#F0C9A0]"
             }`}
           >
             {hasImage && avatar ? (
               <img src={avatar} alt="Preview" className="w-full aspect-[1/.92] object-cover rounded-[14px] block" />
             ) : (
               <>
-                <div className="flex items-center gap-[14px] text-[#A78358]">
+                <div className="flex items-center gap-[14px] text-[#D47A2E]">
                   <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="w-14 h-14">
                     <rect x="6" y="16" width="38" height="30" rx="7"/><circle cx="25" cy="31" r="8.5"/><path d="M14 16 l4 -6 h14 l4 6"/><circle cx="39" cy="24" r="1.6" fill="currentColor"/>
                     <g transform="translate(40 26)"><circle cx="6" cy="4" r="2.6"/><circle cx="13" cy="3" r="2.6"/><circle cx="19.5" cy="6" r="2.4"/><circle cx="8" cy="11" r="2.5"/><circle cx="15" cy="11.5" r="2.4"/></g>
@@ -176,7 +176,7 @@ function UploadScreen({
                 </div>
                 <button
                   onClick={() => fileRef.current?.click()}
-                  className="h-[52px] rounded-full bg-gradient-to-br from-[#C17248] to-[#A65A34] px-[30px] text-[16.5px] font-bold text-white shadow-[0_12px_24px_-10px_rgba(166,90,52,.6),inset_0_1px_0_rgba(255,255,255,.25)] active:scale-[.96] transition-transform"
+                  className="h-[52px] rounded-full bg-gradient-to-br from-[#FF9D4D] to-[#E8893A] px-[30px] text-[16.5px] font-bold text-white shadow-[0_12px_24px_-10px_rgba(255,157,77,.6),inset_0_1px_0_rgba(255,255,255,.25)] active:scale-[.96] transition-transform"
                 >
                   {t("petbadge.upload.pick")}
                 </button>
@@ -189,7 +189,7 @@ function UploadScreen({
             <div className="mt-3 flex justify-center">
               <button
                 onClick={() => fileRef.current?.click()}
-                className="h-[44px] rounded-full px-[22px] text-[14.5px] bg-white text-[#C17248] shadow-[inset_0_0_0_1.5px_#E3C7AC] active:scale-[.96] transition-transform"
+                className="h-[44px] rounded-full px-[22px] text-[14.5px] bg-white text-[#D47A2E] shadow-[inset_0_0_0_1.5px_#F0C9A0] active:scale-[.96] transition-transform"
               >
                 {t("petbadge.upload.retake")}
               </button>
@@ -199,7 +199,7 @@ function UploadScreen({
           <div className="mt-[14px] text-center">
             <button
               onClick={() => fileRef.current?.click()}
-              className="border-0 bg-transparent text-[#B08968] text-[13.5px] font-bold underline decoration-dotted cursor-pointer"
+              className="border-0 bg-transparent text-[#D47A2E] text-[13.5px] font-bold underline decoration-dotted cursor-pointer"
             >
               {t("petbadge.upload.change")}
             </button>
@@ -208,29 +208,29 @@ function UploadScreen({
       </div>
 
       {hasImage && (
-        <div className="mt-[18px] rounded-[14px] bg-[#E7F4E4] p-[13px_16px] text-[14.5px] font-extrabold text-[#3E7C46] flex gap-2 items-center justify-center">
+        <div className="mt-[18px] rounded-[14px] bg-[#E9F2E3] p-[13px_16px] text-[14.5px] font-extrabold text-[#4A8A4F] flex gap-2 items-center justify-center">
           {t("petbadge.upload.ok")}
         </div>
       )}
 
-      <h2 className="mt-[26px] mb-3 text-center text-[17px] font-black text-[#8A6B4C] tracking-[.12em]">{t("petbadge.upload.guide")}</h2>
+      <h2 className="mt-[26px] mb-3 text-center text-[17px] font-black text-[#D47A2E] tracking-[.12em]">{t("petbadge.upload.guide")}</h2>
       <div className="flex gap-[9px] flex-wrap justify-center">
-        <span className="rounded-xl bg-white px-[13px] py-[9px] text-[13.5px] font-extrabold text-[#3A4656] shadow-[0_6px_14px_-8px_rgba(150,100,60,.35),inset_0_0_0_1px_rgba(150,110,70,.06)]">{t("petbadge.upload.tip1")}</span>
-        <span className="rounded-xl bg-white px-[13px] py-[9px] text-[13.5px] font-extrabold text-[#3A4656] shadow-[0_6px_14px_-8px_rgba(150,100,60,.35),inset_0_0_0_1px_rgba(150,110,70,.06)]">{t("petbadge.upload.tip2")}</span>
-        <span className="rounded-xl bg-[#FDF1EE] px-[13px] py-[9px] text-[13.5px] font-extrabold text-[#D8402C] shadow-[0_6px_14px_-8px_rgba(150,100,60,.35),inset_0_0_0_1px_rgba(150,110,70,.06)]">{t("petbadge.upload.tip3")}</span>
+        <span className="rounded-xl bg-white px-[13px] py-[9px] text-[13.5px] font-extrabold text-[#3A4656] shadow-[0_6px_14px_-8px_rgba(255,157,77,.35),inset_0_0_0_1px_rgba(255,157,77,.06)]">{t("petbadge.upload.tip1")}</span>
+        <span className="rounded-xl bg-white px-[13px] py-[9px] text-[13.5px] font-extrabold text-[#3A4656] shadow-[0_6px_14px_-8px_rgba(255,157,77,.35),inset_0_0_0_1px_rgba(255,157,77,.06)]">{t("petbadge.upload.tip2")}</span>
+        <span className="rounded-xl bg-[#FFF0E0] px-[13px] py-[9px] text-[13.5px] font-extrabold text-[#D47A2E] shadow-[0_6px_14px_-8px_rgba(255,157,77,.35),inset_0_0_0_1px_rgba(255,157,77,.06)]">{t("petbadge.upload.tip3")}</span>
       </div>
 
       <div className="mt-[26px] flex gap-3">
         <button
           onClick={onBack}
-          className="h-[58px] flex-1 rounded-full bg-white text-[17.5px] font-bold text-[#2F3E4E] shadow-[0_8px_20px_-10px_rgba(150,100,60,.35),inset_0_0_0_1px_rgba(150,110,70,.08)] active:scale-[.96] transition-transform"
+          className="h-[58px] flex-1 rounded-full bg-white text-[17.5px] font-bold text-[#2F3E4E] shadow-[0_8px_20px_-10px_rgba(255,157,77,.35),inset_0_0_0_1px_rgba(255,157,77,.08)] active:scale-[.96] transition-transform"
         >
           {t("petbadge.upload.back")}
         </button>
         <button
           onClick={onNext}
           disabled={!hasImage}
-          className="h-[58px] flex-[1.7] rounded-full bg-gradient-to-br from-[#C17248] to-[#A65A34] text-[17.5px] font-bold text-white shadow-[0_12px_24px_-10px_rgba(166,90,52,.6),inset_0_1px_0_rgba(255,255,255,.25)] disabled:opacity-45 disabled:pointer-events-none disabled:saturate-[.6] active:scale-[.96] transition-transform"
+          className="h-[58px] flex-[1.7] rounded-full bg-gradient-to-br from-[#FF9D4D] to-[#E8893A] text-[17.5px] font-bold text-white shadow-[0_12px_24px_-10px_rgba(255,157,77,.6),inset_0_1px_0_rgba(255,255,255,.25)] disabled:opacity-45 disabled:pointer-events-none disabled:saturate-[.6] active:scale-[.96] transition-transform"
         >
           {t("petbadge.upload.analyze")}
         </button>
@@ -294,15 +294,15 @@ function AnalysisScreen({ avatar, onDone }: { avatar: string; onDone: () => void
 
   return (
     <div className="flex flex-col items-center pt-[12vh]">
-      <div className="rounded-full border border-[rgba(226,120,60,.28)] bg-[rgba(255,255,255,.8)] px-[22px] py-[10px] text-[13.5px] text-[#D95B2B] shadow-[0_8px_18px_-12px_rgba(220,120,60,.45)] uppercase font-bold tracking-[.22em]">
+      <div className="rounded-full border border-[rgba(255,157,77,.28)] bg-[rgba(255,255,255,.8)] px-[22px] py-[10px] text-[13.5px] text-[#D47A2E] shadow-[0_8px_18px_-12px_rgba(255,157,77,.45)] uppercase font-bold tracking-[.22em]">
         {t("petbadge.analysis.pill")}
       </div>
       <div className="relative mt-[30px] w-[min(360px,100%)] rounded-[24px]">
-        <img src={avatar} alt="Pet photo" className="w-full aspect-[16/10.5] object-cover rounded-[24px] block shadow-[0_24px_50px_-22px_rgba(160,95,45,.5)]" />
+        <img src={avatar} alt="Pet photo" className="w-full aspect-[16/10.5] object-cover rounded-[24px] block shadow-[0_24px_50px_-22px_rgba(255,157,77,.5)]" />
         <div
-          className="absolute left-0 right-0 h-[64px] top-[-64px] pointer-events-none rounded-[24px] border-b-2 border-[rgba(255,80,40,.9)]"
+          className="absolute left-0 right-0 h-[64px] top-[-64px] pointer-events-none rounded-[24px] border-b-2 border-[rgba(255,157,77,.9)]"
           style={{
-            background: "linear-gradient(180deg,rgba(255,120,70,0),rgba(255,110,60,.28) 70%,rgba(255,90,50,.75))",
+            background: "linear-gradient(180deg,rgba(255,157,77,0),rgba(255,157,77,.28) 70%,rgba(255,157,77,.75))",
             filter: "blur(.4px)",
             animation: "petbadge-scan 2.1s ease-in-out infinite alternate",
           }}
@@ -310,7 +310,7 @@ function AnalysisScreen({ avatar, onDone }: { avatar: string; onDone: () => void
         <span className="absolute left-[38%] top-[34%] text-[30px] opacity-55 -rotate-[16deg]" style={{ animation: "petbadge-pawpulse 1.6s ease-in-out infinite" }}>🐾</span>
         <span className="absolute left-[50%] top-[52%] text-[30px] opacity-55 rotate-[10deg]" style={{ animation: "petbadge-pawpulse 1.6s ease-in-out infinite .4s" }}>🐾</span>
         <div
-          className={`absolute right-[-26px] bottom-[-38px] w-[118px] h-[118px] text-[#98A4AE] transition-all duration-[.45s] ease-[cubic-bezier(.2,.8,.3,1.2)] ${
+          className={`absolute right-[-26px] bottom-[-38px] w-[118px] h-[118px] text-[#A0AEC0] transition-all duration-[.45s] ease-[cubic-bezier(.2,.8,.3,1.2)] ${
             stampShow ? "opacity-100 scale-100 -rotate-[10deg]" : "opacity-0 scale-150 -rotate-[24deg]"
           }`}
           style={{ filter: "drop-shadow(0 8px 14px rgba(90,100,110,.3))" }}
@@ -328,10 +328,10 @@ function AnalysisScreen({ avatar, onDone }: { avatar: string; onDone: () => void
       </div>
       <h2 className="mt-[56px] text-[23px] font-black text-[#333F4A]">{t("petbadge.analysis.title")}</h2>
       <p className="mt-[22px] text-[16px] text-[#7E8B96]">{t("petbadge.analysis.sub")}</p>
-      <div className="mt-[26px] w-[min(360px,100%)] h-[14px] rounded-full bg-white shadow-[inset_0_0_0_1px_rgba(150,100,60,.12)] overflow-hidden">
-        <div className="h-full rounded-full bg-gradient-to-r from-[#F4562C] to-[#FF9D4D] transition-[width] duration-[.12s] linear" style={{ width: `${pct}%` }} />
+      <div className="mt-[26px] w-[min(360px,100%)] h-[14px] rounded-full bg-white shadow-[inset_0_0_0_1px_rgba(255,157,77,.12)] overflow-hidden">
+        <div className="h-full rounded-full bg-gradient-to-r from-[#FF9D4D] to-[#E8893A] transition-[width] duration-[.12s] linear" style={{ width: `${pct}%` }} />
       </div>
-      <div className="mt-[14px] text-[24px] font-black text-[#E8542E]">{pct}%</div>
+      <div className="mt-[14px] text-[24px] font-black text-[#D47A2E]">{pct}%</div>
       <p className="mt-[26px] w-[min(360px,100%)] text-[15.5px] leading-[1.8] text-[#5D6D7A] min-h-[3.6em]">{t(`petbadge.fact.${factIdx}`)}</p>
     </div>
   );
@@ -362,20 +362,20 @@ function RegisterScreen({
 
       <div className="relative mt-[26px]">
         <BadgeClip />
-        <div className="relative rounded-[26px] bg-white p-[22px_20px_24px] shadow-[0_30px_60px_-24px_rgba(160,95,45,.35)]">
+        <div className="relative rounded-[26px] bg-white p-[22px_20px_24px] shadow-[0_30px_60px_-24px_rgba(255,157,77,.35)]">
           <div className="flex items-center gap-2 pb-[6px]">
             <span className="flex items-center gap-2 text-[13px] text-[#3A4656]">🐾 <span className="uppercase font-bold tracking-[.22em] text-[13px]">PAW &amp; CLAW CORP.</span></span>
-            <span className="ml-auto inline-flex items-center gap-[7px] rounded-full bg-[#FDEBDD] px-3 py-[7px] text-[12.5px] font-extrabold text-[#D95B2B]">
-              <span className="w-[7px] h-[7px] rounded-full bg-[#F4562C]" />{t("petbadge.register.wait")}
+            <span className="ml-auto inline-flex items-center gap-[7px] rounded-full bg-[#FFF0E0] px-3 py-[7px] text-[12.5px] font-extrabold text-[#D47A2E]">
+              <span className="w-[7px] h-[7px] rounded-full bg-[#FF9D4D]" />{t("petbadge.register.wait")}
             </span>
           </div>
           <div className="text-center text-[27px] font-black my-4 tracking-[.06em]">{t("petbadge.register.mystery")}</div>
           <div className="flex flex-col items-center gap-[14px]">
-            <img src={avatar} alt="Candidate photo" className="w-[210px] h-[170px] object-cover rounded-[18px] shadow-[0_18px_36px_-16px_rgba(160,95,45,.5)]" />
-            <span className="border-[1.5px] border-[#F08A4B] text-[#E06A2B] bg-[#FFF9F3] rounded-xl px-4 py-2 text-[14.5px] font-black tracking-[.1em]">{t("petbadge.register.pending")}</span>
+            <img src={avatar} alt="Candidate photo" className="w-[210px] h-[170px] object-cover rounded-[18px] shadow-[0_18px_36px_-16px_rgba(255,157,77,.5)]" />
+            <span className="border-[1.5px] border-[#FF9D4D] text-[#D47A2E] bg-[#FFF7EE] rounded-xl px-4 py-2 text-[14.5px] font-black tracking-[.1em]">{t("petbadge.register.pending")}</span>
           </div>
           <div className="mt-[2px] text-center text-[13.5px] text-[#9AA6B1] tracking-[.16em] font-bold">{t("petbadge.register.no")}</div>
-          <div className="mt-[18px] bg-[#F6EEE3] rounded-[16px] p-[18px_16px] text-center">
+          <div className="mt-[18px] bg-[#FFF0E0] rounded-[16px] p-[18px_16px] text-center">
             <div className="text-[18px] font-black text-[#3A4656]">{t("petbadge.register.mystery")}</div>
             <div className="mt-2 text-[14.5px] font-semibold text-[#8A97A2]">{t("petbadge.register.wait")}</div>
           </div>
@@ -383,7 +383,7 @@ function RegisterScreen({
       </div>
 
       <input
-        className="mt-[24px] w-full border-[1.5px] border-[#E8D5BD] bg-[#FFFDF9] rounded-[18px] px-5 py-[17px] text-[16.5px] font-bold text-[#2F3E4E] outline-none shadow-[0_10px_24px_-16px_rgba(150,100,60,.4)] placeholder:text-[#B4A28C] placeholder:font-semibold focus:border-[#E8A06B]"
+        className="mt-[24px] w-full border-[1.5px] border-[#F0C9A0] bg-[#FFFDF9] rounded-[18px] px-5 py-[17px] text-[16.5px] font-bold text-[#2F3E4E] outline-none shadow-[0_10px_24px_-16px_rgba(255,157,77,.4)] placeholder:text-[#B4A28C] placeholder:font-semibold focus:border-[#FF9D4D]"
         maxLength={8}
         placeholder={t("petbadge.register.namePlaceholder")}
         value={name}
@@ -396,18 +396,18 @@ function RegisterScreen({
       <div className="mt-[30px] flex gap-3">
         <button
           onClick={randName}
-          className="h-[58px] flex-1 rounded-full bg-white text-[17.5px] font-bold text-[#2F3E4E] shadow-[0_8px_20px_-10px_rgba(150,100,60,.35),inset_0_0_0_1px_rgba(150,110,70,.08)] active:scale-[.96] transition-transform"
+          className="h-[58px] flex-1 rounded-full bg-white text-[17.5px] font-bold text-[#2F3E4E] shadow-[0_8px_20px_-10px_rgba(255,157,77,.35),inset_0_0_0_1px_rgba(255,157,77,.08)] active:scale-[.96] transition-transform"
         >
           {t("petbadge.register.randName")}
         </button>
         <button
           onClick={() => onNext(name || t(`petbadge.name.${rnd(0, 23)}`))}
-          className="h-[58px] flex-[1.7] rounded-full bg-[#26262B] text-[17.5px] font-bold text-white shadow-[0_14px_26px_-12px_rgba(30,30,35,.55)] active:scale-[.96] transition-transform"
+          className="h-[58px] flex-[1.7] rounded-full bg-gradient-to-br from-[#FF9D4D] to-[#E8893A] text-[17.5px] font-bold text-white shadow-[0_14px_26px_-12px_rgba(255,157,77,.55)] active:scale-[.96] transition-transform"
         >
           {t("petbadge.register.finish")}
         </button>
       </div>
-      <p className="mt-[30px] text-center text-[12px] text-[#C09A78] uppercase tracking-[.22em] font-bold">{t("petbadge.register.foot")}</p>
+      <p className="mt-[30px] text-center text-[12px] text-[#D47A2E] uppercase tracking-[.22em] font-bold">{t("petbadge.register.foot")}</p>
     </div>
   );
 }
@@ -443,6 +443,28 @@ const THEME_KEYS: [Theme, string][] = [
 
 const RLBL_KEYS = ["petbadge.radar.颜值", "petbadge.radar.亲和力", "petbadge.radar.观察力", "petbadge.radar.执行力", "petbadge.radar.治愈力", "petbadge.radar.摸鱼能力"];
 
+/* holo foil palette per theme: c1/c2 feed the beam gradient, glow (rgb triplet) feeds the
+   hover shadow, blend must be multiply on light cards but screen on the dark cyber card */
+const THEME_HOLO: Record<Theme, { c1: string; c2: string; glow: string; blend: string }> = {
+  ins: { c1: "#FFC38C", c2: "#FFEAD4", glow: "255,157,77", blend: "multiply" },
+  cute: { c1: "#FFC0DB", c2: "#FFE2F0", glow: "255,128,180", blend: "multiply" },
+  y2k: { c1: "#C3CDFF", c2: "#E2EDFF", glow: "150,168,255", blend: "multiply" },
+  cyber: { c1: "#37E8B4", c2: "#9CF6E0", glow: "77,255,196", blend: "screen" },
+  biz: { c1: "#D9CBA6", c2: "#EFE9D6", glow: "186,170,128", blend: "multiply" },
+  hk: { c1: "#F4A9A2", c2: "#FFDCC8", glow: "235,100,88", blend: "multiply" },
+};
+
+/* ins theme inline color tokens */
+const INS = {
+  meta: "#9AA6B1",
+  line: "#F0C9A0",
+  accent: "#FF9D4D",
+  greenBg: "#E9F2E3",
+  greenText: "#4A8A4F",
+  cardBg: "#FFF7EE",
+  radarBg: "#FFF0E0",
+};
+
 function BadgeScreen({
   avatar,
   name,
@@ -455,7 +477,11 @@ function BadgeScreen({
   const { t } = useTranslation();
   const [theme, setTheme] = useState<Theme>("ins");
   const cardRef = useRef<HTMLDivElement>(null);
-  const [cardStyle, setCardStyle] = useState<Record<string, string>>({});
+  const targetRef = useRef({ px: 50, py: 50, active: false });
+  const curRef = useRef({ x: 50, y: 50, rx: 0, ry: 0, bgx: 50, bgy: 50, o: 0, lift: 0 });
+  const rafRef = useRef(0);
+  const stopShowcaseRef = useRef<() => void>(() => {});
+  const holo = THEME_HOLO[theme];
 
   const jobIdx = useState(() => rnd(0, 15))[0];
   const hrIdx = useState(() => rnd(0, 6))[0];
@@ -471,38 +497,124 @@ function BadgeScreen({
   const rank = avg > 82 ? "★★★" : avg > 64 ? "★★" : "★";
   const labels = RLBL_KEYS.map((k) => t(k));
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+  /* rAF lerp loop: writes CSS vars straight to the DOM (no React re-render per mousemove).
+     Faster easing while interacting, slow springy settle on leave — like the reference springs. */
+  const tick = useCallback(() => {
     const el = cardRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const px = (x / rect.width) * 100;
-    const py = (y / rect.height) * 100;
-    const cx = px - 50;
-    const cy = py - 50;
-    setCardStyle({
-      "--pointer-x": `${px}%`,
-      "--pointer-y": `${py}%`,
-      "--rotate-x": `${-cy / 3.5}deg`,
-      "--rotate-y": `${cx / 3.5}deg`,
-      "--card-opacity": "1",
-      "--pointer-from-center": String(Math.min(Math.sqrt(cy * cy + cx * cx) / 50, 1)),
-      "--background-x": `${37 + (px * 26) / 100}%`,
-      "--background-y": `${33 + (py * 34) / 100}%`,
-    });
+    if (!el) {
+      rafRef.current = 0;
+      return;
+    }
+    const cur = curRef.current;
+    const tgt = targetRef.current;
+    const kPos = tgt.active ? 0.22 : 0.07;
+    const kRot = tgt.active ? 0.18 : 0.055;
+    const kFx = tgt.active ? 0.15 : 0.05;
+    cur.x += (tgt.px - cur.x) * kPos;
+    cur.y += (tgt.py - cur.y) * kPos;
+    const trx = -((cur.x - 50) / 3.5);
+    const tryy = (cur.y - 50) / 3.5;
+    cur.rx += (trx - cur.rx) * kRot;
+    cur.ry += (tryy - cur.ry) * kRot;
+    cur.bgx += (37 + (cur.x * 26) / 100 - cur.bgx) * kPos;
+    cur.bgy += (33 + (cur.y * 34) / 100 - cur.bgy) * kPos;
+    cur.o += ((tgt.active ? 1 : 0) - cur.o) * kFx;
+    cur.lift += ((tgt.active ? 1 : 0) - cur.lift) * (tgt.active ? 0.12 : 0.05);
+
+    const s = el.style;
+    s.setProperty("--pointer-x", `${cur.x.toFixed(2)}%`);
+    s.setProperty("--pointer-y", `${cur.y.toFixed(2)}%`);
+    s.setProperty("--rotate-x", `${cur.rx.toFixed(3)}deg`);
+    s.setProperty("--rotate-y", `${cur.ry.toFixed(3)}deg`);
+    s.setProperty("--background-x", `${cur.bgx.toFixed(2)}%`);
+    s.setProperty("--background-y", `${cur.bgy.toFixed(2)}%`);
+    s.setProperty("--card-opacity", cur.o.toFixed(3));
+    s.setProperty("--card-lift", cur.lift.toFixed(3));
+    el.classList.toggle("interacting", cur.o > 0.02);
+
+    const settled =
+      !tgt.active &&
+      cur.o < 0.01 &&
+      cur.lift < 0.01 &&
+      Math.abs(cur.rx) < 0.08 &&
+      Math.abs(cur.ry) < 0.08;
+    if (settled) {
+      curRef.current = { x: 50, y: 50, rx: 0, ry: 0, bgx: 50, bgy: 50, o: 0, lift: 0 };
+      rafRef.current = 0;
+      return;
+    }
+    rafRef.current = requestAnimationFrame(tick);
   }, []);
 
-  const handleMouseLeave = useCallback(() => {
-    setCardStyle({
-      "--pointer-x": "50%",
-      "--pointer-y": "50%",
-      "--rotate-x": "0deg",
-      "--rotate-y": "0deg",
-      "--card-opacity": "0",
-      "--pointer-from-center": "0",
-    });
-  }, []);
+  const ensureLoop = useCallback(() => {
+    if (!rafRef.current) rafRef.current = requestAnimationFrame(tick);
+  }, [tick]);
+
+  /* Reveal showcase on entry (sine-loop tilt like the reference showcase card). On
+     hover-less (touch) devices it keeps looping until the user touches the card. */
+  useEffect(() => {
+    const killRaf = () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = 0;
+      }
+    };
+    if (!cardRef.current || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      stopShowcaseRef.current = () => {};
+      return killRaf;
+    }
+    const noHover = window.matchMedia("(hover: none)").matches;
+    let r = Math.random() * 6;
+    let iv = 0;
+    const stop = () => {
+      if (iv) {
+        clearInterval(iv);
+        iv = 0;
+      }
+      targetRef.current.px = 50;
+      targetRef.current.py = 50;
+      targetRef.current.active = false;
+      ensureLoop();
+    };
+    stopShowcaseRef.current = stop;
+    const startTimer = window.setTimeout(() => {
+      iv = window.setInterval(() => {
+        r += 0.042;
+        targetRef.current.px = 50 + Math.sin(r) * 46;
+        targetRef.current.py = 50 + Math.cos(r * 0.9) * 42;
+        targetRef.current.active = true;
+        ensureLoop();
+      }, 33);
+    }, 450);
+    const capTimer = window.setTimeout(stop, noHover ? 11000 : 3400);
+    return () => {
+      clearTimeout(startTimer);
+      clearTimeout(capTimer);
+      if (iv) clearInterval(iv);
+      killRaf();
+    };
+  }, [ensureLoop]);
+
+  const handlePointer = useCallback(
+    (e: React.PointerEvent) => {
+      stopShowcaseRef.current();
+      const el = cardRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      targetRef.current.px = Math.min(100, Math.max(0, ((e.clientX - rect.left) / rect.width) * 100));
+      targetRef.current.py = Math.min(100, Math.max(0, ((e.clientY - rect.top) / rect.height) * 100));
+      targetRef.current.active = true;
+      ensureLoop();
+    },
+    [ensureLoop]
+  );
+
+  const handleLeave = useCallback(() => {
+    targetRef.current.px = 50;
+    targetRef.current.py = 50;
+    targetRef.current.active = false;
+    ensureLoop();
+  }, [ensureLoop]);
 
   return (
     <div
@@ -514,30 +626,39 @@ function BadgeScreen({
           <div
             ref={cardRef}
             className="holo-card"
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            style={cardStyle as React.CSSProperties}
+            onPointerMove={handlePointer}
+            onPointerDown={handlePointer}
+            onPointerLeave={handleLeave}
+            onPointerCancel={handleLeave}
           >
             <div
-              className={`holo-rotator relative rounded-[26px] p-[24px_20px_22px] shadow-[0_30px_60px_-24px_rgba(160,95,45,.35)] transition-colors duration-500 ${
+              className={`holo-rotator relative rounded-[26px] p-[24px_20px_22px] transition-colors duration-500 ${
                 THEME_CARD[theme] || "bg-white text-[#33424E]"
               } ${theme === "hk" ? "border-2 border-[rgba(196,55,43,.35)] rounded-[20px] relative" : ""}`}
-              style={theme === "y2k" ? { background: "linear-gradient(160deg,#EFECFF,#DFF2FF 55%,#FDE9F6)" } : undefined}
+              style={
+                {
+                  "--holo-c1": holo.c1,
+                  "--holo-c2": holo.c2,
+                  "--holo-glow": holo.glow,
+                  "--holo-blend": holo.blend,
+                  ...(theme === "y2k" ? { background: "linear-gradient(160deg,#EFECFF,#DFF2FF 55%,#FDE9F6)" } : undefined),
+                } as React.CSSProperties
+              }
             >
             {theme === "hk" && <div className="absolute inset-[7px] border-2 border-[rgba(196,55,43,.35)] rounded-[20px] pointer-events-none" />}
 
-            <div className="text-[12px] tracking-[.26em] font-extrabold px-1" style={{ color: theme === "ins" ? "#9AA6B1" : undefined }}>
+            <div className="text-[12px] tracking-[.26em] font-extrabold px-1" style={{ color: theme === "ins" ? INS.meta : undefined }}>
               {t("petbadge.badge.identity")} {new Date().getFullYear()}
             </div>
-            <div className="h-px my-3" style={{ background: theme === "ins" ? "#EAE2D6" : undefined }} />
+            <div className="h-px my-3" style={{ background: theme === "ins" ? INS.line : undefined }} />
             <div className="flex items-center gap-[7px] px-[2px]">
-              <span className="text-[15px]" style={{ color: theme === "ins" ? "#E2603F" : undefined }}>🐾</span>
+              <span className="text-[15px]" style={{ color: theme === "ins" ? INS.accent : undefined }}>🐾</span>
               <span className="uppercase text-[14.5px] font-bold tracking-[.14em]" style={{ letterSpacing: ".14em" }}>PAW &amp; CLAW CORP.</span>
               <span
                 className="ml-auto rounded-full px-[14px] py-[7px] text-[13px] font-extrabold tracking-[.06em]"
                 style={{
-                  background: theme === "ins" ? "#E9F2E3" : undefined,
-                  color: theme === "ins" ? "#4A8A4F" : undefined,
+                  background: theme === "ins" ? INS.greenBg : undefined,
+                  color: theme === "ins" ? INS.greenText : undefined,
                 }}
               >
                 {t("petbadge.badge.official入职")}
@@ -551,27 +672,27 @@ function BadgeScreen({
                   className="absolute right-[-14px] bottom-2 rounded-[6px] px-[7px] py-[3px] text-[11px] font-black tracking-[.14em] -rotate-[11deg] shadow-[0_4px_10px_-4px_rgba(200,50,30,.4)]"
                   style={{
                     background: theme === "cyber" ? "#0C161B" : "#fff",
-                    color: theme === "cyber" ? "#FF5C7A" : "#E2482E",
-                    border: `2px solid ${theme === "cyber" ? "#FF5C7A" : "#E2482E"}`,
+                    color: theme === "cyber" ? "#FF5C7A" : INS.accent,
+                    border: `2px solid ${theme === "cyber" ? "#FF5C7A" : INS.accent}`,
                   }}
                 >
                   {t("petbadge.badge.official")}
                 </span>
               </div>
-              <div className="flex-1 flex flex-col pb-[14px] border-b-[1.5px] min-w-0" style={{ borderColor: theme === "ins" ? "#EAE2D6" : undefined }}>
+              <div className="flex-1 flex flex-col pb-[14px] border-b-[1.5px] min-w-0" style={{ borderColor: theme === "ins" ? INS.line : undefined }}>
                 <div className="flex items-center gap-[9px] flex-wrap">
                   <span className="text-[33px] font-black tracking-[.03em] leading-[1.15] break-all">{name}</span>
                   <span
                     className="border-[1.5px] rounded-[8px] px-[7px] py-[3px] text-[11px] font-extrabold tracking-[.08em] whitespace-nowrap"
                     style={{
-                      borderColor: theme === "ins" ? "#9AA6B1" : undefined,
-                      color: theme === "ins" ? "#9AA6B1" : undefined,
+                      borderColor: theme === "ins" ? INS.meta : undefined,
+                      color: theme === "ins" ? INS.meta : undefined,
                     }}
                   >
                     {t("petbadge.badge.staff")} {rank}
                   </span>
                 </div>
-                <div className="mt-[9px] text-[12px] tracking-[.09em] font-bold whitespace-nowrap" style={{ color: theme === "ins" ? "#9AA6B1" : undefined }}>
+                <div className="mt-[9px] text-[12px] tracking-[.09em] font-bold whitespace-nowrap" style={{ color: theme === "ins" ? INS.meta : undefined }}>
                   NO．<b style={{ color: theme === "ins" ? undefined : "inherit" }}>{no}</b>
                 </div>
                 <div className="mt-auto pt-3 text-[20.5px] font-black tracking-[.05em]">{job}</div>
@@ -580,30 +701,30 @@ function BadgeScreen({
 
             <div
               className="mt-4 rounded-[18px] p-3 grid grid-cols-[1.1fr_1fr] gap-[10px]"
-              style={{ background: theme === "ins" ? "#F5EEE3" : undefined }}
+              style={{ background: theme === "ins" ? INS.radarBg : undefined }}
             >
               <div className="flex items-center justify-center">
-                <div className="w-full" style={{ color: theme === "ins" ? "#9AA6B1" : undefined }} dangerouslySetInnerHTML={{ __html: RadarSVG({ vals, labels }) }} />
+                <div className="w-full" style={{ color: theme === "ins" ? INS.meta : undefined }} dangerouslySetInnerHTML={{ __html: RadarSVG({ vals, labels }) }} />
               </div>
               <div
                 className="flex flex-col gap-[10px] rounded-[14px] p-3 shadow-[0_6px_16px_-12px_rgba(60,50,40,.35)]"
                 style={{ background: theme === "ins" ? "#fff" : undefined }}
               >
                 <div>
-                  <div className="text-[10.5px] tracking-[.16em] font-extrabold" style={{ color: theme === "ins" ? "#9AA6B1" : undefined }}>{t("petbadge.badge.hr")}</div>
+                  <div className="text-[10.5px] tracking-[.16em] font-extrabold" style={{ color: theme === "ins" ? INS.meta : undefined }}>{t("petbadge.badge.hr")}</div>
                   <div className="mt-[5px] text-[14.5px] font-extrabold leading-[1.55] tracking-[.02em]">{hr}</div>
                 </div>
                 <div>
-                  <div className="text-[10.5px] tracking-[.16em] font-extrabold" style={{ color: theme === "ins" ? "#9AA6B1" : undefined }}>{t("petbadge.badge.pay")}</div>
+                  <div className="text-[10.5px] tracking-[.16em] font-extrabold" style={{ color: theme === "ins" ? INS.meta : undefined }}>{t("petbadge.badge.pay")}</div>
                   <div className="mt-[5px] text-[14.5px] font-extrabold leading-[1.55] tracking-[.02em]">{pay}</div>
                 </div>
               </div>
             </div>
 
-            <div className="mt-4 pt-[14px] border-t-[1.5px] flex items-center gap-[14px]" style={{ borderColor: theme === "ins" ? "#EAE2D6" : undefined }}>
+            <div className="mt-4 pt-[14px] border-t-[1.5px] flex items-center gap-[14px]" style={{ borderColor: theme === "ins" ? INS.line : undefined }}>
               <div
                 className="flex-none w-[52px] h-[52px] rounded-full border-2 border-dashed flex items-center justify-center -rotate-[12deg] opacity-85"
-                style={{ borderColor: theme === "ins" ? "#E2603F" : undefined, color: theme === "ins" ? "#E2603F" : undefined }}
+                style={{ borderColor: theme === "ins" ? INS.accent : undefined, color: theme === "ins" ? INS.accent : undefined }}
               >
                 <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
                   <ellipse cx="7.2" cy="8.2" rx="2.1" ry="2.8"/><ellipse cx="16.8" cy="8.2" rx="2.1" ry="2.8"/>
@@ -613,7 +734,7 @@ function BadgeScreen({
               </div>
               <div className="flex-1 min-w-0">
                 <div style={{ color: theme === "ins" ? "#33424E" : undefined }}><div dangerouslySetInnerHTML={{ __html: BarcodeSVG({ seed: no }) }} /></div>
-                <div className="mt-[6px] text-right text-[12.5px] tracking-[.3em] font-extrabold" style={{ color: theme === "ins" ? "#9AA6B1" : undefined }}>{code}</div>
+                <div className="mt-[6px] text-right text-[12.5px] tracking-[.3em] font-extrabold" style={{ color: theme === "ins" ? INS.meta : undefined }}>{code}</div>
               </div>
             </div>
 
@@ -630,8 +751,8 @@ function BadgeScreen({
               onClick={() => setTheme(key)}
               className={`border-0 cursor-pointer font-extrabold text-[15px] rounded-full py-[13px] px-1 transition-all active:scale-[.95] whitespace-nowrap ${
                 theme === key
-                  ? "bg-gradient-to-br from-[#FF7A3D] to-[#FF9D4D] text-white shadow-[0_12px_24px_-8px_rgba(247,140,60,.6),inset_0_1px_0_rgba(255,255,255,.4)]"
-                  : "bg-white text-[#3A4656] shadow-[0_8px_18px_-10px_rgba(150,100,60,.4),inset_0_0_0_1px_rgba(150,110,70,.06)]"
+                  ? "bg-gradient-to-br from-[#FF9D4D] to-[#E8893A] text-white shadow-[0_12px_24px_-8px_rgba(255,157,77,.6),inset_0_1px_0_rgba(255,255,255,.4)]"
+                  : "bg-white text-[#3A4656] shadow-[0_8px_18px_-10px_rgba(255,157,77,.4),inset_0_0_0_1px_rgba(255,157,77,.06)]"
               }`}
             >
               {t(labelKey)}
@@ -640,10 +761,10 @@ function BadgeScreen({
         </div>
 
         <div className="mt-[22px] flex gap-3 w-[min(352px,100%)]">
-          <button className="h-[58px] flex-1 rounded-full bg-[#26262B] text-[17.5px] font-bold text-white shadow-[0_14px_26px_-12px_rgba(30,30,35,.55)] active:scale-[.96] transition-transform">
+          <button className="h-[58px] flex-1 rounded-full bg-gradient-to-br from-[#FF9D4D] to-[#E8893A] text-[17.5px] font-bold text-white shadow-[0_14px_26px_-12px_rgba(255,157,77,.55)] active:scale-[.96] transition-transform">
             {t("petbadge.badge.wall")}
           </button>
-          <button className="h-[58px] flex-1 rounded-full bg-white text-[17.5px] font-bold text-[#2F3E4E] shadow-[0_8px_20px_-10px_rgba(150,100,60,.35),inset_0_0_0_1px_rgba(150,110,70,.08)] active:scale-[.96] transition-transform flex items-center justify-center gap-2">
+          <button className="h-[58px] flex-1 rounded-full bg-white text-[17.5px] font-bold text-[#2F3E4E] shadow-[0_8px_20px_-10px_rgba(255,157,77,.35),inset_0_0_0_1px_rgba(255,157,77,.08)] active:scale-[.96] transition-transform flex items-center justify-center gap-2">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg>
             {t("petbadge.badge.share")}
           </button>
@@ -651,7 +772,7 @@ function BadgeScreen({
         <div className="mt-[22px] text-center">
           <button
             onClick={onAgain}
-            className="border-0 bg-transparent text-[#B08968] text-[13.5px] font-bold underline decoration-dotted cursor-pointer"
+            className="border-0 bg-transparent text-[#D47A2E] text-[13.5px] font-bold underline decoration-dotted cursor-pointer"
           >
             {t("petbadge.badge.again")}
           </button>
@@ -678,51 +799,80 @@ export function PetBadgeApp() {
         .holo-card {
           --pointer-x: 50%; --pointer-y: 50%;
           --rotate-x: 0deg; --rotate-y: 0deg;
-          --card-opacity: 0; --pointer-from-center: 0;
+          --card-opacity: 0; --card-lift: 0;
           --background-x: 50%; --background-y: 50%;
-          --red: #f80e35; --yellow: #eedf10; --green: #21e985;
-          --blue: #0dbde9; --violet: #c929f1;
+          --holo-c1: #FFC38C; --holo-c2: #FFEAD4;
+          --holo-glow: 255,157,77; --holo-blend: multiply;
           perspective: 600px;
         }
         .holo-card .holo-rotator {
           transform-style: preserve-3d;
-          transform: rotateY(var(--rotate-x)) rotateX(var(--rotate-y));
-          transition: transform 0.15s ease-out;
+          transform:
+            translateY(calc(var(--card-lift) * -8px))
+            scale(calc(1 + var(--card-lift) * 0.03))
+            rotateY(var(--rotate-x)) rotateX(var(--rotate-y));
+          transition: box-shadow .45s ease, background-color .5s ease, color .5s ease, border-color .5s ease;
+          box-shadow:
+            0 0 0 1px rgba(255,255,255,.35),
+            0 30px 60px -24px rgba(120,75,35,.35);
+          will-change: transform;
+        }
+        .holo-card.interacting .holo-rotator {
+          box-shadow:
+            0 0 2px 1px rgba(255,255,255,.9),
+            0 0 5px 1px rgba(var(--holo-glow), .45),
+            0 0 22px 6px rgba(var(--holo-glow), .3),
+            0 26px 60px -22px rgba(var(--holo-glow), .5);
         }
         .holo-card .holo-shine {
           position: absolute; inset: 0; border-radius: inherit;
-          transform: translateZ(1px); overflow: hidden; z-index: 3;
-          pointer-events: none;
-          background-image:
-            repeating-linear-gradient(
-              110deg,
-              transparent 0%,
-              rgba(255,100,200,0.15) 15%,
-              rgba(100,200,255,0.2) 30%,
-              rgba(100,255,180,0.15) 45%,
-              rgba(255,220,100,0.2) 60%,
-              rgba(255,100,200,0.15) 75%,
-              transparent 100%
-            );
-          background-size: 300% 300%;
-          background-position: calc(var(--background-x) * 2%) calc(var(--background-y) * 2%);
-          filter: brightness(1.15) saturate(1.4);
+          overflow: hidden; z-index: 3; pointer-events: none;
+          transform: translateZ(1px);
           opacity: var(--card-opacity);
+          /* diagonal foil beams; position drifts with the pointer (reference: card__shine) */
+          background-image: repeating-linear-gradient(112deg,
+            transparent 0%, transparent 6%,
+            var(--holo-c2) 14%, var(--holo-c1) 22%,
+            var(--holo-c2) 30%, transparent 40%, transparent 52%,
+            var(--holo-c1) 66%, var(--holo-c2) 76%, transparent 88%);
+          background-size: 320% 320%;
+          background-position:
+            calc(((50% - var(--background-x)) * 2.4) + 50%)
+            calc(((50% - var(--background-y)) * 3.2) + 50%);
+          mix-blend-mode: var(--holo-blend);
+          filter: saturate(1.3);
+        }
+        /* vertical light bars sliding the opposite way (reference: shine::before sunpillar) */
+        .holo-card .holo-shine::before {
+          content: ""; position: absolute; inset: 0;
+          background-image: repeating-linear-gradient(90deg,
+            rgba(255,255,255,0) 0%, rgba(255,255,255,.95) 4.5%, rgba(255,255,255,0) 9%,
+            rgba(255,255,255,0) 26%, rgba(255,255,255,.7) 30%, rgba(255,255,255,0) 34%);
+          background-size: 240% 240%;
+          background-position:
+            calc(((50% - var(--background-x)) * -1.8) + 50%)
+            calc(((50% - var(--background-y)) * 1.2) + 50%);
+          mix-blend-mode: overlay;
+        }
+        /* soft bloom under the cursor (reference: shine::after) */
+        .holo-card .holo-shine::after {
+          content: ""; position: absolute; inset: 0;
+          background-image: radial-gradient(farthest-corner circle at var(--pointer-x) var(--pointer-y),
+            rgba(255,255,255,.9) 0%, rgba(255,255,255,.2) 30%, rgba(255,255,255,0) 62%);
+          mix-blend-mode: soft-light;
         }
         .holo-card .holo-glare {
           position: absolute; inset: 0; border-radius: inherit;
           transform: translateZ(2px); pointer-events: none;
-          background: radial-gradient(
-            farthest-corner circle at var(--pointer-x) var(--pointer-y),
-            hsla(0, 0%, 100%, 0.8) 0%,
-            hsla(0, 0%, 100%, 0.5) 30%,
-            hsla(0, 0%, 0%, 0.3) 100%
-          );
+          background: radial-gradient(farthest-corner circle at var(--pointer-x) var(--pointer-y),
+            hsla(0, 0%, 100%, .75) 10%,
+            hsla(0, 0%, 100%, .4) 24%,
+            hsla(0, 0%, 0%, .26) 92%);
           mix-blend-mode: overlay;
           opacity: var(--card-opacity);
         }
       `}</style>
-      <div className="max-w-[470px] mx-auto min-h-dvh relative overflow-x-clip bg-white" style={{ boxShadow: "0 0 0 1px rgba(150,100,60,.08),0 40px 90px -40px rgba(150,90,40,.35)" }}>
+      <div className="max-w-[470px] mx-auto min-h-dvh relative overflow-x-clip bg-white" style={{ boxShadow: "0 0 0 1px rgba(255,157,77,.08),0 40px 90px -40px rgba(255,157,77,.35)" }}>
         <div className="p-[26px_22px_46px] min-h-dvh">
           {screen === "landing" && <LandingScreen onStart={() => setScreen("upload")} />}
           {screen === "upload" && (
