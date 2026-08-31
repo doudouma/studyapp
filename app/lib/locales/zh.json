@@ -358,6 +358,8 @@
   "petbadge.landing.heroTip": "上传一张大头照，收编入职！",
   "petbadge.landing.sub": "看看 TA 是「深夜跑酷教练」<br>还是「拖鞋收纳顾问」？",
   "petbadge.landing.cta": "领取工牌 →",
+  "petbadge.landing.phishingTitle": "⚠️ 安全提示",
+  "petbadge.landing.phishingDesc": "本工具完全在浏览器本地运行，照片不上传任何服务器。请认准官方域名 100mini.com，任何索要密码、支付信息的页面均为钓鱼网站。",
   "petbadge.upload.title": "上传准员工<br>「入职证件照」",
   "petbadge.upload.sub": "晒出一张颜值巅峰的证件照<br>配合 HR 完成入职背调 ✨",
   "petbadge.upload.privacy": "🔒 照片仅在本地处理，不上传服务器",
