@@ -443,15 +443,16 @@ const THEME_KEYS: [Theme, string][] = [
 
 const RLBL_KEYS = ["petbadge.radar.颜值", "petbadge.radar.亲和力", "petbadge.radar.观察力", "petbadge.radar.执行力", "petbadge.radar.治愈力", "petbadge.radar.摸鱼能力"];
 
-/* holo foil palette per theme: c1/c2 feed the beam gradient, glow (rgb triplet) feeds the
-   hover shadow, blend must be multiply on light cards but screen on the dark cyber card */
-const THEME_HOLO: Record<Theme, { c1: string; c2: string; glow: string; blend: string }> = {
-  ins: { c1: "#FFC38C", c2: "#FFEAD4", glow: "255,157,77", blend: "multiply" },
-  cute: { c1: "#FFC0DB", c2: "#FFE2F0", glow: "255,128,180", blend: "multiply" },
-  y2k: { c1: "#C3CDFF", c2: "#E2EDFF", glow: "150,168,255", blend: "multiply" },
-  cyber: { c1: "#37E8B4", c2: "#9CF6E0", glow: "77,255,196", blend: "screen" },
-  biz: { c1: "#D9CBA6", c2: "#EFE9D6", glow: "186,170,128", blend: "multiply" },
-  hk: { c1: "#F4A9A2", c2: "#FFDCC8", glow: "235,100,88", blend: "multiply" },
+/* Rarity tiers, pokemon-tcg style: each tier gets its own foil pattern class
+   (holo-r-*) and palette. c1/c2 feed the beam gradients, glow (rgb triplet)
+   feeds the hover shadow. Tier is derived from the radar average score. */
+type Rarity = "common" | "holo" | "ultra" | "gold";
+
+const RARITY_HOLO: Record<Rarity, { c1: string; c2: string; glow: string; stars: string; labelKey: string }> = {
+  common: { c1: "#C7D0D8", c2: "#E8EDF1", glow: "150,162,175", stars: "★", labelKey: "petbadge.rarity.common" },
+  holo: { c1: "#FFC38C", c2: "#FFEAD4", glow: "255,157,77", stars: "★★", labelKey: "petbadge.rarity.holo" },
+  ultra: { c1: "#C9B8FF", c2: "#FFC9E8", glow: "180,140,255", stars: "★★★", labelKey: "petbadge.rarity.ultra" },
+  gold: { c1: "#F2CE6B", c2: "#FFF0BC", glow: "255,199,71", stars: "★★★★", labelKey: "petbadge.rarity.gold" },
 };
 
 /* ins theme inline color tokens */
@@ -481,7 +482,6 @@ function BadgeScreen({
   const curRef = useRef({ x: 50, y: 50, rx: 0, ry: 0, bgx: 50, bgy: 50, o: 0, lift: 0 });
   const rafRef = useRef(0);
   const stopShowcaseRef = useRef<() => void>(() => {});
-  const holo = THEME_HOLO[theme];
 
   const jobIdx = useState(() => rnd(0, 15))[0];
   const hrIdx = useState(() => rnd(0, 6))[0];
@@ -494,7 +494,8 @@ function BadgeScreen({
   const hr = t(`petbadge.hr.${hrIdx}`);
   const pay = t(`petbadge.pay.${payIdx}`);
   const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
-  const rank = avg > 82 ? "★★★" : avg > 64 ? "★★" : "★";
+  const rarity: Rarity = avg >= 85 ? "gold" : avg >= 72 ? "ultra" : avg >= 58 ? "holo" : "common";
+  const holo = RARITY_HOLO[rarity];
   const labels = RLBL_KEYS.map((k) => t(k));
 
   /* rAF lerp loop: writes CSS vars straight to the DOM (no React re-render per mousemove).
@@ -625,7 +626,7 @@ function BadgeScreen({
           <BadgeClip />
           <div
             ref={cardRef}
-            className="holo-card"
+            className={`holo-card holo-r-${rarity}`}
             onPointerMove={handlePointer}
             onPointerDown={handlePointer}
             onPointerLeave={handleLeave}
@@ -640,7 +641,8 @@ function BadgeScreen({
                   "--holo-c1": holo.c1,
                   "--holo-c2": holo.c2,
                   "--holo-glow": holo.glow,
-                  "--holo-blend": holo.blend,
+                  /* multiply vanishes on the dark cyber card; it needs screen there */
+                  "--holo-blend": theme === "cyber" ? "screen" : "multiply",
                   ...(theme === "y2k" ? { background: "linear-gradient(160deg,#EFECFF,#DFF2FF 55%,#FDE9F6)" } : undefined),
                 } as React.CSSProperties
               }
@@ -689,7 +691,7 @@ function BadgeScreen({
                       color: theme === "ins" ? INS.meta : undefined,
                     }}
                   >
-                    {t("petbadge.badge.staff")} {rank}
+                    {t(holo.labelKey)} {holo.stars}
                   </span>
                 </div>
                 <div className="mt-[9px] text-[12px] tracking-[.09em] font-bold whitespace-nowrap" style={{ color: theme === "ins" ? INS.meta : undefined }}>
@@ -829,7 +831,13 @@ export function PetBadgeApp() {
           overflow: hidden; z-index: 3; pointer-events: none;
           transform: translateZ(1px);
           opacity: var(--card-opacity);
-          /* diagonal foil beams; position drifts with the pointer (reference: card__shine) */
+          mix-blend-mode: var(--holo-blend);
+          filter: saturate(1.3);
+        }
+        /* N common: no foil pattern, glare only (reference: basic cards) */
+        .holo-card.holo-r-common .holo-shine::before { content: none; }
+        /* R holo: diagonal foil beams drifting with the pointer (reference: rare holo) */
+        .holo-card.holo-r-holo .holo-shine {
           background-image: repeating-linear-gradient(112deg,
             transparent 0%, transparent 6%,
             var(--holo-c2) 14%, var(--holo-c1) 22%,
@@ -839,8 +847,38 @@ export function PetBadgeApp() {
           background-position:
             calc(((50% - var(--background-x)) * 2.4) + 50%)
             calc(((50% - var(--background-y)) * 3.2) + 50%);
-          mix-blend-mode: var(--holo-blend);
-          filter: saturate(1.3);
+        }
+        /* SR ultra: crossing metallic weave sliding both ways (reference: V full art) */
+        .holo-card.holo-r-ultra .holo-shine {
+          background-image:
+            repeating-linear-gradient(118deg,
+              transparent 0%, transparent 8%,
+              var(--holo-c2) 18%, var(--holo-c1) 26%,
+              var(--holo-c2) 34%, transparent 46%,
+              var(--holo-c1) 58%, var(--holo-c2) 68%, transparent 84%),
+            repeating-linear-gradient(56deg,
+              transparent 0%, transparent 14%,
+              var(--holo-c2) 24%, transparent 36%);
+          background-size: 320% 320%, 260% 260%;
+          background-position:
+            calc(((50% - var(--background-x)) * 2.4) + 50%) calc(((50% - var(--background-y)) * 3.2) + 50%),
+            calc(((50% - var(--background-x)) * -1.7) + 50%) calc(((50% - var(--background-y)) * -2.3) + 50%);
+        }
+        /* UR gold: gold beams + two drifting sparkle grids (reference: secret rare glitter) */
+        .holo-card.holo-r-gold .holo-shine {
+          background-image:
+            repeating-linear-gradient(112deg,
+              transparent 0%, transparent 6%,
+              var(--holo-c2) 14%, var(--holo-c1) 24%,
+              var(--holo-c2) 32%, transparent 42%,
+              var(--holo-c1) 64%, var(--holo-c2) 74%, transparent 88%),
+            radial-gradient(circle, var(--holo-c1) 0.8px, transparent 1.7px),
+            radial-gradient(circle, #C98A1E 0.7px, transparent 1.6px);
+          background-size: 320% 320%, 17px 23px, 13px 19px;
+          background-position:
+            calc(((50% - var(--background-x)) * 2.4) + 50%) calc(((50% - var(--background-y)) * 3.2) + 50%),
+            calc(((50% - var(--background-x)) * -3) + 50%) calc(((50% - var(--background-y)) * 4) + 50%),
+            calc(((50% - var(--background-x)) * 4) + 50%) calc(((50% - var(--background-y)) * -3) + 50%);
         }
         /* vertical light bars sliding the opposite way (reference: shine::before sunpillar) */
         .holo-card .holo-shine::before {
