@@ -19,3 +19,5 @@ anydoc/
 .env.local
 .env.*.local
 template/
+docs/
+AGENTS.md
