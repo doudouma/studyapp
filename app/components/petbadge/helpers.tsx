@@ -97,7 +97,7 @@ export function BarcodeSVG({ seed }: { seed: string }) {
   let x = 0;
   const bars: string[] = [];
   while (x < 296) {
-    const w = [1.5, 1.5, 2, 2, 3, 4][Math.floor(r() * 6)];
+    const w = [1.5, 1.5, 2, 2, 3, 4][Math.floor(r() * 5)];
     if (r() > 0.42) bars.push(`<rect x="${x.toFixed(1)}" y="0" width="${w}" height="34"/>`);
     x += w + (r() > 0.5 ? 1.5 : 2.5);
   }
