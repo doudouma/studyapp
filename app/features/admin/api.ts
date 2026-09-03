@@ -89,3 +89,36 @@ export async function cleanupTmp(): Promise<{ ok: boolean; error?: string; delet
   if (!res.ok) return { ok: false, error: (json as { error?: string }).error };
   return { ok: true, deleted: (json as { deleted?: number }).deleted };
 }
+
+
+export interface UploadLogData {
+  id: number;
+  userId: string | null;
+  pageId: string;
+  event: string;
+  contentType: string | null;
+  isAnonymous: number;
+  ip: string | null;
+  fileSize: number | null;
+  createdAt: number;
+}
+
+/** 分页获取上传日志（管理员权限） */
+export async function fetchAdminLogs(
+  page: number,
+  pageSize: number,
+  filters?: { userId?: string; event?: string; from?: number; to?: number }
+): Promise<{ logs: UploadLogData[]; total: number }> {
+  const query: Record<string, string> = {
+    page: String(page),
+    pageSize: String(pageSize),
+  };
+  if (filters?.userId) query.userId = filters.userId;
+  if (filters?.event) query.event = filters.event;
+  if (filters?.from) query.from = String(filters.from);
+  if (filters?.to) query.to = String(filters.to);
+
+  const res = await apiClient().api.admin.logs.$get({ query });
+  if (!res.ok) throw new Error((await rpcErrorMessage(res)) || "加载失败");
+  return res.json();
+}

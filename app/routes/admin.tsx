@@ -17,6 +17,7 @@ import i18n from "~/lib/i18n";
 import {
   fetchAdminUsers,
   fetchAdminPages,
+  fetchAdminLogs,
   setMembership as setMembershipApi,
   cancelMembership as cancelMembershipApi,
   deleteAdminPage,
@@ -44,7 +45,7 @@ function AdminPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, authLoading } = useAuth();
-  const [tab, setTab] = useState<"users" | "pages">("users");
+  const [tab, setTab] = useState<"users" | "pages" | "logs">("users");
 
   // User list state
   const [users, setUsers] = useState<AdminUserData[]>([]);
@@ -77,6 +78,23 @@ function AdminPage() {
   const [deletePageState, setDeletePageState] = useState<AdminPageData | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
+  // Upload logs state
+  const [logs, setLogs] = useState<Array<{
+    id: number;
+    userId: string | null;
+    pageId: string;
+    event: string;
+    contentType: string | null;
+    isAnonymous: number;
+    ip: string | null;
+    fileSize: number | null;
+    createdAt: number;
+  }>>([]);
+  const [logTotal, setLogTotal] = useState(0);
+  const [logPage, setLogPage] = useState(1);
+  const [logEventFilter, setLogEventFilter] = useState<string>("");
+  const [logLoading, setLogLoading] = useState(false);
+
   const pageSize = 10;
 
   // Check auth and admin role
@@ -106,7 +124,8 @@ function AdminPage() {
   useEffect(() => {
     if (!authLoading && user?.role === "admin") {
       if (tab === "users") fetchUsers(1);
-      else fetchPages(1);
+      else if (tab === "pages") fetchPages(1);
+      else if (tab === "logs") fetchLogs(1);
     }
   }, [authLoading, tab]);
 
@@ -123,6 +142,26 @@ function AdminPage() {
       setPagesLoading(false);
     }
   };
+
+  const fetchLogs = async (p: number) => {
+    setLogLoading(true);
+    try {
+      const data = await fetchAdminLogs(p, 20, logEventFilter ? { event: logEventFilter } : undefined);
+      setLogs(data.logs);
+      setLogTotal(data.total);
+    } catch {
+      // ignore
+    } finally {
+      setLogLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (tab === "logs" && !authLoading && user?.role === "admin") {
+      fetchLogs(1);
+      setLogPage(1);
+    }
+  }, [logEventFilter]);
 
   const handleDeletePage = async () => {
     if (!deletePageState) return;
@@ -240,6 +279,16 @@ function AdminPage() {
               }`}
             >
               {t("admin.tab.pages")}
+            </button>
+            <button
+              onClick={() => setTab("logs")}
+              className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-all ${
+                tab === "logs"
+                  ? "bg-[#006c49] text-white dark:bg-[#4edea3] dark:text-[#002113]"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {t("admin.tab.logs")}
             </button>
           </div>
 
@@ -400,6 +449,106 @@ function AdminPage() {
                 )}
               </>
             )
+          )}
+
+          {/* ===== Upload Logs ===== */}
+          {tab === "logs" && (
+            <div className="space-y-4">
+              {/* Filters */}
+              <div className="flex items-center gap-4">
+                <select
+                  value={logEventFilter}
+                  onChange={(e) => { setLogEventFilter(e.target.value); setLogPage(1); }}
+                  className="rounded-lg border border-[#d3e4fe] dark:border-[#3c4a42] bg-white dark:bg-[#15243b] px-3 py-1.5 text-sm"
+                >
+                  <option value="">{t("admin.log.allEvents")}</option>
+                  <option value="upload">{t("admin.log.upload")}</option>
+                  <option value="delete">{t("admin.log.delete")}</option>
+                  <option value="cleanup">{t("admin.log.cleanup")}</option>
+                </select>
+                <span className="text-sm text-muted-foreground">
+                  {t("admin.log.total", { count: logTotal })}
+                </span>
+              </div>
+
+              {/* Table */}
+              <div className="overflow-x-auto rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b]">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-[#d3e4fe] dark:border-[#3c4a42] bg-[#e5eeff]/30 dark:bg-[#1e314a]/30">
+                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.log.time")}</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.log.event")}</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.log.user")}</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.log.page")}</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95] hidden sm:table-cell">{t("admin.log.type")}</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95] hidden md:table-cell">{t("admin.log.ip")}</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95] hidden sm:table-cell">{t("admin.log.size")}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {logLoading ? (
+                      <tr>
+                        <td colSpan={7} className="px-4 py-12 text-center text-muted-foreground">{t("common.loading")}</td>
+                      </tr>
+                    ) : logs.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="px-4 py-12 text-center text-muted-foreground">{t("admin.log.noData")}</td>
+                      </tr>
+                    ) : (
+                      logs.map((log) => (
+                        <tr key={log.id} className="border-b border-[#d3e4fe] dark:border-[#3c4a42] last:border-0 hover:bg-[#e5eeff]/20 dark:hover:bg-[#1e314a]/20">
+                          <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">
+                            {new Date(log.createdAt).toLocaleString("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                              log.event === "upload" ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400"
+                              : log.event === "delete" ? "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400"
+                              : "bg-orange-50 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400"
+                            }`}>
+                              {log.event === "upload" ? t("admin.log.upload") : log.event === "delete" ? t("admin.log.delete") : t("admin.log.cleanup")}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            {log.isAnonymous ? (
+                              <span className="text-muted-foreground">{t("admin.log.anonymous")}</span>
+                            ) : (
+                              <span className="font-medium">{log.userId}</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3">
+                            <a href={`/p/${log.pageId}`} target="_blank" rel="noopener noreferrer"
+                              className="text-[#0058be] dark:text-[#adc6ff] hover:underline">
+                              {log.pageId}
+                            </a>
+                          </td>
+                          <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">
+                            {log.contentType === "html" ? "HTML" : log.contentType === "zip" ? "ZIP" : log.contentType === "thumbnail" ? t("admin.log.thumbnail") : "-"}
+                          </td>
+                          <td className="px-4 py-3 font-mono text-xs text-muted-foreground hidden md:table-cell">{log.ip ?? "-"}</td>
+                          <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">
+                            {log.fileSize != null ? (
+                              log.fileSize > 1024 * 1024
+                                ? `${(log.fileSize / 1024 / 1024).toFixed(1)} MB`
+                                : `${(log.fileSize / 1024).toFixed(0)} KB`
+                            ) : "-"}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination */}
+              {logTotal > 20 && (
+                <div className="flex items-center justify-center gap-2">
+                  <Button variant="outline" size="sm" disabled={logPage <= 1} onClick={() => { setLogPage(logPage - 1); fetchLogs(logPage - 1); }}>{t("admin.pagination.prev")}</Button>
+                  <span className="text-sm text-muted-foreground">{logPage} / {Math.ceil(logTotal / 20)}</span>
+                  <Button variant="outline" size="sm" disabled={logPage >= Math.ceil(logTotal / 20)} onClick={() => { setLogPage(logPage + 1); fetchLogs(logPage + 1); }}>{t("admin.pagination.next")}</Button>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </main>

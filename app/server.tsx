@@ -194,13 +194,28 @@ app.all("*", async (c) => {
 });
 
 // Cron trigger: cleanup expired anonymous uploads daily (3 AM UTC)
+// Also cleans up old upload logs (90-day retention)
 export async function scheduled(_event: ScheduledEvent, env: Bindings, _ctx: ExecutionContext) {
-  if (!env.BUCKET) return;
-  try {
-    const count = await cleanupAnonymousUploads(env.BUCKET);
-    console.log(`[cron] cleaned up ${count} expired anonymous upload(s)`);
-  } catch (err) {
-    console.error("[cron] cleanup failed:", err);
+  // Cleanup expired anonymous uploads
+  if (env.BUCKET) {
+    try {
+      const count = await cleanupAnonymousUploads(env.BUCKET);
+      console.log(`[cron] cleaned up ${count} expired anonymous upload(s)`);
+    } catch (err) {
+      console.error("[cron] cleanup failed:", err);
+    }
+  }
+
+  // Cleanup old upload logs (90 days)
+  if (env.D1) {
+    try {
+      const { deleteOldUploadLogs } = await import("./../server/features/admin/upload-log.repo");
+      const cutoff = Date.now() - 90 * 24 * 60 * 60 * 1000;
+      const count = await deleteOldUploadLogs(env.D1, cutoff);
+      console.log(`[cron] cleaned up ${count} old upload log(s)`);
+    } catch (err) {
+      console.error("[cron] upload log cleanup failed:", err);
+    }
   }
 }
 

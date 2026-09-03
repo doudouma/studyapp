@@ -43,6 +43,13 @@
       "when": 1787360758501,
       "tag": "0005_thankful_wendigo",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1788439043730,
+      "tag": "0006_sudden_songbird",
+      "breakpoints": true
     }
   ]
 }

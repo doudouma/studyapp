@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 
 // --- Better Auth tables (D1/SQLite compatible) ---
@@ -154,3 +154,21 @@ export const wardrobeOutfit = sqliteTable("wardrobe_outfit", {
   createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`CURRENT_TIMESTAMP`),
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull().default(sql`CURRENT_TIMESTAMP`),
 });
+
+// --- Upload logs ---
+
+export const uploadLog = sqliteTable("upload_log", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: text("user_id"),
+  pageId: text("page_id").notNull(),
+  event: text("event").notNull(),
+  contentType: text("content_type"),
+  isAnonymous: integer("is_anonymous", { mode: "boolean" }).notNull().default(false),
+  ip: text("ip"),
+  fileSize: integer("file_size"),
+  createdAt: integer("created_at").notNull(),
+}, (t) => [
+  index("idx_upload_log_user").on(t.userId),
+  index("idx_upload_log_time").on(t.createdAt),
+  index("idx_upload_log_event").on(t.event),
+]);

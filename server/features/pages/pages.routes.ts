@@ -16,6 +16,7 @@ import {
 import { createApiKey, listApiKeys, revokeApiKey } from "./apikey.service";
 import { detectLangFromHeader } from "./pages.render";
 import { cleanupAnonymousUploads, deletePageObjects } from "./pages.storage";
+import { insertUploadLog } from "../admin/upload-log.repo";
 
 /**
  * Pages 路由层 (HTTP 边界)
@@ -51,8 +52,17 @@ export const pagesRoutes = new Hono<AppEnv>()
   .delete("/api/pages/:id", async (c) => {
     const user = c.get("user");
     if (!user) return c.json({ error: "未登录" }, 401);
-
-    await deleteOwnPage(c.env.D1, c.env?.BUCKET, user.id, c.req.param("id"));
+    const pageId = c.req.param("id");
+    await deleteOwnPage(c.env.D1, c.env?.BUCKET, user.id, pageId);
+    if (c.env.D1) {
+      insertUploadLog(c.env.D1, {
+        userId: user.id,
+        pageId,
+        event: "delete",
+        isAnonymous: false,
+        ip: c.req.header("cf-connecting-ip") || c.req.header("x-forwarded-for")?.split(",")[0]?.trim() || null,
+      });
+    }
     return c.json({ success: true });
   })
 
@@ -174,6 +184,22 @@ export const pagesRoutes = new Hono<AppEnv>()
       content: typeof body.content === "string" ? body.content : undefined,
       file: fileInput,
     });
+
+    if (c.env.D1) {
+      const ip = c.req.header("cf-connecting-ip") || c.req.header("x-forwarded-for")?.split(",")[0]?.trim() || null;
+      const contentType = fileInput ? (fileInput.filename.endsWith(".zip") ? "zip" : "html") : "html";
+      const fileSize = fileInput ? fileInput.bytes.length : (typeof body.content === "string" ? new Blob([body.content]).size : 0);
+      insertUploadLog(c.env.D1, {
+        userId: user?.id ?? null,
+        pageId: result.id,
+        event: "upload",
+        contentType,
+        isAnonymous: !user,
+        ip,
+        fileSize,
+      });
+    }
+
     return c.json(result);
   })
 
@@ -219,9 +245,21 @@ export const pagesRoutes = new Hono<AppEnv>()
     const thumbnail = body.thumbnail as File | null;
     if (!pageId || !thumbnail) return c.json({ error: "缺少参数" }, 400);
 
-    return c.json(
-      await savePageThumbnail(c.env.D1, c.env?.BUCKET, user.id, pageId, thumbnail)
-    );
+    const thumbResult = await savePageThumbnail(c.env.D1, c.env?.BUCKET, user.id, pageId, thumbnail);
+
+    if (c.env.D1) {
+      insertUploadLog(c.env.D1, {
+        userId: user.id,
+        pageId,
+        event: "upload",
+        contentType: "thumbnail",
+        isAnonymous: false,
+        ip: c.req.header("cf-connecting-ip") || c.req.header("x-forwarded-for")?.split(",")[0]?.trim() || null,
+        fileSize: thumbnail.size,
+      });
+    }
+
+    return c.json(thumbResult);
   })
 
   // 页面缩略图（长缓存）
