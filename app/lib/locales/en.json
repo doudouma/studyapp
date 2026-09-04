@@ -877,5 +877,20 @@
   "admin.log.ip": "IP",
   "admin.log.size": "Size",
   "admin.log.anonymous": "Anonymous",
-  "admin.log.thumbnail": "Thumbnail"
+  "admin.log.thumbnail": "Thumbnail",
+  "admin.log.status": "Status",
+  "admin.log.statusSuccess": "Success",
+  "admin.log.statusBlocked": "Blocked",
+  "admin.log.statusError": "Error",
+  "admin.tab.scanLogs": "Scan Logs",
+  "admin.scanLog.allStatus": "All Status",
+  "admin.scanLog.approved": "Approved",
+  "admin.scanLog.blocked": "Blocked",
+  "admin.scanLog.error": "Error",
+  "admin.scanLog.total": "{{count}} records",
+  "admin.scanLog.noData": "No data",
+  "admin.scanLog.reason": "Reason",
+  "admin.scanLog.detail": "Detail",
+  "admin.scanLog.type": "Type",
+  "admin.scanLog.userType": "User"
 }

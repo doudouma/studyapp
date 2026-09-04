@@ -123,3 +123,35 @@ export async function fetchAdminLogs(
   if (!res.ok) throw new Error((await rpcErrorMessage(res)) || "加载失败");
   return res.json();
 }
+
+export interface ScanLogData {
+  id: number;
+  pageId: string;
+  status: string;
+  reason: string | null;
+  threats: string | null;
+  htmlLength: number;
+  isAnonymous: number;
+  createdAt: number;
+}
+
+/** 分页获取审核日志（管理员权限） */
+export async function fetchScanLogs(
+  page: number,
+  pageSize: number,
+  filters?: { status?: string; pageId?: string; from?: number; to?: number }
+): Promise<{ logs: ScanLogData[]; total: number }> {
+  const query: Record<string, string> = {
+    page: String(page),
+    pageSize: String(pageSize),
+  };
+  if (filters?.status) query.status = filters.status;
+  if (filters?.pageId) query.pageId = filters.pageId;
+  if (filters?.from) query.from = String(filters.from);
+  if (filters?.to) query.to = String(filters.to);
+
+  const res = await apiClient().api.admin["scan-logs"].$get({ query });
+  if (!res.ok) throw new Error((await rpcErrorMessage(res)) || "加载失败");
+  const data = await res.json();
+  return data as unknown as { logs: ScanLogData[]; total: number };
+}

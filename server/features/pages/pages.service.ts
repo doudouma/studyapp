@@ -23,6 +23,7 @@ import {
 } from "./pages.storage";
 import { injectBanner, notFoundHtml, detectLangFromHeader } from "./pages.render";
 import { log } from "../../lib/log";
+import { insertUploadLog } from "../admin/upload-log.repo";
 import {
   getMembershipExpiresAt,
   isMemberByUserId,
@@ -441,6 +442,9 @@ export async function scanHtmlInBackground(
     const guard = detectAndSanitizeHtml(html);
     if (!guard.safe) {
       log.warn("审核不通过", { pageId, status: "blocked", reason: "regex", threats: guard.threats });
+      if (ctx.d1) {
+        insertUploadLog(ctx.d1, { pageId, event: "upload", isAnonymous, status: "blocked" });
+      }
       await deletePageById(ctx, pageId, isAnonymous);
       return;
     }
@@ -451,6 +455,9 @@ export async function scanHtmlInBackground(
       const domainCheck = await checkDomainsWithPhishDestroy(domains);
       if (!domainCheck.safe) {
         log.warn("审核不通过", { pageId, status: "blocked", reason: "phishing", threats: domainCheck.threats });
+        if (ctx.d1) {
+          insertUploadLog(ctx.d1, { pageId, event: "upload", isAnonymous, status: "blocked" });
+        }
         await deletePageById(ctx, pageId, isAnonymous);
         return;
       }
@@ -461,6 +468,9 @@ export async function scanHtmlInBackground(
       const aiResult = await detectWithAi(ctx.ai, html);
       if (!aiResult.safe) {
         log.warn("审核不通过", { pageId, status: "blocked", reason: "ai", verdict: aiResult.verdict });
+        if (ctx.d1) {
+          insertUploadLog(ctx.d1, { pageId, event: "upload", isAnonymous, status: "blocked" });
+        }
         await deletePageById(ctx, pageId, isAnonymous);
         return;
       }

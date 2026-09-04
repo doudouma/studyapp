@@ -166,6 +166,7 @@ export const uploadLog = sqliteTable("upload_log", {
   isAnonymous: integer("is_anonymous", { mode: "boolean" }).notNull().default(false),
   ip: text("ip"),
   fileSize: integer("file_size"),
+  status: text("status"),
   createdAt: integer("created_at").notNull(),
 }, (t) => [
   index("idx_upload_log_user").on(t.userId),

@@ -877,5 +877,20 @@
   "admin.log.ip": "IP",
   "admin.log.size": "大小",
   "admin.log.anonymous": "匿名",
-  "admin.log.thumbnail": "缩略图"
+  "admin.log.thumbnail": "缩略图",
+  "admin.log.status": "状态",
+  "admin.log.statusSuccess": "成功",
+  "admin.log.statusBlocked": "拦截",
+  "admin.log.statusError": "异常",
+  "admin.tab.scanLogs": "审核日志",
+  "admin.scanLog.allStatus": "全部状态",
+  "admin.scanLog.approved": "审核通过",
+  "admin.scanLog.blocked": "审核不通过",
+  "admin.scanLog.error": "审核异常",
+  "admin.scanLog.total": "共 {{count}} 条",
+  "admin.scanLog.noData": "暂无数据",
+  "admin.scanLog.reason": "原因",
+  "admin.scanLog.detail": "详情",
+  "admin.scanLog.type": "类型",
+  "admin.scanLog.userType": "用户"
 }

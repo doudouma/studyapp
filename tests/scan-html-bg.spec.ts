@@ -16,10 +16,15 @@ vi.mock("../server/features/pages/pages.repo", () => ({
   deletePageRecord: vi.fn(),
 }));
 
+vi.mock("../server/features/admin/upload-log.repo", () => ({
+  insertUploadLog: vi.fn(),
+}));
+
 import { scanHtmlInBackground } from "../server/features/pages/pages.service";
 import { detectAndSanitizeHtml, extractDomains, checkDomainsWithPhishDestroy, detectWithAi } from "../server/features/pages/html-guard";
 import { deletePageObjects, deleteTmpByBucketId } from "../server/features/pages/pages.storage";
 import { deletePageRecord } from "../server/features/pages/pages.repo";
+import { insertUploadLog } from "../server/features/admin/upload-log.repo";
 
 const mockDetect = vi.mocked(detectAndSanitizeHtml);
 const mockExtract = vi.mocked(extractDomains);
@@ -28,6 +33,7 @@ const mockAi = vi.mocked(detectWithAi);
 const mockDeletePageObjects = vi.mocked(deletePageObjects);
 const mockDeleteTmp = vi.mocked(deleteTmpByBucketId);
 const mockDeleteRecord = vi.mocked(deletePageRecord);
+const mockInsertUploadLog = vi.mocked(insertUploadLog);
 
 beforeEach(() => {
   vi.clearAllMocks();

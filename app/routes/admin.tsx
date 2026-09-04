@@ -18,6 +18,7 @@ import {
   fetchAdminUsers,
   fetchAdminPages,
   fetchAdminLogs,
+  fetchScanLogs,
   setMembership as setMembershipApi,
   cancelMembership as cancelMembershipApi,
   deleteAdminPage,
@@ -45,7 +46,7 @@ function AdminPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, authLoading } = useAuth();
-  const [tab, setTab] = useState<"users" | "pages" | "logs">("users");
+  const [tab, setTab] = useState<"users" | "pages" | "logs" | "scan-logs">("users");
 
   // User list state
   const [users, setUsers] = useState<AdminUserData[]>([]);
@@ -95,6 +96,22 @@ function AdminPage() {
   const [logPage, setLogPage] = useState(1);
   const [logEventFilter, setLogEventFilter] = useState<string>("");
   const [logLoading, setLogLoading] = useState(false);
+
+  // Scan logs state
+  const [scanLogs, setScanLogs] = useState<Array<{
+    id: number;
+    pageId: string;
+    status: string;
+    reason: string | null;
+    threats: string | null;
+    htmlLength: number;
+    isAnonymous: number;
+    createdAt: number;
+  }>>([]);
+  const [scanLogTotal, setScanLogTotal] = useState(0);
+  const [scanLogPage, setScanLogPage] = useState(1);
+  const [scanLogStatusFilter, setScanLogStatusFilter] = useState<string>("");
+  const [scanLogLoading, setScanLogLoading] = useState(false);
 
   const pageSize = 10;
 
@@ -157,12 +174,32 @@ function AdminPage() {
     }
   };
 
+  const fetchScanLogsData = async (p: number) => {
+    setScanLogLoading(true);
+    try {
+      const data = await fetchScanLogs(p, 20, scanLogStatusFilter ? { status: scanLogStatusFilter } : undefined);
+      setScanLogs(data.logs);
+      setScanLogTotal(data.total);
+    } catch {
+      // ignore
+    } finally {
+      setScanLogLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (tab === "logs" && !authLoading && user?.role === "admin") {
       fetchLogs(1);
       setLogPage(1);
     }
   }, [logEventFilter]);
+
+  useEffect(() => {
+    if (tab === "scan-logs" && !authLoading && user?.role === "admin") {
+      fetchScanLogsData(1);
+      setScanLogPage(1);
+    }
+  }, [scanLogStatusFilter]);
 
   const handleDeletePage = async () => {
     if (!deletePageState) return;
@@ -282,14 +319,14 @@ function AdminPage() {
               {t("admin.tab.pages")}
             </button>
             <button
-              onClick={() => setTab("logs")}
+              onClick={() => setTab("scan-logs")}
               className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-all ${
-                tab === "logs"
+                tab === "scan-logs"
                   ? "bg-[#006c49] text-white dark:bg-[#4edea3] dark:text-[#002113]"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              {t("admin.tab.logs")}
+              {t("admin.tab.scanLogs")}
             </button>
           </div>
 
@@ -479,7 +516,7 @@ function AdminPage() {
                     <tr className="border-b border-[#d3e4fe] dark:border-[#3c4a42] bg-[#e5eeff]/30 dark:bg-[#1e314a]/30">
                       <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.log.time")}</th>
                       <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.log.event")}</th>
-                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">状态</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.log.status")}</th>
                       <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.log.user")}</th>
                       <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.log.page")}</th>
                       <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95] hidden sm:table-cell">{t("admin.log.type")}</th>
@@ -517,7 +554,7 @@ function AdminPage() {
                               : log.status === "blocked" ? "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400"
                               : "bg-gray-50 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400"
                             }`}>
-                              {log.status === "success" ? "成功" : log.status === "blocked" ? "拦截" : log.status ?? "-"}
+                              {log.status === "success" ? t("admin.log.statusSuccess") : log.status === "blocked" ? t("admin.log.statusBlocked") : log.status ?? "-"}
                             </span>
                           </td>
                           <td className="px-4 py-3">
@@ -557,6 +594,96 @@ function AdminPage() {
                   <Button variant="outline" size="sm" disabled={logPage <= 1} onClick={() => { setLogPage(logPage - 1); fetchLogs(logPage - 1); }}>{t("admin.pagination.prev")}</Button>
                   <span className="text-sm text-muted-foreground">{logPage} / {Math.ceil(logTotal / 20)}</span>
                   <Button variant="outline" size="sm" disabled={logPage >= Math.ceil(logTotal / 20)} onClick={() => { setLogPage(logPage + 1); fetchLogs(logPage + 1); }}>{t("admin.pagination.next")}</Button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ===== Scan Logs ===== */}
+          {tab === "scan-logs" && (
+            <div className="space-y-4">
+              {/* Filters */}
+              <div className="flex items-center gap-4">
+                <select
+                  value={scanLogStatusFilter}
+                  onChange={(e) => { setScanLogStatusFilter(e.target.value); setScanLogPage(1); }}
+                  className="rounded-lg border border-[#d3e4fe] dark:border-[#3c4a42] bg-white dark:bg-[#15243b] px-3 py-1.5 text-sm"
+                >
+                  <option value="">{t("admin.scanLog.allStatus")}</option>
+                  <option value="approved">{t("admin.scanLog.approved")}</option>
+                  <option value="blocked">{t("admin.scanLog.blocked")}</option>
+                  <option value="error">{t("admin.scanLog.error")}</option>
+                </select>
+                <span className="text-sm text-muted-foreground">
+                  {t("admin.scanLog.total", { count: scanLogTotal })}
+                </span>
+              </div>
+
+              {/* Table */}
+              <div className="overflow-x-auto rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b]">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-[#d3e4fe] dark:border-[#3c4a42] bg-[#e5eeff]/30 dark:bg-[#1e314a]/30">
+                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.log.time")}</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.log.status")}</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.log.page")}</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95] hidden sm:table-cell">{t("admin.scanLog.reason")}</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95] hidden md:table-cell">{t("admin.scanLog.detail")}</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95] hidden sm:table-cell">{t("admin.scanLog.type")}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {scanLogLoading ? (
+                      <tr>
+                        <td colSpan={6} className="px-4 py-12 text-center text-muted-foreground">{t("common.loading")}</td>
+                      </tr>
+                    ) : scanLogs.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="px-4 py-12 text-center text-muted-foreground">{t("admin.scanLog.noData")}</td>
+                      </tr>
+                    ) : (
+                      scanLogs.map((log) => (
+                        <tr key={log.id} className="border-b border-[#d3e4fe] dark:border-[#3c4a42] last:border-0 hover:bg-[#e5eeff]/20 dark:hover:bg-[#1e314a]/20">
+                          <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">
+                            {new Date(log.createdAt).toLocaleString("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                              log.status === "approved" ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400"
+                              : log.status === "blocked" ? "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400"
+                              : "bg-orange-50 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400"
+                            }`}>
+                              {log.status === "approved" ? t("admin.scanLog.approved") : log.status === "blocked" ? t("admin.scanLog.blocked") : t("admin.scanLog.error")}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <a href={`/p/${log.pageId}`} target="_blank" rel="noopener noreferrer"
+                              className="text-[#0058be] dark:text-[#adc6ff] hover:underline">
+                              {log.pageId}
+                            </a>
+                          </td>
+                          <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">
+                            {log.reason ?? "-"}
+                          </td>
+                          <td className="px-4 py-3 text-muted-foreground hidden md:table-cell max-w-[200px] truncate">
+                            {log.threats ?? "-"}
+                          </td>
+                          <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">
+                            {log.isAnonymous ? t("admin.log.anonymous") : t("admin.scanLog.userType")}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination */}
+              {scanLogTotal > 20 && (
+                <div className="flex items-center justify-center gap-2">
+                  <Button variant="outline" size="sm" disabled={scanLogPage <= 1} onClick={() => { setScanLogPage(scanLogPage - 1); fetchScanLogsData(scanLogPage - 1); }}>{t("admin.pagination.prev")}</Button>
+                  <span className="text-sm text-muted-foreground">{scanLogPage} / {Math.ceil(scanLogTotal / 20)}</span>
+                  <Button variant="outline" size="sm" disabled={scanLogPage >= Math.ceil(scanLogTotal / 20)} onClick={() => { setScanLogPage(scanLogPage + 1); fetchScanLogsData(scanLogPage + 1); }}>{t("admin.pagination.next")}</Button>
                 </div>
               )}
             </div>
