@@ -18,6 +18,7 @@ import { createApiKey, listApiKeys, revokeApiKey } from "./apikey.service";
 import { detectLangFromHeader } from "./pages.render";
 import { cleanupAnonymousUploads, deletePageObjects } from "./pages.storage";
 import { insertUploadLog } from "../admin/upload-log.repo";
+import { log } from "../../lib/log";
 
 /**
  * Pages 路由层 (HTTP 边界)
@@ -132,12 +133,20 @@ export const pagesRoutes = new Hono<AppEnv>()
     const user = c.get("user");
     const body = await c.req.parseBody();
     const file = body.file;
+    const ip = c.req.header("cf-connecting-ip") || c.req.header("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+
+    log.info("上传请求", {
+      userId: user?.id,
+      isAnonymous: !user,
+      ip,
+      hasFile: file instanceof File,
+      hasContent: typeof body.content === "string" && body.content.length > 0,
+    });
 
     // 匿名上传频率限制：同一 IP 每天最多 5 次
     // 容错：限流表（upload_rate_log）缺失或 D1 异常时「放行」，绝不让限流功能阻塞上传
     if (!user && c.env.D1) {
       try {
-        const ip = c.req.header("cf-connecting-ip") || c.req.header("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
         const dayStart = new Date();
         dayStart.setUTCHours(0, 0, 0, 0);
         const ts = dayStart.getTime();
@@ -152,9 +161,10 @@ export const pagesRoutes = new Hono<AppEnv>()
             zh: "匿名上传已达今日上限（5次/天），请明天再试或登录后上传",
             en: "Anonymous upload limit reached (5/day). Try again tomorrow or log in to upload.",
             es: "Límite de carga anónima alcanzado (5/día). Inténtelo mañana o inicie sesión para subir.",
-            fr: "Limite d\'upload anonyme atteinte (5/jour). Réessayez demain ou connectez-vous.",
+            fr: "Limite d'upload anonyme atteinte (5/jour). Réessayez demain ou connectez-vous.",
             pt: "Limite de upload anônimo atingido (5/dia). Tente amanhã ou faça login para enviar.",
           };
+          log.warn("上传被限流", { ip, count: row.cnt, status: "rate_limited" });
           return c.json({ error: msg[lang] || msg.en }, 429);
         }
 
@@ -164,7 +174,7 @@ export const pagesRoutes = new Hono<AppEnv>()
         ).bind(ip, Date.now()).run();
       } catch (e) {
         // 限流失败不影响上传主流程（仅失去限流能力）
-        console.error("匿名上传限流失败（已放行）:", e);
+        log.error("限流记录失败（已放行）", { error: String(e) });
       }
     }
 
@@ -184,6 +194,15 @@ export const pagesRoutes = new Hono<AppEnv>()
       shareToSquare: body.shareToSquare === "true",
       content: typeof body.content === "string" ? body.content : undefined,
       file: fileInput,
+    });
+
+    log.info("上传成功", {
+      pageId: result.id,
+      userId: user?.id,
+      isAnonymous: result._isAnonymous,
+      title: result.title,
+      url: result.url,
+      status: "success",
     });
 
     // 后台安全扫描（不阻塞响应）

@@ -22,6 +22,7 @@ import {
   isExpiredByUploaded,
 } from "./pages.storage";
 import { injectBanner, notFoundHtml, detectLangFromHeader } from "./pages.render";
+import { log } from "../../lib/log";
 import {
   getMembershipExpiresAt,
   isMemberByUserId,
@@ -434,10 +435,12 @@ export async function scanHtmlInBackground(
   try {
     const { detectAndSanitizeHtml, extractDomains, checkDomainsWithPhishDestroy, detectWithAi } = await import("./html-guard");
 
+    log.info("审核开始", { pageId, isAnonymous, htmlLength: html.length });
+
     // 1. 正则检测 + 净化
     const guard = detectAndSanitizeHtml(html);
     if (!guard.safe) {
-      console.warn(`[html-guard] page ${pageId} blocked:`, guard.threats);
+      log.warn("审核不通过", { pageId, status: "blocked", reason: "regex", threats: guard.threats });
       await deletePageById(ctx, pageId, isAnonymous);
       return;
     }
@@ -447,7 +450,7 @@ export async function scanHtmlInBackground(
     if (domains.length > 0) {
       const domainCheck = await checkDomainsWithPhishDestroy(domains);
       if (!domainCheck.safe) {
-        console.warn(`[html-guard] page ${pageId} phishing domains:`, domainCheck.threats);
+        log.warn("审核不通过", { pageId, status: "blocked", reason: "phishing", threats: domainCheck.threats });
         await deletePageById(ctx, pageId, isAnonymous);
         return;
       }
@@ -457,14 +460,16 @@ export async function scanHtmlInBackground(
     if (ctx.ai) {
       const aiResult = await detectWithAi(ctx.ai, html);
       if (!aiResult.safe) {
-        console.warn(`[html-guard] page ${pageId} AI blocked:`, aiResult.verdict);
+        log.warn("审核不通过", { pageId, status: "blocked", reason: "ai", verdict: aiResult.verdict });
         await deletePageById(ctx, pageId, isAnonymous);
         return;
       }
     }
+
+    log.info("审核通过", { pageId, status: "approved" });
   } catch (e) {
     // 后台扫描失败不影响已上传的页面
-    console.error(`[html-guard] scan failed for page ${pageId}:`, e);
+    log.error("审核异常", { pageId, status: "error", error: String(e) });
   }
 }
 
@@ -483,8 +488,9 @@ async function deletePageById(
       }
     }
     if (!isAnonymous && ctx.d1) await deletePageRecord(ctx.d1, pageId);
+    log.info("page deleted", { pageId, isAnonymous });
   } catch (e) {
-    console.error(`[html-guard] delete failed for page ${pageId}:`, e);
+    log.error("delete failed", { pageId, isAnonymous, error: String(e) });
   }
 }
 

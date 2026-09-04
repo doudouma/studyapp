@@ -1,4 +1,5 @@
 import type { D1Database } from "@cloudflare/workers-types";
+import { log } from "../../lib/log";
 
 export interface UploadLogEntry {
   userId?: string | null;
@@ -41,7 +42,7 @@ export function insertUploadLog(d1: D1Database, entry: UploadLogEntry): void {
       Date.now()
     )
     .run()
-    .catch((e) => console.error("upload log write failed:", e));
+    .catch((e) => log.error("upload log write failed", { pageId: entry.pageId, event: entry.event, error: String(e) }));
 }
 
 export interface LogQueryParams {

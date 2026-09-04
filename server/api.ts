@@ -16,6 +16,7 @@ import { pagesRoutes } from "./features/pages/pages.routes";
 import { adminRoutes } from "./features/admin/admin.routes";
 import { pomodoroRoutes } from "./features/pomodoro/pomodoro.routes";
 import { wardrobeRoutes } from "./features/wardrobe/wardrobe.routes";
+import { log } from "./lib/log";
 
 type Variables = {
   user: { id: string; name: string; email: string; image?: string; role?: string } | null;
@@ -28,7 +29,7 @@ const api = new Hono<{
 }>();
 
 api.onError((err, c) => {
-  console.error("API Error:", err);
+  log.error("API异常", { path: c.req.path, status: "error", error: String(err) });
   return c.json({ error: err.message || "Internal Server Error" }, 500);
 });
 
