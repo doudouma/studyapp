@@ -12,6 +12,7 @@ import {
   serveUserPage,
   serveThumbnail,
   normalizeTags,
+  scanHtmlInBackground,
 } from "./pages.service";
 import { createApiKey, listApiKeys, revokeApiKey } from "./apikey.service";
 import { detectLangFromHeader } from "./pages.render";
@@ -185,22 +186,19 @@ export const pagesRoutes = new Hono<AppEnv>()
       file: fileInput,
     });
 
-    if (c.env.D1) {
-      const ip = c.req.header("cf-connecting-ip") || c.req.header("x-forwarded-for")?.split(",")[0]?.trim() || null;
-      const contentType = fileInput ? (fileInput.filename.endsWith(".zip") ? "zip" : "html") : "html";
-      const fileSize = fileInput ? fileInput.bytes.length : (typeof body.content === "string" ? new Blob([body.content]).size : 0);
-      insertUploadLog(c.env.D1, {
-        userId: user?.id ?? null,
-        pageId: result.id,
-        event: "upload",
-        contentType,
-        isAnonymous: !user,
-        ip,
-        fileSize,
-      });
-    }
+    // 后台安全扫描（不阻塞响应）
+    c.executionCtx.waitUntil(
+      scanHtmlInBackground(
+        { d1: c.env.D1, bucket: c.env?.BUCKET, ai: c.env?.AI },
+        result.id,
+        result._html,
+        result._isAnonymous,
+      )
+    );
 
-    return c.json(result);
+    // 剥离内部字段后返回
+    const { _html, _isAnonymous, ...response } = result;
+    return c.json(response);
   })
 
   // --- API Key management ---
