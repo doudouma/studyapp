@@ -9,6 +9,7 @@ export interface UploadLogEntry {
   isAnonymous: boolean;
   ip?: string | null;
   fileSize?: number | null;
+  status?: string | null;
 }
 
 export interface UploadLogRow {
@@ -20,6 +21,7 @@ export interface UploadLogRow {
   isAnonymous: number;
   ip: string | null;
   fileSize: number | null;
+  status: string | null;
   createdAt: number;
 }
 
@@ -28,8 +30,8 @@ export interface UploadLogRow {
  */
 export function insertUploadLog(d1: D1Database, entry: UploadLogEntry): void {
   d1.prepare(
-    `INSERT INTO upload_log (user_id, page_id, event, content_type, is_anonymous, ip, file_size, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+    `INSERT INTO upload_log (user_id, page_id, event, content_type, is_anonymous, ip, file_size, status, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
   )
     .bind(
       entry.userId ?? null,
@@ -39,6 +41,7 @@ export function insertUploadLog(d1: D1Database, entry: UploadLogEntry): void {
       entry.isAnonymous ? 1 : 0,
       entry.ip ?? null,
       entry.fileSize ?? null,
+      entry.status ?? null,
       Date.now()
     )
     .run()
@@ -107,6 +110,7 @@ export async function queryUploadLogs(
     isAnonymous: r.is_anonymous,
     ip: r.ip ?? null,
     fileSize: r.file_size ?? null,
+    status: r.status ?? null,
     createdAt: r.created_at,
   }));
 

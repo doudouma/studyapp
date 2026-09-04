@@ -88,6 +88,7 @@ function AdminPage() {
     isAnonymous: number;
     ip: string | null;
     fileSize: number | null;
+    status: string | null;
     createdAt: number;
   }>>([]);
   const [logTotal, setLogTotal] = useState(0);
@@ -478,6 +479,7 @@ function AdminPage() {
                     <tr className="border-b border-[#d3e4fe] dark:border-[#3c4a42] bg-[#e5eeff]/30 dark:bg-[#1e314a]/30">
                       <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.log.time")}</th>
                       <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.log.event")}</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">状态</th>
                       <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.log.user")}</th>
                       <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.log.page")}</th>
                       <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95] hidden sm:table-cell">{t("admin.log.type")}</th>
@@ -507,6 +509,15 @@ function AdminPage() {
                               : "bg-orange-50 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400"
                             }`}>
                               {log.event === "upload" ? t("admin.log.upload") : log.event === "delete" ? t("admin.log.delete") : t("admin.log.cleanup")}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                              log.status === "success" ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400"
+                              : log.status === "blocked" ? "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400"
+                              : "bg-gray-50 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400"
+                            }`}>
+                              {log.status === "success" ? "成功" : log.status === "blocked" ? "拦截" : log.status ?? "-"}
                             </span>
                           </td>
                           <td className="px-4 py-3">

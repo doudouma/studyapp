@@ -100,6 +100,7 @@ export interface UploadLogData {
   isAnonymous: number;
   ip: string | null;
   fileSize: number | null;
+  status: string | null;
   createdAt: number;
 }
 

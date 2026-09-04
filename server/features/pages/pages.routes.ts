@@ -205,6 +205,20 @@ export const pagesRoutes = new Hono<AppEnv>()
       status: "success",
     });
 
+    // 写入上传日志
+    if (c.env.D1) {
+      insertUploadLog(c.env.D1, {
+        userId: user?.id ?? null,
+        pageId: result.id,
+        event: "upload",
+        contentType: fileInput ? (fileInput.filename.endsWith(".zip") ? "zip" : "html") : "html",
+        isAnonymous: result._isAnonymous,
+        ip,
+        fileSize: fileInput?.bytes.length ?? null,
+        status: "success",
+      });
+    }
+
     // 后台安全扫描（不阻塞响应）
     c.executionCtx.waitUntil(
       scanHtmlInBackground(
