@@ -174,3 +174,59 @@ crons = ["0 3 * * *"]
 - 路径：`app/server.tsx` → `app.use("/assets/*", ...)` 中间件
 
 **重要：提交代码、部署等操作必须由用户确认后才执行，AI 不得自动执行。**
+
+## 日志规则
+
+### 日志表
+
+| 表名 | 用途 | 保留期 |
+|---|---|---|
+| `upload_log` | 上传记录 | 90 天 |
+| `scan_log` | 审核记录 | 90 天 |
+
+### upload_log 字段
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| id | INTEGER | 自增主键 |
+| user_id | TEXT | 用户ID（匿名为空） |
+| page_id | TEXT | 页面ID |
+| event | TEXT | upload / delete / cleanup |
+| content_type | TEXT | html / zip / thumbnail |
+| is_anonymous | INTEGER | 0=用户 1=匿名 |
+| ip | TEXT | 来源IP |
+| file_size | INTEGER | 文件大小（字节） |
+| status | TEXT | success / blocked |
+| created_at | INTEGER | 时间戳（毫秒） |
+
+### scan_log 字段
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| id | INTEGER | 自增主键 |
+| page_id | TEXT | 页面ID |
+| status | TEXT | approved / blocked / error |
+| reason | TEXT | regex / phishing / ai |
+| threats | TEXT | 威胁详情 JSON |
+| html_length | INTEGER | HTML 大小 |
+| is_anonymous | INTEGER | 0=用户 1=匿名 |
+| created_at | INTEGER | 时间戳（毫秒） |
+
+### 日志写入时机
+
+| 事件 | 表 | status |
+|---|---|---|
+| 上传成功 | upload_log | success |
+| 审核不通过（正则） | upload_log + scan_log | blocked |
+| 审核不通过（钓鱼） | upload_log + scan_log | blocked |
+| 审核不通过（AI） | upload_log + scan_log | blocked |
+| 审核通过 | scan_log | approved |
+| 审核异常 | scan_log | error |
+| 删除页面 | upload_log | - |
+| 清理过期 | upload_log | - |
+
+### 定时清理
+
+- Cron: `0 3 * * *` (每天 UTC 3:00)
+- 逻辑: `DELETE FROM upload_log/scan_log WHERE created_at < (now - 90天)`
+- 位置: `app/server.tsx` → `cleanupExpiredUploadLogs()`
