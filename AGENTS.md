@@ -183,6 +183,7 @@ crons = ["0 3 * * *"]
 |---|---|---|
 | `upload_log` | 上传记录 | 90 天 |
 | `scan_log` | 审核记录 | 90 天 |
+| `upload_rate_log` | 匿名限流 | 90 天 |
 
 ### upload_log 字段
 
@@ -228,5 +229,5 @@ crons = ["0 3 * * *"]
 ### 定时清理
 
 - Cron: `0 3 * * *` (每天 UTC 3:00)
-- 逻辑: `DELETE FROM upload_log/scan_log WHERE created_at < (now - 90天)`
+- 逻辑: `DELETE FROM upload_log/scan_log/upload_rate_log WHERE created_at < (now - 90天)`
 - 位置: `app/server.tsx` → `cleanupExpiredUploadLogs()`

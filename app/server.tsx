@@ -206,14 +206,15 @@ export async function scheduled(_event: ScheduledEvent, env: Bindings, _ctx: Exe
     }
   }
 
-  // Cleanup old upload logs (90 days)
+  // Cleanup old logs (90 days)
   if (env.D1) {
     try {
-      const { deleteOldUploadLogs, deleteOldScanLogs } = await import("./../server/features/admin/upload-log.repo");
+      const { deleteOldUploadLogs, deleteOldScanLogs, deleteOldRateLogs } = await import("./../server/features/admin/upload-log.repo");
       const cutoff = Date.now() - 90 * 24 * 60 * 60 * 1000;
       const uploadCount = await deleteOldUploadLogs(env.D1, cutoff);
       const scanCount = await deleteOldScanLogs(env.D1, cutoff);
-      console.log(`[cron] cleaned up ${uploadCount} old upload log(s), ${scanCount} old scan log(s)`);
+      const rateCount = await deleteOldRateLogs(env.D1, cutoff);
+      console.log(`[cron] cleaned up ${uploadCount} upload log(s), ${scanCount} scan log(s), ${rateCount} rate log(s)`);
     } catch (err) {
       console.error("[cron] log cleanup failed:", err);
     }

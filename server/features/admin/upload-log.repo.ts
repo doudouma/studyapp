@@ -139,3 +139,13 @@ export async function deleteOldScanLogs(
     .run();
   return result.meta.changes ?? 0;
 }
+
+export async function deleteOldRateLogs(
+  d1: D1Database,
+  cutoffMs: number
+): Promise<number> {
+  const result = await d1.prepare("DELETE FROM upload_rate_log WHERE created_at < ?")
+    .bind(cutoffMs)
+    .run();
+  return result.meta.changes ?? 0;
+}
