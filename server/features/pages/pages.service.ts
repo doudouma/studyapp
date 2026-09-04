@@ -274,7 +274,7 @@ export interface CreateUploadInput {
   file?: PageFileInput;
 }
 
-export async function createUpload(input: CreateUploadInput): Promise<UploadResult> {
+export async function createUpload(input: CreateUploadInput): Promise<UploadResult & { _html: string; _isAnonymous: boolean }> {
   const { d1, bucket, user } = input;
   const title = input.title.trim();
 
@@ -343,34 +343,6 @@ export async function createUpload(input: CreateUploadInput): Promise<UploadResu
     throw new ServiceError(400, "请提供 HTML 内容或上传文件");
   }
 
-  // 恶意 HTML 检测 + 净化（sanitize-html + 钓鱼关键词 + PhishDestroy + AI）
-  const { detectAndSanitizeHtml, extractDomains, checkDomainsWithPhishDestroy, detectWithAi } = await import("./html-guard");
-  const guard = detectAndSanitizeHtml(html);
-  if (!guard.safe) {
-    const detail = guard.threats.map((t) => `${t.label}(${t.count})`).join(", ");
-    throw new ServiceError(400, `检测到不安全内容：${detail}`);
-  }
-  // 使用净化后的 HTML 存储（剥离 iframe/object/embed 等）
-  html = guard.sanitizedHtml || html;
-
-  // PhishDestroy 域名检查（提取 HTML 中的外部域名，检查是否为钓鱼站点）
-  const domains = extractDomains(html);
-  if (domains.length > 0) {
-    const domainCheck = await checkDomainsWithPhishDestroy(domains);
-    if (!domainCheck.safe) {
-      const detail = domainCheck.threats.map((t) => `${t.domain}(${t.severity}, ${t.score}分)`).join(", ");
-      throw new ServiceError(400, `检测到钓鱼域名：${detail}`);
-    }
-  }
-
-  // AI 辅助检测（所有用户上传均触发）
-  if (input.ai) {
-    const aiResult = await detectWithAi(input.ai, html);
-    if (!aiResult.safe) {
-      throw new ServiceError(400, `AI 检测到不安全内容：${aiResult.verdict}`);
-    }
-  }
-
   const id = nanoid(7);
   const now = Date.now();
   const isAnonymous = !user;
@@ -434,7 +406,86 @@ export async function createUpload(input: CreateUploadInput): Promise<UploadResu
     title,
     isSharedToSquare: input.shareToSquare,
     previewPath: null,
+    /** @internal 后台扫描用，不暴露给前端 */
+    _html: html,
+    _isAnonymous: isAnonymous,
   };
+}
+
+// ---------- 后台安全扫描 ----------
+
+export interface ScanContext {
+  d1?: D1Database;
+  bucket?: R2Bucket;
+  ai?: Ai;
+}
+
+/**
+ * 后台扫描已上传的 HTML 内容
+ * 上传成功后异步调用，不阻塞用户响应
+ * 检测不通过时自动删除页面
+ */
+export async function scanHtmlInBackground(
+  ctx: ScanContext,
+  pageId: string,
+  html: string,
+  isAnonymous: boolean,
+): Promise<void> {
+  try {
+    const { detectAndSanitizeHtml, extractDomains, checkDomainsWithPhishDestroy, detectWithAi } = await import("./html-guard");
+
+    // 1. 正则检测 + 净化
+    const guard = detectAndSanitizeHtml(html);
+    if (!guard.safe) {
+      console.warn(`[html-guard] page ${pageId} blocked:`, guard.threats);
+      await deletePageById(ctx, pageId, isAnonymous);
+      return;
+    }
+
+    // 2. 钓鱼域名检查
+    const domains = extractDomains(html);
+    if (domains.length > 0) {
+      const domainCheck = await checkDomainsWithPhishDestroy(domains);
+      if (!domainCheck.safe) {
+        console.warn(`[html-guard] page ${pageId} phishing domains:`, domainCheck.threats);
+        await deletePageById(ctx, pageId, isAnonymous);
+        return;
+      }
+    }
+
+    // 3. AI 辅助检测
+    if (ctx.ai) {
+      const aiResult = await detectWithAi(ctx.ai, html);
+      if (!aiResult.safe) {
+        console.warn(`[html-guard] page ${pageId} AI blocked:`, aiResult.verdict);
+        await deletePageById(ctx, pageId, isAnonymous);
+        return;
+      }
+    }
+  } catch (e) {
+    // 后台扫描失败不影响已上传的页面
+    console.error(`[html-guard] scan failed for page ${pageId}:`, e);
+  }
+}
+
+/** 删除页面的所有资源（R2 + D1） */
+async function deletePageById(
+  ctx: ScanContext,
+  pageId: string,
+  isAnonymous: boolean,
+): Promise<void> {
+  try {
+    if (ctx.bucket) {
+      if (isAnonymous) {
+        await deleteTmpByBucketId(ctx.bucket, pageId);
+      } else {
+        await deletePageObjects(ctx.bucket, pageId);
+      }
+    }
+    if (!isAnonymous && ctx.d1) await deletePageRecord(ctx.d1, pageId);
+  } catch (e) {
+    console.error(`[html-guard] delete failed for page ${pageId}:`, e);
+  }
 }
 
 // ---------- 缩略图 ----------

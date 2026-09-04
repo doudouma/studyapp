@@ -12,6 +12,7 @@ import {
   serveUserPage,
   serveThumbnail,
   normalizeTags,
+  scanHtmlInBackground,
 } from "./pages.service";
 import { createApiKey, listApiKeys, revokeApiKey } from "./apikey.service";
 import { detectLangFromHeader } from "./pages.render";
@@ -174,7 +175,20 @@ export const pagesRoutes = new Hono<AppEnv>()
       content: typeof body.content === "string" ? body.content : undefined,
       file: fileInput,
     });
-    return c.json(result);
+
+    // 后台安全扫描（不阻塞响应）
+    c.executionCtx.waitUntil(
+      scanHtmlInBackground(
+        { d1: c.env.D1, bucket: c.env?.BUCKET, ai: c.env?.AI },
+        result.id,
+        result._html,
+        result._isAnonymous,
+      )
+    );
+
+    // 剥离内部字段后返回
+    const { _html, _isAnonymous, ...response } = result;
+    return c.json(response);
   })
 
   // --- API Key management ---
