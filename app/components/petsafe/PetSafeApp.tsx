@@ -592,20 +592,16 @@ export default function PetSafeApp() {
                     <BadgeCheck className="w-5 h-5 text-[#3366ff]" />
                     <span>{t("petsafe.qr.title")}</span>
                   </h3>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <div className="bubble tail-b bg-[#ffcc00] px-3 py-1.5 text-[11px] font-black uppercase">{t("petsafe.qr.subtitle")}</div>
-                    <label className="flex items-center gap-1.5 text-[11px] font-black cursor-pointer">
-                      <input type="checkbox" checked={shareToSquare} onChange={(e) => setShareToSquare(e.target.checked)} className="chk" />
-                      <span>{t("petsafe.qr.shareToSquare")}</span>
-                    </label>
-                    <button onClick={handleGenerateQR} disabled={generating} className={`btn-comic px-3 py-1.5 text-[11px] ${generating ? "opacity-50 cursor-not-allowed" : ""}`}>
-                      <QrCode className="w-4 h-4" />
-                      <span>{generating ? t("petsafe.qr.generating") : t("petsafe.qr.generateBtn")}</span>
-                    </button>
-                  </div>
+                  <div className="bubble tail-b bg-[#ffcc00] px-3 py-1.5 text-[11px] font-black uppercase">{t("petsafe.qr.subtitle")}</div>
                 </div>
 
-                {generatedUrl && (
+                {!generatedUrl ? (
+                    <button onClick={handleGenerateQR} disabled={generating} className={`btn-comic w-full px-6 py-3 text-base ${generating ? "opacity-50 cursor-not-allowed" : ""}`}>
+                      <QrCode className="w-5 h-5" />
+                      <span>{generating ? t("petsafe.qr.generating") : t("petsafe.qr.generateBtn")}</span>
+                    </button>
+                ) : (
+                  <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
                   <div className="card-comic group p-5 flex flex-col items-center text-center justify-between aspect-[1.5/1]">
                     <div className="w-5 h-5 rounded-full border-4 border-[#1a1a1a] bg-[#fffef0]" />
@@ -637,6 +633,7 @@ export default function PetSafeApp() {
                     <span className="badge-new"><span className="starburst relative w-full h-full bg-[#ffcc00] flex items-center justify-center font-black uppercase text-[10px] text-[#1a1a1a]">24H!</span></span>
                   </div>
                 </div>
+                  </>
                 )}
               </div>
 
@@ -647,6 +644,7 @@ export default function PetSafeApp() {
                     <span>{t("petsafe.qr.generatedUrl")}</span>
                   </div>
                   <div className="bg-[#fffef0] border-2 border-[#1a1a1a] p-2 font-mono text-[11px] break-all">{generatedUrl}</div>
+                  <p className="text-[10px] font-bold text-[#4a4a4a]">{t("petsafe.qr.uploadHint")}</p>
                 </div>
               )}
 
