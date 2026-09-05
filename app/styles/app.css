@@ -222,7 +222,7 @@ body::before {
     --zap: #ffcc00;
     --info: #3366ff;
     --go: #33cc33;
-    --muted: #4a4a4a;
+    --comic-muted: #4a4a4a;
     --stroke-2: -2px 0 #1a1a1a, 2px 0 #1a1a1a, 0 -2px #1a1a1a, 0 2px #1a1a1a, -2px -2px #1a1a1a, 2px 2px #1a1a1a, -2px 2px #1a1a1a, 2px -2px #1a1a1a;
     --stroke-15: -1.5px 0 #1a1a1a, 1.5px 0 #1a1a1a, 0 -1.5px #1a1a1a, 0 1.5px #1a1a1a, -1.5px -1.5px #1a1a1a, 1.5px 1.5px #1a1a1a, -1.5px 1.5px #1a1a1a, 1.5px -1.5px #1a1a1a;
 }
@@ -343,7 +343,7 @@ body::before {
     box-shadow: 4px 4px 0 var(--ink);
     transform: translate(-2px, -2px);
 }
-.input-comic::placeholder { color: var(--muted); font-weight: 700; }
+.input-comic::placeholder { color: var(--comic-muted); font-weight: 700; }
 select.input-comic { cursor: pointer; }
 .input-zap { background: var(--zap); }
 .label-comic {
