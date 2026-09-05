@@ -15,6 +15,7 @@ import { Route as SquareRouteImport } from './routes/square'
 import { Route as RhythmRouteImport } from './routes/rhythm'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PomodoroRouteImport } from './routes/pomodoro'
+import { Route as PetsafeRouteImport } from './routes/petsafe'
 import { Route as PetbadgeRouteImport } from './routes/petbadge'
 import { Route as Md2htmlRouteImport } from './routes/md2html'
 import { Route as LinksRouteImport } from './routes/links'
@@ -54,6 +55,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const PomodoroRoute = PomodoroRouteImport.update({
   id: '/pomodoro',
   path: '/pomodoro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PetsafeRoute = PetsafeRouteImport.update({
+  id: '/petsafe',
+  path: '/petsafe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PetbadgeRoute = PetbadgeRouteImport.update({
@@ -118,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/links': typeof LinksRoute
   '/md2html': typeof Md2htmlRoute
   '/petbadge': typeof PetbadgeRoute
+  '/petsafe': typeof PetsafeRoute
   '/pomodoro': typeof PomodoroRoute
   '/privacy': typeof PrivacyRoute
   '/rhythm': typeof RhythmRoute
@@ -136,6 +143,7 @@ export interface FileRoutesByTo {
   '/links': typeof LinksRoute
   '/md2html': typeof Md2htmlRoute
   '/petbadge': typeof PetbadgeRoute
+  '/petsafe': typeof PetsafeRoute
   '/pomodoro': typeof PomodoroRoute
   '/privacy': typeof PrivacyRoute
   '/rhythm': typeof RhythmRoute
@@ -155,6 +163,7 @@ export interface FileRoutesById {
   '/links': typeof LinksRoute
   '/md2html': typeof Md2htmlRoute
   '/petbadge': typeof PetbadgeRoute
+  '/petsafe': typeof PetsafeRoute
   '/pomodoro': typeof PomodoroRoute
   '/privacy': typeof PrivacyRoute
   '/rhythm': typeof RhythmRoute
@@ -175,6 +184,7 @@ export interface FileRouteTypes {
     | '/links'
     | '/md2html'
     | '/petbadge'
+    | '/petsafe'
     | '/pomodoro'
     | '/privacy'
     | '/rhythm'
@@ -193,6 +203,7 @@ export interface FileRouteTypes {
     | '/links'
     | '/md2html'
     | '/petbadge'
+    | '/petsafe'
     | '/pomodoro'
     | '/privacy'
     | '/rhythm'
@@ -211,6 +222,7 @@ export interface FileRouteTypes {
     | '/links'
     | '/md2html'
     | '/petbadge'
+    | '/petsafe'
     | '/pomodoro'
     | '/privacy'
     | '/rhythm'
@@ -230,6 +242,7 @@ export interface RootRouteChildren {
   LinksRoute: typeof LinksRoute
   Md2htmlRoute: typeof Md2htmlRoute
   PetbadgeRoute: typeof PetbadgeRoute
+  PetsafeRoute: typeof PetsafeRoute
   PomodoroRoute: typeof PomodoroRoute
   PrivacyRoute: typeof PrivacyRoute
   RhythmRoute: typeof RhythmRoute
@@ -280,6 +293,13 @@ declare module '@tanstack/react-router' {
       path: '/pomodoro'
       fullPath: '/pomodoro'
       preLoaderRoute: typeof PomodoroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/petsafe': {
+      id: '/petsafe'
+      path: '/petsafe'
+      fullPath: '/petsafe'
+      preLoaderRoute: typeof PetsafeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/petbadge': {
@@ -366,6 +386,7 @@ const rootRouteChildren: RootRouteChildren = {
   LinksRoute: LinksRoute,
   Md2htmlRoute: Md2htmlRoute,
   PetbadgeRoute: PetbadgeRoute,
+  PetsafeRoute: PetsafeRoute,
   PomodoroRoute: PomodoroRoute,
   PrivacyRoute: PrivacyRoute,
   RhythmRoute: RhythmRoute,

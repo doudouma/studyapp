@@ -138,6 +138,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           {hreflangLinks.map((l) => (
             <link key={l.hrefLang} rel={l.rel} hrefLang={l.hrefLang} href={l.href} />
           ))}
+          {/* Comic fonts for PetSafe/PetBadge */}
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+          <link href="https://fonts.googleapis.com/css2?family=Bangers&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet" />
         </head>
         <body>
           <div id="root">{children}</div>
