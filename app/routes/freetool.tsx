@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Timer, Music, FileText, FileCode2, Camera, ArrowRight, Sparkles } from "lucide-react";
+import { Timer, Music, FileText, FileCode2, Camera, ArrowRight, Sparkles, PawPrint } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { useTranslation } from "react-i18next";
@@ -65,6 +65,12 @@ export const Route = createFileRoute("/freetool")({
                 name: i18n.t("freetool.item.idphoto.title"),
                 url: "https://100mini.com/idphoto",
               },
+              {
+                "@type": "ListItem",
+                position: 6,
+                name: i18n.t("freetool.item.petbadge.title"),
+                url: "https://100mini.com/petbadge",
+              },
             ],
           }),
         },
@@ -107,6 +113,12 @@ function FreeToolPage() {
       icon: Camera,
       title: t("freetool.item.idphoto.title"),
       desc: t("freetool.item.idphoto.desc"),
+    },
+    {
+      href: "/petbadge" as const,
+      icon: PawPrint,
+      title: t("freetool.item.petbadge.title"),
+      desc: t("freetool.item.petbadge.desc"),
     },
   ];
 
