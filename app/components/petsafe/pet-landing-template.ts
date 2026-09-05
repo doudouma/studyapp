@@ -31,7 +31,7 @@ export function generatePetLandingHTML(data: PetLandingData, t: (key: string) =>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>PAW&CLAW Safe - ${data.name || "Lost Pet"}</title>
+<title>Pet Safe - ${data.name || "Lost Pet"}</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#fffef0;color:#1a1a1a;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px}
@@ -87,7 +87,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
     <a href="tel:${data.ownerPhone}" class="btn btn-call" style="color:#fff;text-decoration:none">
       &#x1F4DE; ${t("petsafe.qr.callOwner")}
     </a>
-    <div class="phone">${data.ownerPhone || t("petsafe.poster.phoneEmpty")}</div>
     <div class="label">${t("petsafe.poster.ownerPrefix")}${data.ownerName || t("petsafe.poster.ownerEmpty")}</div>
   </div>
 
@@ -97,7 +96,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
   </div>
 </div>
 
-<div class="footer">PAW&amp;CLAW SAFE · ${t("petsafe.poster.footer")}</div>
+<div class="footer">Pet Safe · ${t("petsafe.poster.footer")}</div>
 
 </body>
 </html>`;

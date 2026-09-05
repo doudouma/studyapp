@@ -14,9 +14,6 @@ import {
   ListChecks,
   Download,
   Printer,
-  BellRing,
-  PhoneCall,
-  Navigation,
   CheckCircle,
   AlertTriangle,
   Clock,
@@ -148,8 +145,8 @@ export default function PetSafeApp() {
 
   const posterRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const qrCanvasRef = useRef<HTMLCanvasElement>(null);
   const tagQrCanvasRef = useRef<HTMLCanvasElement>(null);
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
 
   const update = useCallback((patch: Partial<PetState>) => {
     setState((prev) => ({ ...prev, ...patch }));
@@ -162,24 +159,31 @@ export default function PetSafeApp() {
 
   useEffect(() => {
     const url = generatedUrl || `https://pawclaw.safe/p/${state.chipId}`;
-    // Small delay to ensure canvas is in DOM after tab switch
+    let cancelled = false;
+    // Generate data URL for poster <img>
+    QRCode.toDataURL(url, {
+      width: 160,
+      margin: 1,
+      color: { dark: "#1a1a1a", light: "#ffffff" },
+    }).then((dataUrl) => {
+      if (!cancelled) setQrDataUrl(dataUrl);
+    }).catch((e) => console.error("QR dataURL error:", e));
+    // Render to canvas for QR tag tab
     const timer = setTimeout(() => {
-      if (qrCanvasRef.current) {
-        QRCode.toCanvas(qrCanvasRef.current, url, {
-          width: 64,
-          margin: 1,
-          color: { dark: "#1a1a1a", light: "#ffffff" },
-        });
+      if (cancelled) return;
+      try {
+        if (tab === "qr" && tagQrCanvasRef.current) {
+          QRCode.toCanvas(tagQrCanvasRef.current, url, {
+            width: 80,
+            margin: 1,
+            color: { dark: "#1a1a1a", light: "#ffffff" },
+          });
+        }
+      } catch (e) {
+        console.error("QR canvas error:", e);
       }
-      if (tagQrCanvasRef.current) {
-        QRCode.toCanvas(tagQrCanvasRef.current, url, {
-          width: 80,
-          margin: 1,
-          color: { dark: "#1a1a1a", light: "#ffffff" },
-        });
-      }
-    }, 50);
-    return () => clearTimeout(timer);
+    }, 150);
+    return () => { cancelled = true; clearTimeout(timer); };
   }, [generatedUrl, state.chipId, tab]);
 
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -231,7 +235,7 @@ export default function PetSafeApp() {
 
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("title", `PAW&CLAW Safe - ${state.name || "Pet"}`);
+      formData.append("title", `Pet Safe - ${state.name || "Pet"}`);
       formData.append("category", "petsafe");
       formData.append("tags", "petsafe,qr,lost-pet");
       formData.append("shareToSquare", String(shareToSquare));
@@ -330,7 +334,7 @@ export default function PetSafeApp() {
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-bang text-2xl md:text-3xl uppercase tracking-wide leading-none ink-title">PAW&amp;CLAW SAFE</span>
+                <span className="font-bang text-2xl md:text-3xl uppercase tracking-wide leading-none ink-title">Pet Safe</span>
                 <span className="bg-[#1a1a1a] text-[#ffcc00] px-2 py-0.5 text-[10px] font-black uppercase tracking-wide">{t("petsafe.header.badge")}</span>
               </div>
               <p className="mt-1.5 inline-block bg-white border-4 border-[#1a1a1a] px-2 py-0.5 text-[10px] md:text-[11px] font-bold shadow-[3px_3px_0_rgba(26,26,26,1)]">{t("petsafe.header.subtitle")}</p>
@@ -500,51 +504,80 @@ export default function PetSafeApp() {
               </div>
 
               <div className="flex justify-center items-start py-2 overflow-auto">
-                <div ref={posterRef} className="bg-white text-[#1a1a1a] border-4 border-[#1a1a1a] shadow-[16px_16px_0_rgba(26,26,26,1)] transition-all duration-100 flex flex-col justify-between" style={{ width: ratioStyles[ratio].width, minHeight: ratio === "a4" ? "537px" : undefined, aspectRatio: ratioStyles[ratio].aspectRatio }}>
-                  <div className="relative bg-[#ff3333] text-white px-4 py-3 text-center border-b-4 border-[#1a1a1a] overflow-hidden">
-                    <div className="absolute inset-0 halftone opacity-10 pointer-events-none" />
-                    <div className="relative flex items-center justify-center gap-2 text-2xl sm:text-3xl font-black uppercase tracking-wider ink-stroke">
-                      <AlertTriangle className="w-7 h-7" />
-                      <span>{t("petsafe.poster.emergency")}</span>
-                    </div>
-                    {state.tagReward && state.reward && (
-                      <div className="relative inline-block bg-[#ffcc00] text-[#1a1a1a] border-4 border-[#1a1a1a] px-3 py-0.5 mt-2 text-sm font-black uppercase shadow-[3px_3px_0_rgba(26,26,26,1)]">{t("petsafe.poster.reward")} {state.reward}</div>
-                    )}
-                  </div>
-                  <div className="action-lines h-2 border-b-4 border-[#1a1a1a]" />
-                  <div className="p-4 space-y-3 flex-1 flex flex-col">
-                    <div className="relative w-full aspect-[4/3] overflow-hidden border-4 border-[#1a1a1a] bg-[#fffef0]">
-                      <img src={state.avatarUrl} alt="Lost Pet" className="w-full h-full object-cover" />
-                      <div className="absolute bottom-2 left-2 right-2 flex flex-wrap gap-1.5">
-                        {state.tagMedical && <span className="px-2 py-0.5 text-[11px] font-black uppercase bg-[#ff3333] text-white ink-stroke-sm shadow-[3px_3px_0_rgba(26,26,26,1)]">{t("petsafe.form.tagMedical")}</span>}
-                        {state.tagTimid && <span className="px-2 py-0.5 text-[11px] font-black uppercase bg-[#ffcc00] text-[#1a1a1a] shadow-[3px_3px_0_rgba(26,26,26,1)]">{t("petsafe.form.tagTimid")}</span>}
+                <div ref={posterRef} className="bg-white text-[#1a1a1a] border-4 border-[#1a1a1a] shadow-[16px_16px_0_rgba(26,26,26,1)] transition-all duration-100 flex flex-col justify-between overflow-hidden" style={{ width: ratioStyles[ratio].width, ...(ratio === "square" ? { aspectRatio: "1/1" } : ratio === "story" ? { aspectRatio: "9/16" } : { minHeight: "537px" }) }}>
+                  {ratio === "square" ? (
+                    /* Square: avatar + QR overlay + name + breed + tags */
+                    <div className="flex flex-col items-center justify-center h-full p-5 gap-3">
+                      <div className="relative bg-[#ff3333] text-white px-4 py-2 text-center border-4 border-[#1a1a1a] shadow-[4px_4px_0_rgba(26,26,26,1)] w-full">
+                        <div className="flex items-center justify-center gap-2 text-xl font-black uppercase tracking-wider ink-stroke">
+                          <AlertTriangle className="w-5 h-5" />
+                          <span>{t("petsafe.poster.emergency")}</span>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex flex-col gap-1 text-left">
-                      <div className="flex items-baseline justify-between gap-2 border-b-4 border-[#1a1a1a] pb-1.5">
-                        <span className="font-bang text-xl uppercase tracking-wide">{state.name || t("petsafe.poster.unnamed")}</span>
-                        <span className="text-[11px] font-black uppercase text-right">{state.breed} / {state.gender}</span>
+                      <div className="relative w-full max-w-[280px]">
+                        <div className="w-full aspect-square border-4 border-[#1a1a1a] overflow-hidden bg-[#fffef0] shadow-[4px_4px_0_rgba(26,26,26,1)]">
+                          <img src={state.avatarUrl} alt="Pet" className="w-full h-full object-cover" />
+                        </div>
+                        <div className="absolute -bottom-3 -right-3 bg-white border-4 border-[#1a1a1a] p-1.5 shadow-[3px_3px_0_rgba(26,26,26,1)]">
+                          {qrDataUrl && <img src={qrDataUrl} alt="QR Code" width={64} height={64} />}
+                        </div>
                       </div>
-                      <div className="flex flex-col gap-1 text-[11px] font-bold leading-snug">
-                        <p><span className="font-black uppercase">{t("petsafe.poster.feature")}</span> {state.features || t("petsafe.poster.featureEmpty")}</p>
-                        <p><span className="font-black uppercase bg-[#ffcc00] px-1">{t("petsafe.poster.location")}</span> <span className="font-black">{state.lostLocation || t("petsafe.poster.locationEmpty")}</span></p>
-                        <p><span className="font-black uppercase">{t("petsafe.poster.time")}</span> {state.lostTime || t("petsafe.poster.timeEmpty")}</p>
-                        <p className="text-[10px] text-[#4a4a4a]"><span className="font-black text-[#1a1a1a]">{t("petsafe.poster.chip")}</span> <span className="font-mono font-bold">{state.chipId || t("petsafe.poster.chipEmpty")}</span></p>
+                      <div className="text-center mt-2">
+                        <div className="font-bang text-2xl uppercase tracking-wide">{state.name || t("petsafe.poster.unnamed")}</div>
                       </div>
-                    </div>
-                    <div className="mt-auto bubble tail-t bg-white px-3 py-2.5 flex items-center justify-between gap-3">
-                      <div className="flex flex-col gap-1 min-w-0">
-                        <div className="text-[11px] font-black uppercase">{t("petsafe.poster.contactHint")}</div>
-                        <div className="inline-block self-start bg-[#ff3333] text-white ink-stroke px-2 py-0.5 text-lg font-black tracking-tight font-mono">{state.ownerPhone || t("petsafe.poster.phoneEmpty")}</div>
+                      <div className="flex flex-col items-center gap-1 text-center">
+                        <div className="bg-[#ff3333] text-white ink-stroke px-3 py-1 text-base font-black tracking-tight font-mono">{state.ownerPhone || t("petsafe.poster.phoneEmpty")}</div>
                         <div className="text-[10px] font-bold text-[#4a4a4a]">{t("petsafe.poster.ownerPrefix")}{state.ownerName || t("petsafe.poster.ownerEmpty")}</div>
                       </div>
-                      <div className="flex flex-col items-center shrink-0">
-                        <div className="bg-white border-4 border-[#1a1a1a] p-1"><canvas ref={qrCanvasRef} /></div>
-                        <span className="text-[8px] font-black uppercase mt-1">{t("petsafe.poster.scanHint")}</span>
-                      </div>
                     </div>
-                  </div>
-                  <div className="bg-[#1a1a1a] text-white text-[10px] py-1.5 text-center font-black uppercase tracking-[0.2em]">{t("petsafe.poster.footer")}</div>
+                  ) : (
+                    /* A4 / Story: full poster */
+                    <>
+                    <div className="relative bg-[#ff3333] text-white px-3 py-2.5 text-center border-b-4 border-[#1a1a1a] overflow-hidden">
+                    <div className="absolute inset-0 halftone opacity-10 pointer-events-none" />
+                    <div className="relative flex flex-wrap items-center justify-center gap-1 sm:gap-2 text-sm sm:text-xl md:text-2xl font-black uppercase tracking-wider ink-stroke">
+                      <AlertTriangle className="w-4 h-4 sm:w-6 sm:h-6 md:w-7 md:h-7" />
+                      <span>{t("petsafe.poster.emergency")}</span>
+                    </div>
+                        {state.tagReward && state.reward && (
+                          <div className="relative inline-block bg-[#ffcc00] text-[#1a1a1a] border-4 border-[#1a1a1a] px-3 py-0.5 mt-2 text-sm font-black uppercase shadow-[3px_3px_0_rgba(26,26,26,1)]">{t("petsafe.poster.reward")} {state.reward}</div>
+                        )}
+                      </div>
+                      <div className="action-lines h-2 border-b-4 border-[#1a1a1a]" />
+                      <div className="p-4 space-y-3 flex-1 flex flex-col">
+                        <div className="relative w-full aspect-[4/3] overflow-hidden border-4 border-[#1a1a1a] bg-[#fffef0]">
+                          <img src={state.avatarUrl} alt="Lost Pet" className="w-full h-full object-cover" />
+                          <div className="absolute bottom-2 left-2 right-2 flex flex-wrap gap-1.5">
+                            {state.tagMedical && <span className="px-2 py-0.5 text-[11px] font-black uppercase bg-[#ff3333] text-white ink-stroke-sm shadow-[3px_3px_0_rgba(26,26,26,1)]">{t("petsafe.form.tagMedical")}</span>}
+                            {state.tagTimid && <span className="px-2 py-0.5 text-[11px] font-black uppercase bg-[#ffcc00] text-[#1a1a1a] shadow-[3px_3px_0_rgba(26,26,26,1)]">{t("petsafe.form.tagTimid")}</span>}
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-1 text-left">
+                          <div className="flex items-baseline justify-between gap-2 border-b-4 border-[#1a1a1a] pb-1.5">
+                            <span className="font-bang text-xl uppercase tracking-wide">{state.name || t("petsafe.poster.unnamed")}</span>
+                            <span className="text-[11px] font-black uppercase text-right">{state.breed} / {state.gender}</span>
+                          </div>
+                          <div className="flex flex-col gap-1 text-[11px] font-bold leading-snug">
+                            <p><span className="font-black uppercase">{t("petsafe.poster.feature")}</span> {state.features || t("petsafe.poster.featureEmpty")}</p>
+                            <p><span className="font-black uppercase bg-[#ffcc00] px-1">{t("petsafe.poster.location")}</span> <span className="font-black">{state.lostLocation || t("petsafe.poster.locationEmpty")}</span></p>
+                            <p><span className="font-black uppercase">{t("petsafe.poster.time")}</span> {state.lostTime || t("petsafe.poster.timeEmpty")}</p>
+                            <p className="text-[10px] text-[#4a4a4a]"><span className="font-black text-[#1a1a1a]">{t("petsafe.poster.chip")}</span> <span className="font-mono font-bold">{state.chipId || t("petsafe.poster.chipEmpty")}</span></p>
+                          </div>
+                        </div>
+                        <div className="mt-auto bubble tail-t bg-white px-3 py-2.5 flex items-center justify-between gap-3">
+                          <div className="flex flex-col gap-1 min-w-0">
+                            <div className="inline-block self-start bg-[#ff3333] text-white ink-stroke px-2 py-0.5 text-lg font-black tracking-tight font-mono">{state.ownerPhone || t("petsafe.poster.phoneEmpty")}</div>
+                            <div className="text-[10px] font-bold text-[#4a4a4a]">{t("petsafe.poster.ownerPrefix")}{state.ownerName || t("petsafe.poster.ownerEmpty")}</div>
+                          </div>
+                          <div className="flex flex-col items-center shrink-0">
+                            <div className="bg-white border-4 border-[#1a1a1a] p-1">{qrDataUrl && <img src={qrDataUrl} alt="QR Code" width={64} height={64} />}</div>
+                            <span className="text-[8px] font-black uppercase mt-1">{t("petsafe.poster.scanHint")}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="bg-[#1a1a1a] text-white text-[10px] py-1.5 text-center font-black uppercase tracking-[0.2em]">{t("petsafe.poster.footer")}</div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -572,6 +605,7 @@ export default function PetSafeApp() {
                   </div>
                 </div>
 
+                {generatedUrl && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
                   <div className="card-comic group p-5 flex flex-col items-center text-center justify-between aspect-[1.5/1]">
                     <div className="w-5 h-5 rounded-full border-4 border-[#1a1a1a] bg-[#fffef0]" />
@@ -589,7 +623,7 @@ export default function PetSafeApp() {
                   <div className="card-comic group p-5 flex flex-col items-center text-center justify-between aspect-[1.5/1]">
                     <div className="w-5 h-5 rounded-full border-4 border-[#1a1a1a] bg-[#fffef0]" />
                     <div className="flex items-center gap-4 my-auto">
-                      <div className="bg-white border-4 border-[#1a1a1a] p-1.5"><canvas ref={tagQrCanvasRef} /></div>
+                      <div className="bg-white border-4 border-[#1a1a1a] p-1.5"><canvas ref={tagQrCanvasRef} width={80} height={80} /></div>
                       <div className="text-left flex flex-col gap-1">
                         <div className="text-sm font-black uppercase text-[#ff3333]">{t("petsafe.qr.scanContact")}</div>
                         <div className="text-[11px] leading-tight font-bold text-[#1a1a1a]">
@@ -603,6 +637,7 @@ export default function PetSafeApp() {
                     <span className="badge-new"><span className="starburst relative w-full h-full bg-[#ffcc00] flex items-center justify-center font-black uppercase text-[10px] text-[#1a1a1a]">24H!</span></span>
                   </div>
                 </div>
+                )}
               </div>
 
               {generatedUrl && (
@@ -627,40 +662,13 @@ export default function PetSafeApp() {
                 </div>
 
                 <div className="max-w-md mx-auto w-full bg-[#1a1a1a] border-4 border-[#1a1a1a] shadow-[8px_8px_0_rgba(26,26,26,1)] p-3">
-                  <div className="bg-white p-4 flex flex-col gap-4 text-[#1a1a1a]">
-                    <div className="bubble tail-b bg-[#ffcc00] p-3 flex items-start gap-2.5">
-                      <BellRing className="w-5 h-5 shrink-0 mt-0.5 animate-pulse-subtle" />
-                      <div>
-                        <h4 className="text-xs font-black uppercase">{t("petsafe.qr.landingThank")}</h4>
-                        <p className="text-[11px] font-bold mt-0.5">{t("petsafe.qr.landingDesc")}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 bg-[#fffef0] border-4 border-[#1a1a1a] p-2.5">
-                      <img src={state.avatarUrl} alt="Pet" className="w-14 h-14 object-cover border-4 border-[#1a1a1a]" />
-                      <div className="flex flex-col gap-0.5 text-xs min-w-0">
-                        <div className="font-black text-sm flex items-center gap-2 flex-wrap">
-                          <span>{state.name || "Pet"}</span>
-                          <span className="bg-[#ff3333] text-white ink-stroke-sm px-1.5 py-0.5 text-[10px] font-black uppercase">{t("petsafe.qr.statusLost")}</span>
-                        </div>
-                        <p className="text-[11px] font-bold text-[#4a4a4a]">{state.breed} · {state.gender}</p>
-                        {state.tagReward && <p className="bg-[#ffcc00] self-start px-1 font-black text-[11px]">{t("petsafe.poster.reward")} {state.reward}</p>}
-                      </div>
-                    </div>
-                    <div className="flex flex-col gap-2.5">
-                      <button className="btn-comic btn-pow w-full py-2.5 text-xs">
-                        <PhoneCall className="w-4 h-4" />
-                        <span>{t("petsafe.qr.callOwner")}</span>
-                      </button>
-                      <button className="btn-comic btn-go w-full py-2.5 text-xs">
-                        <Navigation className="w-4 h-4" />
-                        <span>{t("petsafe.qr.reportLocation")}</span>
-                      </button>
-                    </div>
-                    <div className="border-4 border-dashed border-[#1a1a1a] bg-[#fffef0] p-2.5 text-[11px] font-bold">
-                      <strong className="flex items-center gap-1 mb-1 font-black uppercase"><ShieldAlert className="w-3.5 h-3.5" /> {t("petsafe.qr注意事项")}</strong>
-                      <p>{state.tagMedical ? t("petsafe.qr.urgentMed") : ""} {state.features || ""}{t("petsafe.qr.noChase")}</p>
-                    </div>
-                  </div>
+                  <iframe
+                    srcDoc={generatePetLandingHTML(state, t)}
+                    title="Landing Page Preview"
+                    className="w-full bg-white border-0"
+                    style={{ height: "600px" }}
+                    sandbox="allow-same-origin"
+                  />
                 </div>
               </div>
             </div>
