@@ -1,14 +1,31 @@
 import { createFileRoute } from "@tanstack/react-router";
 import PetSafeApp from "~/components/petsafe/PetSafeApp";
+import PetSafeSeoContent from "~/components/petsafe/PetSafeSeoContent";
+import { PETSAFE_FAQ_KEYS } from "~/components/petsafe/petsafe-constants";
 import i18n from "~/lib/i18n";
 import { withLangPrefix, currentLang, BASE_URL } from "~/lib/seo";
 
 export const Route = createFileRoute("/petsafe")({
   head: () => {
-    const title = i18n.t("petsafe.title") || "PAW&CLAW Safe 宠安盾 - 宠物走失应急与永久安全牌";
-    const desc = i18n.t("petsafe.desc") || "零后端隐私保护，一键生成走失海报、永久QR宠物牌、全网求助文案，48小时科学找回清单";
-    const keywords = i18n.t("petsafe.keywords") || "宠物安全,走失海报,QR宠物牌,寻宠启事,宠安盾";
+    const t = (key: string) => i18n.t(key) || "";
+    const title = t("petsafe.title") || "PET Safe - Lost Pet Emergency & Permanent QR Tag | 100mini";
+    const desc = t("petsafe.desc") || "Zero-backend privacy protection. Generate lost pet posters, permanent QR pet tags, social media broadcast copies, and 48-hour recovery checklist.";
+    const keywords = t("petsafe.keywords") || "pet safety,lost pet poster,QR pet tag,lost pet notice,pet safe";
     const pageUrl = BASE_URL + withLangPrefix(currentLang(), "/petsafe");
+
+    const faqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: PETSAFE_FAQ_KEYS.map((key) => ({
+        "@type": "Question",
+        name: t(`petsafe.seo.qa.${key}.q`),
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: t(`petsafe.seo.qa.${key}.a`).replace(/<[^>]+>/g, ""),
+        },
+      })),
+    };
+
     return {
       meta: [
         { title },
@@ -41,8 +58,17 @@ export const Route = createFileRoute("/petsafe")({
             author: { "@type": "Organization", name: "100mini", url: "https://100mini.com" },
           }),
         },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(faqSchema),
+        },
       ],
     };
   },
-  component: PetSafeApp,
+  component: () => (
+    <>
+      <PetSafeApp />
+      <PetSafeSeoContent />
+    </>
+  ),
 });

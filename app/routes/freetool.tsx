@@ -71,6 +71,12 @@ export const Route = createFileRoute("/freetool")({
                 name: i18n.t("freetool.item.petbadge.title"),
                 url: "https://100mini.com/petbadge",
               },
+              {
+                "@type": "ListItem",
+                position: 7,
+                name: i18n.t("freetool.item.petsafe.title"),
+                url: "https://100mini.com/petsafe",
+              },
             ],
           }),
         },
