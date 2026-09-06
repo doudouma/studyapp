@@ -135,6 +135,28 @@ Contact: ${s.ownerName} at ${phone}
 Please do not chase. Safe QR landing: https://pawclaw.safe/p/${s.chipId}`;
 }
 
+/** Convert locale time string → "2026-09-01T08:30" for datetime-local input */
+function lostTimeToDatetimeLocal(val: string): string {
+  if (!val) return "";
+  // Match: "08:30 AM", "08h30", "上午 08:30", "08:30", "07:15"
+  const m = val.match(/^(\d{4}-\d{2}-\d{2})\s+(?:上午|AM)?\s*(\d{1,2})[h:](\d{2})(?:\s*(?:下午|PM))?$/i);
+  if (!m) return "";
+  const [, date, h, min] = m;
+  const hour = parseInt(h, 10);
+  return `${date}T${String(hour).padStart(2, "0")}:${min}`;
+}
+
+/** Convert "2026-09-01T08:30" → "2026-09-01 08:30 AM" (English internal format) */
+function datetimeLocalToLostTime(val: string): string {
+  if (!val) return "";
+  const [date, time] = val.split("T");
+  if (!date || !time) return "";
+  const [h, min] = time.split(":").map(Number);
+  const ap = h >= 12 ? "PM" : "AM";
+  const h12 = h % 12 || 12;
+  return `${date} ${h12}:${String(min).padStart(2, "0")} ${ap}`;
+}
+
 export default function PetSafeApp() {
   const { t } = useTranslation();
   const [state, setState] = useState<PetState>(() => makeInitialState(t));
@@ -486,7 +508,12 @@ export default function PetSafeApp() {
                 </div>
                 <div>
                   <label className="label-comic">{t("petsafe.form.lostTime")}</label>
-                  <input type="text" value={state.lostTime} onChange={(e) => update({ lostTime: e.target.value })} className="input-comic" />
+                  <input
+                    type="datetime-local"
+                    value={lostTimeToDatetimeLocal(state.lostTime)}
+                    onChange={(e) => update({ lostTime: datetimeLocalToLostTime(e.target.value) })}
+                    className="input-comic"
+                  />
                 </div>
               </div>
             </div>
