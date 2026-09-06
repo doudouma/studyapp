@@ -47,6 +47,14 @@ export function AppFooter() {
           >
             {t("footer.cookie")}
           </Link>
+          <a
+            href="https://mossai.org"
+            title="MossAI Tools"
+            target="_blank"
+            className="text-xs text-muted-foreground transition-colors hover:text-[#006c49] dark:hover:text-[#4edea3]"
+          >
+            MossAI Tools
+          </a>
         </div>
       </div>
     </footer>

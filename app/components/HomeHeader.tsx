@@ -266,7 +266,7 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
             >
               <Bookmark className="size-4" />
             </button>
-            <div className="hidden md:flex items-center size-9">
+            <div className="hidden md:flex items-center">
               <LangSwitcher />
             </div>
             <Button
