@@ -412,6 +412,7 @@
   "petsafe.form.reward": "Valor da Recompensa",
   "petsafe.form.features": "Características Distintivas / Pontos de ID",
   "petsafe.form.tags": "Tags de Alerta Especial (Destaque no Cartaz)",
+  "petsafe.form.customTagPlaceholder": "Adicionar tag personalizada...",
   "petsafe.form.tagMedical": "Medicação Diária Urgente",
   "petsafe.form.tagTimid": "Tímido, Não Corra",
   "petsafe.form.tagReward": "Recompensa em Dinheiro",

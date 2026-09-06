@@ -412,6 +412,7 @@
   "petsafe.form.reward": "Reward Amount",
   "petsafe.form.features": "Distinguishing Marks / Key ID Points",
   "petsafe.form.tags": "Special Warning Tags (Poster Highlight)",
+  "petsafe.form.customTagPlaceholder": "Add custom tag...",
   "petsafe.form.tagMedical": "Urgent Daily Medication",
   "petsafe.form.tagTimid": "Timid, Don't Chase",
   "petsafe.form.tagReward": "Cash Reward",

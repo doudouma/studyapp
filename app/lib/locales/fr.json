@@ -412,6 +412,7 @@
   "petsafe.form.reward": "Montant de la Récompense",
   "petsafe.form.features": "Marques Distinctives / Points d'Identification",
   "petsafe.form.tags": "Tags d'Alerte Spéciale (Mise en Avant)",
+  "petsafe.form.customTagPlaceholder": "Ajouter un tag personnalisé...",
   "petsafe.form.tagMedical": "Médicaments Quotidiens Urgents",
   "petsafe.form.tagTimid": "Timide, Ne Pas Courir",
   "petsafe.form.tagReward": "Récompense en Espèces",

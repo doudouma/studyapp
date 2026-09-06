@@ -19,12 +19,14 @@ export interface PetLandingData {
   tagMedical: boolean;
   tagTimid: boolean;
   tagReward: boolean;
+  customTags?: string[];
 }
 
 export function generatePetLandingHTML(data: PetLandingData, t: (key: string) => string): string {
   const tags: string[] = [];
   if (data.tagMedical) tags.push(`<span style="display:inline-block;padding:4px 12px;background:#ff3333;color:#fff;font-weight:900;font-size:12px;border:3px solid #1a1a1a;box-shadow:3px 3px 0 #1a1a1a;margin-right:6px">${t("petsafe.form.tagMedical")}</span>`);
   if (data.tagTimid) tags.push(`<span style="display:inline-block;padding:4px 12px;background:#ffcc00;color:#1a1a1a;font-weight:900;font-size:12px;border:3px solid #1a1a1a;box-shadow:3px 3px 0 #1a1a1a;margin-right:6px">${t("petsafe.form.tagTimid")}</span>`);
+  if (data.customTags) for (const tag of data.customTags) tags.push(`<span style="display:inline-block;padding:4px 12px;background:#3366ff;color:#fff;font-weight:900;font-size:12px;border:3px solid #1a1a1a;box-shadow:3px 3px 0 #1a1a1a;margin-right:6px">${tag}</span>`);
 
   return `<!DOCTYPE html>
 <html lang="en">

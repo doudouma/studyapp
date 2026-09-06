@@ -412,6 +412,7 @@
   "petsafe.form.reward": "Monto de la Recompensa",
   "petsafe.form.features": "Marcas Distintivas / Puntos de Identificación",
   "petsafe.form.tags": "Tags de Alerta Especial (Resalte en Cartel)",
+  "petsafe.form.customTagPlaceholder": "Agregar tag personalizado...",
   "petsafe.form.tagMedical": "Medicación Diaria Urgente",
   "petsafe.form.tagTimid": "Tímido, No Correr",
   "petsafe.form.tagReward": "Recompensa en Efectivo",

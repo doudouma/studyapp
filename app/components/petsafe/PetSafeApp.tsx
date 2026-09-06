@@ -26,6 +26,8 @@ import {
   Check,
   Lightbulb,
   Lock,
+  X,
+  Plus,
 } from "lucide-react";
 
 type Tab = "poster" | "qr" | "copy" | "guide";
@@ -47,6 +49,7 @@ interface PetState {
   tagMedical: boolean;
   tagTimid: boolean;
   tagReward: boolean;
+  customTags: string[];
 }
 
 const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&auto=format&fit=crop&q=80";
@@ -67,6 +70,7 @@ function makeInitialState(t: (key: string) => string): PetState {
     tagMedical: true,
     tagTimid: true,
     tagReward: true,
+    customTags: [],
   };
 }
 
@@ -86,6 +90,7 @@ function makeSampleState(t: (key: string) => string): PetState {
     tagMedical: false,
     tagTimid: true,
     tagReward: true,
+    customTags: [],
   };
 }
 
@@ -142,6 +147,19 @@ export default function PetSafeApp() {
   const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [shareToSquare, setShareToSquare] = useState(false);
+  const [newTag, setNewTag] = useState("");
+
+  const addCustomTag = () => {
+    const tag = newTag.trim();
+    if (tag && !state.customTags.includes(tag)) {
+      update({ customTags: [...state.customTags, tag] });
+      setNewTag("");
+    }
+  };
+
+  const removeCustomTag = (tag: string) => {
+    update({ customTags: state.customTags.filter((t) => t !== tag) });
+  };
 
   const posterRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -428,6 +446,31 @@ export default function PetSafeApp() {
                   </label>
                 ))}
               </div>
+              <div className="flex gap-2 mt-2">
+                <input
+                  type="text"
+                  value={newTag}
+                  onChange={(e) => setNewTag(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addCustomTag())}
+                  placeholder={t("petsafe.form.customTagPlaceholder")}
+                  className="input-comic flex-1"
+                />
+                <button onClick={addCustomTag} disabled={!newTag.trim()} className="btn-comic px-2 py-1 text-[11px] disabled:opacity-40 disabled:cursor-not-allowed">
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
+              {state.customTags.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {state.customTags.map((tag) => (
+                    <span key={tag} className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#ff3333] text-white text-[11px] font-black uppercase border-2 border-[#1a1a1a] shadow-[2px_2px_0_rgba(26,26,26,1)]">
+                      {tag}
+                      <button onClick={() => removeCustomTag(tag)} className="hover:bg-white/30 rounded-full p-0.5">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Lost Info */}
@@ -504,39 +547,42 @@ export default function PetSafeApp() {
               </div>
 
               <div className="flex justify-center items-start py-2 overflow-auto">
-                <div ref={posterRef} className="bg-white text-[#1a1a1a] border-4 border-[#1a1a1a] shadow-[16px_16px_0_rgba(26,26,26,1)] transition-all duration-100 flex flex-col justify-between overflow-hidden" style={{ width: ratioStyles[ratio].width, ...(ratio === "square" ? { aspectRatio: "1/1" } : ratio === "story" ? { aspectRatio: "9/16" } : { minHeight: "537px" }) }}>
+                <div ref={posterRef} className="print-poster bg-white text-[#1a1a1a] border-4 border-[#1a1a1a] shadow-[16px_16px_0_rgba(26,26,26,1)] transition-all duration-100 flex flex-col justify-between overflow-hidden" style={{ width: ratioStyles[ratio].width, ...(ratio === "square" ? { aspectRatio: "1/1" } : ratio === "story" ? { aspectRatio: "9/16" } : { minHeight: "537px" }) }}>
                   {ratio === "square" ? (
                     /* Square: avatar + QR overlay + name + breed + tags */
-                    <div className="flex flex-col items-center justify-center h-full p-5 gap-3">
-                      <div className="relative bg-[#ff3333] text-white px-4 py-2 text-center border-4 border-[#1a1a1a] shadow-[4px_4px_0_rgba(26,26,26,1)] w-full">
-                        <div className="flex items-center justify-center gap-2 text-xl font-black uppercase tracking-wider ink-stroke">
-                          <AlertTriangle className="w-5 h-5" />
+                    <div className="flex flex-col items-center justify-center h-full p-4 gap-2">
+                      <div className="relative bg-[#ff3333] text-white px-3 py-1.5 text-center border-4 border-[#1a1a1a] shadow-[4px_4px_0_rgba(26,26,26,1)] w-full">
+                        <div className="flex items-center justify-center gap-1.5 text-sm font-black uppercase tracking-wider ink-stroke">
+                          <AlertTriangle className="w-4 h-4" />
                           <span>{t("petsafe.poster.emergency")}</span>
                         </div>
                       </div>
                       <div className="relative w-full max-w-[280px]">
-                        <div className="w-full aspect-square border-4 border-[#1a1a1a] overflow-hidden bg-[#fffef0] shadow-[4px_4px_0_rgba(26,26,26,1)]">
+                        <div className="relative w-full aspect-square border-4 border-[#1a1a1a] overflow-hidden bg-[#fffef0] shadow-[4px_4px_0_rgba(26,26,26,1)]">
                           <img src={state.avatarUrl} alt="Pet" className="w-full h-full object-cover" />
+                          <div className="absolute bottom-2 left-2 right-2 flex flex-wrap gap-1">
+                            {state.tagMedical && <span className="px-1.5 py-0.5 text-[9px] font-black uppercase bg-[#ff3333] text-white ink-stroke-sm shadow-[2px_2px_0_rgba(26,26,26,1)]">{t("petsafe.form.tagMedical")}</span>}
+                            {state.tagTimid && <span className="px-1.5 py-0.5 text-[9px] font-black uppercase bg-[#ffcc00] text-[#1a1a1a] shadow-[2px_2px_0_rgba(26,26,26,1)]">{t("petsafe.form.tagTimid")}</span>}
+                            {state.customTags.map((tag) => (
+                              <span key={tag} className="px-1.5 py-0.5 text-[9px] font-black uppercase bg-[#3366ff] text-white ink-stroke-sm shadow-[2px_2px_0_rgba(26,26,26,1)]">{tag}</span>
+                            ))}
+                          </div>
                         </div>
                         <div className="absolute -bottom-3 -right-3 bg-white border-4 border-[#1a1a1a] p-1.5 shadow-[3px_3px_0_rgba(26,26,26,1)]">
                           {qrDataUrl && <img src={qrDataUrl} alt="QR Code" width={64} height={64} />}
                         </div>
                       </div>
-                      <div className="text-center mt-2">
-                        <div className="font-bang text-2xl uppercase tracking-wide">{state.name || t("petsafe.poster.unnamed")}</div>
-                      </div>
-                      <div className="flex flex-col items-center gap-1 text-center">
-                        <div className="bg-[#ff3333] text-white ink-stroke px-3 py-1 text-base font-black tracking-tight font-mono">{state.ownerPhone || t("petsafe.poster.phoneEmpty")}</div>
-                        <div className="text-[10px] font-bold text-[#4a4a4a]">{t("petsafe.poster.ownerPrefix")}{state.ownerName || t("petsafe.poster.ownerEmpty")}</div>
+                      <div className="text-center mt-1">
+                        <div className="font-bang text-xl uppercase tracking-wide">{state.name || t("petsafe.poster.unnamed")}</div>
                       </div>
                     </div>
                   ) : (
                     /* A4 / Story: full poster */
                     <>
-                    <div className="relative bg-[#ff3333] text-white px-3 py-2.5 text-center border-b-4 border-[#1a1a1a] overflow-hidden">
+                    <div className="relative bg-[#ff3333] text-white px-3 py-2 text-center border-b-4 border-[#1a1a1a] overflow-hidden shrink-0">
                     <div className="absolute inset-0 halftone opacity-10 pointer-events-none" />
-                    <div className="relative flex flex-wrap items-center justify-center gap-1 sm:gap-2 text-sm sm:text-xl md:text-2xl font-black uppercase tracking-wider ink-stroke">
-                      <AlertTriangle className="w-4 h-4 sm:w-6 sm:h-6 md:w-7 md:h-7" />
+                    <div className={`relative flex flex-wrap items-center justify-center gap-1 font-black uppercase tracking-wider ink-stroke ${ratio === "story" ? "text-sm" : "text-sm sm:text-xl md:text-2xl"}`}>
+                      <AlertTriangle className={ratio === "story" ? "w-4 h-4" : "w-4 h-4 sm:w-6 sm:h-6 md:w-7 md:h-7"} />
                       <span>{t("petsafe.poster.emergency")}</span>
                     </div>
                         {state.tagReward && state.reward && (
@@ -544,29 +590,32 @@ export default function PetSafeApp() {
                         )}
                       </div>
                       <div className="action-lines h-2 border-b-4 border-[#1a1a1a]" />
-                      <div className="p-4 space-y-3 flex-1 flex flex-col">
-                        <div className="relative w-full aspect-[4/3] overflow-hidden border-4 border-[#1a1a1a] bg-[#fffef0]">
+                      <div className={`p-4 space-y-3 flex-1 flex flex-col ${ratio === "story" ? "p-2.5 space-y-2" : ""}`}>
+                        <div className={`relative w-full overflow-hidden border-4 border-[#1a1a1a] bg-[#fffef0] ${ratio === "story" ? "aspect-[3/2]" : "aspect-[4/3]"}`}>
                           <img src={state.avatarUrl} alt="Lost Pet" className="w-full h-full object-cover" />
                           <div className="absolute bottom-2 left-2 right-2 flex flex-wrap gap-1.5">
                             {state.tagMedical && <span className="px-2 py-0.5 text-[11px] font-black uppercase bg-[#ff3333] text-white ink-stroke-sm shadow-[3px_3px_0_rgba(26,26,26,1)]">{t("petsafe.form.tagMedical")}</span>}
                             {state.tagTimid && <span className="px-2 py-0.5 text-[11px] font-black uppercase bg-[#ffcc00] text-[#1a1a1a] shadow-[3px_3px_0_rgba(26,26,26,1)]">{t("petsafe.form.tagTimid")}</span>}
+                            {state.customTags.map((tag) => (
+                              <span key={tag} className="px-2 py-0.5 text-[11px] font-black uppercase bg-[#3366ff] text-white ink-stroke-sm shadow-[3px_3px_0_rgba(26,26,26,1)]">{tag}</span>
+                            ))}
                           </div>
                         </div>
-                        <div className="flex flex-col gap-1 text-left">
+                        <div className={`flex flex-col gap-1 text-left ${ratio === "story" ? "gap-0.5" : ""}`}>
                           <div className="flex items-baseline justify-between gap-2 border-b-4 border-[#1a1a1a] pb-1.5">
-                            <span className="font-bang text-xl uppercase tracking-wide">{state.name || t("petsafe.poster.unnamed")}</span>
+                            <span className={`font-bang uppercase tracking-wide ${ratio === "story" ? "text-base" : "text-xl"}`}>{state.name || t("petsafe.poster.unnamed")}</span>
                             <span className="text-[11px] font-black uppercase text-right">{state.breed} / {state.gender}</span>
                           </div>
-                          <div className="flex flex-col gap-1 text-[11px] font-bold leading-snug">
+                          <div className={`flex flex-col gap-1 font-bold leading-snug ${ratio === "story" ? "text-[10px]" : "text-[11px]"}`}>
                             <p><span className="font-black uppercase">{t("petsafe.poster.feature")}</span> {state.features || t("petsafe.poster.featureEmpty")}</p>
                             <p><span className="font-black uppercase bg-[#ffcc00] px-1">{t("petsafe.poster.location")}</span> <span className="font-black">{state.lostLocation || t("petsafe.poster.locationEmpty")}</span></p>
                             <p><span className="font-black uppercase">{t("petsafe.poster.time")}</span> {state.lostTime || t("petsafe.poster.timeEmpty")}</p>
                             <p className="text-[10px] text-[#4a4a4a]"><span className="font-black text-[#1a1a1a]">{t("petsafe.poster.chip")}</span> <span className="font-mono font-bold">{state.chipId || t("petsafe.poster.chipEmpty")}</span></p>
                           </div>
                         </div>
-                        <div className="mt-auto bubble tail-t bg-white px-3 py-2.5 flex items-center justify-between gap-3">
+                        <div className={`mt-auto bubble tail-t bg-white flex items-center justify-between gap-3 ${ratio === "story" ? "px-2 py-1.5" : "px-3 py-2.5"}`}>
                           <div className="flex flex-col gap-1 min-w-0">
-                            <div className="inline-block self-start bg-[#ff3333] text-white ink-stroke px-2 py-0.5 text-lg font-black tracking-tight font-mono">{state.ownerPhone || t("petsafe.poster.phoneEmpty")}</div>
+                            <div className={`inline-block self-start bg-[#ff3333] text-white ink-stroke font-black tracking-tight font-mono ${ratio === "story" ? "px-1.5 py-0.5 text-sm" : "px-2 py-0.5 text-lg"}`}>{state.ownerPhone || t("petsafe.poster.phoneEmpty")}</div>
                             <div className="text-[10px] font-bold text-[#4a4a4a]">{t("petsafe.poster.ownerPrefix")}{state.ownerName || t("petsafe.poster.ownerEmpty")}</div>
                           </div>
                           <div className="flex flex-col items-center shrink-0">
