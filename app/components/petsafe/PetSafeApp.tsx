@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "@tanstack/react-router";
 import QRCode from "qrcode";
 import { uploadPage } from "~/features/pages/api";
 import { generatePetLandingHTML } from "./pet-landing-template";
@@ -381,6 +382,9 @@ export default function PetSafeApp() {
             </div>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
+            <Link to="/" className="btn-comic px-3 py-2 text-xs no-underline hidden sm:inline-flex">
+              <span>← 100mini</span>
+            </Link>
             <button onClick={() => setTab("guide")} className="btn-comic btn-pow px-3 py-2 text-xs hidden sm:inline-flex">
               <Clock className="w-4 h-4" />
               <span>{t("petsafe.header.guide")}</span>
