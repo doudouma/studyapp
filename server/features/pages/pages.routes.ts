@@ -205,27 +205,29 @@ export const pagesRoutes = new Hono<AppEnv>()
       status: "success",
     });
 
-    // 写入上传日志
-    if (c.env.D1) {
-      insertUploadLog(c.env.D1, {
-        userId: user?.id ?? null,
-        pageId: result.id,
-        event: "upload",
-        contentType: fileInput ? (fileInput.filename.endsWith(".zip") ? "zip" : "html") : "html",
-        isAnonymous: result._isAnonymous,
-        ip,
-        fileSize: fileInput?.bytes.length ?? null,
-        status: "success",
-      });
-    }
+    // 安全扫描 + 写入上传日志（用 waitUntil 确保响应发送后仍能完成 D1 写入）
+    const postUploadTasks = (async () => {
+      if (c.env.D1) {
+        await insertUploadLog(c.env.D1, {
+          userId: user?.id ?? null,
+          pageId: result.id,
+          event: "upload",
+          contentType: fileInput ? (fileInput.filename.endsWith(".zip") ? "zip" : "html") : "html",
+          isAnonymous: result._isAnonymous,
+          ip,
+          fileSize: fileInput?.bytes.length ?? null,
+          status: "success",
+        });
+      }
+      await scanHtmlInBackground(
+        { d1: c.env.D1, bucket: c.env?.BUCKET, ai: c.env?.AI },
+        result.id,
+        result._html,
+        result._isAnonymous,
+      );
+    })();
 
-    // 安全扫描（直接调用，不用 waitUntil）
-    scanHtmlInBackground(
-      { d1: c.env.D1, bucket: c.env?.BUCKET, ai: c.env?.AI },
-      result.id,
-      result._html,
-      result._isAnonymous,
-    ).catch(() => {});
+    c.executionCtx.waitUntil(postUploadTasks);
 
     // 剥离内部字段后返回
     const { _html, _isAnonymous, ...response } = result;

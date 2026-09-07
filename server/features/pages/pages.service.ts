@@ -443,7 +443,7 @@ export async function scanHtmlInBackground(
     if (!guard.safe) {
       log.warn("审核不通过", { pageId, status: "blocked", reason: "regex", threats: guard.threats });
       if (ctx.d1) {
-        insertUploadLog(ctx.d1, { pageId, event: "upload", isAnonymous, status: "blocked" });
+        await insertUploadLog(ctx.d1, { pageId, event: "upload", isAnonymous, status: "blocked" });
       }
       await deletePageById(ctx, pageId, isAnonymous);
       return;
@@ -456,7 +456,7 @@ export async function scanHtmlInBackground(
       if (!domainCheck.safe) {
         log.warn("审核不通过", { pageId, status: "blocked", reason: "phishing", threats: domainCheck.threats });
         if (ctx.d1) {
-          insertUploadLog(ctx.d1, { pageId, event: "upload", isAnonymous, status: "blocked" });
+          await insertUploadLog(ctx.d1, { pageId, event: "upload", isAnonymous, status: "blocked" });
         }
         await deletePageById(ctx, pageId, isAnonymous);
         return;
@@ -469,7 +469,7 @@ export async function scanHtmlInBackground(
       if (!aiResult.safe) {
         log.warn("审核不通过", { pageId, status: "blocked", reason: "ai", verdict: aiResult.verdict });
         if (ctx.d1) {
-          insertUploadLog(ctx.d1, { pageId, event: "upload", isAnonymous, status: "blocked" });
+          await insertUploadLog(ctx.d1, { pageId, event: "upload", isAnonymous, status: "blocked" });
         }
         await deletePageById(ctx, pageId, isAnonymous);
         return;

@@ -26,10 +26,11 @@ export interface UploadLogRow {
 }
 
 /**
- * Insert an upload log entry. Fire-and-forget — errors are swallowed.
+ * Insert an upload log entry. Errors are swallowed to never block the caller.
+ * Returns a Promise so callers can optionally await it for reliability.
  */
-export function insertUploadLog(d1: D1Database, entry: UploadLogEntry): void {
-  d1.prepare(
+export function insertUploadLog(d1: D1Database, entry: UploadLogEntry): Promise<void> {
+  return d1.prepare(
     `INSERT INTO upload_log (user_id, page_id, event, content_type, is_anonymous, ip, file_size, status, created_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
   )
@@ -45,7 +46,8 @@ export function insertUploadLog(d1: D1Database, entry: UploadLogEntry): void {
       Date.now()
     )
     .run()
-    .catch((e) => log.error("upload log write failed", { pageId: entry.pageId, event: entry.event, error: String(e) }));
+    .then(() => {})
+    .catch((e) => { log.error("upload log write failed", { pageId: entry.pageId, event: entry.event, error: String(e) }); });
 }
 
 export interface LogQueryParams {

@@ -105,7 +105,8 @@ describe("insertUploadLog", () => {
     expect(binds[4]).toBe(0); // isAnonymous=false → 0
     expect(binds[5]).toBe("1.2.3.4");
     expect(binds[6]).toBe(1024);
-    expect(typeof binds[7]).toBe("number"); // createdAt is a timestamp
+    expect(binds[7]).toBeNull(); // status (omitted)
+    expect(typeof binds[8]).toBe("number"); // createdAt is a timestamp
   });
 
   it("should bind null for anonymous user fields", () => {
@@ -232,14 +233,14 @@ describe("insertUploadLog", () => {
     expect(binds[6]).toBeNull(); // fileSize
   });
 
-  it("should return void (fire-and-forget)", () => {
+  it("should return a Promise (not void)", () => {
     const d1 = createMockD1();
     const result = insertUploadLog(d1 as any, {
       pageId: "p1",
       event: "upload",
       isAnonymous: false,
     });
-    expect(result).toBeUndefined();
+    expect(result).toBeInstanceOf(Promise);
   });
 
   it("should swallow errors and not throw", () => {
@@ -275,7 +276,7 @@ describe("insertUploadLog", () => {
     });
     const after = Date.now();
 
-    const createdAt = d1.getInserted()[0].binds[7] as number;
+    const createdAt = d1.getInserted()[0].binds[8] as number;
     expect(createdAt).toBeGreaterThanOrEqual(before);
     expect(createdAt).toBeLessThanOrEqual(after);
   });
