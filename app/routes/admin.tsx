@@ -82,6 +82,7 @@ function AdminPage() {
   const [logs, setLogs] = useState<Array<{
     id: number;
     userId: string | null;
+    userName: string | null;
     pageId: string;
     event: string;
     contentType: string | null;
@@ -524,7 +525,7 @@ function AdminPage() {
                             {log.isAnonymous ? (
                               <span className="text-muted-foreground">{t("admin.log.anonymous")}</span>
                             ) : (
-                              <span className="font-medium">{log.userId}</span>
+                              <span className="font-medium">{log.userName || log.userId}</span>
                             )}
                           </td>
                           <td className="px-4 py-3">

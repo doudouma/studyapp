@@ -15,6 +15,7 @@ export interface UploadLogEntry {
 export interface UploadLogRow {
   id: number;
   userId: string | null;
+  userName: string | null;
   pageId: string;
   event: string;
   contentType: string | null;
@@ -98,7 +99,7 @@ export async function queryUploadLogs(
     d1.prepare(`SELECT COUNT(*) as cnt FROM upload_log ${where}`)
       .bind(...binds)
       .first<{ cnt: number }>(),
-    d1.prepare(`SELECT * FROM upload_log ${where} ORDER BY created_at DESC LIMIT ? OFFSET ?`)
+    d1.prepare(`SELECT l.*, u.name as user_name FROM upload_log l LEFT JOIN user u ON l.user_id = u.id ${where} ORDER BY l.created_at DESC LIMIT ? OFFSET ?`)
       .bind(...binds, pageSize, offset)
       .all(),
   ]);
@@ -106,6 +107,7 @@ export async function queryUploadLogs(
   const logs: UploadLogRow[] = (rows.results ?? []).map((r: any) => ({
     id: r.id,
     userId: r.user_id ?? null,
+    userName: r.user_name ?? null,
     pageId: r.page_id,
     event: r.event,
     contentType: r.content_type ?? null,

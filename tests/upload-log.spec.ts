@@ -335,7 +335,7 @@ describe("queryUploadLogs", () => {
 
     const queryCalls = d1.getQueryCalls();
     // The SELECT query should have LIMIT 20 OFFSET 0
-    const selectQuery = queryCalls.find((i) => i.sql.includes("SELECT *"));
+    const selectQuery = queryCalls.find((i) => i.sql.includes("SELECT l.*"));
     expect(selectQuery).toBeDefined();
     // binds should contain pageSize=20 and offset=0 at the end
     const binds = selectQuery!.binds;
@@ -347,7 +347,7 @@ describe("queryUploadLogs", () => {
     const d1 = createMockD1({ countResult: { cnt: 0 }, queryResults: [] });
     await queryUploadLogs(d1 as any, { page: -5, pageSize: 10 });
 
-    const selectQuery = d1.getQueryCalls().find((i) => i.sql.includes("SELECT *"));
+    const selectQuery = d1.getQueryCalls().find((i) => i.sql.includes("SELECT l.*"));
     const binds = selectQuery!.binds;
     expect(binds[binds.length - 2]).toBe(10); // pageSize
     expect(binds[binds.length - 1]).toBe(0);  // offset (page=1 → offset=0)
@@ -357,7 +357,7 @@ describe("queryUploadLogs", () => {
     const d1 = createMockD1({ countResult: { cnt: 0 }, queryResults: [] });
     await queryUploadLogs(d1 as any, { page: 1, pageSize: -10 });
 
-    const selectQuery = d1.getQueryCalls().find((i) => i.sql.includes("SELECT *"));
+    const selectQuery = d1.getQueryCalls().find((i) => i.sql.includes("SELECT l.*"));
     const binds = selectQuery!.binds;
     expect(binds[binds.length - 2]).toBe(1); // pageSize clamped to 1
   });
@@ -366,7 +366,7 @@ describe("queryUploadLogs", () => {
     const d1 = createMockD1({ countResult: { cnt: 0 }, queryResults: [] });
     await queryUploadLogs(d1 as any, { page: 1, pageSize: 999 });
 
-    const selectQuery = d1.getQueryCalls().find((i) => i.sql.includes("SELECT *"));
+    const selectQuery = d1.getQueryCalls().find((i) => i.sql.includes("SELECT l.*"));
     const binds = selectQuery!.binds;
     expect(binds[binds.length - 2]).toBe(100); // pageSize clamped to 100
   });
@@ -375,7 +375,7 @@ describe("queryUploadLogs", () => {
     const d1 = createMockD1({ countResult: { cnt: 50 }, queryResults: [] });
     await queryUploadLogs(d1 as any, { page: 2, pageSize: 20 });
 
-    const selectQuery = d1.getQueryCalls().find((i) => i.sql.includes("SELECT *"));
+    const selectQuery = d1.getQueryCalls().find((i) => i.sql.includes("SELECT l.*"));
     const binds = selectQuery!.binds;
     expect(binds[binds.length - 2]).toBe(20); // pageSize
     expect(binds[binds.length - 1]).toBe(20); // offset = (2-1)*20 = 20
@@ -385,7 +385,7 @@ describe("queryUploadLogs", () => {
     const d1 = createMockD1({ countResult: { cnt: 50 }, queryResults: [] });
     await queryUploadLogs(d1 as any, { page: 3, pageSize: 10 });
 
-    const selectQuery = d1.getQueryCalls().find((i) => i.sql.includes("SELECT *"));
+    const selectQuery = d1.getQueryCalls().find((i) => i.sql.includes("SELECT l.*"));
     const binds = selectQuery!.binds;
     expect(binds[binds.length - 2]).toBe(10);
     expect(binds[binds.length - 1]).toBe(20); // offset = (3-1)*10 = 20
@@ -450,8 +450,8 @@ describe("queryUploadLogs", () => {
     const d1 = createMockD1({ countResult: { cnt: 0 }, queryResults: [] });
     await queryUploadLogs(d1 as any, {});
 
-    const selectQuery = d1.getQueryCalls().find((i) => i.sql.includes("SELECT *"));
-    expect(selectQuery!.sql).toContain("ORDER BY created_at DESC");
+    const selectQuery = d1.getQueryCalls().find((i) => i.sql.includes("SELECT l.*"));
+    expect(selectQuery!.sql).toContain("ORDER BY l.created_at DESC");
   });
 
   it("should return logs from query results", async () => {
@@ -481,7 +481,7 @@ describe("queryUploadLogs", () => {
     expect(d1.getQueryCalls()).toHaveLength(2);
     const sqls = d1.getQueryCalls().map((i) => i.sql);
     expect(sqls.some((s) => s.includes("COUNT"))).toBe(true);
-    expect(sqls.some((s) => s.includes("SELECT *"))).toBe(true);
+    expect(sqls.some((s) => s.includes("SELECT l.*"))).toBe(true);
   });
 });
 
@@ -598,7 +598,7 @@ describe("edge cases", () => {
     const d1 = createMockD1({ countResult: { cnt: 0 }, queryResults: [] });
     await queryUploadLogs(d1 as any, { page: 0 });
 
-    const selectQuery = d1.getQueryCalls().find((i) => i.sql.includes("SELECT *"));
+    const selectQuery = d1.getQueryCalls().find((i) => i.sql.includes("SELECT l.*"));
     const binds = selectQuery!.binds;
     expect(binds[binds.length - 1]).toBe(0); // offset = (1-1)*20 = 0
   });
@@ -607,7 +607,7 @@ describe("edge cases", () => {
     const d1 = createMockD1({ countResult: { cnt: 0 }, queryResults: [] });
     await queryUploadLogs(d1 as any, { pageSize: 0 });
 
-    const selectQuery = d1.getQueryCalls().find((i) => i.sql.includes("SELECT *"));
+    const selectQuery = d1.getQueryCalls().find((i) => i.sql.includes("SELECT l.*"));
     const binds = selectQuery!.binds;
     expect(binds[binds.length - 2]).toBe(1);
   });

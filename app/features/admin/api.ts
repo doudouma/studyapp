@@ -94,6 +94,7 @@ export async function cleanupTmp(): Promise<{ ok: boolean; error?: string; delet
 export interface UploadLogData {
   id: number;
   userId: string | null;
+  userName: string | null;
   pageId: string;
   event: string;
   contentType: string | null;
