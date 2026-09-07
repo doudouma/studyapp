@@ -55,6 +55,15 @@ interface PetState {
 
 const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&auto=format&fit=crop&q=80";
 
+function nowLostTime(): string {
+  const d = new Date();
+  const date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const h = d.getHours();
+  const ap = h >= 12 ? "PM" : "AM";
+  const h12 = h % 12 || 12;
+  return `${date} ${h12}:${String(d.getMinutes()).padStart(2, "0")} ${ap}`;
+}
+
 function makeInitialState(t: (key: string) => string): PetState {
   return {
     name: t("petsafe.sample1.name"),
@@ -64,7 +73,7 @@ function makeInitialState(t: (key: string) => string): PetState {
     reward: t("petsafe.sample1.reward"),
     features: t("petsafe.sample1.features"),
     lostLocation: t("petsafe.sample1.lostLocation"),
-    lostTime: t("petsafe.sample1.lostTime"),
+    lostTime: nowLostTime(),
     ownerName: t("petsafe.sample1.ownerName"),
     ownerPhone: t("petsafe.sample1.ownerPhone"),
     avatarUrl: DEFAULT_AVATAR,
