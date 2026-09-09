@@ -51,6 +51,8 @@ const STATIC_PAGES: { loc: string; changefreq: string; priority: string }[] = [
   { loc: "/links", changefreq: "weekly", priority: "0.7" },
   { loc: "/pomodoro", changefreq: "weekly", priority: "0.6" },
   { loc: "/rhythm", changefreq: "weekly", priority: "0.6" },
+  { loc: "/petsafe", changefreq: "weekly", priority: "0.7" },
+  { loc: "/petbadge", changefreq: "weekly", priority: "0.7" },
   { loc: "/contact", changefreq: "yearly", priority: "0.3" },
   { loc: "/privacy", changefreq: "yearly", priority: "0.3" },
   { loc: "/terms", changefreq: "yearly", priority: "0.3" },
