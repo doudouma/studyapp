@@ -1,5 +1,5 @@
 import { useState, useRef, memo, useMemo, useCallback } from "react";
-import { ArrowDown, Code2, Clock, Infinity, Tags, Share2, List, Crown, LogIn, Loader2 } from "lucide-react";
+import { ArrowDown, Code2, Clock, Infinity, Tags, Share2, List, Crown, LogIn, Loader2, Puzzle } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { DropZone } from "~/components/DropZone";
 import { SuccessCard } from "~/components/SuccessCard";
@@ -280,6 +280,15 @@ function HeroSection({ onUpload, onBrowse }: { onUpload: () => void; onBrowse: (
             {t("home.hero.cta1")}
             <ArrowDown className="size-4" />
           </Button>
+          <a
+            href="https://chromewebstore.google.com/detail/dmmhkdcmifenlihbbhihkagnebgiekep?utm_source=item-share-cb"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 h-11 px-6 text-base rounded-xl border border-border bg-background hover:bg-muted hover:text-foreground transition-all"
+          >
+            <Puzzle className="size-4" />
+            Chrome Extension
+          </a>
           <Button
             variant="outline"
             size="lg"
