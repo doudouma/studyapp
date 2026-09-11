@@ -68,6 +68,22 @@ export function GuideSection() {
       q: t("components.guide.faq5.q"),
       a: t("components.guide.faq5.a"),
     },
+    {
+      q: t("components.guide.faq6.q"),
+      a: t("components.guide.faq6.a"),
+    },
+    {
+      q: t("components.guide.faq7.q"),
+      a: t("components.guide.faq7.a"),
+    },
+    {
+      q: t("components.guide.faq8.q"),
+      a: t("components.guide.faq8.a"),
+    },
+    {
+      q: t("components.guide.faq9.q"),
+      a: t("components.guide.faq9.a"),
+    },
   ];
 
   const tips = [
