@@ -256,7 +256,7 @@
   "idphoto.export.kbUnit": "KB（0=不限）",
   "idphoto.export.btn": "导出证件照",
   "idphoto.export.btnDigital": "下载数字照片 ({{size}})",
-  "idphoto.export.btnPrint": "下载4×6打印模板",
+  "idphoto.export.btnPrint": "下载{{paper}}打印模板",
   "idphoto.export.done": "已导出 {{info}}",
   "idphoto.tab.photo": "证件照预览",
   "idphoto.tab.print": "相纸排版打印",

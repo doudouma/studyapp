@@ -57,6 +57,7 @@ export function IdPhotoWorkbench() {
   const [exportNote, setExportNote] = useState("");
   const [segEvent, setSegEvent] = useState<SegEvent | null>(null);
   const [status, setStatus] = useState<{ kind: "ok" | "err"; text: string }>({ kind: "ok", text: "" });
+  const [printPaper, setPrintPaper] = useState("4R");
 
   const setStatusOk = useCallback((text: string) => setStatus({ kind: "ok", text }), []);
   const setStatusErr = useCallback((text: string) => setStatus({ kind: "err", text }), []);
@@ -270,7 +271,7 @@ export function IdPhotoWorkbench() {
     const canvas = resultRef.current;
     if (!canvas) return;
     const s = effectiveSize;
-    const pw = PAPERS["A4"];
+    const pw = PAPERS[printPaper] ?? PAPERS["4R"];
     const l = buildPrintLayout(pw.wmm, pw.hmm, s.wmm, s.hmm);
     if (!l) {
       setExportNote(t("idphoto.print.fitError"));
@@ -281,14 +282,14 @@ export function IdPhotoWorkbench() {
     printCanvas.toBlob(
       (b) => {
         if (b) {
-          downloadBlob(b, `${t("idphoto.file.print")}_A4.jpg`);
-          setExportNote(t("idphoto.export.done", { info: `4×6 ${t("idphoto.print.btnExportPrint")}` }));
+          downloadBlob(b, `${t("idphoto.file.print")}_${printPaper}.jpg`);
+          setExportNote(t("idphoto.export.done", { info: `${printPaper} ${t("idphoto.print.btnExportPrint")}` }));
         }
       },
       "image/jpeg",
       0.95,
     );
-  }, [resultReady, effectiveSize, t]);
+  }, [resultReady, effectiveSize, printPaper, t]);
 
   // segEvent → 状态文案（Task 7 接入 AI 按钮后生效）
   useEffect(() => {
@@ -378,6 +379,9 @@ export function IdPhotoWorkbench() {
             format={exportFormat}
             note={exportNote}
             disabled={!resultReady || aiBusy}
+            currentW={effectiveSize.w}
+            currentH={effectiveSize.h}
+            printPaper={printPaper}
             onDigital={(v) => {
               setDigitalKey(v);
               setSizeLimitKB(v && DIGITAL[v as keyof typeof DIGITAL] ? DIGITAL[v as keyof typeof DIGITAL].maxKB : 0);
@@ -413,7 +417,13 @@ export function IdPhotoWorkbench() {
             <PreviewCanvas resultRef={resultRef} rulerRef={rulerRef} W={effectiveSize.w} H={effectiveSize.h} />
           </TabsContent>
           <TabsContent value="print" className="mt-0" keepMounted>
-            <PrintLayoutPanel sourceRef={resultRef} size={effectiveSize} resultReady={resultReady} />
+            <PrintLayoutPanel
+              sourceRef={resultRef}
+              size={effectiveSize}
+              resultReady={resultReady}
+              paper={printPaper}
+              onPaperChange={setPrintPaper}
+            />
           </TabsContent>
         </Tabs>
       </div>

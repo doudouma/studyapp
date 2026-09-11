@@ -10,14 +10,15 @@ interface PrintLayoutPanelProps {
   sourceRef: React.RefObject<HTMLCanvasElement | null>;
   size: EffectiveSize;
   resultReady: boolean;
+  paper: string;
+  onPaperChange: (paper: string) => void;
 }
 
 type Orient = "portrait" | "landscape";
 
-export function PrintLayoutPanel({ sourceRef, size, resultReady }: PrintLayoutPanelProps) {
+export function PrintLayoutPanel({ sourceRef, size, resultReady, paper, onPaperChange }: PrintLayoutPanelProps) {
   const { t } = useTranslation();
   const printRef = useRef<HTMLCanvasElement>(null);
-  const [paper, setPaper] = useState("A4");
   const [paperOrient, setPaperOrient] = useState<Orient>("portrait");
   const [photoOrient, setPhotoOrient] = useState<Orient>("portrait");
   const [info, setInfo] = useState<{ kind: "initial" | "error" | "summary"; text: string }>({ kind: "initial", text: "" });
@@ -77,7 +78,7 @@ export function PrintLayoutPanel({ sourceRef, size, resultReady }: PrintLayoutPa
     <div className="flex flex-col items-center">
       <div className="mb-3 flex flex-wrap items-end justify-center gap-2">
         <Field label={t("idphoto.paper.label")}>
-          <select value={paper} onChange={(e) => setPaper(e.target.value)} className={selectCls}>
+          <select value={paper} onChange={(e) => onPaperChange(e.target.value)} className={selectCls}>
             {Object.keys(PAPERS).map((k) => (
               <option key={k} value={k}>
                 {t(`idphoto.paper.${k}`)}

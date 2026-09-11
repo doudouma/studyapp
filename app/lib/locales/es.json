@@ -256,7 +256,7 @@
   "idphoto.export.kbUnit": "KB (0 = ilimitado)",
   "idphoto.export.btn": "Exportar foto",
   "idphoto.export.btnDigital": "Descargar Foto Digital ({{size}})",
-  "idphoto.export.btnPrint": "Descargar Plantilla 4×6",
+  "idphoto.export.btnPrint": "Descargar Plantilla {{paper}}",
   "idphoto.export.done": "Exportada {{info}}",
   "idphoto.tab.photo": "Vista previa",
   "idphoto.tab.print": "Hoja de impresión",

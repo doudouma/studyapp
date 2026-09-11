@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Download, Printer } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import { DIGITAL, type DigitalKey } from "~/lib/idphoto/specs";
+import { DIGITAL, PAPERS, type DigitalKey } from "~/lib/idphoto/specs";
 
 interface ExportPanelProps {
   digitalKey: string;
@@ -9,6 +9,9 @@ interface ExportPanelProps {
   format: "jpeg" | "png";
   note: string;
   disabled: boolean;
+  currentW: number;
+  currentH: number;
+  printPaper: string;
   onDigital: (v: string) => void;
   onSizeLimit: (v: number) => void;
   onFormat: (v: "jpeg" | "png") => void;
@@ -18,7 +21,7 @@ interface ExportPanelProps {
 
 const DIGITAL_KEYS = Object.keys(DIGITAL) as DigitalKey[];
 
-export function ExportPanel({ digitalKey, sizeLimitKB, format, note, disabled, onDigital, onSizeLimit, onFormat, onExport, onExportPrint }: ExportPanelProps) {
+export function ExportPanel({ digitalKey, sizeLimitKB, format, note, disabled, currentW, currentH, printPaper, onDigital, onSizeLimit, onFormat, onExport, onExportPrint }: ExportPanelProps) {
   const { t } = useTranslation();
   return (
     <div>
@@ -65,12 +68,12 @@ export function ExportPanel({ digitalKey, sizeLimitKB, format, note, disabled, o
       <div className="flex flex-col gap-2">
         <Button className="w-full" disabled={disabled} onClick={onExport}>
           <Download className="size-4" />
-          {t("idphoto.export.btnDigital", { size: "600×600" })}
+          {t("idphoto.export.btnDigital", { size: `${currentW}×${currentH}` })}
         </Button>
         {onExportPrint && (
           <Button variant="secondary" className="w-full" disabled={disabled} onClick={onExportPrint}>
             <Printer className="size-4" />
-            {t("idphoto.export.btnPrint")}
+            {t("idphoto.export.btnPrint", { paper: t(`idphoto.paper.${printPaper}`) })}
           </Button>
         )}
       </div>

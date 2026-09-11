@@ -256,7 +256,7 @@
   "idphoto.export.kbUnit": "KB (0 = unlimited)",
   "idphoto.export.btn": "Export photo",
   "idphoto.export.btnDigital": "Download Digital Photo ({{size}})",
-  "idphoto.export.btnPrint": "Download 4×6 Print Template",
+  "idphoto.export.btnPrint": "Download {{paper}} Print Template",
   "idphoto.export.done": "Exported {{info}}",
   "idphoto.tab.photo": "Photo Preview",
   "idphoto.tab.print": "Print Layout",
