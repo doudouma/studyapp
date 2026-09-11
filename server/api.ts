@@ -69,48 +69,14 @@ function escapeXml(s: string): string {
 
 api.get("/robots.txt", (c) => {
   const sitemapLines = LANGS.map((l) => `Sitemap: ${BASE_URL}/sitemap-${l}.xml`).join("\n");
-  return new Response(
-    `User-agent: *
+  return c.text(`User-agent: *
 Allow: /
 Allow: /p/
 Disallow: /api/
 Disallow: /admin
 
-User-agent: GPTBot
-Allow: /
-
-User-agent: ChatGPT-User
-Allow: /
-
-User-agent: Google-Extended
-Allow: /
-
-User-agent: CCBot
-Allow: /
-
-User-agent: anthropic-ai
-Allow: /
-
-User-agent: ClaudeBot
-Allow: /
-
-User-agent: PerplexityBot
-Allow: /
-
-User-agent: Bytespider
-Allow: /
-
 ${sitemapLines}
-`,
-    {
-      status: 200,
-      headers: {
-        "Content-Type": "text/plain; charset=utf-8",
-        "Content-Signals": "ai-train:yes",
-        "Cache-Control": "public, max-age=3600",
-      },
-    }
-  );
+`);
 });
 
 // Sitemap index — lists each per-language sitemap.
