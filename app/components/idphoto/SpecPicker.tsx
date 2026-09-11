@@ -16,6 +16,10 @@ export function SpecPicker({ presetIdx, regionFilter, customW, customH, onRegion
   const visible = SIZE_PRESETS.map((p, i) => ({ p, i })).filter(
     ({ p }) => regionFilter === "all" || p.group === regionFilter,
   );
+  // "all" 模式下，中文规格排在最后
+  const sorted = regionFilter === "all"
+    ? [...visible.filter(({ p }) => p.group !== "cn"), ...visible.filter(({ p }) => p.group === "cn")]
+    : visible;
   const isCustom = SIZE_PRESETS[presetIdx]?.key === "custom";
 
   return (
@@ -33,7 +37,7 @@ export function SpecPicker({ presetIdx, regionFilter, customW, customH, onRegion
         ))}
       </select>
       <div className="grid max-h-64 grid-cols-2 gap-2 overflow-y-auto">
-        {visible.map(({ p, i }) => {
+        {sorted.map(({ p, i }) => {
           const active = i === presetIdx;
           return (
             <button
