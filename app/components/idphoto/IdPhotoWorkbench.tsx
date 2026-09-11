@@ -131,6 +131,13 @@ export function IdPhotoWorkbench() {
           label: t("idphoto.headRatio", { pct: headRatioPct }),
         });
       }
+    } else if (srcImg && !resultReady) {
+      const scale = Math.min(s.w / srcImg.naturalWidth, s.h / srcImg.naturalHeight);
+      const dw = srcImg.naturalWidth * scale;
+      const dh = srcImg.naturalHeight * scale;
+      const dx = (s.w - dw) / 2;
+      const dy = (s.h - dh) / 2;
+      ctx.drawImage(srcImg, dx, dy, dw, dh);
     }
   }, [
     effectiveSize, base, headSrc, srcImg, cutImg, bgColor, keepBg, adjust,

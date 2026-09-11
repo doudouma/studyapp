@@ -23,8 +23,11 @@ export function PrintLayoutPanel({ sourceRef, size, resultReady }: PrintLayoutPa
   const [info, setInfo] = useState<{ kind: "initial" | "error" | "summary"; text: string }>({ kind: "initial", text: "" });
   const [layout, setLayout] = useState<PrintLayout | null>(null);
 
-  const runLayout = () => {
-    if (!resultReady) {
+  const runLayout = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const src = sourceRef.current;
+    if (!src) {
       setInfo({ kind: "error", text: t("idphoto.print.needGenerate") });
       return;
     }
@@ -38,11 +41,7 @@ export function PrintLayoutPanel({ sourceRef, size, resultReady }: PrintLayoutPa
       return;
     }
     const canvas = printRef.current;
-    const src = sourceRef.current;
-    if (!canvas || !src) {
-      setInfo({ kind: "error", text: t("idphoto.print.needGenerate") });
-      return;
-    }
+    if (!canvas) return;
     drawPrintLayout(canvas, src, l, photoOrient === "landscape");
     setLayout(l);
     setInfo({
@@ -60,7 +59,9 @@ export function PrintLayoutPanel({ sourceRef, size, resultReady }: PrintLayoutPa
     });
   };
 
-  const runExport = () => {
+  const runExport = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     const canvas = printRef.current;
     if (!canvas) return;
     canvas.toBlob(
@@ -96,8 +97,8 @@ export function PrintLayoutPanel({ sourceRef, size, resultReady }: PrintLayoutPa
             <option value="landscape">{t("idphoto.orient.landscape")}</option>
           </select>
         </Field>
-        <Button onClick={runLayout}>{t("idphoto.print.btnLayout")}</Button>
-        <Button variant="secondary" disabled={!layout} onClick={runExport}>
+        <Button type="button" onClick={runLayout}>{t("idphoto.print.btnLayout")}</Button>
+        <Button type="button" variant="secondary" disabled={!layout} onClick={runExport}>
           {t("idphoto.print.btnExportPrint")}
         </Button>
       </div>
