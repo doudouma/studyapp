@@ -13,7 +13,7 @@ import { withLangPrefix, currentLang } from "~/lib/seo";
 
 export const Route = createFileRoute("/idphoto")({
   head: () => {
-    const faqs = Array.from({ length: 9 }, (_, i) => ({
+    const faqs = Array.from({ length: 6 }, (_, i) => ({
       name: i18n.t(`idphoto.faq${i + 1}.q`),
       text: i18n.t(`idphoto.faq${i + 1}.a`),
     }));
@@ -103,7 +103,7 @@ function IdPhotoPage() {
     t("idphoto.spotlight.list3"),
   ];
 
-  const faqs = Array.from({ length: 9 }, (_, i) => ({
+  const faqs = Array.from({ length: 6 }, (_, i) => ({
     q: t(`idphoto.faq${i + 1}.q`),
     a: t(`idphoto.faq${i + 1}.a`),
   }));

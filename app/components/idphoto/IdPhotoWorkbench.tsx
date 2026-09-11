@@ -11,8 +11,8 @@ import { AdjustPanel } from "./AdjustPanel";
 import { ExportPanel } from "./ExportPanel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { PrintLayoutPanel } from "./PrintLayoutPanel";
-import { DIGITAL, SIZE_PRESETS, currentSize, headRange, headTarget } from "~/lib/idphoto/specs";
-import { canvasToBlobLimit, downloadBlob } from "~/lib/idphoto/exportImage";
+import { DIGITAL, SIZE_PRESETS, PAPERS, currentSize, headRange, headTarget } from "~/lib/idphoto/specs";
+import { canvasToBlobLimit, downloadBlob, buildPrintLayout, drawPrintLayout } from "~/lib/idphoto/exportImage";
 import { complianceRatio, computeBase, drawRuler, renderCompose } from "~/lib/idphoto/compose";
 import { detectFace } from "~/lib/idphoto/face";
 import { segmentImage, type SegEvent } from "~/lib/idphoto/segmentation";
@@ -258,6 +258,31 @@ export function IdPhotoWorkbench() {
     setExportNote(t("idphoto.export.done", { info: `${s.w}×${s.h}px ${note}` }));
   }, [resultReady, effectiveSize, exportFormat, sizeLimitKB, t]);
 
+  const runExportPrint = useCallback(async () => {
+    if (!resultReady) return;
+    const canvas = resultRef.current;
+    if (!canvas) return;
+    const s = effectiveSize;
+    const pw = PAPERS["A4"];
+    const l = buildPrintLayout(pw.wmm, pw.hmm, s.wmm, s.hmm);
+    if (!l) {
+      setExportNote(t("idphoto.print.fitError"));
+      return;
+    }
+    const printCanvas = document.createElement("canvas");
+    drawPrintLayout(printCanvas, canvas, l, false);
+    printCanvas.toBlob(
+      (b) => {
+        if (b) {
+          downloadBlob(b, `${t("idphoto.file.print")}_A4.jpg`);
+          setExportNote(t("idphoto.export.done", { info: `4×6 ${t("idphoto.print.btnExportPrint")}` }));
+        }
+      },
+      "image/jpeg",
+      0.95,
+    );
+  }, [resultReady, effectiveSize, t]);
+
   // segEvent → 状态文案（Task 7 接入 AI 按钮后生效）
   useEffect(() => {
     if (!segEvent) return;
@@ -353,6 +378,7 @@ export function IdPhotoWorkbench() {
             onSizeLimit={setSizeLimitKB}
             onFormat={setExportFormat}
             onExport={runExport}
+            onExportPrint={runExportPrint}
           />
         </section>
 
