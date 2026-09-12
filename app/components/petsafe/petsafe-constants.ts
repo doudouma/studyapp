@@ -9,4 +9,10 @@ export const PETSAFE_FAQ_KEYS = [
   "noChip",
   "phoneNumber",
   "notTechy",
+  "posterTemplate",
+  "howToQr",
+  "printable",
+  "tearOff",
+  "landingPage",
+  "privacy",
 ] as const;
