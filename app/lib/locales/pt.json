@@ -1175,5 +1175,8 @@
   "admin.log.ip": "IP",
   "admin.log.size": "Tamanho",
   "admin.log.anonymous": "Anônimo",
-  "admin.log.thumbnail": "Miniatura"
+  "admin.log.thumbnail": "Miniatura",
+  "petsafe.copy.xhs.qrLink": "🔗 Escaneie o QR para ver o perfil completo",
+  "petsafe.copy.nextdoor.qrLink": "Perfil QR",
+  "petsafe.copy.reddit.qrLink": "Escaneie o QR para ver o perfil completo"
 }

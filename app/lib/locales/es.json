@@ -1188,5 +1188,8 @@
   "any2md.feature5.title": "Optimizado para pipelines RAG y LLM",
   "any2md.feature5.desc": "Jerarquía de encabezados limpia, tablas GFM y salida estructurada reducen errores de fragmentación y recortan costos de tokens un 25–75% al alimentar modelos de IA.",
   "any2md.pain5": "Cumplimiento empresarial — cero datos salen de tu navegador, sin backend en la nube, sin cuenta requerida",
-  "any2md.feature5": "Optimizado para pipelines RAG y reducción de tokens LLM"
+  "any2md.feature5": "Optimizado para pipelines RAG y reducción de tokens LLM",
+  "petsafe.copy.xhs.qrLink": "🔗 Escanee QR para ver el perfil completo",
+  "petsafe.copy.nextdoor.qrLink": "Perfil QR",
+  "petsafe.copy.reddit.qrLink": "Escanee QR para ver el perfil completo"
 }

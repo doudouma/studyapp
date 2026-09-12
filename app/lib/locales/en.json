@@ -1276,5 +1276,8 @@
   "any2md.feature5.title": "Optimized for RAG and LLM pipelines",
   "any2md.feature5.desc": "Clean heading hierarchy, GFM tables, and structured output reduce chunking errors and cut token costs by 25–75% when feeding documents to AI models.",
   "any2md.pain5": "Enterprise compliance — zero data leaves your browser, no cloud backend, no account required",
-  "any2md.feature5": "Optimized for RAG pipelines and LLM token reduction"
+  "any2md.feature5": "Optimized for RAG pipelines and LLM token reduction",
+  "petsafe.copy.xhs.qrLink": "🔗 Scan QR to view full profile",
+  "petsafe.copy.nextdoor.qrLink": "QR Profile",
+  "petsafe.copy.reddit.qrLink": "Scan QR for full profile"
 }

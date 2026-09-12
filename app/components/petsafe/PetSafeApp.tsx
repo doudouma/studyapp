@@ -104,9 +104,10 @@ function makeSampleState(t: (key: string) => string): PetState {
   };
 }
 
-function getCopyTemplate(platform: Platform, s: PetState, t: (key: string) => string): string {
+function getCopyTemplate(platform: Platform, s: PetState, t: (key: string) => string, generatedUrl?: string | null): string {
   const phone = s.ownerPhone || "138-xxxx-xxxx";
   const name = s.name || "Pet";
+  const qrLine = generatedUrl ? `\n${t("petsafe.copy." + platform + ".qrLink")}: ${generatedUrl}` : "";
 
   if (platform === "xhs") {
     return `🚨${t("petsafe.copy.xhs.title")}${name}🚨
@@ -119,7 +120,7 @@ ${t("petsafe.copy.xhs.line1")}
 💰 ${t("petsafe.copy.xhs.reward")}: ${s.reward}
 
 ${t("petsafe.copy.xhs.note")}${s.tagMedical ? t("petsafe.copy.xhs.medical") : ""}
-📞 ${t("petsafe.copy.xhs.phone")}: ${phone} (${s.ownerName})
+📞 ${t("petsafe.copy.xhs.phone")}: ${phone} (${s.ownerName})${qrLine}
 
 ${t("petsafe.copy.xhs.hashtags")}`;
   }
@@ -131,7 +132,7 @@ ${t("petsafe.copy.nextdoor.line1")}
 • ${t("petsafe.copy.nextdoor.time")}: ${s.lostTime}
 • ${t("petsafe.copy.nextdoor.features")}: ${s.features}
 • ${t("petsafe.copy.nextdoor.chip")}: ${s.chipId}
-• ${t("petsafe.copy.nextdoor.reward")}: ${s.reward}
+• ${t("petsafe.copy.nextdoor.reward")}: ${s.reward}${qrLine}
 ${t("petsafe.copy.nextdoor.contact")} ${phone}`;
   }
   return `[LOST PET EMERGENCY REPORT] - Reward: ${s.reward}
@@ -141,8 +142,8 @@ Microchip ID: ${s.chipId}
 Last Seen: ${s.lostLocation} at ${s.lostTime}
 Distinguishing Marks: ${s.features}
 Medical: ${s.tagMedical ? "URGENT DAILY MEDICATION REQUIRED" : "None"}
-Contact: ${s.ownerName} at ${phone}
-Please do not chase. Safe QR landing: https://pawclaw.safe/p/${s.chipId}`;
+Contact: ${s.ownerName} at ${phone}${qrLine ? `\n${t("petsafe.copy.reddit.qrLink")}: ${generatedUrl}` : ""}
+Please do not chase.`;
 }
 
 /** Convert locale time string → "2026-09-01T08:30" for datetime-local input */
@@ -267,7 +268,7 @@ export default function PetSafeApp() {
   };
 
   const handleCopy = () => {
-    const text = getCopyTemplate(platform, state, t);
+    const text = getCopyTemplate(platform, state, t, generatedUrl);
     navigator.clipboard.writeText(text).then(() => {
       setCopied(true);
       showToast(t("petsafe.toast.copied"));
@@ -774,7 +775,7 @@ export default function PetSafeApp() {
                 ))}
               </div>
               <div className="relative">
-                <textarea readOnly value={getCopyTemplate(platform, state, t)} rows={9} className="input-comic font-mono text-xs leading-relaxed resize-y" />
+                <textarea readOnly value={getCopyTemplate(platform, state, t, generatedUrl)} rows={9} className="input-comic font-mono text-xs leading-relaxed resize-y" />
                 <button onClick={handleCopy} className="btn-comic btn-pow absolute top-3 right-3 px-3 py-1.5 text-[11px]">
                   {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copied ? t("petsafe.copy.copied") : t("petsafe.copy.copyBtn")}</span>

@@ -227,7 +227,11 @@ export const pagesRoutes = new Hono<AppEnv>()
       );
     })();
 
-    c.executionCtx.waitUntil(postUploadTasks);
+    try {
+      c.executionCtx.waitUntil(postUploadTasks);
+    } catch {
+      await postUploadTasks;
+    }
 
     // 剥离内部字段后返回
     const { _html, _isAnonymous, ...response } = result;

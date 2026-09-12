@@ -135,8 +135,10 @@ export const wardrobeRoutes = new Hono<AppEnv>()
     if (!user) return c.json({ error: "Unauthorized" }, 401);
 
     const body = await c.req.json();
+    let execCtx: ExecutionContext | undefined;
+    try { execCtx = c.executionCtx; } catch {}
     const result = await createWardrobeOutfit(
-      { ...c.env, executionCtx: c.executionCtx },
+      { ...c.env, executionCtx: execCtx },
       user.id,
       body
     );
@@ -152,8 +154,10 @@ export const wardrobeRoutes = new Hono<AppEnv>()
     const body = await c.req.json().catch(() => ({}));
     const count = Math.max(1, Math.min(6, Number(body.count) || 3));
 
+    let execCtx2: ExecutionContext | undefined;
+    try { execCtx2 = c.executionCtx; } catch {}
     const result = await autoCreateOutfits(
-      { ...c.env, executionCtx: c.executionCtx },
+      { ...c.env, executionCtx: execCtx2 },
       user.id,
       count
     );

@@ -1255,5 +1255,8 @@
   "admin.scanLog.reason": "原因",
   "admin.scanLog.detail": "详情",
   "admin.scanLog.type": "类型",
-  "admin.scanLog.userType": "用户"
+  "admin.scanLog.userType": "用户",
+  "petsafe.copy.xhs.qrLink": "🔗 扫码查看完整档案",
+  "petsafe.copy.nextdoor.qrLink": "扫码查看档案",
+  "petsafe.copy.reddit.qrLink": "扫码查看完整档案"
 }
