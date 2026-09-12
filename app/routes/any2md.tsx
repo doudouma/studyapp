@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { FileText, ShieldCheck, Files, Table2, ArrowRight, Check, ChevronDown } from "lucide-react";
+import { FileText, ShieldCheck, Files, Table2, ArrowRight, Brain, Check, ChevronDown } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { FileDrop } from "~/components/any2md/FileDrop";
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/any2md")({
     const bcp = getBcp47(i18n.language);
     const pageUrl = BASE_URL + withLangPrefix(currentLang(), "/any2md");
     const ogImage = "https://100mini.com/spritesheet2/frame_38.webp";
-    const faqs = Array.from({ length: 6 }, (_, i) => ({
+    const faqs = Array.from({ length: 10 }, (_, i) => ({
       name: i18n.t(`any2md.faq${i + 1}.q`),
       text: i18n.t(`any2md.faq${i + 1}.a`),
     }));
@@ -53,7 +53,7 @@ export const Route = createFileRoute("/any2md")({
           children: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebApplication",
-            name: "100mini Any to MD",
+            name: "100mini PDF to Markdown Converter",
             url: pageUrl,
             description: i18n.t("any2md.subtitle"),
             applicationCategory: "UtilitiesApplication",
@@ -64,6 +64,7 @@ export const Route = createFileRoute("/any2md")({
               i18n.t("any2md.feature1"),
               i18n.t("any2md.feature2"),
               i18n.t("any2md.feature3"),
+              i18n.t("any2md.feature5"),
               i18n.t("any2md.feature4"),
             ],
             author: { "@type": "Organization", name: "100mini", url: "https://100mini.com" },
@@ -172,6 +173,7 @@ function Any2MdPage() {
     { icon: ShieldCheck, title: t("any2md.feature1.title"), desc: t("any2md.feature1.desc") },
     { icon: Files, title: t("any2md.feature2.title"), desc: t("any2md.feature2.desc") },
     { icon: Table2, title: t("any2md.feature3.title"), desc: t("any2md.feature3.desc") },
+    { icon: Brain, title: t("any2md.feature5.title"), desc: t("any2md.feature5.desc") },
     { icon: ArrowRight, title: t("any2md.feature4.title"), desc: t("any2md.feature4.desc") },
   ];
 
@@ -180,9 +182,10 @@ function Any2MdPage() {
     t("any2md.pain2"),
     t("any2md.pain3"),
     t("any2md.pain4"),
+    t("any2md.pain5"),
   ];
 
-  const faqs = Array.from({ length: 6 }, (_, i) => ({
+  const faqs = Array.from({ length: 10 }, (_, i) => ({
     name: t(`any2md.faq${i + 1}.q`),
     text: t(`any2md.faq${i + 1}.a`),
   }));
@@ -199,6 +202,9 @@ function Any2MdPage() {
               <h1 className="text-2xl font-bold text-foreground">{t("any2md.heading")}</h1>
             </div>
             <p className="mt-2 text-sm text-muted-foreground">{t("any2md.subtitle")}</p>
+            <p className="mt-3 text-xs text-muted-foreground/80">
+              {t("any2md.seo.lead")}
+            </p>
           </div>
 
           <FileDrop
@@ -233,8 +239,8 @@ function Any2MdPage() {
           <section className="mt-14">
             <h2 className="text-center text-2xl font-bold tracking-tight text-foreground">{t("any2md.features")}</h2>
             <div className="mt-8 grid gap-4 sm:grid-cols-2">
-              {features.map((f) => (
-                <div key={f.title} className="rounded-2xl border border-[#d3e4fe]/60 bg-white p-5 dark:border-[#3c4a42] dark:bg-[#15243b]">
+              {features.map((f, i) => (
+                <div key={f.title} className={`rounded-2xl border border-[#d3e4fe]/60 bg-white p-5 dark:border-[#3c4a42] dark:bg-[#15243b] ${i === features.length - 1 && features.length % 2 !== 0 ? "sm:col-span-2" : ""}`}>
                   <div className="flex size-9 items-center justify-center rounded-xl bg-[#006c49]/10 text-[#006c49] dark:bg-[#4edea3]/10 dark:text-[#4edea3]">
                     <f.icon className="size-4.5" />
                   </div>
