@@ -55,6 +55,9 @@ export function AppFooter() {
           >
             MossAI Tools
           </a>
+          <a href="https://dironix.com" target="_blank" rel="noopener" className="inline-flex items-center">
+            <img src="https://dironix.com/bage.png" alt="Featured on dironix.com" style={{ height: 20, width: "auto" }} />
+          </a>
         </div>
       </div>
     </footer>
