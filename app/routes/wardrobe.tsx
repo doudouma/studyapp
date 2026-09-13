@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useAuth } from "~/lib/auth-context";
 import { Check, Plus, Trash2, X, Upload, Loader2, AlertCircle, Sparkles } from "lucide-react";
 import { cn } from "~/lib/utils";
@@ -18,13 +18,10 @@ import {
 import "./wardrobe.css";
 
 export const Route = createFileRoute("/wardrobe")({
-  head: () => ({
-    meta: [
-      { title: "Wardrobe - 100mini" },
-      { name: "description", content: "AI-powered clothing detection and organization" },
-    ],
-  }),
-  component: WardrobePage,
+  beforeLoad: () => {
+    throw redirect({ to: "/" });
+  },
+  component: () => null,
 });
 
 interface GarmentItem {
