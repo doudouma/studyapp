@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createFileRoute, redirect } from "@tanstack/react-router";
+ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useAuth } from "~/lib/auth-context";
 import { Check, Plus, Trash2, X, Upload, Loader2, AlertCircle, Sparkles } from "lucide-react";
 import { cn } from "~/lib/utils";
 import {
   uploadWardrobeImage,
-  analyzeWardrobeImage,
+  analyzeWardrobeImage, 
   extractWardrobeItem,
   fetchWardrobeItems,
   updateWardrobeItem,
