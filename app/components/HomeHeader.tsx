@@ -304,9 +304,6 @@ export function AppNav() {
             </div>
             <ToolsDropdown />
             <NavLink href="/links">{t("nav.profile")}</NavLink>
-            {user.role === "admin" && (
-              <NavLink href="/admin">{t("nav.admin")}</NavLink>
-            )}
           </div>
         </div>
 
