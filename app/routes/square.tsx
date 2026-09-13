@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { createFileRoute, useLoaderData } from "@tanstack/react-router";
-import { Globe, Loader2 } from "lucide-react";
+import { Globe, Loader2, Search } from "lucide-react";
+import { Input } from "~/components/ui/input";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { SquareGrid } from "~/components/SquareGrid";
@@ -136,10 +137,7 @@ function SquarePage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <AppNav
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-      />
+      <AppNav />
 
       <main className="flex-1">
         <div className="mx-auto max-w-360 px-6 pt-10 pb-12">
@@ -152,6 +150,17 @@ function SquarePage() {
             <p className="mt-1.5 text-base text-muted-foreground">
               {t("square.subtitle")}
             </p>
+          </div>
+
+          {/* Search */}
+          <div className="relative mb-6">
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              className="h-10 w-full bg-muted pl-9 text-sm"
+              placeholder={t("nav.search")}
+              value={searchQuery}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+            />
           </div>
 
           {/* Category filter */}

@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { Code2, Search, Settings, LogOut, Menu, X, Bookmark, ChevronDown } from "lucide-react";
-import { Input } from "~/components/ui/input";
+import { Code2, Settings, LogOut, Menu, X, Bookmark, ChevronDown } from "lucide-react";
 import { authClient } from "~/lib/auth-client";
 import { useAuth } from "~/lib/auth-context";
 import { Button } from "~/components/ui/button";
@@ -9,11 +8,6 @@ import { AuthDialog } from "~/components/AuthDialog";
 import { useTranslation } from "react-i18next";
 import { LangSwitcher } from "~/components/LangSwitcher";
 import { fetchSquareItems } from "~/features/square/api";
-
-interface AppNavProps {
-  searchQuery?: string;
-  onSearchChange?: (query: string) => void;
-}
 
 function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
   const location = useLocation();
@@ -180,17 +174,15 @@ function prefetchSquare() {
   fetchSquareItems(0).catch(() => {}).finally(() => { _prefetching = false; });
 }
 
-export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
+export function AppNav() {
   const { t } = useTranslation();
   const { user, refreshAuth, points } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [localSearch, setLocalSearch] = useState("");
   const menuRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
-  const isOnSquare = location.pathname.startsWith("/square");
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -201,24 +193,6 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  // Search value = from square page (when on square) or local state
-  const searchValue = isOnSquare ? (searchQuery ?? "") : localSearch;
-
-  const handleSearchChange = (value: string) => {
-    if (isOnSquare) {
-      onSearchChange?.(value);
-    } else {
-      setLocalSearch(value);
-    }
-  };
-
-  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && !isOnSquare && searchValue.trim()) {
-      navigate({ to: "/square", search: { q: searchValue.trim() } });
-      setLocalSearch("");
-    }
-  };
 
   const handleLogout = async () => {
     setMenuOpen(false);
@@ -336,7 +310,7 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
           </div>
         </div>
 
-        {/* Right: Search + Icons + Avatar */}
+        {/* Right: Icons + Avatar */}
         <div className="flex items-center gap-3">
           <button
             className="flex items-center justify-center size-9 md:hidden"
@@ -345,16 +319,6 @@ export function AppNav({ searchQuery, onSearchChange }: AppNavProps) {
           >
             {mobileNavOpen ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
-          <div className="relative hidden sm:block">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              className="h-9 w-48 bg-muted pl-9 text-sm lg:w-64"
-              placeholder={t("nav.search")}
-              value={searchValue}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              onKeyDown={handleSearchKeyDown}
-            />
-          </div>
           {/* <Button variant="ghost" size="icon" className="size-9">
             <Bell className="size-4" />
           </Button>
