@@ -66,7 +66,8 @@ function ToolsDropdown() {
     location.pathname.startsWith("/freetool") ||
     location.pathname.startsWith("/idphoto") ||
     location.pathname.startsWith("/petbadge") ||
-    location.pathname.startsWith("/petsafe");
+    location.pathname.startsWith("/petsafe") ||
+    location.pathname.startsWith("/papercut");
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -118,6 +119,9 @@ function ToolsDropdown() {
           </DropdownLink>
           <DropdownLink href="/petsafe" onClick={() => setOpen(false)}>
             {t("nav.petsafe")}
+          </DropdownLink>
+          <DropdownLink href="/papercut" onClick={() => setOpen(false)}>
+            {t("nav.papercut")}
           </DropdownLink>
         </div>
       )}
@@ -275,6 +279,7 @@ export function AppNav() {
               <MobileNavLink href="/idphoto" onClick={() => setMobileNavOpen(false)}>{t("nav.idphoto")}</MobileNavLink>
               <MobileNavLink href="/petbadge" onClick={() => setMobileNavOpen(false)}>{t("nav.petbadge")}</MobileNavLink>
               <MobileNavLink href="/petsafe" onClick={() => setMobileNavOpen(false)}>{t("nav.petsafe")}</MobileNavLink>
+              <MobileNavLink href="/papercut" onClick={() => setMobileNavOpen(false)}>{t("nav.papercut")}</MobileNavLink>
               <div className="px-4 pt-2">
                 <LangSwitcher />
               </div>
@@ -398,6 +403,7 @@ export function AppNav() {
             <MobileNavLink href="/idphoto" onClick={() => setMobileNavOpen(false)}>{t("nav.idphoto")}</MobileNavLink>
             <MobileNavLink href="/petbadge" onClick={() => setMobileNavOpen(false)}>{t("nav.petbadge")}</MobileNavLink>
             <MobileNavLink href="/petsafe" onClick={() => setMobileNavOpen(false)}>{t("nav.petsafe")}</MobileNavLink>
+            <MobileNavLink href="/papercut" onClick={() => setMobileNavOpen(false)}>{t("nav.papercut")}</MobileNavLink>
             <MobileNavLink href="/links" onClick={() => setMobileNavOpen(false)}>{t("nav.profile")}</MobileNavLink>
             {user.role === "admin" && (
               <MobileNavLink href="/admin" onClick={() => setMobileNavOpen(false)}>{t("nav.admin")}</MobileNavLink>
