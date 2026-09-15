@@ -17,6 +17,14 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ["@firecrawl/anydoc-wasm"],
   },
+  ssr: {
+    // Cloudflare Workers runtime: resolve worker/browser export conditions so
+    // dependencies don't pull Node-only builds (e.g. @better-auth/telemetry's
+    // `node` condition imports node:fs, which Workers rejects).
+    resolve: {
+      conditions: ["workerd", "worker", "module", "browser", "development|production"],
+    },
+  },
   plugins: [
     tanstackStart({
       srcDirectory: "app",
