@@ -733,6 +733,7 @@ export function PaperCutApp() {
         .papercut-app {
           position: relative;
           margin: 0 auto;
+          width: 100%;
           height: 100vh;
           height: 100dvh;
           max-width: 480px;
@@ -742,7 +743,7 @@ export function PaperCutApp() {
           -webkit-touch-callout: none;
           background: linear-gradient(180deg, #fdf8f0 0%, #fbeeda 46%, #f7dbbe 100%);
         }
-        @media (min-width: 520px) {
+        @media (min-width: 520px) and (min-height: 640px) {
           .papercut-app {
             width: 480px;
             height: min(900px, 94vh);
@@ -755,6 +756,7 @@ export function PaperCutApp() {
           inset: 0;
           display: none;
           flex-direction: column;
+          overflow: hidden;
         }
         .papercut-page.active {
           display: flex;
@@ -876,6 +878,81 @@ export function PaperCutApp() {
           font-size: 14px;
           letter-spacing: 0.12em;
         }
+        /* Keep the whole home screen visible without a scrollbar on short viewports */
+        @media (min-width: 520px) and (min-height: 640px) {
+          .papercut-hero-card {
+            margin: max(7vh, 60px) 7vw 0;
+            padding: 6vh 10px 7vh;
+          }
+          .papercut-btn-start {
+            margin-top: 4vh;
+          }
+          .papercut-recent {
+            margin-top: 3vh;
+            padding-bottom: 28px;
+          }
+        }
+        @media (max-height: 720px) {
+          .papercut-hero-card {
+            margin: max(6vh, 48px) 7vw 0;
+            padding: 5vh 10px 6vh;
+          }
+          .papercut-btn-start {
+            margin-top: 4vh;
+          }
+          .papercut-recent {
+            margin-top: 3vh;
+            padding-bottom: 24px;
+          }
+          .papercut-gallery-empty {
+            padding: 20px 0 4px;
+          }
+        }
+        @media (max-height: 620px) {
+          .papercut-hero-card {
+            margin: 34px 7vw 0;
+            padding: 20px 10px 24px;
+          }
+          .papercut-btn-start {
+            margin-top: 18px;
+            padding: 13px 36px;
+            font-size: 18px;
+          }
+          .papercut-recent {
+            margin-top: 14px;
+            padding-bottom: 16px;
+          }
+          .papercut-gallery-empty {
+            padding: 12px 0 2px;
+          }
+          .papercut-culture-link {
+            margin-top: 12px !important;
+          }
+        }
+        @media (max-height: 460px) {
+          .papercut-hero-card {
+            margin: 16px 7vw 0;
+            padding: 12px 10px 16px;
+          }
+          .papercut-hero-card h1 {
+            font-size: clamp(28px, 6vw, 34px);
+          }
+          .papercut-btn-start {
+            margin-top: 10px;
+            padding: 10px 28px;
+            font-size: 16px;
+          }
+          .papercut-recent {
+            margin-top: 8px;
+            padding-bottom: 8px;
+          }
+          .papercut-gallery-empty {
+            padding: 6px 0 2px;
+          }
+          .papercut-culture-link {
+            margin-top: 8px !important;
+          }
+        }
         .papercut-cut-top {
           position: relative;
           z-index: 6;
@@ -924,6 +1001,26 @@ export function PaperCutApp() {
           color: #41302a;
           font-weight: 700;
           box-shadow: 0 3px 10px rgba(150, 80, 40, 0.18);
+        }
+        @media (max-width: 400px) {
+          .papercut-home-btn {
+            width: 46px;
+            height: 46px;
+          }
+          .papercut-seg button {
+            padding: 8px 13px;
+            font-size: 14px;
+          }
+        }
+        @media (max-width: 340px) {
+          .papercut-home-btn {
+            width: 42px;
+            height: 42px;
+          }
+          .papercut-seg button {
+            padding: 7px 10px;
+            font-size: 13px;
+          }
         }
         .papercut-stage {
           flex: 1;
@@ -1178,7 +1275,7 @@ export function PaperCutApp() {
 
       <div className="papercut-app">
         {/* Home page */}
-        <section className={`papercut-page ${page === "home" ? "active" : ""}`} style={{ overflowY: "auto" }}>
+        <section className={`papercut-page ${page === "home" ? "active" : ""}`}>
           <div className="papercut-glow" />
           <div className="papercut-hero-card">
             <h1>{t("papercut.home.title")}</h1>
