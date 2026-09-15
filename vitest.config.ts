@@ -10,7 +10,7 @@ export default defineConfig({
     },
   },
   test: {
-    include: ["tests/**/*.spec.ts"],
+    include: ["tests/**/*.spec.{ts,tsx}"],
     exclude: [
       "tests/any2md.spec.ts",
       "tests/idphoto.spec.ts",

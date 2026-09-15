@@ -17,6 +17,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PomodoroRouteImport } from './routes/pomodoro'
 import { Route as PetsafeRouteImport } from './routes/petsafe'
 import { Route as PetbadgeRouteImport } from './routes/petbadge'
+import { Route as PapercutRouteImport } from './routes/papercut'
 import { Route as Md2htmlRouteImport } from './routes/md2html'
 import { Route as LinksRouteImport } from './routes/links'
 import { Route as IdphotoRouteImport } from './routes/idphoto'
@@ -26,6 +27,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as Any2mdRouteImport } from './routes/any2md'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PapercutViewRouteImport } from './routes/papercut_.view'
 
 const WardrobeRoute = WardrobeRouteImport.update({
   id: '/wardrobe',
@@ -65,6 +67,11 @@ const PetsafeRoute = PetsafeRouteImport.update({
 const PetbadgeRoute = PetbadgeRouteImport.update({
   id: '/petbadge',
   path: '/petbadge',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PapercutRoute = PapercutRouteImport.update({
+  id: '/papercut',
+  path: '/papercut',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Md2htmlRoute = Md2htmlRouteImport.update({
@@ -112,6 +119,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PapercutViewRoute = PapercutViewRouteImport.update({
+  id: '/papercut_/view',
+  path: '/papercut/view',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -123,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/idphoto': typeof IdphotoRoute
   '/links': typeof LinksRoute
   '/md2html': typeof Md2htmlRoute
+  '/papercut': typeof PapercutRoute
   '/petbadge': typeof PetbadgeRoute
   '/petsafe': typeof PetsafeRoute
   '/pomodoro': typeof PomodoroRoute
@@ -131,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/square': typeof SquareRoute
   '/terms': typeof TermsRoute
   '/wardrobe': typeof WardrobeRoute
+  '/papercut/view': typeof PapercutViewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -142,6 +156,7 @@ export interface FileRoutesByTo {
   '/idphoto': typeof IdphotoRoute
   '/links': typeof LinksRoute
   '/md2html': typeof Md2htmlRoute
+  '/papercut': typeof PapercutRoute
   '/petbadge': typeof PetbadgeRoute
   '/petsafe': typeof PetsafeRoute
   '/pomodoro': typeof PomodoroRoute
@@ -150,6 +165,7 @@ export interface FileRoutesByTo {
   '/square': typeof SquareRoute
   '/terms': typeof TermsRoute
   '/wardrobe': typeof WardrobeRoute
+  '/papercut/view': typeof PapercutViewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -162,6 +178,7 @@ export interface FileRoutesById {
   '/idphoto': typeof IdphotoRoute
   '/links': typeof LinksRoute
   '/md2html': typeof Md2htmlRoute
+  '/papercut': typeof PapercutRoute
   '/petbadge': typeof PetbadgeRoute
   '/petsafe': typeof PetsafeRoute
   '/pomodoro': typeof PomodoroRoute
@@ -170,6 +187,7 @@ export interface FileRoutesById {
   '/square': typeof SquareRoute
   '/terms': typeof TermsRoute
   '/wardrobe': typeof WardrobeRoute
+  '/papercut_/view': typeof PapercutViewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -183,6 +201,7 @@ export interface FileRouteTypes {
     | '/idphoto'
     | '/links'
     | '/md2html'
+    | '/papercut'
     | '/petbadge'
     | '/petsafe'
     | '/pomodoro'
@@ -191,6 +210,7 @@ export interface FileRouteTypes {
     | '/square'
     | '/terms'
     | '/wardrobe'
+    | '/papercut/view'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -202,6 +222,7 @@ export interface FileRouteTypes {
     | '/idphoto'
     | '/links'
     | '/md2html'
+    | '/papercut'
     | '/petbadge'
     | '/petsafe'
     | '/pomodoro'
@@ -210,6 +231,7 @@ export interface FileRouteTypes {
     | '/square'
     | '/terms'
     | '/wardrobe'
+    | '/papercut/view'
   id:
     | '__root__'
     | '/'
@@ -221,6 +243,7 @@ export interface FileRouteTypes {
     | '/idphoto'
     | '/links'
     | '/md2html'
+    | '/papercut'
     | '/petbadge'
     | '/petsafe'
     | '/pomodoro'
@@ -229,6 +252,7 @@ export interface FileRouteTypes {
     | '/square'
     | '/terms'
     | '/wardrobe'
+    | '/papercut_/view'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -241,6 +265,7 @@ export interface RootRouteChildren {
   IdphotoRoute: typeof IdphotoRoute
   LinksRoute: typeof LinksRoute
   Md2htmlRoute: typeof Md2htmlRoute
+  PapercutRoute: typeof PapercutRoute
   PetbadgeRoute: typeof PetbadgeRoute
   PetsafeRoute: typeof PetsafeRoute
   PomodoroRoute: typeof PomodoroRoute
@@ -249,6 +274,7 @@ export interface RootRouteChildren {
   SquareRoute: typeof SquareRoute
   TermsRoute: typeof TermsRoute
   WardrobeRoute: typeof WardrobeRoute
+  PapercutViewRoute: typeof PapercutViewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -307,6 +333,13 @@ declare module '@tanstack/react-router' {
       path: '/petbadge'
       fullPath: '/petbadge'
       preLoaderRoute: typeof PetbadgeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/papercut': {
+      id: '/papercut'
+      path: '/papercut'
+      fullPath: '/papercut'
+      preLoaderRoute: typeof PapercutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/md2html': {
@@ -372,6 +405,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/papercut_/view': {
+      id: '/papercut_/view'
+      path: '/papercut/view'
+      fullPath: '/papercut/view'
+      preLoaderRoute: typeof PapercutViewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -385,6 +425,7 @@ const rootRouteChildren: RootRouteChildren = {
   IdphotoRoute: IdphotoRoute,
   LinksRoute: LinksRoute,
   Md2htmlRoute: Md2htmlRoute,
+  PapercutRoute: PapercutRoute,
   PetbadgeRoute: PetbadgeRoute,
   PetsafeRoute: PetsafeRoute,
   PomodoroRoute: PomodoroRoute,
@@ -393,6 +434,7 @@ const rootRouteChildren: RootRouteChildren = {
   SquareRoute: SquareRoute,
   TermsRoute: TermsRoute,
   WardrobeRoute: WardrobeRoute,
+  PapercutViewRoute: PapercutViewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

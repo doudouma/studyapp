@@ -58,6 +58,8 @@ function pageKeys(basePath: string): { name: string; desc: string } {
       return { name: "nav.pomodoro", desc: "pomodoro.desc" };
     case "/rhythm":
       return { name: "rhythm.brand", desc: "rhythm.desc" };
+    case "/papercut":
+      return { name: "papercut.seo.heading", desc: "papercut.desc" };
     case "/links":
       return { name: "profile.heading", desc: "profile.desc" };
     case "/contact":

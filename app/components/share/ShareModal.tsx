@@ -18,8 +18,14 @@ export interface ShareModalProps {
   onOpenChange: (open: boolean) => void;
   url?: string;
   text?: string;
+  title?: string;
+  subtitle?: string;
   captureRef?: React.RefObject<HTMLElement | null>;
   fileName?: string;
+  /** Capture with a transparent background instead of white */
+  transparent?: boolean;
+  /** Optional hint shown below the share actions */
+  linkHint?: string;
   className?: string;
 }
 
@@ -162,8 +168,12 @@ export function ShareModal({
   onOpenChange,
   url: propUrl,
   text = "",
+  title,
+  subtitle,
   captureRef,
   fileName = "share.png",
+  transparent = false,
+  linkHint,
   className,
 }: ShareModalProps) {
   const { t } = useTranslation();
@@ -178,6 +188,12 @@ export function ShareModal({
   const [qrOpen, setQrOpen] = useState(false);
   const [hasNativeShare, setHasNativeShare] = useState(false);
 
+  // Track open state so async generation can bail if the modal closed
+  const openRef = useRef(open);
+  useEffect(() => {
+    openRef.current = open;
+  }, [open]);
+
   useEffect(() => {
     setHasNativeShare(
       typeof navigator !== "undefined" && !!navigator.share
@@ -185,15 +201,34 @@ export function ShareModal({
   }, []);
 
   const generateImage = useCallback(async () => {
-    if (!captureRef?.current || generating) return;
+    const el = captureRef?.current;
+    if (!el || generating) return;
     setGenerating(true);
     try {
-      const { snapdom } = await import("@zumer/snapdom");
-      const blob = await snapdom.toBlob(captureRef.current, {
-        type: "png",
-        backgroundColor: "#ffffff",
-        scale: 2,
-      });
+      let blob: Blob;
+      if (transparent && el instanceof HTMLCanvasElement) {
+        const out = document.createElement("canvas");
+        out.width = el.width * 2;
+        out.height = el.height * 2;
+        const octx = out.getContext("2d");
+        if (!octx) throw new Error("No 2D context");
+        octx.imageSmoothingQuality = "high";
+        octx.drawImage(el, 0, 0, out.width, out.height);
+        blob = await new Promise<Blob>((resolve, reject) =>
+          out.toBlob(
+            (b) => (b ? resolve(b) : reject(new Error("toBlob failed"))),
+            "image/png"
+          )
+        );
+      } else {
+        const { snapdom } = await import("@zumer/snapdom");
+        blob = await snapdom.toBlob(el, {
+          type: "png",
+          scale: 2,
+          ...(transparent ? {} : { backgroundColor: "#ffffff" }),
+        });
+      }
+      if (!openRef.current) return;
       setImgBlob(blob);
       setImgUrl(URL.createObjectURL(blob));
     } catch (e) {
@@ -201,7 +236,7 @@ export function ShareModal({
     } finally {
       setGenerating(false);
     }
-  }, [captureRef, generating]);
+  }, [captureRef, generating, transparent]);
 
   useEffect(() => {
     if (open && captureRef?.current && !imgBlob) {
@@ -210,7 +245,16 @@ export function ShareModal({
   }, [open, captureRef, imgBlob, generateImage]);
 
   useEffect(() => {
-    if (!open) setQrOpen(false);
+    if (!imgUrl) return;
+    return () => URL.revokeObjectURL(imgUrl);
+  }, [imgUrl]);
+
+  useEffect(() => {
+    if (!open) {
+      setQrOpen(false);
+      setImgBlob(null);
+      setImgUrl(null);
+    }
   }, [open]);
 
   const copyLink = useCallback(async () => {
@@ -298,24 +342,25 @@ export function ShareModal({
       >
         <div className="relative">
           <DialogTitle className="sr-only">
-            {t("petbadge.share.title")}
+            {title || t("petbadge.share.title")}
           </DialogTitle>
 
           {/* Header */}
           <div className="flex items-center justify-between px-5 pt-5 pb-3">
             <div>
               <h2 className="text-[17px] font-extrabold text-[#2F3E4E]">
-                {t("petbadge.share.title")}
+                {title || t("petbadge.share.title")}
               </h2>
               <p className="mt-0.5 text-[13px] text-[#8A97A2]">
-                {t("petbadge.share.subtitle")}
+                {subtitle || t("petbadge.share.subtitle")}
               </p>
             </div>
             <button
               onClick={() => onOpenChange(false)}
-              className="size-8 flex items-center justify-center rounded-full bg-[#F0F0F0] text-[#8A97A2] hover:bg-[#E4E4E4] transition-colors"
+              className="relative z-10 size-8 flex items-center justify-center rounded-full bg-[#F0F0F0] text-[#6B7280] hover:bg-[#E4E4E4] transition-colors"
+              type="button"
             >
-              <X className="size-4" />
+              <X className="size-4" strokeWidth={2.5} />
             </button>
           </div>
 
@@ -324,7 +369,7 @@ export function ShareModal({
             <div className="mx-5 overflow-hidden rounded-xl bg-[#F5F5F5]">
               {generating && !imgUrl ? (
                 <div className="flex flex-col items-center gap-2 py-10">
-                  <Loader2 className="size-6 animate-spin text-[#C17248]" />
+                  <Loader2 className="size-6 animate-spin text-[#6B7280]" />
                   <span className="text-[13px] text-[#8A97A2]">
                     {t("petbadge.share.generating")}
                   </span>
@@ -416,13 +461,19 @@ export function ShareModal({
             {hasNativeShare && (
               <button
                 onClick={nativeShare}
-                className="flex-1 min-w-[100px] h-10 rounded-xl bg-[#C17248] text-[13px] font-bold text-white flex items-center justify-center gap-1.5 hover:bg-[#A65A34] transition-colors"
+                className="flex-1 min-w-[100px] h-10 rounded-xl bg-[#374151] text-[13px] font-bold text-white flex items-center justify-center gap-1.5 hover:bg-[#1F2937] transition-colors"
               >
                 <Share2 className="size-4" />
                 {t("petbadge.share.native")}
               </button>
             )}
           </div>
+
+          {linkHint && (
+            <p className="px-5 pb-5 -mt-1 text-center text-[11.5px] leading-[1.6] text-[#A0947F]">
+              {linkHint}
+            </p>
+          )}
         </div>
       </DialogContent>
     </Dialog>
