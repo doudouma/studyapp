@@ -710,15 +710,6 @@ export function PaperCutApp() {
     }
   }, [currentBlob, downloadBlob, toast, t]);
 
-  // Jump to the standalone showcase page
-  const handleOpenView = useCallback(() => {
-    if (!shareUrl) return;
-    toast(t("papercut.result.viewOpening"));
-    window.setTimeout(() => {
-      window.location.href = shareUrl;
-    }, 350);
-  }, [shareUrl, toast, t]);
-
   // Render
   return (
     <div className="flex min-h-screen flex-col">
@@ -1140,8 +1131,7 @@ export function PaperCutApp() {
           display: flex;
           align-items: center;
           justify-content: center;
-          flex-wrap: wrap;
-          gap: 14px;
+          gap: 16px;
         }
         .papercut-rbtn {
           width: 56px;
@@ -1152,14 +1142,10 @@ export function PaperCutApp() {
           display: grid;
           place-items: center;
           box-shadow: 0 6px 16px rgba(190, 100, 60, 0.24);
-          transition: transform 0.12s, opacity 0.2s;
+          transition: transform 0.12s;
         }
         .papercut-rbtn:active {
           transform: scale(0.9);
-        }
-        .papercut-rbtn.disabled {
-          opacity: 0.38;
-          pointer-events: none;
         }
         .papercut-share-btn {
           min-width: 148px;
@@ -1470,18 +1456,6 @@ export function PaperCutApp() {
                   <path d="M12 4.2v9.6" />
                   <path d="m7.6 10 4.4 4.4L16.4 10" />
                   <path d="M5 19.4h14" />
-                </svg>
-              </button>
-              <button
-                className={`papercut-rbtn ${!shareUrl ? "disabled" : ""}`}
-                onClick={handleOpenView}
-                aria-label={t("papercut.result.view")}
-                title={t("papercut.result.view")}
-              >
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#e06a3c" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M14 5h5v5" />
-                  <path d="M19 5l-7.6 7.6" />
-                  <path d="M18 13.6V18a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4.4" />
                 </svg>
               </button>
             </div>
