@@ -179,8 +179,8 @@ export async function listPages(
 }
 
 /** 管理员手动触发匿名 tmp 文件清理 */
-export async function cleanupTmp(bucket: R2Bucket): Promise<CleanupTmpResponse> {
-  const deleted = await cleanupAnonymousUploads(bucket);
+export async function cleanupTmp(bucket: R2Bucket, expiryMs?: number): Promise<CleanupTmpResponse> {
+  const deleted = await cleanupAnonymousUploads(bucket, expiryMs);
   return { success: true, deleted };
 }
 

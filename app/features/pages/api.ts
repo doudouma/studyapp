@@ -1,5 +1,5 @@
 import { apiClient, rpcErrorMessage } from "~/features/api-client";
-import type { PagesListResponse, PageContentResponse } from "@shared/types/pages";
+import type { PagesListResponse, PageContentResponse, UploadResult } from "@shared/types/pages";
 
 /**
  * Pages 功能的类型化 API 客户端 (Hono RPC)
@@ -81,13 +81,15 @@ export async function updatePageFile(pageId: string, formData: FormData): Promis
 }
 
 /** 上传新页面（匿名 = 7 天临时；登录 = 永久）。调用方负责组装 FormData */
-export async function uploadPage(formData: FormData) {
+export async function uploadPage(
+  formData: FormData
+): Promise<{ ok: true; data: UploadResult } | { ok: false; error?: string }> {
   const res = await apiClient().api.upload.$post({ form: formDataToObject(formData) });
   const json = await res.json();
   if (!res.ok) {
     return { ok: false as const, error: (json as { error?: string }).error };
   }
-  return { ok: true as const, data: json };
+  return { ok: true as const, data: json as UploadResult };
 }
 
 /** 上传页面缩略图（SnapDOM WebP）。调用方负责组装 FormData */

@@ -1,7 +1,7 @@
 /// <reference types="@cloudflare/workers-types" />
 import { createStartHandler, defaultStreamHandler } from "@tanstack/react-start/server";
 import api from "~/../server/api";
-import { cleanupAnonymousUploads } from "~/../server/features/pages/pages.storage";
+import { cleanupAnonymousUploads, getTmpExpiryMs } from "~/../server/features/pages/pages.storage";
 import { createAuth } from "~/../server/auth";
 import { getUserByApiKey } from "~/../server/features/pages/apikey.service";
 import { Hono } from "hono";
@@ -23,6 +23,8 @@ type Bindings = {
   BETTER_AUTH_API_KEY?: string;
   GOOGLE_CLIENT_ID?: string;
   GOOGLE_CLIENT_SECRET?: string;
+  /** 匿名 tmp 上传过期毫秒数，默认 7 天 */
+  TMP_EXPIRY_MS?: string;
 };
 
 // In Vite dev mode, c.env is undefined — use getPlatformProxy for local D1/R2
@@ -47,7 +49,7 @@ app.use("*", async (c, next) => {
   if (!c.env?.D1) {
     try {
       const proxy = await getDevBindings();
-      c.env = { ...c.env, D1: proxy.env.D1, BUCKET: proxy.env.BUCKET, AI: proxy.env.AI } as any;
+      c.env = { ...c.env, ...proxy.env } as any;
       (globalThis as any).__CF_ENV__ = { D1: proxy.env.D1, BUCKET: proxy.env.BUCKET, AI: proxy.env.AI };
     } catch (err) {
       console.warn("Local bindings not available:", (err as Error).message);
@@ -199,7 +201,7 @@ export async function scheduled(_event: ScheduledEvent, env: Bindings, _ctx: Exe
   // Cleanup expired anonymous uploads
   if (env.BUCKET) {
     try {
-      const count = await cleanupAnonymousUploads(env.BUCKET);
+      const count = await cleanupAnonymousUploads(env.BUCKET, getTmpExpiryMs(env));
       console.log(`[cron] cleaned up ${count} expired anonymous upload(s)`);
     } catch (err) {
       console.error("[cron] cleanup failed:", err);

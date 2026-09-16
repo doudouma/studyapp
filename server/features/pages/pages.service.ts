@@ -533,6 +533,8 @@ export async function savePageThumbnail(
 export interface ServePageEnv {
   d1?: D1Database;
   bucket?: R2Bucket;
+  /** tmp 匿名上传过期毫秒数，默认 7 天（可由环境变量覆盖） */
+  tmpExpiryMs?: number;
 }
 
 /** 服务用户页面 HTML 或其资产文件，含过期惰性清理、浏览量与 SEO 注入 */
@@ -571,7 +573,7 @@ export async function serveUserPage(
     if (!obj) return new Response(notFoundHtml(lang), { status: 404, headers: htmlHeaders() });
 
     // Lazy cleanup for expired tmp uploads
-    if (isTmp && isExpiredByUploaded(obj.uploaded)) {
+    if (isTmp && isExpiredByUploaded(obj.uploaded, env.tmpExpiryMs)) {
       await deleteTmpByBucketId(bucket, id);
       return new Response(notFoundHtml(lang), { status: 404, headers: htmlHeaders() });
     }
@@ -600,7 +602,7 @@ export async function serveUserPage(
   }
 
   // Lazy cleanup: delete expired anonymous tmp uploads
-  if (obj.key?.startsWith("tmp/") && isExpiredByUploaded(obj.uploaded)) {
+  if (obj.key?.startsWith("tmp/") && isExpiredByUploaded(obj.uploaded, env.tmpExpiryMs)) {
     await deleteTmpByBucketId(bucket, id);
     return new Response(notFoundHtml(lang), { status: 404, headers: htmlHeaders() });
   }

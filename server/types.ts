@@ -9,6 +9,8 @@ export type AppBindings = {
   BUCKET?: R2Bucket;
   D1?: D1Database;
   AI?: Ai;
+  /** 匿名 tmp 上传过期毫秒数，默认 7 天（7 * 24 * 60 * 60 * 1000） */
+  TMP_EXPIRY_MS?: string;
 };
 
 export type AppVariables = {

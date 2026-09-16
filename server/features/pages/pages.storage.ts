@@ -16,6 +16,13 @@ import { MAX_CONTENT_SIZE } from "@shared/types/pages";
 export const TMP_EXPIRY_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 export const MAX_THUMBNAIL_SIZE = 2 * 1024 * 1024; // 2MB
 
+/** Resolve the tmp expiry from env (ms). Falls back to the 7-day default. */
+export function getTmpExpiryMs(env?: { TMP_EXPIRY_MS?: string | number }): number {
+  const raw = env?.TMP_EXPIRY_MS;
+  const n = typeof raw === "number" ? raw : raw != null && raw !== "" ? Number(raw) : NaN;
+  return Number.isFinite(n) && n > 0 ? n : TMP_EXPIRY_MS;
+}
+
 export const ALLOWED_EXTENSIONS = [".html", ".htm", ".zip"];
 
 export { MAX_CONTENT_SIZE };
@@ -61,20 +68,23 @@ export async function deletePageObjects(bucket: R2Bucket, id: string): Promise<v
   } while (cursor);
 }
 
-function isExpiredByUploaded(uploaded: Date | undefined): boolean {
+function isExpiredByUploaded(uploaded: Date | undefined, expiryMs: number = TMP_EXPIRY_MS): boolean {
   if (!uploaded) return true;
-  return Date.now() - uploaded.getTime() > TMP_EXPIRY_MS;
+  return Date.now() - uploaded.getTime() > expiryMs;
 }
 
 /** 全量遍历并删除过期的匿名 tmp 上传（cron 手动清理用），返回删除数量 */
-export async function cleanupAnonymousUploads(bucket: R2Bucket): Promise<number> {
+export async function cleanupAnonymousUploads(
+  bucket: R2Bucket,
+  expiryMs: number = TMP_EXPIRY_MS
+): Promise<number> {
   let deleted = 0;
   let cursor: string | undefined;
   do {
     const listed = await bucket.list({ prefix: "tmp/", cursor });
     const toDelete: string[] = [];
     for (const obj of listed.objects) {
-      if (isExpiredByUploaded(obj.uploaded)) {
+      if (isExpiredByUploaded(obj.uploaded, expiryMs)) {
         toDelete.push(obj.key);
       }
     }

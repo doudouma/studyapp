@@ -16,7 +16,7 @@ import {
 } from "./pages.service";
 import { createApiKey, listApiKeys, revokeApiKey } from "./apikey.service";
 import { detectLangFromHeader } from "./pages.render";
-import { cleanupAnonymousUploads, deletePageObjects } from "./pages.storage";
+import { cleanupAnonymousUploads, deletePageObjects, getTmpExpiryMs } from "./pages.storage";
 import { insertUploadLog } from "../admin/upload-log.repo";
 import { log } from "../../lib/log";
 
@@ -307,7 +307,7 @@ export const pagesRoutes = new Hono<AppEnv>()
   // 用户页面访问（HTML + 资产），含过期惰性清理
   .get("/p/*", async (c) => {
     return serveUserPage(
-      { d1: c.env.D1, bucket: c.env?.BUCKET },
+      { d1: c.env.D1, bucket: c.env?.BUCKET, tmpExpiryMs: getTmpExpiryMs(c.env) },
       c.req.path.replace(/^\/p\//, ""),
       c.req.header("accept-language")
     );

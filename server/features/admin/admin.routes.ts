@@ -13,6 +13,7 @@ import {
   setUserPoints,
 } from "./admin.service";
 import { insertUploadLog, queryUploadLogs } from "./upload-log.repo";
+import { getTmpExpiryMs } from "../pages/pages.storage";
 
 /**
  * Admin 路由层 (HTTP 边界)
@@ -90,7 +91,7 @@ export const adminRoutes = new Hono<AppEnv>()
   // 手动触发匿名 tmp 清理
   .post("/api/admin/cleanup-tmp", async (c) => {
     if (!c.env?.BUCKET) return c.json({ error: "storage unavailable" }, 503);
-    const result = await cleanupTmp(c.env.BUCKET);
+    const result = await cleanupTmp(c.env.BUCKET, getTmpExpiryMs(c.env));
     if (c.env.D1) {
       insertUploadLog(c.env.D1, {
         pageId: "batch",
