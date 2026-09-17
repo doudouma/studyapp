@@ -421,3 +421,119 @@ select.input-comic { cursor: pointer; }
     section:has(.print-poster) > *:not(:has(.print-poster)) { display: none !important; }
     .print-poster { position: fixed; top: 0; left: 0; margin: 0; box-shadow: none; border: 2px solid #000; }
 }
+
+/* ============================================
+   CASE LIBRARY MARKDOWN BODY (/showcase/{slug})
+   Markdown 正文渲染出的 HTML 作用域样式。
+   终端风：等宽字体 + 标题带 `## ` 前缀 + 表格/引用块的终端化处理。
+   强调色来自祖先的 --sc-accent / --sc-accent-dark 变量。
+   ============================================ */
+.sc-md {
+  font-size: 11.5px;
+  line-height: 1.75;
+  color: #333;
+}
+.sc-md > :first-child { margin-top: 0; }
+.sc-md h2 {
+  margin: 1.6em 0 0.5em;
+  font-size: 13px;
+  font-weight: 700;
+  color: #000;
+}
+.sc-md h2::before {
+  content: "## ";
+  color: rgba(0, 0, 0, 0.28);
+}
+.sc-md h3 {
+  margin: 1.3em 0 0.4em;
+  font-size: 12px;
+  font-weight: 700;
+  color: #000;
+}
+.sc-md p { margin: 0 0 0.75em; }
+.sc-md strong { color: #000; }
+.sc-md em { font-style: italic; }
+.sc-md a {
+  color: #1d4ed8;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.sc-md code {
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+  background: #f0f0f0;
+  font-size: 0.95em;
+}
+
+.sc-md ul,
+.sc-md ol { margin: 0 0 0.9em; padding-left: 1.4em; }
+.sc-md ul { list-style: disc; }
+.sc-md ol { list-style: decimal; }
+.sc-md li { margin: 0 0 0.35em; }
+.sc-md li::marker { color: var(--sc-accent, #006c49); }
+
+/* 对照表：横向可滚（窄屏不压缩列宽） */
+.sc-table-wrap {
+  margin: 0 0 1em;
+  overflow-x: auto;
+  border: 1px solid #cfcfcf;
+  border-radius: 8px;
+}
+.sc-md table { width: 100%; border-collapse: collapse; text-align: left; }
+.sc-md thead { background: #ececec; }
+.sc-md th {
+  padding: 6px 12px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #5c5c5c;
+}
+.sc-md td {
+  padding: 8px 12px;
+  vertical-align: top;
+  border-top: 1px dashed #e0e0e0;
+}
+.sc-md td:first-child { font-weight: 700; white-space: nowrap; color: #000; }
+.sc-md td:first-child + td { white-space: nowrap; }
+.sc-tone { font-weight: 700; color: var(--sc-tone); }
+
+/* 引用块 → 结论/提示块 */
+.sc-md blockquote {
+  margin: 0 0 1em;
+  padding: 10px 14px;
+  border-left: 2px solid var(--sc-accent, #006c49);
+  border-radius: 8px;
+  background: #f5f5f5;
+}
+.sc-md blockquote p:last-child { margin-bottom: 0; }
+.sc-md blockquote p:first-child strong {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sc-accent, #006c49);
+}
+
+/* 暗色 */
+.dark .sc-md { color: #9fb0c3; }
+.dark .sc-md h2,
+.dark .sc-md h3,
+.dark .sc-md strong,
+.dark .sc-md td:first-child { color: #e6edf6; }
+.dark .sc-md h2::before { color: rgba(255, 255, 255, 0.28); }
+.dark .sc-md a { color: #7dd3fc; }
+.dark .sc-md code { background: #1b2637; }
+.dark .sc-md li::marker { color: var(--sc-accent-dark, #4edea3); }
+.dark .sc-table-wrap { border-color: #243244; }
+.dark .sc-md thead { background: #151d2b; }
+.dark .sc-md th { color: #9fb0c3; }
+.dark .sc-md td { border-top-color: #243244; }
+.dark .sc-tone { color: var(--sc-tone-dark); }
+.dark .sc-md blockquote {
+  border-left-color: var(--sc-accent-dark, #4edea3);
+  background: #101a24;
+}
+.dark .sc-md blockquote p:first-child strong {
+  color: var(--sc-accent-dark, #4edea3);
+}

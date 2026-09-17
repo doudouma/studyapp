@@ -32,7 +32,7 @@ export const Route = createFileRoute("/square")({
         property: "og:description",
         content: i18n.t("square.desc"),
       },
-      { name: "twitter:card", content: "summary" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: i18n.t("square.title") },
       {
         name: "twitter:description",

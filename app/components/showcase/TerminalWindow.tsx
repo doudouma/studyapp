@@ -20,14 +20,15 @@ export function TerminalWindow({
     <div
       style={{ fontFamily: TERMINAL_FONT }}
       className={cn(
-        "overflow-hidden rounded-xl border border-[#d9d9d0] bg-[#fbfbf8] text-[#26302b] dark:border-[#243244] dark:bg-[#0d1117] dark:text-[#c9d5e4]",
+        "overflow-hidden rounded-xl border border-[#cfcfcf] bg-[#ffffff] text-[#000000] dark:border-[#243244] dark:bg-[#0d1117] dark:text-[#c9d5e4]",
         className,
       )}
     >
-      <div className="flex items-center gap-1.5 border-b border-[#d9d9d0] bg-[#f1f1ea] px-3 py-2 dark:border-[#243244] dark:bg-[#151d2b]">
-        <span className="size-2 rounded-full bg-[#c9c9bf] dark:bg-[#3b4a5f]" />
-        <span className="size-2 rounded-full bg-[#c9c9bf] dark:bg-[#3b4a5f]" />
-        <span className="size-2 rounded-full bg-[#c9c9bf] dark:bg-[#3b4a5f]" />
+      <div className="flex items-center gap-1.5 border-b border-[#cfcfcf] bg-[#ececec] px-3 py-2 dark:border-[#243244] dark:bg-[#151d2b]">
+        {/* macOS 交通灯：关闭 / 最小化 / 全屏 */}
+        <span className="size-2.5 rounded-full bg-[#ff5f57]" />
+        <span className="size-2.5 rounded-full bg-[#febc2e]" />
+        <span className="size-2.5 rounded-full bg-[#28c840]" />
         <span className="ml-1.5 truncate text-[10px] text-muted-foreground">{title}</span>
       </div>
       <div className={cn(bodyClassName)}>{children}</div>

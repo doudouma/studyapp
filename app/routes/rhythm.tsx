@@ -3,7 +3,7 @@ import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import i18n, { getBcp47 } from "~/lib/i18n";
-import { withLangPrefix, currentLang, BASE_URL } from "~/lib/seo";
+import { withLangPrefix, currentLang, BASE_URL, DEFAULT_OG_IMAGE } from "~/lib/seo";
 import { AppNav } from "~/components/HomeHeader";
 import { RhythmGame } from "~/components/RhythmGame";
 
@@ -24,12 +24,12 @@ export const Route = createFileRoute("/rhythm")({
         { property: "og:type", content: "website" },
         { property: "og:title", content: i18n.t("rhythm.title") },
         { property: "og:description", content: i18n.t("rhythm.desc") },
-        { property: "og:image", content: "https://100mini.com/spritesheet2/frame_38.webp" },
+        { property: "og:image", content: DEFAULT_OG_IMAGE },
         { property: "og:site_name", content: "100mini" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: i18n.t("rhythm.title") },
         { name: "twitter:description", content: i18n.t("rhythm.desc") },
-        { name: "twitter:image", content: "https://100mini.com/spritesheet2/frame_38.webp" },
+        { name: "twitter:image", content: DEFAULT_OG_IMAGE },
       ],
       scripts: [
         {

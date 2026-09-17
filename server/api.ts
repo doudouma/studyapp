@@ -11,7 +11,7 @@ import {
 } from "../app/lib/lang";
 import { page } from "./db/schema";
 import { createDb } from "./db";
-import { SHOWCASE_CASES } from "../shared/showcase/cases";
+import { SHOWCASE_CASES } from "../shared/showcase";
 import { squareRoutes } from "./features/square/square.routes";
 import { pagesRoutes } from "./features/pages/pages.routes";
 import { adminRoutes } from "./features/admin/admin.routes";

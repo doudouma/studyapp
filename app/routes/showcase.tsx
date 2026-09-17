@@ -28,7 +28,7 @@ export const Route = createFileRoute("/showcase")({
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:site_name", content: "100mini" },
-        { name: "twitter:card", content: "summary" },
+        { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: desc },
       ],
@@ -84,7 +84,7 @@ function ShowcasePage() {
       <main className="flex-1">
         <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
           <TerminalWindow title="100mini ~ /showcase — zsh" bodyClassName="p-4 text-[11px] sm:p-5">
-            <h1 className="font-bold text-[15px] leading-snug text-[#26302b] dark:text-[#e6edf6]">
+            <h1 className="font-bold text-[15px] leading-snug text-[#000000] dark:text-[#e6edf6]">
               <span aria-hidden className="text-muted-foreground/40">
                 #{" "}
               </span>
@@ -93,7 +93,7 @@ function ShowcasePage() {
             <p className="mt-1 text-muted-foreground">{t("showcase.subtitle")}</p>
 
             {/* 命令栏 + 分类过滤 */}
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-b border-dashed border-[#e6e6de] pb-3 dark:border-[#243244]">
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-b border-dashed border-[#e0e0e0] pb-3 dark:border-[#243244]">
               <div className="text-[11px]">
                 <TerminalPrompt /> <TerminalCmd>ls /showcase</TerminalCmd>{" "}
                 <span className="text-muted-foreground">
@@ -107,7 +107,7 @@ function ShowcasePage() {
                   className={`cursor-pointer rounded-full border px-2.5 py-0.5 text-[10px] font-semibold transition-colors ${
                     activeCategory === ""
                       ? "border-[#006c49] bg-[#006c49] text-white dark:border-[#4edea3] dark:bg-[#4edea3] dark:text-[#002113]"
-                      : "border-[#d9d9d0] text-muted-foreground hover:text-foreground dark:border-[#243244]"
+                      : "border-[#cfcfcf] text-muted-foreground hover:text-foreground dark:border-[#243244]"
                   }`}
                 >
                   {t("showcase.filter.all")}
@@ -120,7 +120,7 @@ function ShowcasePage() {
                     className={`cursor-pointer rounded-full border px-2.5 py-0.5 text-[10px] font-semibold transition-colors ${
                       activeCategory === cat
                         ? "border-[#006c49] bg-[#006c49] text-white dark:border-[#4edea3] dark:bg-[#4edea3] dark:text-[#002113]"
-                        : "border-[#d9d9d0] text-muted-foreground hover:text-foreground dark:border-[#243244]"
+                        : "border-[#cfcfcf] text-muted-foreground hover:text-foreground dark:border-[#243244]"
                     }`}
                   >
                     {cat}
@@ -144,7 +144,7 @@ function ShowcasePage() {
                   onBlur={() => setSearchFocused(false)}
                   aria-label={t("showcase.searchPlaceholder")}
                   placeholder={t("showcase.searchPlaceholder")}
-                  className="w-full bg-transparent text-[11px] text-[#26302b] outline-none placeholder:text-transparent dark:text-[#c9d5e4]"
+                  className="w-full bg-transparent text-[11px] text-[#000000] outline-none placeholder:text-transparent dark:text-[#c9d5e4]"
                 />
                 {query === "" && !searchFocused ? (
                   <span
@@ -166,7 +166,7 @@ function ShowcasePage() {
                 ))}
               </div>
             ) : (
-              <div className="mt-4 border border-dashed border-[#d9d9d0] px-4 py-8 text-center dark:border-[#243244]">
+              <div className="mt-4 border border-dashed border-[#cfcfcf] px-4 py-8 text-center dark:border-[#243244]">
                 <p className="text-[11px]">
                   <TerminalPrompt /> <TerminalCmd>grep</TerminalCmd>{" "}
                   <span className="text-muted-foreground">{t("showcase.empty")}</span>{" "}

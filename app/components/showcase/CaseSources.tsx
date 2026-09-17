@@ -11,14 +11,14 @@ export function CaseSources({ sources }: { sources: ShowcaseSource[] }) {
 
   return (
     <section>
-      <h2 className="mt-6 text-[13px] font-bold text-[#26302b] before:text-muted-foreground/40 before:content-['##_'] dark:text-[#e6edf6]">
+      <h2 className="mt-6 text-[13px] font-bold text-[#000000] before:text-muted-foreground/40 before:content-['##_'] dark:text-[#e6edf6]">
         {t("showcase.section.sources")}
       </h2>
       <ol className="mt-1">
         {sources.map((s, i) => (
           <li
             key={s.url}
-            className="flex gap-2.5 border-t border-dashed border-[#e6e6de] py-2 first:border-t-0 dark:border-[#243244]"
+            className="flex gap-2.5 border-t border-dashed border-[#e0e0e0] py-2 first:border-t-0 dark:border-[#243244]"
           >
             <span className="shrink-0 text-[11px] font-bold text-[color:var(--sc-accent)] dark:text-[color:var(--sc-accent-dark)]">
               [{i + 1}]

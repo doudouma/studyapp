@@ -10,6 +10,7 @@ import {
   withLangPrefix,
   currentLang,
   BASE_URL,
+  DEFAULT_OG_IMAGE,
 } from "~/lib/seo";
 import "~/styles/app.css";
 import interFontUrl from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
@@ -49,11 +50,15 @@ export const Route = createRootRoute({
         },
         { property: "og:url", content: pageUrl },
         { property: "og:locale", content: getBcp47(lang).replace("-", "_") },
-        { name: "twitter:card", content: "summary" },
-        {
-          name: "twitter:title",
-          content: i18n.t("app.title"),
-        },
+        // 站点级兜底社交分享图（1200×630）。页面级 head 若声明自己的
+        // og:image 会覆盖这里；案例详情页用 cover.src 覆盖。
+        { property: "og:image", content: DEFAULT_OG_IMAGE },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        { property: "og:image:alt", content: i18n.t("app.title") },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: i18n.t("app.title") },
+        { name: "twitter:image", content: DEFAULT_OG_IMAGE },
         {
           name: "twitter:description",
           content: i18n.t("app.desc"),

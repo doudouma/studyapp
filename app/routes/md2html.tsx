@@ -36,7 +36,7 @@ export const Route = createFileRoute("/md2html")({
       { property: "og:type", content: "website" },
       { property: "og:title", content: i18n.t("md2html.seoTitle") },
       { property: "og:description", content: i18n.t("md2html.seoDesc") },
-      { name: "twitter:card", content: "summary" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: i18n.t("md2html.seoTitle") },
       { name: "twitter:description", content: i18n.t("md2html.seoDesc") },
     ],

@@ -56,19 +56,32 @@ export function AppFooter() {
         </div>
       </div>
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-6 px-6 pb-6">
+        {/* 目录站/徽章互链：显式标注 sponsored + nofollow。
+            这三个链接出现在全站共享页脚，N 个页面 × 3 条即跨全站 dofollow 外链，
+            会触发 link spam 判定（降权的是链接来源站，也就是我们自己）。 */}
         <a
           href="https://mossai.org"
           title="MossAI Tools"
           target="_blank"
-          rel="noopener"
+          rel="sponsored nofollow noopener"
           className="text-xs text-muted-foreground transition-colors hover:text-[#006c49] dark:hover:text-[#4edea3]"
         >
           MossAI Tools
         </a>
-        <a href="https://dironix.com" target="_blank" rel="noopener" className="inline-flex items-center">
+        <a
+          href="https://dironix.com"
+          target="_blank"
+          rel="sponsored nofollow noopener"
+          className="inline-flex items-center"
+        >
           <img src="https://dironix.com/bage.png" alt="Featured on dironix.com" style={{ height: 20, width: "auto" }} />
         </a>
-        <a href="https://gets.tools" target="_blank" rel="noopener" className="inline-flex items-center">
+        <a
+          href="https://gets.tools"
+          target="_blank"
+          rel="sponsored nofollow noopener"
+          className="inline-flex items-center"
+        >
           <img src="https://gets.tools/badge/badge_light.svg" alt="Featured on Gets.Tools" style={{ height: 20, width: "auto" }} />
         </a>
       </div>

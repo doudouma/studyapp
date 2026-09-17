@@ -10,36 +10,60 @@ export function canonicalCaseUrl(slug: string): string {
   return BASE_URL + withLangPrefix(DEFAULT_LANG, `/showcase/${slug}`);
 }
 
-const ACTION_BTN =
-  "inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-3.5 py-2 text-[11px] font-bold transition-colors";
+const BTN =
+  "inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-bold transition-colors";
+const BTN_PRIMARY = `${BTN} bg-[color:var(--sc-accent)] text-white hover:opacity-90`;
+const BTN_SECONDARY = `${BTN} border border-[#cfcfcf] bg-white text-[#000000] hover:bg-[#ececec] dark:border-[#243244] dark:bg-[#0f1720] dark:text-[#c9d5e4] dark:hover:bg-[#151d2b]`;
 
-/** 案例标题下的主要动作：直接访问原站 + 分享（复用通用 ShareModal） */
+/**
+ * 案例主要动作：直接访问原站 + 分享（复用通用 ShareModal）。
+ *
+ * 不占版面：桌面端固定在视口右侧中部，移动端固定在视口底部，
+ * 读到任何位置都能操作。强调色从祖先 `--sc-accent` 变量继承
+ * （position: fixed 不影响 CSS 变量继承）。
+ */
 export function CaseActions({ item }: { item: ShowcaseCase }) {
   const { t } = useTranslation();
   const [shareOpen, setShareOpen] = useState(false);
 
-  return (
-    <div className="mt-4 flex flex-wrap gap-2">
-      {item.externalUrl ? (
-        <a
-          href={item.externalUrl}
-          target="_blank"
-          rel="noopener"
-          className={`${ACTION_BTN} bg-[color:var(--sc-accent)] text-white hover:opacity-90`}
-        >
-          <ExternalLink className="size-3.5" />
-          {t("showcase.cite.visit")}
-        </a>
-      ) : null}
+  const share = (
+    <button
+      type="button"
+      onClick={() => setShareOpen(true)}
+      className={BTN_SECONDARY}
+      style={{ boxShadow: "0 4px 14px -4px rgba(16,24,40,.22)" }}
+    >
+      <Share2 className="size-3.5 shrink-0" />
+      {t("showcase.cite.share")}
+    </button>
+  );
 
-      <button
-        type="button"
-        onClick={() => setShareOpen(true)}
-        className={`${ACTION_BTN} border border-[#d9d9d0] bg-white text-[#26302b] hover:bg-[#f1f1ea] dark:border-[#243244] dark:bg-[#0f1720] dark:text-[#c9d5e4] dark:hover:bg-[#151d2b]`}
-      >
-        <Share2 className="size-3.5" />
-        {t("showcase.cite.share")}
-      </button>
+  const visit = item.externalUrl ? (
+    <a
+      href={item.externalUrl}
+      target="_blank"
+      rel="noopener"
+      className={BTN_PRIMARY}
+      style={{ boxShadow: "0 4px 14px -4px rgba(16,24,40,.22)" }}
+    >
+      <ExternalLink className="size-3.5 shrink-0" />
+      {t("showcase.cite.visit")}
+    </a>
+  ) : null;
+
+  return (
+    <>
+      {/* 桌面：右侧居中竖排 */}
+      <div className="fixed right-4 top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-2 lg:flex xl:right-6">
+        {visit}
+        {share}
+      </div>
+
+      {/* 移动端/平板：底部横排 */}
+      <div className="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-[#cfcfcf] bg-[#ffffff]/95 px-4 py-3 backdrop-blur lg:hidden dark:border-[#243244] dark:bg-[#0d1117]/95">
+        {visit ? <span className="flex-1 [&>*]:w-full">{visit}</span> : null}
+        <span className="flex-1 [&>*]:w-full">{share}</span>
+      </div>
 
       <ShareModal
         open={shareOpen}
@@ -50,6 +74,6 @@ export function CaseActions({ item }: { item: ShowcaseCase }) {
         subtitle={t("showcase.share.subtitle")}
         fileName={`${item.slug}.png`}
       />
-    </div>
+    </>
   );
 }

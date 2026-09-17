@@ -27,7 +27,7 @@ export function CaseMedia({ item }: { item: ShowcaseCase }) {
           playsInline
           preload="metadata"
           aria-label={item.name}
-          className="w-full rounded-lg border border-[#d9d9d0] bg-black dark:border-[#243244]"
+          className="w-full rounded-lg border border-[#cfcfcf] bg-black dark:border-[#243244]"
         />
       </figure>
     );
@@ -39,7 +39,7 @@ export function CaseMedia({ item }: { item: ShowcaseCase }) {
         <img
           src={cover.src}
           alt={item.name}
-          className="w-full rounded-lg border border-[#d9d9d0] dark:border-[#243244]"
+          className="w-full rounded-lg border border-[#cfcfcf] dark:border-[#243244]"
         />
       </figure>
     );

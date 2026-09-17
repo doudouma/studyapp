@@ -14,7 +14,7 @@ export function CaseCard({ item, index = 0 }: { item: ShowcaseCase; index?: numb
       to="/showcase/$slug"
       params={{ slug: item.slug }}
       style={{ ...accentVars(item), fontFamily: TERMINAL_FONT }}
-      className="group flex flex-col overflow-hidden rounded-lg border border-[#d9d9d0] bg-white transition-colors hover:border-[#006c49] dark:border-[#243244] dark:bg-[#0f1720] dark:hover:border-[#4edea3]"
+      className="group flex flex-col overflow-hidden rounded-lg border border-[#cfcfcf] bg-white transition-colors hover:border-[#006c49] dark:border-[#243244] dark:bg-[#0f1720] dark:hover:border-[#4edea3]"
     >
       <div
         className="relative h-24 shrink-0"
@@ -39,12 +39,12 @@ export function CaseCard({ item, index = 0 }: { item: ShowcaseCase; index?: numb
           {item.cover?.video ? (
             <span
               aria-hidden
-              className="rounded-full bg-[#26302b]/85 px-1.5 py-0.5 text-[9px] font-semibold text-white"
+              className="rounded-full bg-[#000000]/85 px-1.5 py-0.5 text-[9px] font-semibold text-white"
             >
               ▶
             </span>
           ) : null}
-          <span className="rounded-full bg-[#26302b]/85 px-2 py-0.5 text-[9px] font-semibold text-white">
+          <span className="rounded-full bg-[#000000]/85 px-2 py-0.5 text-[9px] font-semibold text-white">
             {item.category}
           </span>
         </span>
@@ -55,7 +55,7 @@ export function CaseCard({ item, index = 0 }: { item: ShowcaseCase; index?: numb
           {item.category}
           {item.tags[0] ? <span className="text-muted-foreground"> · {item.tags[0]}</span> : null}
         </div>
-        <h3 className="mt-1 text-sm font-bold leading-snug text-[#26302b] dark:text-[#e6edf6]">
+        <h3 className="mt-1 text-sm font-bold leading-snug text-[#000000] dark:text-[#e6edf6]">
           {item.name}
         </h3>
         <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-muted-foreground">
@@ -63,8 +63,8 @@ export function CaseCard({ item, index = 0 }: { item: ShowcaseCase; index?: numb
         </p>
 
         {lead ? (
-          <div className="mt-2 border-t border-dashed border-[#e6e6de] pt-2 text-[10px] text-muted-foreground dark:border-[#243244]">
-            <span className="font-bold text-[#26302b] dark:text-[#c9d5e4]">{lead.value}</span>{" "}
+          <div className="mt-2 border-t border-dashed border-[#e0e0e0] pt-2 text-[10px] text-muted-foreground dark:border-[#243244]">
+            <span className="font-bold text-[#000000] dark:text-[#c9d5e4]">{lead.value}</span>{" "}
             {lead.key}
           </div>
         ) : null}

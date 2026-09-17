@@ -37,6 +37,13 @@ export function currentLang(): Lang {
 }
 
 /**
+ * 站点级默认社交分享图（1200×630，`public/og-default.jpg`）。
+ * 页面没有自己的分享图时用它——先前各页用的是 177×177 的 spritesheet 帧，
+ * 低于 twitter `summary_large_image` 的最小宽度（300px）。
+ */
+export const DEFAULT_OG_IMAGE = `${BASE_URL}/og-default.jpg`;
+
+/**
  * Map a base path to the i18n keys for that page's name/description.
  * Used to produce localized JSON-LD per language.
  */

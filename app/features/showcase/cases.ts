@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { SHOWCASE_CASES } from "@shared/showcase/cases";
+import { SHOWCASE_CASES, findCaseBySlug } from "@shared/showcase";
 import {
   CATEGORIES,
   CATEGORY_ACCENTS,
@@ -11,17 +11,16 @@ import {
 } from "@shared/types/showcase";
 
 /**
- * 案例库的读取辅助（纯静态数据，无 HTTP 边界，故无 api.ts）
- * 页面/组件只依赖此模块，不直接 import @shared/showcase/cases
+ * 案例库的读取辅助（数据来自 content/showcase/*.md，见 shared/showcase）
+ * 页面/组件只依赖此模块，不直接 import @shared/showcase
  */
 
-/** 全部案例，按数据文件顺序 */
 export function getCases(): ShowcaseCase[] {
   return SHOWCASE_CASES;
 }
 
 export function getCaseBySlug(slug: string): ShowcaseCase | undefined {
-  return SHOWCASE_CASES.find((c) => c.slug === slug);
+  return findCaseBySlug(slug);
 }
 
 /** 相关案例：同分类优先，不足用其它分类补齐 */
@@ -36,12 +35,12 @@ export function getRelatedCases(slug: string, limit = 3): ShowcaseCase[] {
 
 /** 案例封面色调：cover.accent 优先，缺省按分类取 */
 export function getCaseAccent(item: ShowcaseCase): string {
-  return item.cover?.accent ?? CATEGORY_ACCENTS[item.category];
+  return item.cover.accent ?? CATEGORY_ACCENTS[item.category];
 }
 
 /** 暗色模式下用于文字的强调色（浅色强调色在深底上对比度不足） */
 export function getCaseAccentDark(item: ShowcaseCase): string {
-  if (item.cover?.accent) return item.cover.accent;
+  if (item.cover.accent) return item.cover.accent;
   return CATEGORY_ACCENTS_DARK[item.category];
 }
 

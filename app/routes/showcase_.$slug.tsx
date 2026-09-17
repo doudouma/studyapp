@@ -5,7 +5,7 @@ import { BASE_URL } from "~/lib/lang";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { CaseActions } from "~/components/showcase/CaseActions";
-import { CaseBlocks } from "~/components/showcase/CaseBlocks";
+import { CaseBody } from "~/components/showcase/CaseBody";
 import { CaseFacts } from "~/components/showcase/CaseFacts";
 import { CaseMedia } from "~/components/showcase/CaseMedia";
 import { CaseSources } from "~/components/showcase/CaseSources";
@@ -33,6 +33,17 @@ export const Route = createFileRoute("/showcase_/$slug")({
 
     const title = `${item.name} — 100mini Case Library`;
     const url = caseUrl(item.slug);
+    // 案例封面：public 下用根路径，外链原样；缺省时由 __root 的站点级兜底图接上
+    const image = item.cover?.src
+      ? item.cover.src.startsWith("/")
+        ? BASE_URL + item.cover.src
+        : item.cover.src
+      : undefined;
+    const videoPoster = item.cover?.videoPoster
+      ? item.cover.videoPoster.startsWith("/")
+        ? BASE_URL + item.cover.videoPoster
+        : item.cover.videoPoster
+      : undefined;
 
     const article: Record<string, unknown> = {
       "@context": "https://schema.org",
@@ -48,6 +59,8 @@ export const Route = createFileRoute("/showcase_/$slug")({
       author: item.author ? { "@type": "Person", name: item.author } : undefined,
       datePublished: item.publishedAt,
       dateModified: item.updatedAt ?? item.publishedAt,
+      // Article 富结果要求 headline + image + datePublished 三者齐备
+      image,
       isBasedOn: item.externalUrl,
       citation: item.sources.map((s) => ({
         "@type": "CreativeWork",
@@ -60,11 +73,7 @@ export const Route = createFileRoute("/showcase_/$slug")({
             contentUrl: item.cover.video,
             name: item.name,
             description: item.summary,
-            thumbnailUrl: item.cover.videoPoster
-              ? item.cover.videoPoster.startsWith("/")
-                ? BASE_URL + item.cover.videoPoster
-                : item.cover.videoPoster
-              : undefined,
+            thumbnailUrl: videoPoster ?? image,
           }
         : undefined,
     };
@@ -100,9 +109,15 @@ export const Route = createFileRoute("/showcase_/$slug")({
         { property: "og:description", content: item.summary },
         { property: "og:url", content: url },
         { property: "og:site_name", content: "100mini" },
-        ...(item.cover?.src ? [{ property: "og:image", content: BASE_URL + item.cover.src }] : []),
-        { name: "twitter:card", content: "summary" },
+        ...(image
+          ? [
+              { property: "og:image", content: image },
+              { property: "og:image:alt", content: item.name },
+            ]
+          : []),
+        { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
+        ...(image ? [{ name: "twitter:image", content: image }] : []),
         { name: "twitter:description", content: item.summary },
       ],
       scripts: [
@@ -123,7 +138,8 @@ function CaseDetailPage() {
     <div className="flex min-h-screen flex-col">
       <AppNav />
 
-      <main className="flex-1">
+      {/* 移动端底部有固定的操作条（CaseActions），留出可滚动空间 */}
+      <main className="flex-1 pb-24 lg:pb-0">
         <div className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
           <TerminalWindow
             title={`100mini ~ /showcase/${item.slug} — zsh`}
@@ -144,7 +160,7 @@ function CaseDetailPage() {
                 <span>{item.name}</span>
               </nav>
 
-              <h1 className="mt-3 text-2xl font-bold leading-tight tracking-tight text-[#26302b] sm:text-3xl dark:text-[#e6edf6]">
+              <h1 className="mt-3 text-2xl font-bold leading-tight tracking-tight text-[#000000] sm:text-3xl dark:text-[#e6edf6]">
                 {item.name}
               </h1>
               <p className="mt-2 text-[12.5px] leading-relaxed text-muted-foreground">
@@ -158,7 +174,7 @@ function CaseDetailPage() {
                 {item.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="rounded-full border border-[#d9d9d0] px-2.5 py-0.5 text-[10px] text-muted-foreground dark:border-[#243244]"
+                    className="rounded-full border border-[#cfcfcf] px-2.5 py-0.5 text-[10px] text-muted-foreground dark:border-[#243244]"
                   >
                     {tag}
                   </span>
@@ -169,72 +185,55 @@ function CaseDetailPage() {
 
               <CaseMedia item={item} />
 
-                <div className="mt-5">
-                  <CaseFacts facts={item.facts} />
-                </div>
+              <div className="mt-5">
+                <CaseFacts facts={item.facts} />
+              </div>
 
-                {item.sections.map((section) => (
-                  <section key={section.heading}>
-                    <h2 className="mt-6 text-[13px] font-bold text-[#26302b] before:text-muted-foreground/40 before:content-['##_'] dark:text-[#e6edf6]">
-                      {section.heading}
-                    </h2>
-                    <div className="mt-1.5 space-y-2.5">
-                      {section.paragraphs?.map((p, i) => (
-                        <p
-                          key={i}
-                          className="text-[11.5px] leading-[1.75] text-[#4b5563] dark:text-[#9fb0c3]"
+              <CaseBody item={item} />
+
+              <CaseSources sources={item.sources} />
+
+              {related.length > 0 ? (
+                <section>
+                  <h2 className="mt-6 text-[13px] font-bold text-[#000000] before:text-muted-foreground/40 before:content-['##_'] dark:text-[#e6edf6]">
+                    {t("showcase.section.related")}
+                  </h2>
+                  <ul className="mt-1.5">
+                    {related.map((r) => (
+                      <li
+                        key={r.slug}
+                        className="flex items-center justify-between gap-3 border-t border-dashed border-[#e0e0e0] py-1.5 first:border-t-0 dark:border-[#243244]"
+                      >
+                        <Link
+                          to="/showcase/$slug"
+                          params={{ slug: r.slug }}
+                          className="min-w-0 truncate text-[11.5px] hover:underline"
                         >
-                          {p}
-                        </p>
-                      ))}
-                      {section.blocks?.length ? <CaseBlocks blocks={section.blocks} /> : null}
-                    </div>
-                  </section>
-                ))}
+                          <TerminalCmd className="font-normal">→ </TerminalCmd>
+                          {r.name}
+                        </Link>
+                        <span className="shrink-0 text-[10px] text-muted-foreground">
+                          {r.category}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
 
-                <CaseSources sources={item.sources} />
+              <div className="mt-6 text-[11px]">
+                <TerminalPrompt /> <TerminalCmd>./cite {item.slug}</TerminalCmd>{" "}
+                <TerminalCursor />
+              </div>
 
-                {related.length > 0 ? (
-                  <section>
-                    <h2 className="mt-6 text-[13px] font-bold text-[#26302b] before:text-muted-foreground/40 before:content-['##_'] dark:text-[#e6edf6]">
-                      {t("showcase.section.related")}
-                    </h2>
-                    <ul className="mt-1.5">
-                      {related.map((r) => (
-                        <li
-                          key={r.slug}
-                          className="flex items-center justify-between gap-3 border-t border-dashed border-[#e6e6de] py-1.5 first:border-t-0 dark:border-[#243244]"
-                        >
-                          <Link
-                            to="/showcase/$slug"
-                            params={{ slug: r.slug }}
-                            className="min-w-0 truncate text-[11.5px] hover:underline"
-                          >
-                            <TerminalCmd className="font-normal">→ </TerminalCmd>
-                            {r.name}
-                          </Link>
-                          <span className="shrink-0 text-[10px] text-muted-foreground">
-                            {r.category}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
-                ) : null}
-
-                <div className="mt-6 text-[11px]">
-                  <TerminalPrompt /> <TerminalCmd>./cite {item.slug}</TerminalCmd>{" "}
-                  <TerminalCursor />
-                </div>
-
-                <div className="mt-4">
-                  <Link
-                    to="/showcase"
-                    className="text-[10.5px] text-muted-foreground hover:underline"
-                  >
-                    ← {t("showcase.backToList")}
-                  </Link>
-                </div>
+              <div className="mt-4">
+                <Link
+                  to="/showcase"
+                  className="text-[10.5px] text-muted-foreground hover:underline"
+                >
+                  ← {t("showcase.backToList")}
+                </Link>
+              </div>
             </article>
           </TerminalWindow>
         </div>

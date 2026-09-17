@@ -9,11 +9,11 @@ import type { ShowcaseFact } from "@shared/types/showcase";
 export function CaseFacts({ facts }: { facts: ShowcaseFact[] }) {
   if (facts.length === 0) return null;
   return (
-    <dl className="overflow-hidden rounded-lg border border-[#d9d9d0] bg-white dark:border-[#243244] dark:bg-[#0f1720]">
+    <dl className="overflow-hidden rounded-lg border border-[#cfcfcf] bg-white dark:border-[#243244] dark:bg-[#0f1720]">
       {facts.map((f) => (
         <div
           key={f.key}
-          className="grid grid-cols-[110px_1fr] gap-3 border-b border-dashed border-[#e6e6de] px-3.5 py-1.5 last:border-b-0 sm:grid-cols-[130px_1fr] dark:border-[#243244]"
+          className="grid grid-cols-[110px_1fr] gap-3 border-b border-dashed border-[#e0e0e0] px-3.5 py-1.5 last:border-b-0 sm:grid-cols-[130px_1fr] dark:border-[#243244]"
         >
           <dt className="truncate text-[11px] text-muted-foreground">{f.key}</dt>
           <dd

@@ -2,8 +2,11 @@
  * 案例库 (Showcase) 功能的共享类型与常量
  *
  * 前后端唯一数据契约来源：
- * - app 侧由 app/features/showcase/cases.ts 消费
+ * - app 侧由 app/features/showcase/* 消费
  * - server 侧由 server/api.ts 生成 sitemap 时消费
+ *
+ * 案例内容本身写在 content/showcase/*.md（frontmatter + Markdown 正文），
+ * 由 shared/showcase/index.ts 解析成 ShowcaseCase[]。
  */
 
 export const CATEGORIES = [
@@ -37,15 +40,6 @@ export const CATEGORY_ACCENTS_DARK: Record<ShowcaseCategory, string> = {
   resource: "#5eead4",
 };
 
-/** 详情页 facts 键值表的一行 */
-export interface ShowcaseFact {
-  /** 展示用英文 key（author / platforms / users / cost / price ...） */
-  key: string;
-  value: string;
-  /** 数值型亮点，用强调色 */
-  highlight?: boolean;
-}
-
 /** 结论/档位的语义色调（替代能力、风险提示等） */
 export type ShowcaseTone = "good" | "warn" | "neutral" | "bad";
 
@@ -57,31 +51,13 @@ export const TONE_COLORS: Record<ShowcaseTone, { light: string; dark: string }> 
   bad: { light: "#b91c1c", dark: "#fca5a5" },
 };
 
-/** 表格单元格：可带档位色与次要说明 */
-export interface ShowcaseCell {
-  text: string;
-  sub?: string;
-  tone?: ShowcaseTone;
-}
-
-/**
- * 详情页正文的内容块。
- * 案例内容形态差异大（段落 / 清单 / 对照表 / 结论块），段落用 paragraphs 简写，
- * 其余用 blocks 表达。
- */
-export type ShowcaseBlock =
-  | { type: "text"; text: string }
-  | { type: "list"; items: string[] }
-  | { type: "table"; columns: string[]; rows: (string | ShowcaseCell)[][] }
-  | { type: "note"; label?: string; text: string; tone?: ShowcaseTone };
-
-/** 详情页正文的一节 */
-export interface ShowcaseSection {
-  heading: string;
-  /** 纯段落简写，先于 blocks 渲染 */
-  paragraphs?: string[];
-  /** 清单 / 对照表 / 结论块等结构化内容 */
-  blocks?: ShowcaseBlock[];
+/** 详情页 facts 键值表的一行 */
+export interface ShowcaseFact {
+  /** 展示用英文 key（author / platforms / users / cost / price ...） */
+  key: string;
+  value: string;
+  /** 数值型亮点，用强调色 */
+  highlight?: boolean;
 }
 
 /** 详情页来源清单的一条（编号外链，便于正文 [n] 引用） */
@@ -94,8 +70,8 @@ export interface ShowcaseSource {
 }
 
 export interface ShowcaseCover {
-  /** 可选封面图：public/showcase/{slug}.webp 或 https 外链 */
-  src?: string;
+  /** 必填封面图：public/showcase/{slug}.jpg 或 https 外链。og:image + Article.image 都用它 */
+  src: string;
   /**
    * 可选首屏视频（https mp4）。**只在详情页加载**，列表卡片不加载，
    * 避免案例网格里出现 N 个视频请求。
@@ -107,7 +83,6 @@ export interface ShowcaseCover {
   accent?: string;
 }
 
-
 export interface ShowcaseCase {
   /** URL-safe、永久稳定的引用标识（^[a-z0-9-]+$），一经发布不可更改 */
   slug: string;
@@ -117,14 +92,18 @@ export interface ShowcaseCase {
   category: ShowcaseCategory;
   tags: string[];
   facts: ShowcaseFact[];
-  sections: ShowcaseSection[];
   /** 至少 1 条 */
   sources: ShowcaseSource[];
+  /**
+   * 正文 Markdown（frontmatter 之后的内容，**不含** frontmatter）。
+   * 渲染时按 `## ` 分节，由 app/features/showcase/markdown.ts 转成 HTML。
+   */
+  body: string;
   /** 案例原始网址（https） */
   externalUrl?: string;
   author?: string;
-  /** ISO yyyy-mm-dd */
-  publishedAt?: string;
+  /** ISO yyyy-mm-dd。Article.datePublished 与 sitemap 都依赖它 */
+  publishedAt: string;
   updatedAt?: string;
-  cover?: ShowcaseCover;
+  cover: ShowcaseCover;
 }
