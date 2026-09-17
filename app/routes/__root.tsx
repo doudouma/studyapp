@@ -19,7 +19,10 @@ export const Route = createRootRoute({
     const matches: Array<{ pathname: string }> = ctx?.matches ?? [];
     const leafPath = matches.length ? matches[matches.length - 1].pathname : "/";
     const lang = currentLang();
-    const jsonLd = buildJsonLd(leafPath, lang);
+    // Case detail pages supply their own Article + BreadcrumbList JSON-LD in
+    // their route head(); the generic WebPage/breadcrumb graph generated here
+    // cannot know the case, so it is skipped to avoid a wrong breadcrumb.
+    const jsonLd = leafPath.startsWith("/showcase/") ? [] : buildJsonLd(leafPath, lang);
     const pageUrl = BASE_URL + withLangPrefix(lang, leafPath);
 
     return {
@@ -97,7 +100,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   });
   const lang = currentLang();
   const canonicalHref = BASE_URL + withLangPrefix(lang, leafPath);
-  const hreflangLinks = buildHreflangLinks(leafPath);
+  // Case detail pages (/showcase/{slug}) carry English-only content and are
+  // served at root only — /{lang}/showcase/{slug} 301-redirects there (see
+  // app/server.tsx). Advertising hreflang alternates would point at those
+  // redirects, so they are omitted: it is a single-language page.
+  const englishOnly = leafPath.startsWith("/showcase/");
+  const hreflangLinks = englishOnly ? [] : buildHreflangLinks(leafPath);
 
   // Keep canonical + hreflang <link> tags in sync on client-side navigation.
   // They are rendered server-only (see head() note above), so React doesn't
@@ -109,7 +117,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     if (canonical) canonical.setAttribute("href", canonicalHref);
 
     const alts = document.querySelectorAll('link[rel="alternate"][hreflang]');
-    const newAlts = buildHreflangLinks(leafPath);
+    const newAlts = englishOnly ? [] : buildHreflangLinks(leafPath);
     if (alts.length === newAlts.length) {
       alts.forEach((el, i) => el.setAttribute("href", newAlts[i].href));
     } else {
@@ -122,7 +130,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         document.head.appendChild(link);
       }
     }
-  }, [leafPath, canonicalHref]);
+  }, [leafPath, canonicalHref, englishOnly]);
 
   if (isServer) {
     return (

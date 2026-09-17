@@ -403,6 +403,16 @@ select.input-comic { cursor: pointer; }
 }
 .animate-pulse-subtle { animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
 
+/* Terminal cursor blink (showcase) — hard on/off steps, stops on reduced motion */
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+.animate-blink { animation: blink 1.05s steps(1) infinite; }
+@media (prefers-reduced-motion: reduce) {
+    .animate-blink { animation: none; }
+}
+
 /* Print */
 @media print {
     .no-print { display: none !important; }

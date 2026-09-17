@@ -11,6 +11,7 @@ import {
 } from "../app/lib/lang";
 import { page } from "./db/schema";
 import { createDb } from "./db";
+import { SHOWCASE_CASES } from "../shared/showcase/cases";
 import { squareRoutes } from "./features/square/square.routes";
 import { pagesRoutes } from "./features/pages/pages.routes";
 import { adminRoutes } from "./features/admin/admin.routes";
@@ -44,6 +45,7 @@ api.onError((err, c) => {
 const STATIC_PAGES: { loc: string; changefreq: string; priority: string }[] = [
   { loc: "/", changefreq: "daily", priority: "1.0" },
   { loc: "/square", changefreq: "hourly", priority: "0.9" },
+  { loc: "/showcase", changefreq: "weekly", priority: "0.8" },
   { loc: "/md2html", changefreq: "weekly", priority: "0.8" },
   { loc: "/any2md", changefreq: "weekly", priority: "0.8" },
   { loc: "/freetool", changefreq: "weekly", priority: "0.7" },
@@ -114,6 +116,19 @@ async function buildLangSitemap(c: any, lang: Lang): Promise<string> {
     <priority>${p.priority}</priority>${alternateLinksXml(p.loc)}
   </url>`;
   });
+
+  // Case library detail pages are English-only and served at root only
+  // (/{lang}/showcase/{slug} 301-redirects there — see app/server.tsx), so they
+  // belong in the default-language sitemap only.
+  if (lang === DEFAULT_LANG) {
+    for (const item of SHOWCASE_CASES) {
+      const lastmod = item.updatedAt ?? item.publishedAt;
+      urls.push(`
+  <url>
+    <loc>${BASE_URL}/showcase/${escapeXml(item.slug)}</loc>${lastmod ? `\n    <lastmod>${lastmod}</lastmod>` : ""}
+  </url>`);
+    }
+  }
 
   // User-generated shared pages live at root only (single canonical URL, no
   // language variants — /{lang}/p/:id 301-redirects to /p/:id). Include them

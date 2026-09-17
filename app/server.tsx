@@ -164,6 +164,9 @@ app.all("*", async (c) => {
   const basePath = stripLangPrefix(url.pathname);
   const rootOnly =
     basePath.startsWith("/p/") ||
+    // Case detail pages are English-only and served at root only (see
+    // app/lib/seo.ts); their list page /showcase stays multilingual.
+    basePath.startsWith("/showcase/") ||
     basePath.startsWith("/api/") ||
     basePath.startsWith("/thumbnails/") ||
     basePath === "/robots.txt" ||

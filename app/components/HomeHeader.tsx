@@ -224,6 +224,7 @@ export function AppNav() {
               <div onPointerEnter={prefetchSquare}>
                 <NavLink href="/square">{t("nav.square")}</NavLink>
               </div>
+              <NavLink href="/showcase">{t("nav.showcase")}</NavLink>
               <ToolsDropdown />
             </div>
           </div>
@@ -268,6 +269,7 @@ export function AppNav() {
               <div onPointerEnter={prefetchSquare}>
                 <MobileNavLink href="/square" onClick={() => setMobileNavOpen(false)}>{t("nav.square")}</MobileNavLink>
               </div>
+              <MobileNavLink href="/showcase" onClick={() => setMobileNavOpen(false)}>{t("nav.showcase")}</MobileNavLink>
               <div className="px-4 pb-1 pt-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 {t("nav.tools")}
               </div>
@@ -307,6 +309,7 @@ export function AppNav() {
             <div onPointerEnter={prefetchSquare}>
               <NavLink href="/square">{t("nav.square")}</NavLink>
             </div>
+            <NavLink href="/showcase">{t("nav.showcase")}</NavLink>
             <ToolsDropdown />
             <NavLink href="/links">{t("nav.profile")}</NavLink>
           </div>
@@ -392,6 +395,7 @@ export function AppNav() {
             <div onPointerEnter={prefetchSquare}>
               <MobileNavLink href="/square" onClick={() => setMobileNavOpen(false)}>{t("nav.square")}</MobileNavLink>
             </div>
+            <MobileNavLink href="/showcase" onClick={() => setMobileNavOpen(false)}>{t("nav.showcase")}</MobileNavLink>
             <div className="px-4 pb-1 pt-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               {t("nav.tools")}
             </div>
