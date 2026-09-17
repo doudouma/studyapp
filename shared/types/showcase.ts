@@ -19,26 +19,12 @@ export const CATEGORIES = [
 
 export type ShowcaseCategory = (typeof CATEGORIES)[number];
 
-/** 终端风格封面色块 / 眉标用色，按分类取 */
-export const CATEGORY_ACCENTS: Record<ShowcaseCategory, string> = {
-  tools: "#0e7a4f",
-  learning: "#1e40af",
-  ai: "#6d28d9",
-  experiment: "#92400e",
-  resource: "#0f766e",
-};
-
 /**
- * 暗色模式下用于「文字」的分类强调色
- * 上面的浅色强调色在深底上对比度不足，这里换成同色相的亮色变体
+ * 案例强调色：固定站点主绿，**不随分类变化**。
+ * 分类色只在列表页的过滤 pill 文本上体现，详情页与卡片统一用这一组。
  */
-export const CATEGORY_ACCENTS_DARK: Record<ShowcaseCategory, string> = {
-  tools: "#4edea3",
-  learning: "#93b4ff",
-  ai: "#c4b5fd",
-  experiment: "#fbbf24",
-  resource: "#5eead4",
-};
+export const SHOWCASE_ACCENT = "#006c49";
+export const SHOWCASE_ACCENT_DARK = "#4edea3";
 
 /** 结论/档位的语义色调（替代能力、风险提示等） */
 export type ShowcaseTone = "good" | "warn" | "neutral" | "bad";
@@ -79,8 +65,6 @@ export interface ShowcaseCover {
   video?: string;
   /** 视频海报图（https 或 public 路径）；缺省回退到 src */
   videoPoster?: string;
-  /** 可选强调色，缺省按 category 取 CATEGORY_ACCENTS */
-  accent?: string;
 }
 
 export interface ShowcaseCase {

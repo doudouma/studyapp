@@ -758,6 +758,7 @@
   "showcase.emptyDesc": "Essayez un autre mot-clé ou choisissez une autre catégorie.",
   "showcase.cite.visit": "Visiter le site",
   "showcase.cite.share": "Partager",
+  "showcase.media.hlsFallback": "Ce navigateur ne peut pas le lire en ligne — cliquez sur la couverture pour le voir à la source.",
   "showcase.share.title": "Partager ce cas",
   "showcase.share.subtitle": "Publiez-le ou envoyez-le à quelqu'un",
   "showcase.section.sources": "Sources",

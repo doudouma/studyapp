@@ -158,9 +158,9 @@ function ShowcasePage() {
               </div>
             </div>
 
-            {/* 卡片网格 */}
+            {/* 卡片网格：最大 3 列，保证缩略图够大 */}
             {filtered.length > 0 ? (
-              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {filtered.map((item, index) => (
                   <CaseCard key={item.slug} item={item} index={index} />
                 ))}

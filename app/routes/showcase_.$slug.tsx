@@ -15,7 +15,12 @@ import {
   TerminalPrompt,
   TerminalWindow,
 } from "~/components/showcase/TerminalWindow";
-import { accentVars, getCaseBySlug, getRelatedCases } from "~/features/showcase/cases";
+import {
+  accentVars,
+  getCaseBySlug,
+  getFactRows,
+  getRelatedCases,
+} from "~/features/showcase/cases";
 
 function caseUrl(slug: string): string {
   return `${BASE_URL}/showcase/${slug}`;
@@ -145,7 +150,7 @@ function CaseDetailPage() {
             title={`100mini ~ /showcase/${item.slug} — zsh`}
             bodyClassName="p-4 text-[11.5px] sm:p-6"
           >
-            <article style={accentVars(item)}>
+            <article style={accentVars()}>
               <div className="text-[10px]">
                 <TerminalPrompt /> <TerminalCmd>cat /showcase/{item.slug}</TerminalCmd>
               </div>
@@ -186,7 +191,7 @@ function CaseDetailPage() {
               <CaseMedia item={item} />
 
               <div className="mt-5">
-                <CaseFacts facts={item.facts} />
+                <CaseFacts facts={getFactRows(item)} />
               </div>
 
               <CaseBody item={item} />

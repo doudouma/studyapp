@@ -4,6 +4,7 @@ import { CATEGORIES } from "../shared/types/showcase";
 import {
   getCaseBySlug,
   getCases,
+  getFactRows,
   getLeadFact,
   getRelatedCases,
 } from "../app/features/showcase/cases";
@@ -80,7 +81,6 @@ describe("showcase case data（来自 content/showcase/*.md）", () => {
       if (c.externalUrl) expect(c.externalUrl).toMatch(HTTPS);
       if (c.cover.video) expect(c.cover.video).toMatch(HTTPS);
       if (c.cover.videoPoster) expect(c.cover.videoPoster).toMatch(/^(https:\/\/|\/)/);
-      if (c.cover.accent) expect(c.cover.accent).toMatch(/^#[0-9a-fA-F]{6}$/);
     }
   });
 });
@@ -107,6 +107,33 @@ describe("showcase case helpers", () => {
     const c = SHOWCASE_CASES[0];
     const highlighted = c.facts.find((f) => f.highlight);
     expect(getLeadFact(c)).toBe(highlighted ?? c.facts[0]);
+  });
+
+  it("derives published/updated fact rows from the frontmatter dates", () => {
+    for (const c of SHOWCASE_CASES) {
+      const rows = getFactRows(c);
+      const byKey = new Map(rows.map((r) => [r.key, r.value]));
+
+      expect(byKey.get("published")).toBe(c.publishedAt);
+      if (c.updatedAt) expect(byKey.get("updated")).toBe(c.updatedAt);
+
+      // 派生行不能和作者手写的行重复
+      const keys = rows.map((r) => r.key);
+      expect(new Set(keys).size).toBe(keys.length);
+      // 作者写的 facts 一行不丢
+      for (const f of c.facts) expect(byKey.get(f.key)).toBe(f.value);
+    }
+  });
+
+  it("lets an author override a derived date row", () => {
+    const c = SHOWCASE_CASES[0];
+    const withOwnPublished = {
+      ...c,
+      facts: [...c.facts, { key: "published", value: "custom label" }],
+    };
+    const rows = getFactRows(withOwnPublished);
+    expect(rows.filter((r) => r.key === "published")).toHaveLength(1);
+    expect(rows.find((r) => r.key === "published")?.value).toBe("custom label");
   });
 });
 

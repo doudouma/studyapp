@@ -53,8 +53,12 @@ export function CaseActions({ item }: { item: ShowcaseCase }) {
 
   return (
     <>
-      {/* 桌面：右侧居中竖排 */}
-      <div className="fixed right-4 top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-2 lg:flex xl:right-6">
+      {/*
+        桌面：视口右侧竖排，但**贴着正文栏的右边缘**而不是视口边缘。
+        23.25rem = max-w-3xl/2 (24rem) − 详情页 px-6 (1.5rem) + 与正文栏的间距 (0.75rem)。
+        lg 以下隐藏（此时窗口宽度 < 正文栏 + 按钮宽，会把按钮压在正文上）。
+      */}
+      <div className="fixed left-[calc(50%+23.25rem)] top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-2 lg:flex">
         {visit}
         {share}
       </div>

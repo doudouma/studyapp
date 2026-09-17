@@ -811,6 +811,7 @@
   "showcase.emptyDesc": "Prueba otra palabra clave o elige otra categoría.",
   "showcase.cite.visit": "Visitar sitio",
   "showcase.cite.share": "Compartir",
+  "showcase.media.hlsFallback": "Este navegador no puede reproducirlo en línea: haz clic en la portada para verlo en la fuente.",
   "showcase.share.title": "Comparte este caso",
   "showcase.share.subtitle": "Publícalo o envíaselo a alguien",
   "showcase.section.sources": "Fuentes",

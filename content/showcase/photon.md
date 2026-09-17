@@ -14,14 +14,14 @@ cover:
   videoPoster: /showcase/photon.jpg
 facts:
   - key: author
-    value: u/AsejereDaDeje · r/vibecoding
+    value: AsejereDaDeje
   - key: platforms
     value: macOS · Windows 11 · Linux (Flatpak)
   - key: version
     value: v0.1.8 · early release
   - key: models
     value: gpt astra 6 extra high
-  - key: day 1 users
+  - key: users
     value: 170
     highlight: true
   - key: token cost

@@ -1,11 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { accentVars, getCaseAccent, getLeadFact } from "~/features/showcase/cases";
+import { accentVars, getLeadFact } from "~/features/showcase/cases";
 import { TERMINAL_FONT } from "./TerminalWindow";
-import type { ShowcaseCase } from "@shared/types/showcase";
+import { SHOWCASE_ACCENT, type ShowcaseCase } from "@shared/types/showcase";
 
 /** 列表页案例卡片（终端风格） */
 export function CaseCard({ item, index = 0 }: { item: ShowcaseCase; index?: number }) {
-  const accent = getCaseAccent(item);
   const lead = getLeadFact(item);
   const eager = index < 6;
 
@@ -13,30 +12,30 @@ export function CaseCard({ item, index = 0 }: { item: ShowcaseCase; index?: numb
     <Link
       to="/showcase/$slug"
       params={{ slug: item.slug }}
-      style={{ ...accentVars(item), fontFamily: TERMINAL_FONT }}
+      style={{ ...accentVars(), fontFamily: TERMINAL_FONT }}
       className="group flex flex-col overflow-hidden rounded-lg border border-[#cfcfcf] bg-white transition-colors hover:border-[#006c49] dark:border-[#243244] dark:bg-[#0f1720] dark:hover:border-[#4edea3]"
     >
+      {/* 缩略图按卡片宽度自适应（16:9），宽度越大图越大 */}
       <div
-        className="relative h-24 shrink-0"
+        className="relative aspect-video shrink-0 overflow-hidden"
         style={{
-          background: `linear-gradient(135deg, ${accent}26, ${accent}59 55%, ${accent}99)`,
+          // 图还没补上时的兜底底色（固定主绿）
+          background: `linear-gradient(135deg, ${SHOWCASE_ACCENT}26, ${SHOWCASE_ACCENT}59 55%, ${SHOWCASE_ACCENT}99)`,
         }}
       >
-        {item.cover?.src ? (
-          <img
-            src={item.cover.src}
-            alt=""
-            className="absolute inset-0 size-full object-cover"
-            loading={eager ? undefined : "lazy"}
-            fetchPriority={index === 0 ? "high" : undefined}
-          />
-        ) : (
-          <span className="absolute bottom-2 left-3 text-sm font-bold tracking-tight text-[color:var(--sc-accent)] dark:text-[color:var(--sc-accent-dark)]">
-            {item.name}
-          </span>
-        )}
+        <img
+          src={item.cover.src}
+          alt=""
+          className="absolute inset-0 size-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+          loading={eager ? undefined : "lazy"}
+          fetchPriority={index === 0 ? "high" : undefined}
+          // 图还没补进 public/showcase/ 时不要露出破图，回退到下面的分类渐变色块
+          onError={(e) => {
+            e.currentTarget.style.display = "none";
+          }}
+        />
         <span className="absolute right-2 top-2 flex items-center gap-1">
-          {item.cover?.video ? (
+          {item.cover.video ? (
             <span
               aria-hidden
               className="rounded-full bg-[#000000]/85 px-1.5 py-0.5 text-[9px] font-semibold text-white"
@@ -50,7 +49,7 @@ export function CaseCard({ item, index = 0 }: { item: ShowcaseCase; index?: numb
         </span>
       </div>
 
-      <div className="flex flex-1 flex-col p-3">
+      <div className="flex flex-1 flex-col p-4">
         <div className="text-[9px] font-bold uppercase tracking-wider text-[color:var(--sc-accent)] dark:text-[color:var(--sc-accent-dark)]">
           {item.category}
           {item.tags[0] ? <span className="text-muted-foreground"> · {item.tags[0]}</span> : null}

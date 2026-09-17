@@ -876,6 +876,7 @@
   "showcase.emptyDesc": "换个关键词，或选择其它分类试试。",
   "showcase.cite.visit": "直接访问",
   "showcase.cite.share": "分享",
+  "showcase.media.hlsFallback": "当前浏览器无法内嵌播放该视频，点封面去原站观看。",
   "showcase.share.title": "分享此案例",
   "showcase.share.subtitle": "转发给朋友，或分享到社交平台",
   "showcase.section.sources": "来源",

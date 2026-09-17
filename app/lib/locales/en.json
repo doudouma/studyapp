@@ -876,6 +876,7 @@
   "showcase.emptyDesc": "Try another keyword or pick a different category.",
   "showcase.cite.visit": "Visit site",
   "showcase.cite.share": "Share",
+  "showcase.media.hlsFallback": "Inline playback isn't available in this browser — click the cover to watch at the source.",
   "showcase.share.title": "Share this case",
   "showcase.share.subtitle": "Post it, or send it to someone",
   "showcase.section.sources": "Sources",

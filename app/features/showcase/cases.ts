@@ -2,11 +2,12 @@ import type { CSSProperties } from "react";
 import { SHOWCASE_CASES, findCaseBySlug } from "@shared/showcase";
 import {
   CATEGORIES,
-  CATEGORY_ACCENTS,
-  CATEGORY_ACCENTS_DARK,
+  SHOWCASE_ACCENT,
+  SHOWCASE_ACCENT_DARK,
   TONE_COLORS,
   type ShowcaseCase,
   type ShowcaseCategory,
+  type ShowcaseFact,
   type ShowcaseTone,
 } from "@shared/types/showcase";
 
@@ -33,22 +34,14 @@ export function getRelatedCases(slug: string, limit = 3): ShowcaseCase[] {
   return [...sameCategory, ...rest].slice(0, limit);
 }
 
-/** 案例封面色调：cover.accent 优先，缺省按分类取 */
-export function getCaseAccent(item: ShowcaseCase): string {
-  return item.cover.accent ?? CATEGORY_ACCENTS[item.category];
-}
-
-/** 暗色模式下用于文字的强调色（浅色强调色在深底上对比度不足） */
-export function getCaseAccentDark(item: ShowcaseCase): string {
-  if (item.cover.accent) return item.cover.accent;
-  return CATEGORY_ACCENTS_DARK[item.category];
-}
-
-/** 终端组件通过内联 CSS 变量取强调色，dark: 变体才能覆盖内联样式 */
-export function accentVars(item: ShowcaseCase): CSSProperties {
+/**
+ * 案例强调色：固定用站点主绿，不随分类变化。
+ * 写成内联 CSS 变量，子组件才能用 dark: 覆盖（内联 style 优先级高于 class）。
+ */
+export function accentVars(): CSSProperties {
   return {
-    "--sc-accent": getCaseAccent(item),
-    "--sc-accent-dark": getCaseAccentDark(item),
+    "--sc-accent": SHOWCASE_ACCENT,
+    "--sc-accent-dark": SHOWCASE_ACCENT_DARK,
   } as CSSProperties;
 }
 
@@ -67,4 +60,19 @@ export function getUsedCategories(): ShowcaseCategory[] {
 /** 首个 highlight fact，兜底首个 fact —— 卡片底部的一行数据 */
 export function getLeadFact(item: ShowcaseCase) {
   return item.facts.find((f) => f.highlight) ?? item.facts[0];
+}
+
+/**
+ * facts 表实际渲染的行 = 作者在 MD 里写的 facts + 由 frontmatter 派生的日期行。
+ * 日期来自 `publishedAt` / `updatedAt`（同时喂给 sitemap 与 Article JSON-LD），
+ * 不要求作者在 facts 里再抄一遍；作者若自己写了同 key 的行，以作者的为准。
+ */
+export function getFactRows(item: ShowcaseCase): ShowcaseFact[] {
+  const rows = [...item.facts];
+  const has = (key: string) => rows.some((f) => f.key === key);
+  if (!has("published")) rows.push({ key: "published", value: item.publishedAt });
+  if (item.updatedAt && !has("updated")) {
+    rows.push({ key: "updated", value: item.updatedAt });
+  }
+  return rows;
 }

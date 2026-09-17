@@ -83,7 +83,6 @@ function buildCase(path: string, raw: string): ShowcaseCase {
     src: reqStr(coverRaw, "src", file),
     video: optStr(coverRaw, "video", file),
     videoPoster: optStr(coverRaw, "videoPoster", file),
-    accent: optStr(coverRaw, "accent", file),
   };
 
   const facts: ShowcaseFact[] = asList(data.facts, "facts", file).map((entry, i) => {
