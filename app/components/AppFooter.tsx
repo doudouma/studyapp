@@ -6,7 +6,7 @@ export function AppFooter() {
   const { t } = useTranslation();
   return (
     <footer className="w-full border-t border-[#d3e4fe] dark:border-[#3c4a42] bg-white dark:bg-[#0b1c30]">
-      <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-4 px-6 py-6 md:flex-row">
+      <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-4 px-6 pt-6 pb-3 md:flex-row">
         <div className="flex flex-col gap-1">
           <Link to="/" className="flex items-center gap-2">
             <Code2 className="size-4 text-[#006c49] dark:text-[#4edea3]" />
@@ -47,18 +47,24 @@ export function AppFooter() {
           >
             {t("footer.cookie")}
           </Link>
-          <a
-            href="https://mossai.org"
-            title="MossAI Tools"
-            target="_blank"
-            className="text-xs text-muted-foreground transition-colors hover:text-[#006c49] dark:hover:text-[#4edea3]"
-          >
-            MossAI Tools
-          </a>
-          <a href="https://dironix.com" target="_blank" rel="noopener" className="inline-flex items-center">
-            <img src="https://dironix.com/bage.png" alt="Featured on dironix.com" style={{ height: 20, width: "auto" }} />
-          </a>
         </div>
+      </div>
+      <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-6 px-6 pb-6">
+        <a
+          href="https://mossai.org"
+          title="MossAI Tools"
+          target="_blank"
+          rel="noopener"
+          className="text-xs text-muted-foreground transition-colors hover:text-[#006c49] dark:hover:text-[#4edea3]"
+        >
+          MossAI Tools
+        </a>
+        <a href="https://dironix.com" target="_blank" rel="noopener" className="inline-flex items-center">
+          <img src="https://dironix.com/bage.png" alt="Featured on dironix.com" style={{ height: 20, width: "auto" }} />
+        </a>
+        <a href="https://gets.tools" target="_blank" rel="noopener" className="inline-flex items-center">
+          <img src="https://gets.tools/badge/badge_light.svg" alt="Featured on Gets.Tools" style={{ height: 20, width: "auto" }} />
+        </a>
       </div>
     </footer>
   );
