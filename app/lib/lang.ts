@@ -95,9 +95,12 @@ export interface HeadLink {
   hrefLang?: string;
 }
 
-/** hreflang alternate <link> entries for every language + x-default. */
-export function buildHreflangLinks(basePath: string): HeadLink[] {
-  const links: HeadLink[] = LANGS.map((lang) => ({
+/**
+ * hreflang alternate <link> entries for the given languages + x-default.
+ * Case detail pages pass only the languages they actually have translations for.
+ */
+export function buildHreflangLinksFor(basePath: string, langs: readonly Lang[]): HeadLink[] {
+  const links: HeadLink[] = langs.map((lang) => ({
     rel: "alternate",
     hrefLang: BCP47[lang],
     href: BASE_URL + withLangPrefix(lang, basePath),
@@ -108,6 +111,11 @@ export function buildHreflangLinks(basePath: string): HeadLink[] {
     href: BASE_URL + withLangPrefix(DEFAULT_LANG, basePath),
   });
   return links;
+}
+
+/** hreflang alternate <link> entries for every language + x-default. */
+export function buildHreflangLinks(basePath: string): HeadLink[] {
+  return buildHreflangLinksFor(basePath, LANGS);
 }
 
 /** Canonical <link> for the current language version of a base path. */

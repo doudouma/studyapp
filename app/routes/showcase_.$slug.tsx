@@ -1,7 +1,8 @@
 import { createFileRoute, Link, notFound, useLoaderData } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import i18n from "~/lib/i18n";
-import { BASE_URL } from "~/lib/lang";
+import { BASE_URL, currentLang, getBcp47, withLangPrefix } from "~/lib/seo";
+import type { ShowcaseLocale } from "@shared/types/showcase";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { CaseActions } from "~/components/showcase/CaseActions";
@@ -22,22 +23,24 @@ import {
   getRelatedCases,
 } from "~/features/showcase/cases";
 
-function caseUrl(slug: string): string {
-  return `${BASE_URL}/showcase/${slug}`;
+/** 案例页 URL：按内容实际语言加前缀（未翻译的案例指回英文原版） */
+function caseUrl(slug: string, locale: ShowcaseLocale): string {
+  return BASE_URL + withLangPrefix(locale, `/showcase/${slug}`);
 }
 
 export const Route = createFileRoute("/showcase_/$slug")({
   loader: ({ params }) => {
-    const item = getCaseBySlug(params.slug);
+    const item = getCaseBySlug(params.slug, currentLang());
     if (!item) throw notFound();
     return item;
   },
   head: ({ params }) => {
-    const item = getCaseBySlug(params.slug);
+    const lang = currentLang();
+    const item = getCaseBySlug(params.slug, lang);
     if (!item) return { meta: [{ title: "Not found | 100mini" }] };
 
     const title = `${item.name} — 100mini Case Library`;
-    const url = caseUrl(item.slug);
+    const url = caseUrl(item.slug, item.locale);
     // 案例封面：public 下用根路径，外链原样；缺省时由 __root 的站点级兜底图接上
     const image = item.cover?.src
       ? item.cover.src.startsWith("/")
@@ -57,7 +60,7 @@ export const Route = createFileRoute("/showcase_/$slug")({
       description: item.summary,
       url,
       mainEntityOfPage: { "@type": "WebPage", "@id": url },
-      inLanguage: "en",
+      inLanguage: getBcp47(item.locale),
       keywords: item.tags.join(", "),
       articleSection: item.category,
       publisher: { "@type": "Organization", name: "100mini", url: BASE_URL },
@@ -97,7 +100,7 @@ export const Route = createFileRoute("/showcase_/$slug")({
           "@type": "ListItem",
           position: 2,
           name: i18n.t("showcase.heading"),
-          item: `${BASE_URL}/showcase`,
+          item: BASE_URL + withLangPrefix(lang, "/showcase"),
         },
         { "@type": "ListItem", position: 3, name: item.name, item: url },
       ],
@@ -136,8 +139,9 @@ export const Route = createFileRoute("/showcase_/$slug")({
 
 function CaseDetailPage() {
   const { t } = useTranslation();
+  const lang = currentLang();
   const item = useLoaderData({ from: Route.id });
-  const related = getRelatedCases(item.slug);
+  const related = getRelatedCases(item.slug, lang, 3);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -174,7 +178,7 @@ function CaseDetailPage() {
 
               <div className="mt-3 flex flex-wrap gap-1.5">
                 <span className="rounded-full bg-[color:var(--sc-accent)] px-2.5 py-0.5 text-[10px] font-semibold text-white">
-                  {item.category}
+                  {t(`showcase.category.${item.category}`)}
                 </span>
                 {item.tags.map((tag) => (
                   <span
@@ -218,7 +222,7 @@ function CaseDetailPage() {
                           {r.name}
                         </Link>
                         <span className="shrink-0 text-[10px] text-muted-foreground">
-                          {r.category}
+                          {t(`showcase.category.${r.category}`)}
                         </span>
                       </li>
                     ))}

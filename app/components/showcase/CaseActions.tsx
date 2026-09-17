@@ -3,11 +3,11 @@ import { useTranslation } from "react-i18next";
 import { ExternalLink, Share2 } from "lucide-react";
 import { BASE_URL, DEFAULT_LANG, withLangPrefix } from "~/lib/lang";
 import { ShareModal } from "~/components/share/ShareModal";
-import type { ShowcaseCase } from "@shared/types/showcase";
+import type { ShowcaseCase, ShowcaseLocale } from "@shared/types/showcase";
 
-/** 案例的永久 URL（英文单版本，恒在根路径，无语言前缀） */
-export function canonicalCaseUrl(slug: string): string {
-  return BASE_URL + withLangPrefix(DEFAULT_LANG, `/showcase/${slug}`);
+/** 案例的永久 URL：指向内容实际语言版本（未翻译的指回英文原版） */
+export function canonicalCaseUrl(slug: string, locale: ShowcaseLocale = DEFAULT_LANG): string {
+  return BASE_URL + withLangPrefix(locale, `/showcase/${slug}`);
 }
 
 const BTN =
@@ -72,7 +72,7 @@ export function CaseActions({ item }: { item: ShowcaseCase }) {
       <ShareModal
         open={shareOpen}
         onOpenChange={setShareOpen}
-        url={canonicalCaseUrl(item.slug)}
+        url={canonicalCaseUrl(item.slug, item.locale)}
         text={item.name}
         title={t("showcase.share.title")}
         subtitle={t("showcase.share.subtitle")}

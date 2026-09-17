@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import i18n from "~/lib/i18n";
-import { BASE_URL } from "~/lib/lang";
+import { BASE_URL, currentLang, withLangPrefix } from "~/lib/seo";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { CaseCard } from "~/components/showcase/CaseCard";
@@ -18,6 +18,8 @@ export const Route = createFileRoute("/showcase")({
   head: () => {
     const title = i18n.t("showcase.title");
     const desc = i18n.t("showcase.desc");
+    const lang = currentLang();
+    const cases = getCases(lang);
     return {
       meta: [
         { title },
@@ -40,11 +42,11 @@ export const Route = createFileRoute("/showcase")({
             "@type": "ItemList",
             name: title,
             description: desc,
-            numberOfItems: getCases().length,
-            itemListElement: getCases().map((c, i) => ({
+            numberOfItems: cases.length,
+            itemListElement: cases.map((c, i) => ({
               "@type": "ListItem",
               position: i + 1,
-              url: `${BASE_URL}/showcase/${c.slug}`,
+              url: BASE_URL + withLangPrefix(lang, `/showcase/${c.slug}`),
               name: c.name,
             })),
           }),
@@ -57,8 +59,9 @@ export const Route = createFileRoute("/showcase")({
 
 function ShowcasePage() {
   const { t } = useTranslation();
-  const cases = getCases();
-  const categories = getUsedCategories();
+  const lang = currentLang();
+  const cases = getCases(lang);
+  const categories = getUsedCategories(lang);
   const [activeCategory, setActiveCategory] = useState("");
   const [query, setQuery] = useState("");
   const [searchFocused, setSearchFocused] = useState(false);
@@ -123,7 +126,7 @@ function ShowcasePage() {
                         : "border-[#cfcfcf] text-muted-foreground hover:text-foreground dark:border-[#243244]"
                     }`}
                   >
-                    {cat}
+                    {t(`showcase.category.${cat}`)}
                   </button>
                 ))}
               </div>

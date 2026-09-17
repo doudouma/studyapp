@@ -9,6 +9,15 @@
  * 由 shared/showcase/index.ts 解析成 ShowcaseCase[]。
  */
 
+/**
+ * 案例内容支持的语言。必须与 app/lib/lang.ts 的 LANGS 一致
+ * （tests/showcase-i18n.spec.ts 会断言两者相等）。
+ * en 是默认语言，也是所有缺失翻译的回退源。
+ */
+export const SHOWCASE_LOCALES = ["en", "zh", "es", "pt", "fr"] as const;
+export type ShowcaseLocale = (typeof SHOWCASE_LOCALES)[number];
+export const DEFAULT_SHOWCASE_LOCALE: ShowcaseLocale = "en";
+
 export const CATEGORIES = [
   "tools",
   "learning",
@@ -70,6 +79,11 @@ export interface ShowcaseCover {
 export interface ShowcaseCase {
   /** URL-safe、永久稳定的引用标识（^[a-z0-9-]+$），一经发布不可更改 */
   slug: string;
+  /**
+   * 这份内容实际使用的语言。拿到的可能是英文回退版本——
+   * 调用方据此决定 canonical / hreflang / `inLanguage`。
+   */
+  locale: ShowcaseLocale;
   name: string;
   /** 一句话英文摘要，用于卡片与 meta description */
   summary: string;

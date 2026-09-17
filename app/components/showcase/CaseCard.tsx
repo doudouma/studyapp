@@ -1,12 +1,15 @@
 import { Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { accentVars, getLeadFact } from "~/features/showcase/cases";
 import { TERMINAL_FONT } from "./TerminalWindow";
 import { SHOWCASE_ACCENT, type ShowcaseCase } from "@shared/types/showcase";
 
 /** 列表页案例卡片（终端风格） */
 export function CaseCard({ item, index = 0 }: { item: ShowcaseCase; index?: number }) {
+  const { t } = useTranslation();
   const lead = getLeadFact(item);
   const eager = index < 6;
+  const categoryLabel = t(`showcase.category.${item.category}`);
 
   return (
     <Link
@@ -44,14 +47,14 @@ export function CaseCard({ item, index = 0 }: { item: ShowcaseCase; index?: numb
             </span>
           ) : null}
           <span className="rounded-full bg-[#000000]/85 px-2 py-0.5 text-[9px] font-semibold text-white">
-            {item.category}
+            {categoryLabel}
           </span>
         </span>
       </div>
 
       <div className="flex flex-1 flex-col p-4">
         <div className="text-[9px] font-bold uppercase tracking-wider text-[color:var(--sc-accent)] dark:text-[color:var(--sc-accent-dark)]">
-          {item.category}
+          {categoryLabel}
           {item.tags[0] ? <span className="text-muted-foreground"> · {item.tags[0]}</span> : null}
         </div>
         <h3 className="mt-1 text-sm font-bold leading-snug text-[#000000] dark:text-[#e6edf6]">

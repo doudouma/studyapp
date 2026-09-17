@@ -5,8 +5,9 @@ import { I18nProvider } from "~/lib/i18n-provider";
 import i18n, { getBcp47 } from "~/lib/i18n";
 import { useTranslation } from "react-i18next";
 import {
-  buildHreflangLinks,
   buildJsonLd,
+  canonicalPathFor,
+  hreflangLinksForPath,
   withLangPrefix,
   currentLang,
   BASE_URL,
@@ -24,7 +25,7 @@ export const Route = createRootRoute({
     // their route head(); the generic WebPage/breadcrumb graph generated here
     // cannot know the case, so it is skipped to avoid a wrong breadcrumb.
     const jsonLd = leafPath.startsWith("/showcase/") ? [] : buildJsonLd(leafPath, lang);
-    const pageUrl = BASE_URL + withLangPrefix(lang, leafPath);
+    const pageUrl = BASE_URL + canonicalPathFor(leafPath, lang);
 
     return {
       meta: [
@@ -104,13 +105,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     select: (s) => s.matches[s.matches.length - 1]?.pathname ?? "/",
   });
   const lang = currentLang();
-  const canonicalHref = BASE_URL + withLangPrefix(lang, leafPath);
-  // Case detail pages (/showcase/{slug}) carry English-only content and are
-  // served at root only — /{lang}/showcase/{slug} 301-redirects there (see
-  // app/server.tsx). Advertising hreflang alternates would point at those
-  // redirects, so they are omitted: it is a single-language page.
-  const englishOnly = leafPath.startsWith("/showcase/");
-  const hreflangLinks = englishOnly ? [] : buildHreflangLinks(leafPath);
+  // 案例详情页各语言内容不等价（没翻译时回退英文），所以 canonical 与
+  // hreflang 都由 seo.ts 按「该案例实际有哪些语言」算，不能一律按当前语言。
+  const canonicalHref = BASE_URL + canonicalPathFor(leafPath, lang);
+  const hreflangLinks = hreflangLinksForPath(leafPath);
 
   // Keep canonical + hreflang <link> tags in sync on client-side navigation.
   // They are rendered server-only (see head() note above), so React doesn't
@@ -122,7 +120,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     if (canonical) canonical.setAttribute("href", canonicalHref);
 
     const alts = document.querySelectorAll('link[rel="alternate"][hreflang]');
-    const newAlts = englishOnly ? [] : buildHreflangLinks(leafPath);
+    const newAlts = hreflangLinksForPath(leafPath);
     if (alts.length === newAlts.length) {
       alts.forEach((el, i) => el.setAttribute("href", newAlts[i].href));
     } else {
@@ -135,7 +133,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         document.head.appendChild(link);
       }
     }
-  }, [leafPath, canonicalHref, englishOnly]);
+  }, [leafPath, canonicalHref]);
 
   if (isServer) {
     return (

@@ -1,33 +1,44 @@
 import type { CSSProperties } from "react";
-import { SHOWCASE_CASES, findCaseBySlug } from "@shared/showcase";
+import { SHOWCASE_CASES, findCaseBySlug, listCases } from "@shared/showcase";
 import {
   CATEGORIES,
+  DEFAULT_SHOWCASE_LOCALE,
   SHOWCASE_ACCENT,
   SHOWCASE_ACCENT_DARK,
   TONE_COLORS,
   type ShowcaseCase,
   type ShowcaseCategory,
   type ShowcaseFact,
+  type ShowcaseLocale,
   type ShowcaseTone,
 } from "@shared/types/showcase";
 
 /**
  * 案例库的读取辅助（数据来自 content/showcase/*.md，见 shared/showcase）
  * 页面/组件只依赖此模块，不直接 import @shared/showcase
+ *
+ * 所有读取函数接受可选的 `locale`：未翻译的案例回退英文，
+ * 返回值的 `locale` 字段标明实际语言。
  */
 
-export function getCases(): ShowcaseCase[] {
-  return SHOWCASE_CASES;
+export function getCases(locale?: ShowcaseLocale): ShowcaseCase[] {
+  if (!locale || locale === DEFAULT_SHOWCASE_LOCALE) return SHOWCASE_CASES;
+  return listCases(locale);
 }
 
-export function getCaseBySlug(slug: string): ShowcaseCase | undefined {
-  return findCaseBySlug(slug);
+export function getCaseBySlug(slug: string, locale?: ShowcaseLocale): ShowcaseCase | undefined {
+  if (!locale || locale === DEFAULT_SHOWCASE_LOCALE) return findCaseBySlug(slug);
+  return findCaseBySlug(slug, locale);
 }
 
 /** 相关案例：同分类优先，不足用其它分类补齐 */
-export function getRelatedCases(slug: string, limit = 3): ShowcaseCase[] {
-  const current = getCaseBySlug(slug);
-  const others = SHOWCASE_CASES.filter((c) => c.slug !== slug);
+export function getRelatedCases(
+  slug: string,
+  locale?: ShowcaseLocale,
+  limit = 3,
+): ShowcaseCase[] {
+  const current = getCaseBySlug(slug, locale);
+  const others = getCases(locale).filter((c) => c.slug !== slug);
   if (!current) return others.slice(0, limit);
   const sameCategory = others.filter((c) => c.category === current.category);
   const rest = others.filter((c) => c.category !== current.category);
@@ -52,8 +63,8 @@ export function toneVars(tone: ShowcaseTone): CSSProperties {
 }
 
 /** 出现过的分类（按 CATEGORIES 顺序），用于列表页过滤栏 */
-export function getUsedCategories(): ShowcaseCategory[] {
-  const used = new Set(SHOWCASE_CASES.map((c) => c.category));
+export function getUsedCategories(locale?: ShowcaseLocale): ShowcaseCategory[] {
+  const used = new Set(getCases(locale).map((c) => c.category));
   return CATEGORIES.filter((c) => used.has(c));
 }
 

@@ -14,12 +14,32 @@ import { TONE_COLORS, type ShowcaseTone } from "@shared/types/showcase";
 
 marked.use({ gfm: true, breaks: false });
 
-/** 表格单元格若整格就是这些词，按档位上色；大小写不敏感 */
+/**
+ * 表格单元格若整格就是这些词，按档位上色；大小写不敏感。
+ * 多语言：各语言译文里写对应词即可，档位色随语言切换保持成立。
+ */
 const TONE_BY_WORD: Record<string, ShowcaseTone> = {
   high: "good",
   partial: "warn",
   moderate: "neutral",
   low: "bad",
+  // zh
+  高: "good",
+  部分: "warn",
+  中等: "neutral",
+  低: "bad",
+  // es / pt
+  alta: "good",
+  parcial: "warn",
+  moderada: "neutral",
+  baja: "bad",
+  // pt (低)
+  baixa: "bad",
+  // fr
+  élevée: "good",
+  partielle: "warn",
+  modérée: "neutral",
+  faible: "bad",
 };
 
 function toneSpan(tone: ShowcaseTone, inner: string): string {

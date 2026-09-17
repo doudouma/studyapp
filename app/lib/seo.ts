@@ -1,10 +1,15 @@
 import i18n from "./i18n";
+import { findCaseBySlug, getCaseLocales } from "@shared/showcase";
+import type { ShowcaseLocale } from "@shared/types/showcase";
 import {
+  LANGS,
   DEFAULT_LANG,
   BASE_URL,
+  buildHreflangLinksFor,
   getBcp47,
   isLang,
   withLangPrefix,
+  type HeadLink,
   type Lang,
 } from "./lang";
 
@@ -34,6 +39,41 @@ export {
 export function currentLang(): Lang {
   const raw = i18n.language?.split("-")[0];
   return isLang(raw) ? raw : DEFAULT_LANG;
+}
+
+const CASE_PATH_RE = /^\/showcase\/([a-z0-9-]+)$/;
+
+/** 案例详情页路径 → slug；非案例页返回 null */
+export function caseSlugFromPath(basePath: string): string | null {
+  const m = CASE_PATH_RE.exec(basePath);
+  return m ? m[1] : null;
+}
+
+/**
+ * 页面的 canonical 路径（语言前缀之后的部分）。
+ *
+ * 案例详情页各语言内容并不等价：某语言没有翻译时会回退渲染英文，
+ * 这时 canonical 指回 en，避免把英文内容当成该语言页面收录。
+ */
+export function canonicalPathFor(basePath: string, lang: Lang): string {
+  const slug = caseSlugFromPath(basePath);
+  if (!slug) return withLangPrefix(lang, basePath);
+  const item = findCaseBySlug(slug, lang as ShowcaseLocale);
+  return withLangPrefix((item?.locale ?? DEFAULT_LANG) as Lang, basePath);
+}
+
+/**
+ * 页面的 hreflang alternates。
+ *
+ * 案例详情页只声明**真的存在翻译**的语言——把未翻译语言的 URL 写进 hreflang
+ * 等于告诉搜索引擎那些页面是独立语言版本，而它们内容其实是英文。
+ */
+export function hreflangLinksForPath(basePath: string): HeadLink[] {
+  const slug = caseSlugFromPath(basePath);
+  if (!slug) return buildHreflangLinksFor(basePath, LANGS);
+  const langs = getCaseLocales(slug);
+  if (langs.length === 0) return [];
+  return buildHreflangLinksFor(basePath, langs as Lang[]);
 }
 
 /**
