@@ -32,7 +32,7 @@ facts:
     value: Yes
 sources:
   - title: r/vibecoding — Photon project thread
-    url: https://www.reddit.com/r/vibecoding/
+    url: https://www.reddit.com/r/vibecoding/comments/1wf3hvx/i_vibe_coded_photoshop_alternative_using_gpt6astra/
     publisher: Reddit
   - title: Photon — official site
     url: https://tenzen.studio/photon/
