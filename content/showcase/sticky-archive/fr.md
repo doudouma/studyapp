@@ -37,8 +37,8 @@ Le projet comble l'écart entre les post-its locaux et temporaires du bureau et 
 
 | Logiciel cible | Faisabilité | Verdict et contexte d'usage |
 | --- | --- | --- |
-| Microsoft Sticky Notes | Moyenne | Adapté à ceux qui veulent une synchronisation web entre appareils et un affichage public communautaire, mais sans widgets natifs épinglés ou ancrés au bureau. |
-| Padlet | Moyenne | Alternative légère pour des tableaux publics sans abonnement complexe, mais sans gestion fine des permissions de niveau éducatif ou entreprise. |
+| Microsoft Sticky Notes | Modérée | Adapté à ceux qui veulent une synchronisation web entre appareils et un affichage public communautaire, mais sans widgets natifs épinglés ou ancrés au bureau. |
+| Padlet | Modérée | Alternative légère pour des tableaux publics sans abonnement complexe, mais sans gestion fine des permissions de niveau éducatif ou entreprise. |
 | Twitter / X (micro-idées des débuts) | Partielle | Redonne l'expérience d'un fil sans algorithme pour consigner sans friction des humeurs brèves et des idées instantanées. |
 
 ## Réalités et limites actuelles

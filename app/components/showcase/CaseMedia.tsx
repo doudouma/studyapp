@@ -104,8 +104,27 @@ export function CaseMedia({ item }: { item: ShowcaseCase }) {
     />
   );
 
-  // 封面图缺失：没有可渲染的素材时整块不占版面（有视频时不会走到这里）
-  if (imageMissing) return null;
+  // 纯封面缺失（没有视频失败回退要说明）时整块不占版面
+  if (imageMissing && !videoFailed) return null;
+
+  // 视频播放失败、且回退封面也缺失：没有可点/可看的图，但仍保留失败说明，
+  // 有原站时把说明做成链接（否则用户既看不到素材也没有去原站的入口）
+  if (imageMissing) {
+    const caption = t("showcase.media.hlsFallback");
+    return (
+      <figure className="mt-5">
+        <figcaption className="mt-1.5 text-[10px] text-muted-foreground">
+          {href ? (
+            <a href={href} target="_blank" rel="noopener" className="hover:underline">
+              {caption}
+            </a>
+          ) : (
+            caption
+          )}
+        </figcaption>
+      </figure>
+    );
+  }
 
   return (
     <figure className="mt-5">
