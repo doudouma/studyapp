@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WardrobeRouteImport } from './routes/wardrobe'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SquareRouteImport } from './routes/square'
+import { Route as ShowcaseRouteImport } from './routes/showcase'
 import { Route as RhythmRouteImport } from './routes/rhythm'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PomodoroRouteImport } from './routes/pomodoro'
@@ -27,6 +28,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as Any2mdRouteImport } from './routes/any2md'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ShowcaseSlugRouteImport } from './routes/showcase_.$slug'
 import { Route as PapercutViewRouteImport } from './routes/papercut_.view'
 
 const WardrobeRoute = WardrobeRouteImport.update({
@@ -42,6 +44,11 @@ const TermsRoute = TermsRouteImport.update({
 const SquareRoute = SquareRouteImport.update({
   id: '/square',
   path: '/square',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShowcaseRoute = ShowcaseRouteImport.update({
+  id: '/showcase',
+  path: '/showcase',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RhythmRoute = RhythmRouteImport.update({
@@ -119,6 +126,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShowcaseSlugRoute = ShowcaseSlugRouteImport.update({
+  id: '/showcase_/$slug',
+  path: '/showcase/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PapercutViewRoute = PapercutViewRouteImport.update({
   id: '/papercut_/view',
   path: '/papercut/view',
@@ -141,10 +153,12 @@ export interface FileRoutesByFullPath {
   '/pomodoro': typeof PomodoroRoute
   '/privacy': typeof PrivacyRoute
   '/rhythm': typeof RhythmRoute
+  '/showcase': typeof ShowcaseRoute
   '/square': typeof SquareRoute
   '/terms': typeof TermsRoute
   '/wardrobe': typeof WardrobeRoute
   '/papercut/view': typeof PapercutViewRoute
+  '/showcase/$slug': typeof ShowcaseSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -162,10 +176,12 @@ export interface FileRoutesByTo {
   '/pomodoro': typeof PomodoroRoute
   '/privacy': typeof PrivacyRoute
   '/rhythm': typeof RhythmRoute
+  '/showcase': typeof ShowcaseRoute
   '/square': typeof SquareRoute
   '/terms': typeof TermsRoute
   '/wardrobe': typeof WardrobeRoute
   '/papercut/view': typeof PapercutViewRoute
+  '/showcase/$slug': typeof ShowcaseSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -184,10 +200,12 @@ export interface FileRoutesById {
   '/pomodoro': typeof PomodoroRoute
   '/privacy': typeof PrivacyRoute
   '/rhythm': typeof RhythmRoute
+  '/showcase': typeof ShowcaseRoute
   '/square': typeof SquareRoute
   '/terms': typeof TermsRoute
   '/wardrobe': typeof WardrobeRoute
   '/papercut_/view': typeof PapercutViewRoute
+  '/showcase_/$slug': typeof ShowcaseSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -207,10 +225,12 @@ export interface FileRouteTypes {
     | '/pomodoro'
     | '/privacy'
     | '/rhythm'
+    | '/showcase'
     | '/square'
     | '/terms'
     | '/wardrobe'
     | '/papercut/view'
+    | '/showcase/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -228,10 +248,12 @@ export interface FileRouteTypes {
     | '/pomodoro'
     | '/privacy'
     | '/rhythm'
+    | '/showcase'
     | '/square'
     | '/terms'
     | '/wardrobe'
     | '/papercut/view'
+    | '/showcase/$slug'
   id:
     | '__root__'
     | '/'
@@ -249,10 +271,12 @@ export interface FileRouteTypes {
     | '/pomodoro'
     | '/privacy'
     | '/rhythm'
+    | '/showcase'
     | '/square'
     | '/terms'
     | '/wardrobe'
     | '/papercut_/view'
+    | '/showcase_/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -271,10 +295,12 @@ export interface RootRouteChildren {
   PomodoroRoute: typeof PomodoroRoute
   PrivacyRoute: typeof PrivacyRoute
   RhythmRoute: typeof RhythmRoute
+  ShowcaseRoute: typeof ShowcaseRoute
   SquareRoute: typeof SquareRoute
   TermsRoute: typeof TermsRoute
   WardrobeRoute: typeof WardrobeRoute
   PapercutViewRoute: typeof PapercutViewRoute
+  ShowcaseSlugRoute: typeof ShowcaseSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -298,6 +324,13 @@ declare module '@tanstack/react-router' {
       path: '/square'
       fullPath: '/square'
       preLoaderRoute: typeof SquareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/showcase': {
+      id: '/showcase'
+      path: '/showcase'
+      fullPath: '/showcase'
+      preLoaderRoute: typeof ShowcaseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/rhythm': {
@@ -405,6 +438,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/showcase_/$slug': {
+      id: '/showcase_/$slug'
+      path: '/showcase/$slug'
+      fullPath: '/showcase/$slug'
+      preLoaderRoute: typeof ShowcaseSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/papercut_/view': {
       id: '/papercut_/view'
       path: '/papercut/view'
@@ -431,10 +471,12 @@ const rootRouteChildren: RootRouteChildren = {
   PomodoroRoute: PomodoroRoute,
   PrivacyRoute: PrivacyRoute,
   RhythmRoute: RhythmRoute,
+  ShowcaseRoute: ShowcaseRoute,
   SquareRoute: SquareRoute,
   TermsRoute: TermsRoute,
   WardrobeRoute: WardrobeRoute,
   PapercutViewRoute: PapercutViewRoute,
+  ShowcaseSlugRoute: ShowcaseSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

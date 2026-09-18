@@ -3,7 +3,7 @@ import PetSafeApp from "~/components/petsafe/PetSafeApp";
 import PetSafeSeoContent from "~/components/petsafe/PetSafeSeoContent";
 import { PETSAFE_FAQ_KEYS } from "~/components/petsafe/petsafe-constants";
 import i18n from "~/lib/i18n";
-import { withLangPrefix, currentLang, BASE_URL } from "~/lib/seo";
+import { withLangPrefix, currentLang, BASE_URL, DEFAULT_OG_IMAGE } from "~/lib/seo";
 
 export const Route = createFileRoute("/petsafe")({
   head: () => {
@@ -35,12 +35,12 @@ export const Route = createFileRoute("/petsafe")({
         { property: "og:type", content: "website" },
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
-        { property: "og:image", content: "https://100mini.com/spritesheet2/frame_38.webp" },
+        { property: "og:image", content: DEFAULT_OG_IMAGE },
         { property: "og:site_name", content: "100mini" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: desc },
-        { name: "twitter:image", content: "https://100mini.com/spritesheet2/frame_38.webp" },
+        { name: "twitter:image", content: DEFAULT_OG_IMAGE },
       ],
       scripts: [
         {

@@ -4,7 +4,7 @@ import { FileText, ShieldCheck, Files, Table2, ArrowRight, Brain, Check, Chevron
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { FileDrop } from "~/components/any2md/FileDrop";
-import { withLangPrefix, currentLang, BASE_URL } from "~/lib/seo";
+import { withLangPrefix, currentLang, BASE_URL, DEFAULT_OG_IMAGE } from "~/lib/seo";
 import { ResultPanel } from "~/components/any2md/ResultPanel";
 import { MdView } from "~/components/any2md/MdView";
 import {
@@ -26,7 +26,6 @@ export const Route = createFileRoute("/any2md")({
   head: () => {
     const bcp = getBcp47(i18n.language);
     const pageUrl = BASE_URL + withLangPrefix(currentLang(), "/any2md");
-    const ogImage = "https://100mini.com/spritesheet2/frame_38.webp";
     const faqs = Array.from({ length: 10 }, (_, i) => ({
       name: i18n.t(`any2md.faq${i + 1}.q`),
       text: i18n.t(`any2md.faq${i + 1}.a`),
@@ -40,12 +39,12 @@ export const Route = createFileRoute("/any2md")({
         { property: "og:type", content: "website" },
         { property: "og:title", content: i18n.t("any2md.title") },
         { property: "og:description", content: i18n.t("any2md.subtitle") },
-        { property: "og:image", content: ogImage },
+        { property: "og:image", content: DEFAULT_OG_IMAGE },
         { property: "og:site_name", content: "100mini" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: i18n.t("any2md.title") },
         { name: "twitter:description", content: i18n.t("any2md.subtitle") },
-        { name: "twitter:image", content: ogImage },
+        { name: "twitter:image", content: DEFAULT_OG_IMAGE },
       ],
       scripts: [
         {

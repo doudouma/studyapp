@@ -11,6 +11,8 @@ import {
 } from "../app/lib/lang";
 import { page } from "./db/schema";
 import { createDb } from "./db";
+import { SHOWCASE_CASE_SETS, type ShowcaseCaseSet } from "../shared/showcase";
+import { type ShowcaseLocale } from "../shared/types/showcase";
 import { squareRoutes } from "./features/square/square.routes";
 import { pagesRoutes } from "./features/pages/pages.routes";
 import { adminRoutes } from "./features/admin/admin.routes";
@@ -44,6 +46,7 @@ api.onError((err, c) => {
 const STATIC_PAGES: { loc: string; changefreq: string; priority: string }[] = [
   { loc: "/", changefreq: "daily", priority: "1.0" },
   { loc: "/square", changefreq: "hourly", priority: "0.9" },
+  { loc: "/showcase", changefreq: "weekly", priority: "0.8" },
   { loc: "/md2html", changefreq: "weekly", priority: "0.8" },
   { loc: "/any2md", changefreq: "weekly", priority: "0.8" },
   { loc: "/freetool", changefreq: "weekly", priority: "0.7" },
@@ -104,6 +107,21 @@ function alternateLinksXml(basePath: string): string {
   return lines.join("");
 }
 
+// hreflang alternates for a case detail page — only the languages that actually
+// have a translation (plus x-default → en). Case URLs are language-prefixed like
+// every other page; untranslated cases are absent from the non-en sitemaps so the
+// English fallback version isn't indexed under a misleading language URL.
+function caseAlternateLinksXml(set: ShowcaseCaseSet): string {
+  const lines = set.locales.map(
+    (l) =>
+      `\n    <xhtml:link rel="alternate" hreflang="${getBcp47(l)}" href="${BASE_URL}${withLangPrefix(l, `/showcase/${set.slug}`)}"/>`
+  );
+  lines.push(
+    `\n    <xhtml:link rel="alternate" hreflang="x-default" href="${BASE_URL}${withLangPrefix(DEFAULT_LANG, `/showcase/${set.slug}`)}"/>`
+  );
+  return lines.join("");
+}
+
 async function buildLangSitemap(c: any, lang: Lang): Promise<string> {
   const urls: string[] = STATIC_PAGES.map((p) => {
     const loc = `${BASE_URL}${withLangPrefix(lang, p.loc)}`;
@@ -114,6 +132,19 @@ async function buildLangSitemap(c: any, lang: Lang): Promise<string> {
     <priority>${p.priority}</priority>${alternateLinksXml(p.loc)}
   </url>`;
   });
+
+  // Case library detail pages: each language sitemap lists the cases that have
+  // that translation; untranslated cases fall back to English and stay en-only.
+  for (const set of SHOWCASE_CASE_SETS) {
+    const item = set.cases[lang as ShowcaseLocale];
+    if (!item) continue;
+    const lastmod = item.updatedAt ?? item.publishedAt;
+    const loc = `${BASE_URL}${withLangPrefix(lang, `/showcase/${set.slug}`)}`;
+    urls.push(`
+  <url>
+    <loc>${escapeXml(loc)}</loc>${lastmod ? `\n    <lastmod>${lastmod}</lastmod>` : ""}${caseAlternateLinksXml(set)}
+  </url>`);
+  }
 
   // User-generated shared pages live at root only (single canonical URL, no
   // language variants — /{lang}/p/:id 301-redirects to /p/:id). Include them

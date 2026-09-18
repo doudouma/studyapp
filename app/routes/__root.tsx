@@ -5,11 +5,13 @@ import { I18nProvider } from "~/lib/i18n-provider";
 import i18n, { getBcp47 } from "~/lib/i18n";
 import { useTranslation } from "react-i18next";
 import {
-  buildHreflangLinks,
   buildJsonLd,
+  canonicalPathFor,
+  hreflangLinksForPath,
   withLangPrefix,
   currentLang,
   BASE_URL,
+  DEFAULT_OG_IMAGE,
 } from "~/lib/seo";
 import "~/styles/app.css";
 import interFontUrl from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
@@ -19,8 +21,11 @@ export const Route = createRootRoute({
     const matches: Array<{ pathname: string }> = ctx?.matches ?? [];
     const leafPath = matches.length ? matches[matches.length - 1].pathname : "/";
     const lang = currentLang();
-    const jsonLd = buildJsonLd(leafPath, lang);
-    const pageUrl = BASE_URL + withLangPrefix(lang, leafPath);
+    // Case detail pages supply their own Article + BreadcrumbList JSON-LD in
+    // their route head(); the generic WebPage/breadcrumb graph generated here
+    // cannot know the case, so it is skipped to avoid a wrong breadcrumb.
+    const jsonLd = leafPath.startsWith("/showcase/") ? [] : buildJsonLd(leafPath, lang);
+    const pageUrl = BASE_URL + canonicalPathFor(leafPath, lang);
 
     return {
       meta: [
@@ -46,11 +51,15 @@ export const Route = createRootRoute({
         },
         { property: "og:url", content: pageUrl },
         { property: "og:locale", content: getBcp47(lang).replace("-", "_") },
-        { name: "twitter:card", content: "summary" },
-        {
-          name: "twitter:title",
-          content: i18n.t("app.title"),
-        },
+        // 站点级兜底社交分享图（1200×630）。页面级 head 若声明自己的
+        // og:image 会覆盖这里；案例详情页用 cover.src 覆盖。
+        { property: "og:image", content: DEFAULT_OG_IMAGE },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        { property: "og:image:alt", content: i18n.t("app.title") },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: i18n.t("app.title") },
+        { name: "twitter:image", content: DEFAULT_OG_IMAGE },
         {
           name: "twitter:description",
           content: i18n.t("app.desc"),
@@ -96,8 +105,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     select: (s) => s.matches[s.matches.length - 1]?.pathname ?? "/",
   });
   const lang = currentLang();
-  const canonicalHref = BASE_URL + withLangPrefix(lang, leafPath);
-  const hreflangLinks = buildHreflangLinks(leafPath);
+  // 案例详情页各语言内容不等价（没翻译时回退英文），所以 canonical 与
+  // hreflang 都由 seo.ts 按「该案例实际有哪些语言」算，不能一律按当前语言。
+  const canonicalHref = BASE_URL + canonicalPathFor(leafPath, lang);
+  const hreflangLinks = hreflangLinksForPath(leafPath);
 
   // Keep canonical + hreflang <link> tags in sync on client-side navigation.
   // They are rendered server-only (see head() note above), so React doesn't
@@ -109,7 +120,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     if (canonical) canonical.setAttribute("href", canonicalHref);
 
     const alts = document.querySelectorAll('link[rel="alternate"][hreflang]');
-    const newAlts = buildHreflangLinks(leafPath);
+    const newAlts = hreflangLinksForPath(leafPath);
     if (alts.length === newAlts.length) {
       alts.forEach((el, i) => el.setAttribute("href", newAlts[i].href));
     } else {
