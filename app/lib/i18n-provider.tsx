@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { I18nextProvider, useTranslation } from "react-i18next";
-import i18n, { getBcp47 } from "./i18n";
+import i18n, { getBcp47, loadLocale } from "./i18n";
 import { parseLangFromPath } from "./seo";
 
 /**
@@ -15,12 +15,13 @@ function LangWatcher() {
   const { i18n: i18nInstance } = useTranslation();
 
   useEffect(() => {
-    // Ensure i18n matches the URL on mount (defensive — init already reads URL).
+    // i18n is already initialized with the URL language by client.tsx; this is a
+    // defensive re-sync (and loads the locale chunk if it somehow isn't loaded).
     const urlLang = parseLangFromPath(window.location.pathname);
+    document.documentElement.lang = getBcp47(urlLang);
     if (i18nInstance.language !== urlLang) {
-      i18nInstance.changeLanguage(urlLang);
+      void loadLocale(urlLang).then(() => i18nInstance.changeLanguage(urlLang));
     }
-    document.documentElement.lang = getBcp47(i18nInstance.language);
 
     const handle = (lng: string) => {
       document.documentElement.lang = getBcp47(lng);

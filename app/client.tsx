@@ -1,14 +1,27 @@
 import { createRoot } from "react-dom/client";
 import { StartClient } from "@tanstack/react-start/client";
+import { loadLocale } from "~/lib/i18n";
+import { parseLangFromPath } from "~/lib/lang";
 
-console.log("[client] Starting hydration...");
-const rootEl = document.getElementById("root");
-console.log("[client] root element:", rootEl ? "found" : "missing");
+/**
+ * Hydration entry. The active language's locale chunk must be in the i18n
+ * instance before React renders, otherwise the server-rendered translations
+ * would be replaced by raw keys. Only the URL's language is fetched here.
+ */
+async function boot() {
+  const rootEl = document.getElementById("root");
+  if (!rootEl) {
+    console.error("[client] root element not found!");
+    return;
+  }
 
-if (rootEl) {
-  const root = createRoot(rootEl);
-  root.render(<StartClient />);
-  console.log("[client] render called");
-} else {
-  console.error("[client] root element not found!");
+  try {
+    await loadLocale(parseLangFromPath(window.location.pathname));
+  } catch (err) {
+    console.error("[client] failed to load locale:", err);
+  }
+
+  createRoot(rootEl).render(<StartClient />);
 }
+
+void boot();

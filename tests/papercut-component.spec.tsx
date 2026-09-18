@@ -1,7 +1,11 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach, beforeAll } from "vitest";
 import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
-import "~/lib/i18n";
+import { loadLocale } from "~/lib/i18n";
 import { PaperCutApp } from "~/components/papercut/PaperCutApp";
+
+beforeAll(async () => {
+  await loadLocale("en");
+});
 
 function makeCtx() {
   const ctx: Record<string, any> = {};

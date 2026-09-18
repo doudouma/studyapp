@@ -1,6 +1,10 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach, beforeAll } from "vitest";
 import { render, screen, waitFor, cleanup } from "@testing-library/react";
-import "~/lib/i18n";
+import { loadLocale } from "~/lib/i18n";
+
+beforeAll(async () => {
+  await loadLocale("en");
+});
 
 vi.mock("@tanstack/react-router", () => ({
   Link: ({ to, children, ...rest }: any) => (

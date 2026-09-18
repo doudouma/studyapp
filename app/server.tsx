@@ -6,7 +6,7 @@ import { createAuth } from "~/../server/auth";
 import { getUserByApiKey } from "~/../server/features/pages/apikey.service";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import i18n from "~/lib/i18n";
+import i18n, { loadLocale } from "~/lib/i18n";
 import {
   parseLangFromPath,
   stripLangPrefix,
@@ -155,7 +155,9 @@ app.all("*", async (c) => {
   }
 
   const lang = parseLangFromPath(url.pathname) as Lang;
-  i18n.changeLanguage(lang);
+  // 只加载当前语言的 locale（chunk），再切换 i18n 语言，保证 SSR 文案正确
+  await loadLocale(lang);
+  await i18n.changeLanguage(lang);
 
   if (lang === DEFAULT_LANG) {
     return startHandler(c.req.raw);
