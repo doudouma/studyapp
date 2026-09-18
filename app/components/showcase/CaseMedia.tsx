@@ -27,7 +27,14 @@ export function CaseMedia({ item }: { item: ShowcaseCase }) {
    * 切换案例不会重建组件，布尔值会把上一个案例的失败状态带到下一个案例上。
    */
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const [failedImageSrc, setFailedImageSrc] = useState<string | null>(null);
   const videoFailed = !!cover.video && failedSrc === cover.video;
+  // 封面图缺失/加载失败时（列表卡片已这样做）不渲染破图
+  const imageMissing = failedImageSrc === cover.src;
+
+  useEffect(() => {
+    setFailedImageSrc(null);
+  }, [cover.src]);
 
   useEffect(() => {
     const src = cover.video;
@@ -92,9 +99,13 @@ export function CaseMedia({ item }: { item: ShowcaseCase }) {
     <img
       src={cover.src}
       alt={item.name}
+      onError={() => setFailedImageSrc(cover.src)}
       className="w-full rounded-lg border border-[#cfcfcf] dark:border-[#243244]"
     />
   );
+
+  // 封面图缺失：没有可渲染的素材时整块不占版面（有视频时不会走到这里）
+  if (imageMissing) return null;
 
   return (
     <figure className="mt-5">
