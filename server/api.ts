@@ -11,7 +11,7 @@ import {
 } from "../app/lib/lang";
 import { page } from "./db/schema";
 import { createDb } from "./db";
-import { SHOWCASE_CASE_SETS, type ShowcaseCaseSet } from "../shared/showcase";
+import { getCaseLocales, getCaseSlugs, loadCase } from "../shared/showcase";
 import { type ShowcaseLocale } from "../shared/types/showcase";
 import { squareRoutes } from "./features/square/square.routes";
 import { pagesRoutes } from "./features/pages/pages.routes";
@@ -111,13 +111,13 @@ function alternateLinksXml(basePath: string): string {
 // have a translation (plus x-default → en). Case URLs are language-prefixed like
 // every other page; untranslated cases are absent from the non-en sitemaps so the
 // English fallback version isn't indexed under a misleading language URL.
-function caseAlternateLinksXml(set: ShowcaseCaseSet): string {
-  const lines = set.locales.map(
+function caseAlternateLinksXml(slug: string, locales: ShowcaseLocale[]): string {
+  const lines = locales.map(
     (l) =>
-      `\n    <xhtml:link rel="alternate" hreflang="${getBcp47(l)}" href="${BASE_URL}${withLangPrefix(l, `/showcase/${set.slug}`)}"/>`
+      `\n    <xhtml:link rel="alternate" hreflang="${getBcp47(l)}" href="${BASE_URL}${withLangPrefix(l, `/showcase/${slug}`)}"/>`
   );
   lines.push(
-    `\n    <xhtml:link rel="alternate" hreflang="x-default" href="${BASE_URL}${withLangPrefix(DEFAULT_LANG, `/showcase/${set.slug}`)}"/>`
+    `\n    <xhtml:link rel="alternate" hreflang="x-default" href="${BASE_URL}${withLangPrefix(DEFAULT_LANG, `/showcase/${slug}`)}"/>`
   );
   return lines.join("");
 }
@@ -135,14 +135,16 @@ async function buildLangSitemap(c: any, lang: Lang): Promise<string> {
 
   // Case library detail pages: each language sitemap lists the cases that have
   // that translation; untranslated cases fall back to English and stay en-only.
-  for (const set of SHOWCASE_CASE_SETS) {
-    const item = set.cases[lang as ShowcaseLocale];
+  for (const slug of getCaseSlugs()) {
+    const locales = getCaseLocales(slug);
+    if (!locales.includes(lang as ShowcaseLocale)) continue;
+    const item = await loadCase(slug, lang as ShowcaseLocale);
     if (!item) continue;
     const lastmod = item.updatedAt ?? item.publishedAt;
-    const loc = `${BASE_URL}${withLangPrefix(lang, `/showcase/${set.slug}`)}`;
+    const loc = `${BASE_URL}${withLangPrefix(lang, `/showcase/${slug}`)}`;
     urls.push(`
   <url>
-    <loc>${escapeXml(loc)}</loc>${lastmod ? `\n    <lastmod>${lastmod}</lastmod>` : ""}${caseAlternateLinksXml(set)}
+    <loc>${escapeXml(loc)}</loc>${lastmod ? `\n    <lastmod>${lastmod}</lastmod>` : ""}${caseAlternateLinksXml(slug, locales)}
   </url>`);
   }
 

@@ -1,5 +1,5 @@
 import i18n from "./i18n";
-import { findCaseBySlug, getCaseLocales } from "@shared/showcase";
+import { getCaseLocales } from "@shared/showcase";
 import type { ShowcaseLocale } from "@shared/types/showcase";
 import {
   LANGS,
@@ -54,12 +54,13 @@ export function caseSlugFromPath(basePath: string): string | null {
  *
  * 案例详情页各语言内容并不等价：某语言没有翻译时会回退渲染英文，
  * 这时 canonical 指回 en，避免把英文内容当成该语言页面收录。
+ * 只依赖「该案例有哪些语言」（同步索引），不需要加载正文。
  */
 export function canonicalPathFor(basePath: string, lang: Lang): string {
   const slug = caseSlugFromPath(basePath);
   if (!slug) return withLangPrefix(lang, basePath);
-  const item = findCaseBySlug(slug, lang as ShowcaseLocale);
-  return withLangPrefix((item?.locale ?? DEFAULT_LANG) as Lang, basePath);
+  const hasTranslation = getCaseLocales(slug).includes(lang as ShowcaseLocale);
+  return withLangPrefix((hasTranslation ? lang : DEFAULT_LANG) as Lang, basePath);
 }
 
 /**

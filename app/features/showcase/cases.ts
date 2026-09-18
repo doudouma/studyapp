@@ -1,8 +1,7 @@
 import type { CSSProperties } from "react";
-import { SHOWCASE_CASES, findCaseBySlug, listCases } from "@shared/showcase";
+import { getCaseLocales, getCaseSlugs, loadCase, loadCases } from "@shared/showcase";
 import {
   CATEGORIES,
-  DEFAULT_SHOWCASE_LOCALE,
   SHOWCASE_ACCENT,
   SHOWCASE_ACCENT_DARK,
   TONE_COLORS,
@@ -17,28 +16,35 @@ import {
  * 案例库的读取辅助（数据来自 content/showcase/{slug}/*.md，见 shared/showcase）
  * 页面/组件只依赖此模块，不直接 import @shared/showcase
  *
+ * 案例内容按语言懒加载：`getCases` / `getCaseBySlug` 都是 async，且在
+ * shared/showcase 里带缓存；`getCaseSlugs` / `getCaseLocales` 是同步的
+ * （只依赖 glob 路径，供 canonical / hreflang / sitemap 用）。
+ *
  * 所有读取函数接受可选的 `locale`：未翻译的案例回退英文，
  * 返回值的 `locale` 字段标明实际语言。
  */
 
-export function getCases(locale?: ShowcaseLocale): ShowcaseCase[] {
-  if (!locale || locale === DEFAULT_SHOWCASE_LOCALE) return SHOWCASE_CASES;
-  return listCases(locale);
+export { getCaseLocales, getCaseSlugs };
+
+export async function getCases(locale?: ShowcaseLocale): Promise<ShowcaseCase[]> {
+  return loadCases(locale);
 }
 
-export function getCaseBySlug(slug: string, locale?: ShowcaseLocale): ShowcaseCase | undefined {
-  if (!locale || locale === DEFAULT_SHOWCASE_LOCALE) return findCaseBySlug(slug);
-  return findCaseBySlug(slug, locale);
+export async function getCaseBySlug(
+  slug: string,
+  locale?: ShowcaseLocale,
+): Promise<ShowcaseCase | undefined> {
+  return loadCase(slug, locale);
 }
 
 /** 相关案例：同分类优先，不足用其它分类补齐 */
-export function getRelatedCases(
+export async function getRelatedCases(
   slug: string,
   locale?: ShowcaseLocale,
   limit = 3,
-): ShowcaseCase[] {
-  const current = getCaseBySlug(slug, locale);
-  const others = getCases(locale).filter((c) => c.slug !== slug);
+): Promise<ShowcaseCase[]> {
+  const [current, all] = await Promise.all([loadCase(slug, locale), loadCases(locale)]);
+  const others = all.filter((c) => c.slug !== slug);
   if (!current) return others.slice(0, limit);
   const sameCategory = others.filter((c) => c.category === current.category);
   const rest = others.filter((c) => c.category !== current.category);
@@ -63,8 +69,8 @@ export function toneVars(tone: ShowcaseTone): CSSProperties {
 }
 
 /** 出现过的分类（按 CATEGORIES 顺序），用于列表页过滤栏 */
-export function getUsedCategories(locale?: ShowcaseLocale): ShowcaseCategory[] {
-  const used = new Set(getCases(locale).map((c) => c.category));
+export function getUsedCategories(cases: ShowcaseCase[]): ShowcaseCategory[] {
+  const used = new Set(cases.map((c) => c.category));
   return CATEGORIES.filter((c) => used.has(c));
 }
 

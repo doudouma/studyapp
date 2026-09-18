@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest";
-import { SHOWCASE_CASES, findCaseBySlug } from "../shared/showcase";
-import { CATEGORIES } from "../shared/types/showcase";
+import { describe, it, expect, beforeAll } from "vitest";
+import { getCaseLocales, getCaseSlugs, loadCase, loadCases } from "../shared/showcase";
+import { CATEGORIES, type ShowcaseCase } from "../shared/types/showcase";
 import {
   getCaseBySlug,
   getCases,
@@ -14,13 +14,20 @@ const HTTPS = /^https:\/\/.+/;
 const SLUG = /^[a-z0-9-]+$/;
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 
+// 案例内容按语言懒加载，测试里显式加载英文基准
+let CASES: ShowcaseCase[];
+
+beforeAll(async () => {
+  CASES = await loadCases("en");
+});
+
 describe("showcase case data（来自 content/showcase/*/*.md）", () => {
   it("has at least one case", () => {
-    expect(SHOWCASE_CASES.length).toBeGreaterThan(0);
+    expect(CASES.length).toBeGreaterThan(0);
   });
 
   it("uses unique, URL-safe, stable slugs", () => {
-    const slugs = SHOWCASE_CASES.map((c) => c.slug);
+    const slugs = CASES.map((c) => c.slug);
     expect(new Set(slugs).size).toBe(slugs.length);
     for (const slug of slugs) {
       expect(slug).toMatch(SLUG);
@@ -30,7 +37,7 @@ describe("showcase case data（来自 content/showcase/*/*.md）", () => {
   });
 
   it("fills the required fields on every case", () => {
-    for (const c of SHOWCASE_CASES) {
+    for (const c of CASES) {
       expect(c.name.trim()).not.toBe("");
       expect(c.summary.trim()).not.toBe("");
       expect(c.body.trim()).not.toBe("");
@@ -41,7 +48,7 @@ describe("showcase case data（来自 content/showcase/*/*.md）", () => {
   });
 
   it("keeps fact values non-empty and keys unique", () => {
-    for (const c of SHOWCASE_CASES) {
+    for (const c of CASES) {
       const keys = c.facts.map((f) => f.key);
       expect(new Set(keys).size).toBe(keys.length);
       for (const f of c.facts) {
@@ -52,7 +59,7 @@ describe("showcase case data（来自 content/showcase/*/*.md）", () => {
   });
 
   it("has at least one `## ` section in the markdown body", () => {
-    for (const c of SHOWCASE_CASES) {
+    for (const c of CASES) {
       expect(c.body).toMatch(/^## /m);
     }
   });
@@ -60,20 +67,20 @@ describe("showcase case data（来自 content/showcase/*/*.md）", () => {
   // Article 富结果要求 headline + image + datePublished 三者齐备；sitemap 的 lastmod
   // 也需要日期。缺任何一个，结构化数据整体不成立——所以这里硬性要求。
   it("carries the dates Article rich results need", () => {
-    for (const c of SHOWCASE_CASES) {
+    for (const c of CASES) {
       expect(c.publishedAt, `${c.slug} 缺 publishedAt`).toMatch(DATE);
       if (c.updatedAt) expect(c.updatedAt).toMatch(DATE);
     }
   });
 
   it("carries a cover image for og:image and Article.image", () => {
-    for (const c of SHOWCASE_CASES) {
+    for (const c of CASES) {
       expect(c.cover.src, `${c.slug} 缺 cover.src`).toMatch(/^(https:\/\/|\/)/);
     }
   });
 
   it("only links out over https", () => {
-    for (const c of SHOWCASE_CASES) {
+    for (const c of CASES) {
       for (const s of c.sources) {
         expect(s.title.trim()).not.toBe("");
         expect(s.url).toMatch(HTTPS);
@@ -85,32 +92,48 @@ describe("showcase case data（来自 content/showcase/*/*.md）", () => {
   });
 });
 
-describe("showcase case helpers", () => {
-  it("returns every case and resolves by slug", () => {
-    expect(getCases()).toBe(SHOWCASE_CASES);
-    for (const c of SHOWCASE_CASES) {
-      expect(getCaseBySlug(c.slug)).toBe(c);
-      expect(findCaseBySlug(c.slug)).toBe(c);
+// 校验改到「加载时」后，用这条测试在 CI 里遍历加载全部内容，等价于原来的构建期校验
+describe("showcase content validation", () => {
+  it("loads every case in every declared locale without throwing", async () => {
+    for (const slug of getCaseSlugs()) {
+      const locales = getCaseLocales(slug);
+      expect(locales, `${slug} 缺英文基准`).toContain("en");
+      for (const locale of locales) {
+        const item = await loadCase(slug, locale);
+        expect(item, `${slug}/${locale}`).toBeDefined();
+        expect(item!.body.trim(), `${slug}/${locale} 正文为空`).not.toBe("");
+        expect(item!.locale).toBe(locale);
+      }
     }
-    expect(getCaseBySlug("does-not-exist")).toBeUndefined();
+  });
+});
+
+describe("showcase case helpers", () => {
+  it("returns every case and resolves by slug", async () => {
+    expect(await getCases()).toBe(CASES);
+    for (const c of CASES) {
+      expect(await getCaseBySlug(c.slug)).toBe(c);
+      expect(await loadCase(c.slug)).toBe(c);
+    }
+    expect(await getCaseBySlug("does-not-exist")).toBeUndefined();
   });
 
-  it("never lists the current case among its related cases", () => {
-    for (const c of SHOWCASE_CASES) {
-      const related = getRelatedCases(c.slug);
+  it("never lists the current case among its related cases", async () => {
+    for (const c of CASES) {
+      const related = await getRelatedCases(c.slug);
       expect(related.length).toBeLessThanOrEqual(3);
       expect(related.some((r) => r.slug === c.slug)).toBe(false);
     }
   });
 
   it("prefers a highlighted fact as the card lead", () => {
-    const c = SHOWCASE_CASES[0];
+    const c = CASES[0];
     const highlighted = c.facts.find((f) => f.highlight);
     expect(getLeadFact(c)).toBe(highlighted ?? c.facts[0]);
   });
 
   it("derives published/updated fact rows from the frontmatter dates", () => {
-    for (const c of SHOWCASE_CASES) {
+    for (const c of CASES) {
       const rows = getFactRows(c);
       const byKey = new Map(rows.map((r) => [r.key, r.value]));
 
@@ -126,7 +149,7 @@ describe("showcase case helpers", () => {
   });
 
   it("lets an author override a derived date row", () => {
-    const c = SHOWCASE_CASES[0];
+    const c = CASES[0];
     const withOwnPublished = {
       ...c,
       facts: [...c.facts, { key: "published", value: "custom label" }],

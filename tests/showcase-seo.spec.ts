@@ -1,5 +1,7 @@
-import { describe, it, expect } from "vitest";
-import { SHOWCASE_CASES } from "../shared/showcase";
+import { describe, it, expect, beforeAll } from "vitest";
+import { loadCase, loadCases } from "../shared/showcase";
+import type { ShowcaseCase } from "../shared/types/showcase";
+import { loadLocale } from "../app/lib/i18n";
 import {
   buildArticleJsonLd,
   buildBreadcrumbJsonLd,
@@ -7,7 +9,16 @@ import {
   caseUrl,
 } from "../app/features/showcase/seo";
 
-const SAMPLE = SHOWCASE_CASES[0]!;
+// i18n 按需加载 + 案例内容按语言懒加载：测试里显式加载一次
+let SAMPLE: ShowcaseCase;
+let ALL: ShowcaseCase[];
+
+beforeAll(async () => {
+  await loadLocale("en");
+  await loadLocale("zh");
+  ALL = await loadCases("en");
+  SAMPLE = (await loadCase("photon", "en"))!;
+});
 
 describe("caseUrl", () => {
   it("omits the prefix for en and adds it for other locales", () => {
@@ -41,7 +52,7 @@ describe("case detail Article structured data", () => {
   });
 
   it("gives every case an absolute image and a non-empty author", () => {
-    for (const c of SHOWCASE_CASES) {
+    for (const c of ALL) {
       const a = buildArticleJsonLd(c, caseUrl(c.slug, c.locale)) as any;
       expect(a.image.url, `${c.slug} image`).toMatch(/^https:\/\//);
       expect(a.author.name, `${c.slug} author`).toBeTruthy();
@@ -49,7 +60,7 @@ describe("case detail Article structured data", () => {
   });
 
   it("makes VideoObject valid with an uploadDate when a video exists", () => {
-    const withVideo = SHOWCASE_CASES.filter((c) => c.cover.video);
+    const withVideo = ALL.filter((c) => c.cover.video);
     expect(withVideo.length).toBeGreaterThan(0);
     for (const c of withVideo) {
       const a = buildArticleJsonLd(c, caseUrl(c.slug, c.locale)) as any;
@@ -71,9 +82,7 @@ describe("case detail Article structured data", () => {
   });
 
   it("carries source publisher/date into citations", () => {
-    const withMeta = SHOWCASE_CASES.find((c) =>
-      c.sources.some((s) => s.publisher && s.date),
-    );
+    const withMeta = ALL.find((c) => c.sources.some((s) => s.publisher && s.date));
     if (!withMeta) return;
     const a = buildArticleJsonLd(withMeta, caseUrl(withMeta.slug, withMeta.locale)) as any;
     const cited = a.citation.find((x: any) => x.publisher && x.datePublished);

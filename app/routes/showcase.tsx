@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useLoaderData } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import i18n from "~/lib/i18n";
 import { BASE_URL, currentLang, withLangPrefix } from "~/lib/seo";
@@ -15,11 +15,13 @@ import {
 import { getCases, getUsedCategories } from "~/features/showcase/cases";
 
 export const Route = createFileRoute("/showcase")({
-  head: () => {
+  // 案例内容按语言懒加载（shared/showcase 有缓存，head 再取一次是命中）
+  loader: async () => await getCases(currentLang()),
+  head: async () => {
     const title = i18n.t("showcase.title");
     const desc = i18n.t("showcase.desc");
     const lang = currentLang();
-    const cases = getCases(lang);
+    const cases = await getCases(lang);
     return {
       meta: [
         { title },
@@ -59,9 +61,8 @@ export const Route = createFileRoute("/showcase")({
 
 function ShowcasePage() {
   const { t } = useTranslation();
-  const lang = currentLang();
-  const cases = getCases(lang);
-  const categories = getUsedCategories(lang);
+  const cases = useLoaderData({ from: Route.id });
+  const categories = getUsedCategories(cases);
   const [activeCategory, setActiveCategory] = useState("");
   const [query, setQuery] = useState("");
   const [searchFocused, setSearchFocused] = useState(false);

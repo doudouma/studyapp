@@ -23,13 +23,16 @@ import {
 import { buildCaseHead } from "~/features/showcase/seo";
 
 export const Route = createFileRoute("/showcase_/$slug")({
-  loader: ({ params }) => {
-    const item = getCaseBySlug(params.slug, currentLang());
+  // 案例内容按语言懒加载；loader 负责取正文，head 再取一次是缓存命中
+  loader: async ({ params }) => {
+    const lang = currentLang();
+    const item = await getCaseBySlug(params.slug, lang);
     if (!item) throw notFound();
-    return item;
+    const related = await getRelatedCases(item.slug, lang, 3);
+    return { item, related };
   },
-  head: ({ params }) => {
-    const item = getCaseBySlug(params.slug, currentLang());
+  head: async ({ params }) => {
+    const item = await getCaseBySlug(params.slug, currentLang());
     if (!item) {
       return {
         meta: [
@@ -45,9 +48,7 @@ export const Route = createFileRoute("/showcase_/$slug")({
 
 function CaseDetailPage() {
   const { t } = useTranslation();
-  const lang = currentLang();
-  const item = useLoaderData({ from: Route.id });
-  const related = getRelatedCases(item.slug, lang, 3);
+  const { item, related } = useLoaderData({ from: Route.id });
 
   return (
     <div className="flex min-h-screen flex-col">
