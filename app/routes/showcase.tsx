@@ -92,7 +92,7 @@ function ShowcasePage() {
               <span aria-hidden className="text-muted-foreground/40">
                 #{" "}
               </span>
-              {t("showcase.heading")}
+              {t("showcase.h1")}
             </h1>
             <p className="mt-1 text-muted-foreground">{t("showcase.subtitle")}</p>
 

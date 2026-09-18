@@ -95,7 +95,7 @@ function pageKeys(basePath: string): { name: string; desc: string } {
     case "/square":
       return { name: "square.heading", desc: "square.desc" };
     case "/showcase":
-      return { name: "showcase.heading", desc: "showcase.desc" };
+      return { name: "showcase.h1", desc: "showcase.desc" };
     case "/md2html":
       return { name: "md2html.seoTitle", desc: "md2html.seoDesc" };
     case "/any2md":
