@@ -24,6 +24,7 @@ function BadgeLink({ href, imgSrc, label }: { href: string; imgSrc: string; labe
           src={imgSrc}
           alt={label}
           style={{ height: 20, width: "auto" }}
+          loading="lazy"
           onError={() => setFailed(true)}
         />
       )}
@@ -86,7 +87,7 @@ export function AppFooter() {
       </div>
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-6 px-6 pb-6">
         {/* 目录站/徽章互链：显式标注 sponsored + nofollow。
-            这三个链接出现在全站共享页脚，N 个页面 × 3 条即跨全站 dofollow 外链，
+            这些链接出现在全站共享页脚，N 个页面 × N 条即跨全站 dofollow 外链，
             会触发 link spam 判定（降权的是链接来源站，也就是我们自己）。 */}
         <a
           href="https://mossai.org"
@@ -106,6 +107,11 @@ export function AppFooter() {
           href="https://gets.tools"
           imgSrc="https://gets.tools/badge/badge_light.svg"
           label="Gets.Tools"
+        />
+        <BadgeLink
+          href="https://goodaitools.com/ai/100mini"
+          imgSrc="https://goodaitools.com/assets/images/badge.png"
+          label="Good AI Tools"
         />
       </div>
     </footer>
