@@ -1,6 +1,35 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Code2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+
+/**
+ * 目录站徽章：图片加载失败时回退成文字。
+ * 徽章图是对方站点的外链，可能挂掉或被墙；只放 <img> 的话加载失败会渲染成一个
+ * 空锚点，页面上看起来这条外链「消失了」。回退文字保证链接始终可见。
+ */
+function BadgeLink({ href, imgSrc, label }: { href: string; imgSrc: string; label: string }) {
+  const [failed, setFailed] = useState(false);
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="sponsored nofollow noopener"
+      className="inline-flex items-center text-xs text-muted-foreground transition-colors hover:text-[#006c49] dark:hover:text-[#4edea3]"
+    >
+      {failed ? (
+        label
+      ) : (
+        <img
+          src={imgSrc}
+          alt={label}
+          style={{ height: 20, width: "auto" }}
+          onError={() => setFailed(true)}
+        />
+      )}
+    </a>
+  );
+}
 
 export function AppFooter() {
   const { t } = useTranslation();
@@ -68,22 +97,16 @@ export function AppFooter() {
         >
           MossAI Tools
         </a>
-        <a
+        <BadgeLink
           href="https://dironix.com"
-          target="_blank"
-          rel="sponsored nofollow noopener"
-          className="inline-flex items-center"
-        >
-          <img src="https://dironix.com/bage.png" alt="Featured on dironix.com" style={{ height: 20, width: "auto" }} />
-        </a>
-        <a
+          imgSrc="https://dironix.com/bage.png"
+          label="dironix.com"
+        />
+        <BadgeLink
           href="https://gets.tools"
-          target="_blank"
-          rel="sponsored nofollow noopener"
-          className="inline-flex items-center"
-        >
-          <img src="https://gets.tools/badge/badge_light.svg" alt="Featured on Gets.Tools" style={{ height: 20, width: "auto" }} />
-        </a>
+          imgSrc="https://gets.tools/badge/badge_light.svg"
+          label="Gets.Tools"
+        />
       </div>
     </footer>
   );
