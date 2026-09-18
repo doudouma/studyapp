@@ -287,7 +287,7 @@ function HeroSection({ onUpload, onBrowse }: { onUpload: () => void; onBrowse: (
             className="inline-flex items-center justify-center gap-2 h-11 px-6 text-base rounded-xl border border-border bg-background hover:bg-muted hover:text-foreground transition-all"
           >
             <Puzzle className="size-4" />
-            Chrome Extension
+            {t("home.hero.chromeExtension")}
           </a>
           <Button
             variant="outline"

@@ -811,6 +811,7 @@
   "home.hero.subtitle": "粘贴 AI 生成的 HTML 或 Claude Artifact，30 秒生成分享链接。免费、免注册、无需服务器。7 天自动销毁。",
   "home.hero.cta1": "开始上传",
   "home.hero.cta2": "浏览学习广场",
+  "home.hero.chromeExtension": "Chrome 扩展",
   "home.section.upload": "即时 HTML 托管 — 粘贴 AI 代码，免注册上线",
   "home.section.uploadDesc": "粘贴 HTML/CSS/JS 代码或上传 .html/.zip 文件，无需账号。",
   "home.agent.title": "给 Agent 一个 Skill 即可",

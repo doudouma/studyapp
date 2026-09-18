@@ -750,6 +750,7 @@
   "home.hero.subtitle": "Pega código HTML generado por IA o artefactos de Claude, obtén un enlace compartible en 30 segundos. Gratis, sin registro, sin configuración de servidor. Se elimina automáticamente después de 7 días.",
   "home.hero.cta1": "Empezar a subir",
   "home.hero.cta2": "Explorar la Plaza",
+  "home.hero.chromeExtension": "Extensión de Chrome",
   "home.section.upload": "Alojamiento HTML instantáneo — pega código IA, online sin registro",
   "home.section.uploadDesc": "Pega código HTML/CSS/JS o sube archivos .html/.zip. No se requiere cuenta.",
   "home.agent.title": "Solo dale un Skill a tu Agent",

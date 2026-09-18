@@ -697,6 +697,7 @@
   "home.hero.subtitle": "Collez du code HTML généré par IA ou des artefacts Claude, obtenez un lien partageable en 30 secondes. Gratuit, sans inscription, sans configuration serveur. Détruit automatiquement après 7 jours.",
   "home.hero.cta1": "Commencer l'envoi",
   "home.hero.cta2": "Parcourir la Place",
+  "home.hero.chromeExtension": "Extension Chrome",
   "home.section.upload": "Hébergement HTML instantané — collez du code IA, en ligne sans inscription",
   "home.section.uploadDesc": "Collez du code HTML/CSS/JS ou envoyez des fichiers .html/.zip. Aucun compte requis.",
   "home.agent.title": "Donnez simplement un Skill à votre Agent",
