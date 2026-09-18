@@ -864,6 +864,7 @@
   "square.unnamed": "未命名",
   "square.anonymous": "匿名",
   "showcase.title": "案例库 — Vibe Coding 与 AI 项目案例 | 100mini",
+  "showcase.caseTitle": "{{name}} — 100mini 案例库",
   "showcase.desc": "精选 vibe coding 与 AI 构建项目案例库。每个案例都有事实数据、来源清单，以及可直接复制的引用格式。",
   "showcase.keywords": "vibe coding 案例, AI 编程案例, LLM 编排项目, AI 生成软件案例, 案例库",
   "showcase.heading": "案例库",

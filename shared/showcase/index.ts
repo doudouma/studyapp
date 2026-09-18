@@ -12,14 +12,18 @@ import {
 import { parseFrontmatter, type FrontmatterValue } from "./frontmatter";
 
 /**
- * 案例库数据装配：`content/showcase/*.md` → ShowcaseCase
+ * 案例库数据装配：`content/showcase/{key}/*.md` → ShowcaseCase
  *
- * 文件命名（新增案例只需丢文件，不改代码）：
- *   {key}.md          → 英文基准，必须存在；也是所有缺失翻译的回退源
- *   {key}.{locale}.md → 该语言的覆盖文件（zh / es / pt / fr）
+ * 目录结构（一个案例一个文件夹，新增案例只需建目录丢文件，不改代码）：
+ *   {key}/en.md     → 英文基准，必须存在；也是所有缺失翻译的回退源
+ *   {key}/{locale}.md → 该语言的覆盖文件（zh / es / pt / fr）
  *
- * 覆盖文件可以只写**任意子集**：只翻正文、只改 summary、只补 tags 都行，
- * 缺的字段逐级回退到英文基准。所以先出英文、再逐步补翻译是可行的。
+ * 文件夹名即案例 key（缺省也是 slug），翻译文件可以只写**任意子集**：
+ * 只翻正文、只改 summary、只补 tags 都行，缺的字段逐级回退到 en。
+ *
+ * 文件夹名即案例 key（缺省也是 slug）。各语言覆盖文件可以只写**任意子集**：
+ * 只翻正文、只改 summary、只补 tags 都行，缺的字段逐级回退到 en，
+ * 所以先出英文、再逐步补翻译是可行的。
  * 注意：数组字段（tags / facts / sources）一旦在覆盖文件里出现就**整体替换**，
  * 不做逐项合并——这样没有意外合并，行为可预测。
  *
@@ -29,7 +33,7 @@ import { parseFrontmatter, type FrontmatterValue } from "./frontmatter";
  * server 侧不必打包 Markdown 解析器。
  */
 
-const RAW_FILES = import.meta.glob("../../content/showcase/*.md", {
+const RAW_FILES = import.meta.glob("../../content/showcase/*/*.md", {
   query: "?raw",
   import: "default",
   eager: true,
@@ -38,9 +42,10 @@ const RAW_FILES = import.meta.glob("../../content/showcase/*.md", {
 type Dict = { [key: string]: FrontmatterValue };
 
 interface RawCase {
-  /** 文件名去掉语言后缀后的 key，用来把各语言版本归到一组 */
+  /** 文件夹名，用来把各语言版本归到一组 */
   key: string;
   locale: ShowcaseLocale;
+  /** 报错用的可读路径，如 `photon/en.md` */
   file: string;
   data: Dict;
   body: string;
@@ -48,21 +53,22 @@ interface RawCase {
 
 /* ---------------- 基础工具 ---------------- */
 
-function fileName(path: string): string {
-  return path.split("/").pop() ?? path;
+/** `.../showcase/photon/en.md` → `photon/en.md`（报错时比裸文件名更有定位价值） */
+function caseFilePath(path: string): string {
+  return path.split("/").slice(-2).join("/");
 }
 
-/** `photon.md` → { key: photon, locale: en }；`photon.zh.md` → { key: photon, locale: zh } */
-function parseFileName(file: string): { key: string; locale: ShowcaseLocale } {
-  const base = file.replace(/\.md$/, "");
-  const dot = base.lastIndexOf(".");
-  if (dot > 0) {
-    const suffix = base.slice(dot + 1).toLowerCase();
-    if ((SHOWCASE_LOCALES as readonly string[]).includes(suffix)) {
-      return { key: base.slice(0, dot), locale: suffix as ShowcaseLocale };
-    }
+/** `.../showcase/photon/en.md` → { key: photon, locale: en } */
+function parsePath(path: string): { key: string; locale: ShowcaseLocale } {
+  const parts = path.split("/");
+  const locale = (parts[parts.length - 1] ?? "").replace(/\.md$/i, "").toLowerCase();
+  const key = parts[parts.length - 2] ?? "";
+  if (!(SHOWCASE_LOCALES as readonly string[]).includes(locale)) {
+    throw new Error(
+      `content/showcase/${caseFilePath(path)}: 文件名必须是语言代码之一（${SHOWCASE_LOCALES.join(" / ")}）`,
+    );
   }
-  return { key: base, locale: DEFAULT_SHOWCASE_LOCALE };
+  return { key, locale: locale as ShowcaseLocale };
 }
 
 function asDict(value: FrontmatterValue | undefined, field: string, file: string): Dict {
@@ -99,8 +105,8 @@ function str(dict: Dict, field: string, file: string, required: boolean): string
 /* ---------------- 单文件解析 ---------------- */
 
 function parseFile(path: string, raw: string): RawCase {
-  const file = fileName(path);
-  const { key, locale } = parseFileName(file);
+  const { key, locale } = parsePath(path);
+  const file = caseFilePath(path);
   const { data, body } = parseFrontmatter(raw);
   return { key, locale, file, data, body };
 }
@@ -237,7 +243,7 @@ for (const [path, raw] of Object.entries(RAW_FILES)) {
   const group = groups.get(rc.key) ?? { key: rc.key, files: {} };
   if (group.files[rc.locale]) {
     throw new Error(
-      `content/showcase: ${rc.key} 有多个 ${rc.locale} 版本（${fileName(path)} 与 ${group.files[rc.locale]!.file}）`,
+      `content/showcase: ${rc.key} 有多个 ${rc.locale} 版本（${rc.file} 与 ${group.files[rc.locale]!.file}）`,
     );
   }
   group.files[rc.locale] = rc;
@@ -256,7 +262,7 @@ function buildSet(group: Group): ShowcaseCaseSet {
   const base = group.files[DEFAULT_SHOWCASE_LOCALE];
   if (!base) {
     throw new Error(
-      `content/showcase: ${group.key} 缺少英文基准文件 ${group.key}.md（en 是所有语言的回退源）`,
+      `content/showcase: ${group.key} 缺少英文基准文件 ${group.key}/en.md（en 是所有语言的回退源）`,
     );
   }
 

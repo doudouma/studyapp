@@ -5,7 +5,7 @@
  * - app 侧由 app/features/showcase/* 消费
  * - server 侧由 server/api.ts 生成 sitemap 时消费
  *
- * 案例内容本身写在 content/showcase/*.md（frontmatter + Markdown 正文），
+ * 案例内容本身写在 content/showcase/{slug}/*.md（frontmatter + Markdown 正文），
  * 由 shared/showcase/index.ts 解析成 ShowcaseCase[]。
  */
 

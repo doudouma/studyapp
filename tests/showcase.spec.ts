@@ -14,7 +14,7 @@ const HTTPS = /^https:\/\/.+/;
 const SLUG = /^[a-z0-9-]+$/;
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 
-describe("showcase case data（来自 content/showcase/*.md）", () => {
+describe("showcase case data（来自 content/showcase/*/*.md）", () => {
   it("has at least one case", () => {
     expect(SHOWCASE_CASES.length).toBeGreaterThan(0);
   });

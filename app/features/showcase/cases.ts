@@ -14,7 +14,7 @@ import {
 } from "@shared/types/showcase";
 
 /**
- * 案例库的读取辅助（数据来自 content/showcase/*.md，见 shared/showcase）
+ * 案例库的读取辅助（数据来自 content/showcase/{slug}/*.md，见 shared/showcase）
  * 页面/组件只依赖此模块，不直接 import @shared/showcase
  *
  * 所有读取函数接受可选的 `locale`：未翻译的案例回退英文，

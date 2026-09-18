@@ -746,6 +746,7 @@
   "square.unnamed": "Sans titre",
   "square.anonymous": "Anonyme",
   "showcase.title": "Bibliothèque de cas — Projets vibe-coded et créés par IA | 100mini",
+  "showcase.caseTitle": "{{name}} — Bibliothèque de cas 100mini",
   "showcase.desc": "Une bibliothèque de cas de projets vibe-coded et créés par IA. Chaque cas liste ses données, ses sources et une citation prête à copier.",
   "showcase.keywords": "cas vibe coding, cas d'apps créées par IA, projets d'orchestration LLM, bibliothèque de cas",
   "showcase.heading": "Bibliothèque de cas",

@@ -1,13 +1,13 @@
 # 案例 MD 生成 Prompt
 
-把下面整段粘给模型（附上你搜集的原始素材），产出的文件直接丢进 `content/showcase/` 即可，不需要改任何代码。
+把下面整段粘给模型（附上你搜集的原始素材），产出的文件丢进 `content/showcase/{slug}/en.md` 即可（翻译放同目录 `zh.md` / `es.md` / `pt.md` / `fr.md`），不需要改任何代码。
 
-> ⚠️ 本文件放在 `content/` 而不是 `content/showcase/`：`content/showcase/*.md` 会被 `import.meta.glob` 全部当成案例解析，放进去会构建失败。
+> ⚠️ 每个案例一个文件夹，文件夹内只能用语言代码命名（`en.md` / `zh.md` / …）。`content/showcase/*/*.md` 会被 `import.meta.glob` 全部当成案例解析，命名不合规会构建失败；`content/showcase/` 根目录下的文件不会被读取。
 
 ---
 
 ```
-你是 100mini 案例库的内容编辑。请为下面这个项目生成案例文件 content/showcase/{slug}.md。
+你是 100mini 案例库的内容编辑。请为下面这个项目生成案例文件 content/showcase/{slug}/en.md。
 
 【输入】
 <在这里粘贴你搜集的原始素材：项目介绍、Reddit/HN 讨论、作者自述、评测数据等>
@@ -92,7 +92,7 @@ Markdown 语法对应关系：
 - 不要在正文里加 H1（# 开头）——标题来自 frontmatter 的 name
 - 不要输出 <html>、<style> 等标签；正文是 Markdown
 
-【完整参考】content/showcase/photon.md 是一个合格样例，字段与分节照它写。
+【完整参考】content/showcase/photon/en.md 是一个合格样例，字段与分节照它写。
 ```
 
 ---

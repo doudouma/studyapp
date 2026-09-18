@@ -1,8 +1,6 @@
 import { createFileRoute, Link, notFound, useLoaderData } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import i18n from "~/lib/i18n";
-import { BASE_URL, currentLang, getBcp47, withLangPrefix } from "~/lib/seo";
-import type { ShowcaseLocale } from "@shared/types/showcase";
+import { currentLang } from "~/lib/seo";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { CaseActions } from "~/components/showcase/CaseActions";
@@ -22,11 +20,7 @@ import {
   getFactRows,
   getRelatedCases,
 } from "~/features/showcase/cases";
-
-/** 案例页 URL：按内容实际语言加前缀（未翻译的案例指回英文原版） */
-function caseUrl(slug: string, locale: ShowcaseLocale): string {
-  return BASE_URL + withLangPrefix(locale, `/showcase/${slug}`);
-}
+import { buildCaseHead } from "~/features/showcase/seo";
 
 export const Route = createFileRoute("/showcase_/$slug")({
   loader: ({ params }) => {
@@ -35,104 +29,16 @@ export const Route = createFileRoute("/showcase_/$slug")({
     return item;
   },
   head: ({ params }) => {
-    const lang = currentLang();
-    const item = getCaseBySlug(params.slug, lang);
-    if (!item) return { meta: [{ title: "Not found | 100mini" }] };
-
-    const title = `${item.name} — 100mini Case Library`;
-    const url = caseUrl(item.slug, item.locale);
-    // 案例封面：public 下用根路径，外链原样；缺省时由 __root 的站点级兜底图接上
-    const image = item.cover?.src
-      ? item.cover.src.startsWith("/")
-        ? BASE_URL + item.cover.src
-        : item.cover.src
-      : undefined;
-    const videoPoster = item.cover?.videoPoster
-      ? item.cover.videoPoster.startsWith("/")
-        ? BASE_URL + item.cover.videoPoster
-        : item.cover.videoPoster
-      : undefined;
-
-    const article: Record<string, unknown> = {
-      "@context": "https://schema.org",
-      "@type": "Article",
-      headline: item.name,
-      description: item.summary,
-      url,
-      mainEntityOfPage: { "@type": "WebPage", "@id": url },
-      inLanguage: getBcp47(item.locale),
-      keywords: item.tags.join(", "),
-      articleSection: item.category,
-      publisher: { "@type": "Organization", name: "100mini", url: BASE_URL },
-      author: item.author ? { "@type": "Person", name: item.author } : undefined,
-      datePublished: item.publishedAt,
-      dateModified: item.updatedAt ?? item.publishedAt,
-      // Article 富结果要求 headline + image + datePublished 三者齐备
-      image,
-      isBasedOn: item.externalUrl,
-      citation: item.sources.map((s) => ({
-        "@type": "CreativeWork",
-        name: s.title,
-        url: s.url,
-      })),
-      video: item.cover?.video
-        ? {
-            "@type": "VideoObject",
-            contentUrl: item.cover.video,
-            name: item.name,
-            description: item.summary,
-            thumbnailUrl: videoPoster ?? image,
-          }
-        : undefined,
-    };
-
-    const breadcrumb = {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        {
-          "@type": "ListItem",
-          position: 1,
-          name: i18n.t("nav.home"),
-          item: BASE_URL + "/",
-        },
-        {
-          "@type": "ListItem",
-          position: 2,
-          name: i18n.t("showcase.heading"),
-          item: BASE_URL + withLangPrefix(lang, "/showcase"),
-        },
-        { "@type": "ListItem", position: 3, name: item.name, item: url },
-      ],
-    };
-
-    return {
-      meta: [
-        { title },
-        { name: "description", content: item.summary },
-        { name: "keywords", content: item.tags.join(", ") },
-        { name: "robots", content: "index, follow" },
-        { property: "og:type", content: "article" },
-        { property: "og:title", content: title },
-        { property: "og:description", content: item.summary },
-        { property: "og:url", content: url },
-        { property: "og:site_name", content: "100mini" },
-        ...(image
-          ? [
-              { property: "og:image", content: image },
-              { property: "og:image:alt", content: item.name },
-            ]
-          : []),
-        { name: "twitter:card", content: "summary_large_image" },
-        { name: "twitter:title", content: title },
-        ...(image ? [{ name: "twitter:image", content: image }] : []),
-        { name: "twitter:description", content: item.summary },
-      ],
-      scripts: [
-        { type: "application/ld+json", children: JSON.stringify(article) },
-        { type: "application/ld+json", children: JSON.stringify(breadcrumb) },
-      ],
-    };
+    const item = getCaseBySlug(params.slug, currentLang());
+    if (!item) {
+      return {
+        meta: [
+          { title: "Not found | 100mini" },
+          { name: "robots", content: "noindex" },
+        ],
+      };
+    }
+    return buildCaseHead(item);
   },
   component: CaseDetailPage,
 });

@@ -864,6 +864,7 @@
   "square.unnamed": "Untitled",
   "square.anonymous": "Anonymous",
   "showcase.title": "Case Library — Vibe-coded & AI-built Projects | 100mini",
+  "showcase.caseTitle": "{{name}} — 100mini Case Library",
   "showcase.desc": "A curated case library of vibe-coded and AI-built projects. Every case lists its facts, its sources and a ready-to-copy citation.",
   "showcase.keywords": "vibe coding case study, ai built app case study, llm orchestration project, ai generated software examples, case library",
   "showcase.heading": "Case Library",
