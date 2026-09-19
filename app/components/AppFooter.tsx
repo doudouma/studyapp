@@ -14,7 +14,7 @@ function BadgeLink({ href, imgSrc, label }: { href: string; imgSrc: string; labe
     <a
       href={href}
       target="_blank"
-      rel="sponsored nofollow noopener"
+      rel="sponsored noopener"
       className="inline-flex items-center text-xs text-muted-foreground transition-colors hover:text-[#006c49] dark:hover:text-[#4edea3]"
     >
       {failed ? (
@@ -112,6 +112,16 @@ export function AppFooter() {
           href="https://goodaitools.com/ai/100mini"
           imgSrc="https://goodaitools.com/assets/images/badge.png"
           label="Good AI Tools"
+        />
+        <BadgeLink
+          href="https://startupfa.me/s/100mini?utm_source=100mini.com"
+          imgSrc="https://startupfa.me/badges/featured-badge-small.webp"
+          label="Startup Fame"
+        />
+        <BadgeLink
+          href="https://deeplaunch.io"
+          imgSrc="https://deeplaunch.io/badge/badge_light.svg"
+          label="DeepLaunch.io"
         />
       </div>
     </footer>
