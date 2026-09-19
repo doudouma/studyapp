@@ -114,7 +114,7 @@ export function AppFooter() {
           label="Good AI Tools"
         />
         <BadgeLink
-          href="https://startupfa.me"
+          href="https://startupfa.me/s/100mini?utm_source=100mini.com"
           imgSrc="https://startupfa.me/badges/featured-badge-small.webp"
           label="Startup Fame"
         />
