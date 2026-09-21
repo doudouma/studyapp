@@ -27,7 +27,7 @@ export const squareRoutes = new Hono<AppEnv>()
     if (!user) return c.json({ error: "未登录" }, 401);
     if (!c.env.D1) return c.json({ error: "database unavailable" }, 503);
 
-    const ok = await unshareFromSquare(c.env.D1, c.req.param("id"), user.id);
+    const ok = await unshareFromSquare(c.env.D1, c.env?.BUCKET, c.req.param("id"), user.id);
     if (!ok) return c.json({ error: "页面不存在" }, 404);
 
     return c.json({ success: true });

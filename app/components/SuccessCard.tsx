@@ -14,9 +14,11 @@ interface SuccessCardProps {
   pageId: string;
   onReset: () => void;
   user?: any;
+  /** 是否已分享到广场：只有分享的页面才生成缩略图 */
+  shareToSquare?: boolean;
 }
 
-export function SuccessCard({ url, expiresAt, isPermanent, pageId, onReset, user }: SuccessCardProps) {
+export function SuccessCard({ url, expiresAt, isPermanent, pageId, onReset, user, shareToSquare }: SuccessCardProps) {
   const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState("");
@@ -54,15 +56,18 @@ export function SuccessCard({ url, expiresAt, isPermanent, pageId, onReset, user
     });
   }, [fullUrl]);
 
-  // Trigger thumbnail capture on mount (once) — logged-in users only
+  // 只有「已登录 + 已分享到广场」的页面才需要缩略图
+  const shouldGenerateThumbnail = !!user && !!shareToSquare;
+
+  // Trigger thumbnail capture on mount (once), only for pages shared to the square
   useEffect(() => {
-    if (!user || capturedRef.current) return;
+    if (!shouldGenerateThumbnail || capturedRef.current) return;
     capturedRef.current = true;
 
     captureAndUploadThumbnail(pageId)
       .then(() => setThumbnailReady(true))
       .catch(() => setThumbnailFailed(true));
-  }, [pageId, user]);
+  }, [pageId, shouldGenerateThumbnail]);
 
   const expiryDate = expiresAt ? new Date(expiresAt).toLocaleString("zh-CN", {
     month: "numeric",
@@ -82,20 +87,20 @@ export function SuccessCard({ url, expiresAt, isPermanent, pageId, onReset, user
           {isPermanent ? t("components.success.permanent") : t("components.success.autoDestroy", { time: expiryDate })}
         </p>
 
-        {/* Thumbnail status — logged-in users only */}
-        {user && !thumbnailReady && !thumbnailFailed && (
+        {/* Thumbnail status — only for pages shared to the square */}
+        {shouldGenerateThumbnail && !thumbnailReady && !thumbnailFailed && (
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <div className="size-3 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
             {t("components.success.generating")}
           </div>
         )}
-        {user && thumbnailReady && (
+        {shouldGenerateThumbnail && thumbnailReady && (
           <div className="flex items-center gap-1.5 text-xs text-green-600">
             <ImageIcon className="size-3.5" />
             {t("components.success.generated")}
           </div>
         )}
-        {user && thumbnailFailed && (
+        {shouldGenerateThumbnail && thumbnailFailed && (
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             {t("components.success.failed")}
           </div>

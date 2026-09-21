@@ -770,6 +770,7 @@ function Md2HtmlPage() {
             pageId={result.id}
             onReset={handleReset}
             user={user}
+            shareToSquare={result.isSharedToSquare}
           />
         </main>
         <AppFooter />

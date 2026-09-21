@@ -443,6 +443,7 @@ function HomePage() {
             pageId={result.id}
             onReset={handleReset}
             user={user}
+            shareToSquare={result.isSharedToSquare}
           />
         </main>
         <MemoAppFooter />

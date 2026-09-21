@@ -40,9 +40,10 @@ export async function getSquarePage(
   return { items, hasMore };
 }
 
-/** 取消分享；页面不存在或不属于该用户时返回 false */
+/** 取消分享；页面不存在或不属于该用户时返回 false。同时删除不再需要的缩略图 */
 export async function unshareFromSquare(
   d1: D1Database | undefined,
+  bucket: R2Bucket | undefined,
   pageId: string,
   userId: string
 ): Promise<boolean> {
@@ -50,5 +51,13 @@ export async function unshareFromSquare(
   const owned = await isPageOwnedBy(d1, pageId, userId);
   if (!owned) return false;
   await clearSquareSharing(d1, pageId);
+  // 缩略图仅用于广场，取消分享后删除（失败不影响取消结果）
+  if (bucket) {
+    try {
+      await bucket.delete(`thumbnails/${pageId}.webp`);
+    } catch {
+      // best-effort：R2 删除失败仅遗留孤立对象，不影响分享状态
+    }
+  }
   return true;
 }

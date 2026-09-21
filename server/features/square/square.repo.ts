@@ -62,11 +62,11 @@ export async function isPageOwnedBy(
   return rows.length > 0;
 }
 
-/** 取消页面在广场的分享 */
+/** 取消页面在广场的分享，并清空缩略图引用 */
 export async function clearSquareSharing(d1: D1Database, pageId: string): Promise<void> {
   const db = createDb(d1);
   await db
     .update(page)
-    .set({ isSharedToSquare: false, sharedAt: null })
+    .set({ isSharedToSquare: false, sharedAt: null, previewPath: null })
     .where(eq(page.id, pageId));
 }
