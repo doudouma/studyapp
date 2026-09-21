@@ -15,6 +15,7 @@ import {
   DialogClose,
 } from "~/components/ui/dialog";
 import { useTranslation } from "react-i18next";
+import { MAX_USER_CONTENT_SIZE, computeSizeFeePoints } from "@shared/types/pages";
 import { deleteMyPage, fetchPageContent, updatePageFile, updatePageMeta } from "~/features/pages/api";
 
 export interface PageLink {
@@ -546,7 +547,12 @@ function EditDialog({
                   />
                 </TabsContent>
                 <TabsContent value="upload">
-                  <DropZone file={contentFile} onFileSelect={(f) => { setContentFile(f); if (f) setContent(""); }} />
+                  <DropZone file={contentFile} onFileSelect={(f) => { setContentFile(f); if (f) setContent(""); }} maxBytes={MAX_USER_CONTENT_SIZE} />
+                  {contentFile && computeSizeFeePoints(contentFile.size) > 0 && (
+                    <p className="mt-2 text-xs text-[#735c00] dark:text-[#eec200]">
+                      {t("home.points.sizeFee", { points: computeSizeFeePoints(contentFile.size) })}
+                    </p>
+                  )}
                 </TabsContent>
               </Tabs>
             )}

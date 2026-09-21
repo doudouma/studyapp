@@ -48,6 +48,22 @@ export async function deductPointsAndAddBonus(d1: D1Database, userId: string, am
   return rows.results[0]?.points ?? 0;
 }
 
+/**
+ * 仅扣除用户积分（不增加链接上限奖励），返回扣除后余额。原子操作。
+ * 用于按内容尺寸计费（尺寸费不应奖励链接额度）。
+ */
+export async function deductPoints(d1: D1Database, userId: string, amount: number): Promise<number> {
+  await d1
+    .prepare("UPDATE user SET points = MAX(0, points - ?) WHERE id = ?")
+    .bind(amount, userId)
+    .run();
+  const rows = await d1
+    .prepare("SELECT points FROM user WHERE id = ?")
+    .bind(userId)
+    .all<{ points: number }>();
+  return rows.results[0]?.points ?? 0;
+}
+
 export async function countUserPages(d1: D1Database, userId: string): Promise<number> {
   const db = createDb(d1);
   const [result] = await db.select({ count: count() }).from(page).where(eq(page.userId, userId));

@@ -24,7 +24,7 @@ import { useAuth } from "~/lib/auth-context";
 import { useTranslation } from "react-i18next";
 import i18n from "~/lib/i18n";
 import { uploadPage } from "~/features/pages/api";
-import { POINTS_PER_UPLOAD } from "@shared/types/pages";
+import { MAX_CONTENT_SIZE, MAX_USER_CONTENT_SIZE, computeUploadFees } from "@shared/types/pages";
 import type { UploadResult } from "@shared/types/pages";
 
 export const Route = createFileRoute("/")({
@@ -64,6 +64,8 @@ function UploadForm({
   formatSize,
   canSubmit,
   user,
+  maxBytes,
+  sizeFee,
 }: {
   mode: TabMode;
   setMode: (v: TabMode) => void;
@@ -86,6 +88,8 @@ function UploadForm({
   formatSize: (bytes: number) => string;
   canSubmit: boolean;
   user: any;
+  maxBytes: number;
+  sizeFee: number;
 }) {
   const { t } = useTranslation();
   return (
@@ -123,20 +127,25 @@ function UploadForm({
             </div>
           ) : (
             <div role="tabpanel" className="min-h-[300px] flex-1 text-sm outline-none">
-              <DropZone file={file} onFileSelect={setFile} />
+              <DropZone file={file} onFileSelect={setFile} maxBytes={maxBytes} />
             </div>
           )}
         </div>
 
-        <div className="mt-2 mb-2 flex justify-end">
+        <div className="mt-2 mb-2 flex items-center justify-end gap-2">
+          {sizeFee > 0 && contentSize <= maxBytes && (
+            <span className="text-xs text-[#735c00] dark:text-[#eec200]">
+              {t("home.points.sizeFee", { points: sizeFee })}
+            </span>
+          )}
           <span
             className={`text-xs ${
-              contentSize > 5 * 1024 * 1024
+              contentSize > maxBytes
                 ? "text-destructive"
                 : "text-muted-foreground"
             }`}
           >
-            {formatSize(contentSize)} / 5 MB
+            {formatSize(contentSize)} / {Math.round(maxBytes / (1024 * 1024))} MB
           </span>
         </div>
 
@@ -335,13 +344,25 @@ function HomePage() {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
+  // 配额费（非会员超出免费链接数）+ 尺寸费（内容超过 5MB），二者叠加
+  const maxBytes = user ? MAX_USER_CONTENT_SIZE : MAX_CONTENT_SIZE;
+  const fees = computeUploadFees({
+    isAnonymous: !user,
+    isMember,
+    pageCount,
+    userLimit: limit,
+    contentBytes: contentSize,
+    points,
+  });
+  const sizeFee = fees.sizeFee;
+  const totalFee = fees.totalFee;
+  const needsPoints = totalFee > 0;
+  const canAffordPoints = fees.affordable;
+
   const canSubmit =
     (mode === "paste" ? htmlContent.trim().length > 0 : file !== null) &&
-    (!user || title.trim().length > 0);
-
-  // Check if user needs to spend points (beyond their limit and not a member)
-  const needsPoints = user && !isMember && limit > 0 && pageCount >= limit;
-  const canAffordPoints = points >= POINTS_PER_UPLOAD;
+    (!user || title.trim().length > 0) &&
+    contentSize <= maxBytes;
 
   const doSubmit = async () => {
     setLoading(true);
@@ -468,6 +489,8 @@ function HomePage() {
             formatSize={formatSize}
             canSubmit={canSubmit}
             user={user}
+            maxBytes={maxBytes}
+            sizeFee={sizeFee}
           />
         </section>
 
@@ -484,7 +507,7 @@ function HomePage() {
           <DialogHeader>
             <DialogTitle>{t("home.points.confirmTitle")}</DialogTitle>
             <DialogDescription>
-              {t("home.points.confirmDesc", { points: POINTS_PER_UPLOAD, remain: points - POINTS_PER_UPLOAD })}
+              {t("home.points.confirmDesc", { points: totalFee, remain: points - totalFee })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

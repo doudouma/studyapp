@@ -5,6 +5,10 @@ import {
   DEFAULT_POINTS,
   POINTS_PER_UPLOAD,
   MAX_CONTENT_SIZE,
+  MAX_USER_CONTENT_SIZE,
+  FREE_CONTENT_SIZE,
+  computeSizeFeePoints,
+  computeUploadFees,
   type MeResponse,
   type PagesListResponse,
   type UserPageItem,
@@ -37,6 +41,7 @@ import {
   getUserPoints,
   getUserLinksLimitBonus,
   deductPointsAndAddBonus,
+  deductPoints,
   incrementPageViewCount,
   getPageMeta,
   type UserPageRow,
@@ -178,6 +183,26 @@ export interface PageFileInput {
   filename: string;
 }
 
+/** 预处理的页面文件：ZIP 已解压，附带计费尺寸，供校验与落盘共用 */
+interface PreparedPageFile {
+  bytes: Uint8Array;
+  filename: string;
+  entries?: Record<string, Uint8Array>;
+  /** 计费尺寸：max(原始字节, ZIP 解压总和) */
+  size: number;
+}
+
+async function preparePageFile(file: PageFileInput): Promise<PreparedPageFile> {
+  const { bytes, filename } = file;
+  if (filename.toLowerCase().endsWith(".zip")) {
+    const { unzipSync } = await import("fflate");
+    const entries = unzipSync(bytes);
+    const totalSize = Object.values(entries).reduce((sum, f) => sum + f.length, 0);
+    return { bytes, filename, entries, size: Math.max(bytes.length, totalSize) };
+  }
+  return { bytes, filename, size: bytes.length };
+}
+
 export interface UpdatePageInput {
   d1: D1Database;
   bucket: R2Bucket;
@@ -199,16 +224,43 @@ export async function updateOwnPage(input: UpdatePageInput): Promise<UpdatePageR
   if (input.category) updates.category = input.category;
   if (input.tags !== undefined) updates.tags = input.tags;
 
-  if (input.content !== undefined && new Blob([input.content]).size > MAX_CONTENT_SIZE) {
-    throw new ServiceError(413, "内容大小不能超过 5MB");
+  const maxSizeMB = MAX_USER_CONTENT_SIZE / (1024 * 1024);
+
+  let preparedFile: PreparedPageFile | undefined;
+  if (input.file) {
+    preparedFile = await preparePageFile(input.file);
+    if (preparedFile.size > MAX_USER_CONTENT_SIZE) {
+      throw new ServiceError(413, `文件大小不能超过 ${maxSizeMB}MB`);
+    }
+  }
+
+  let contentBytes = 0;
+  if (input.content !== undefined) {
+    contentBytes = new Blob([input.content]).size;
+    if (contentBytes > MAX_USER_CONTENT_SIZE) {
+      throw new ServiceError(413, `内容大小不能超过 ${maxSizeMB}MB`);
+    }
+  }
+
+  // 尺寸费：替换超出 5MB 的文件/内容按块扣积分（与发布上传一致，防止先小后大绕过）
+  const effectiveSize = preparedFile ? preparedFile.size : contentBytes;
+  const sizeFee = computeSizeFeePoints(effectiveSize);
+  if (sizeFee > 0) {
+    const points = await getUserPoints(d1, userId);
+    if (points < sizeFee) {
+      throw new ServiceError(
+        403,
+        `积分不足（当前 ${points}，本次需要 ${sizeFee} 积分）：内容超过 ${FREE_CONTENT_SIZE / (1024 * 1024)}MB 免费尺寸`
+      );
+    }
   }
 
   if (Object.keys(updates).length > 0) {
     await updatePageRecord(d1, pageId, updates);
   }
 
-  if (input.file) {
-    await replacePageObjects(bucket, pageId, input.file);
+  if (preparedFile) {
+    await replacePageObjects(bucket, pageId, preparedFile);
   } else if (input.content !== undefined) {
     // Detect ZIP format: HTML is stored under {id}/index.html instead of {id}.html
     const isZip = await bucket.get(`${pageId}/index.html`).then(Boolean).catch(() => false);
@@ -216,18 +268,21 @@ export async function updateOwnPage(input: UpdatePageInput): Promise<UpdatePageR
     await putHtml(bucket, key, input.content);
   }
 
+  // 替换成功后再扣尺寸费
+  if (sizeFee > 0) {
+    await deductPoints(d1, userId, sizeFee);
+  }
+
   const updated = (await getPageRecord(d1, pageId))!;
   return { success: true, page: toUserPageItem(updated as UserPageRow) };
 }
 
 /** 用新文件整体替换页面的 R2 对象（ZIP: 清空 {id}/ 前缀重写；单 HTML: 覆盖并清理 ZIP 残留） */
-async function replacePageObjects(bucket: R2Bucket, pageId: string, file: PageFileInput): Promise<void> {
-  const { bytes, filename } = file;
-  if (bytes.length > MAX_CONTENT_SIZE) throw new ServiceError(413, "文件大小不能超过 5MB");
+async function replacePageObjects(bucket: R2Bucket, pageId: string, prepared: PreparedPageFile): Promise<void> {
+  const { bytes } = prepared;
+  const files = prepared.entries;
 
-  if (filename.toLowerCase().endsWith(".zip")) {
-    const { unzipSync } = await import("fflate");
-    const files = unzipSync(bytes);
+  if (files) {
     const entries = Object.keys(files);
 
     const htmlEntry =
@@ -235,14 +290,11 @@ async function replacePageObjects(bucket: R2Bucket, pageId: string, file: PageFi
       entries.find((f) => f.endsWith(".html"));
     if (!htmlEntry) throw new ServiceError(400, "ZIP 中未找到 HTML 文件");
 
-    const totalSize = entries.reduce((sum, f) => sum + files[f].length, 0);
-    if (totalSize > MAX_CONTENT_SIZE) throw new ServiceError(413, "解压后文件大小不能超过 5MB");
-
     await deletePageObjects(bucket, pageId);
     const puts = Object.entries(files).map(([name, data]) => {
       const key = name === htmlEntry ? `${pageId}/index.html` : `${pageId}/${name}`;
       const mime = getMimeType(name);
-      const buf = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
+      const buf = new Uint8Array(data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength));
       return bucket.put(key, buf, { httpMetadata: { contentType: mime } });
     });
     await Promise.all(puts);
@@ -282,42 +334,40 @@ export async function createUpload(input: CreateUploadInput): Promise<UploadResu
 
   if (user && !title) throw new ServiceError(400, "标题不能为空");
 
-  // Check quota for logged-in users requesting permanent storage.
-  // Points are deducted only AFTER the page is successfully inserted (see below),
-  // so a failed upload never consumes points.
+  // 配额费（非会员超出免费链接数）与尺寸费（内容超过 5MB）由共享纯函数计算，
+  // 合并校验，成功后一并扣除，失败不扣分。
   const wantPermanent = !!user;
-  let needsDeduct = false;
-  if (wantPermanent && user) {
-    const expiresAt = d1 ? await getMembershipExpiresAt(d1, user.id) : null;
-    const member = expiresAt !== null && expiresAt > Date.now();
-    if (!member) {
-      if (!d1) throw new ServiceError(503, "database unavailable");
-      const pageCount = await countUserPages(d1, user.id);
-      const linksLimitBonus = await getUserLinksLimitBonus(d1, user.id);
-      const userLimit = FREE_PERMANENT_LIMIT + linksLimitBonus;
-      if (pageCount >= userLimit) {
-        // Beyond free limit, need to spend points
-        const points = await getUserPoints(d1, user.id);
-        if (points < POINTS_PER_UPLOAD) {
-          throw new ServiceError(
-            403,
-            `免费额度已用完（${pageCount}/${userLimit}），积分不足（当前 ${points}，需要 ${POINTS_PER_UPLOAD}）`
-          );
-        }
-        needsDeduct = true;
-      }
+  const isAnonymous = !user;
+  const maxSize = isAnonymous ? MAX_CONTENT_SIZE : MAX_USER_CONTENT_SIZE;
+  const maxSizeMB = maxSize / (1024 * 1024);
+
+  // 取配额与积分（仅登录用户；会员无配额费，但仍需积分支付尺寸费）
+  let isMember = false;
+  let pageCount = 0;
+  let userLimit = 0;
+  let points = 0;
+  if (user) {
+    if (!d1) throw new ServiceError(503, "database unavailable");
+    const expiresAt = await getMembershipExpiresAt(d1, user.id);
+    isMember = expiresAt !== null && expiresAt > Date.now();
+    if (!isMember) {
+      pageCount = await countUserPages(d1, user.id);
+      userLimit = FREE_PERMANENT_LIMIT + (await getUserLinksLimitBonus(d1, user.id));
     }
+    points = await getUserPoints(d1, user.id);
   }
 
   let html: string;
   let zipEntries: Record<string, Uint8Array> | null = null;
   let htmlFile: string | undefined;
+  let contentBytes = 0;
 
   if (input.file) {
     const { bytes, filename } = input.file;
     const ext = ALLOWED_EXTENSIONS.find((e) => filename.toLowerCase().endsWith(e));
     if (!ext) throw new ServiceError(400, "仅支持 .html 或 .zip 文件");
-    if (bytes.length > MAX_CONTENT_SIZE) throw new ServiceError(413, "文件大小不能超过 5MB");
+    if (bytes.length > maxSize) throw new ServiceError(413, `文件大小不能超过 ${maxSizeMB}MB`);
+    contentBytes = bytes.length;
 
     if (ext === ".zip") {
       const { unzipSync } = await import("fflate");
@@ -329,7 +379,8 @@ export async function createUpload(input: CreateUploadInput): Promise<UploadResu
       if (!htmlFile) throw new ServiceError(400, "ZIP 中未找到 HTML 文件");
 
       const totalSize = entries.reduce((sum, f) => sum + files[f].length, 0);
-      if (totalSize > MAX_CONTENT_SIZE) throw new ServiceError(413, "解压后文件大小不能超过 5MB");
+      if (totalSize > maxSize) throw new ServiceError(413, `解压后文件大小不能超过 ${maxSizeMB}MB`);
+      contentBytes = Math.max(contentBytes, totalSize);
 
       html = new TextDecoder().decode(files[htmlFile]);
       zipEntries = files;
@@ -337,17 +388,34 @@ export async function createUpload(input: CreateUploadInput): Promise<UploadResu
       html = new TextDecoder().decode(bytes);
     }
   } else if (input.content && input.content.trim()) {
-    if (new Blob([input.content]).size > MAX_CONTENT_SIZE) {
-      throw new ServiceError(413, "内容大小不能超过 5MB");
-    }
+    contentBytes = new Blob([input.content]).size;
+    if (contentBytes > maxSize) throw new ServiceError(413, `内容大小不能超过 ${maxSizeMB}MB`);
     html = input.content;
   } else {
     throw new ServiceError(400, "请提供 HTML 内容或上传文件");
   }
 
+  const fees = computeUploadFees({
+    isAnonymous,
+    isMember,
+    pageCount,
+    userLimit,
+    contentBytes,
+    points,
+  });
+
+  if (user && fees.totalFee > 0 && !fees.affordable) {
+    const reasons: string[] = [];
+    if (fees.quotaFee > 0) reasons.push(`免费额度已用完（${pageCount}/${userLimit}）`);
+    if (fees.sizeFee > 0) reasons.push(`内容超过 ${FREE_CONTENT_SIZE / (1024 * 1024)}MB 需 ${fees.sizeFee} 积分`);
+    throw new ServiceError(
+      403,
+      `积分不足（当前 ${points}，本次需要 ${fees.totalFee} 积分）${reasons.length ? "：" + reasons.join("；") : ""}`
+    );
+  }
+
   const id = nanoid(7);
   const now = Date.now();
-  const isAnonymous = !user;
 
   if (zipEntries) {
     // Store all ZIP files under {id}/ prefix; rename main HTML to index.html
@@ -394,9 +462,12 @@ export async function createUpload(input: CreateUploadInput): Promise<UploadResu
       createdAt: new Date(now),
       expiresAt: expiresAt ? new Date(expiresAt) : null,
     });
-    // Deduct points and increase link limit bonus after the page is successfully persisted
-    if (needsDeduct) {
-      await deductPointsAndAddBonus(d1, user.id, POINTS_PER_UPLOAD);
+    // 成功落库后再扣分：配额费附带链接额度 +1，尺寸费仅扣积分
+    if (fees.quotaFee > 0) {
+      await deductPointsAndAddBonus(d1, user.id, fees.quotaFee);
+    }
+    if (fees.sizeFee > 0) {
+      await deductPoints(d1, user.id, fees.sizeFee);
     }
   }
 

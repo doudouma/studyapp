@@ -3,8 +3,15 @@ import {
   FREE_PERMANENT_LIMIT,
   POINTS_PER_UPLOAD,
   DEFAULT_POINTS,
+  FREE_CONTENT_SIZE,
+  MAX_CONTENT_SIZE,
+  MAX_USER_CONTENT_SIZE,
+  POINTS_PER_SIZE_BLOCK,
+  SIZE_BLOCK_BYTES,
+  computeSizeFeePoints,
+  computeUploadFees,
 } from "../shared/types/pages";
-import { deductPointsAndAddBonus } from "../server/features/pages/pages.repo";
+import { deductPointsAndAddBonus, deductPoints } from "../server/features/pages/pages.repo";
 
 // ───────────────────────────────────────────────
 // 1. 常量一致性
@@ -414,5 +421,166 @@ describe("完整场景：新用户发布链接", () => {
     }
     expect(points).toBe(30); // 积分未变
     expect(bonus).toBe(1);   // bonus未变
+  });
+});
+
+// ───────────────────────────────────────────────
+// 8. 尺寸费
+// ───────────────────────────────────────────────
+describe("尺寸费常量", () => {
+  it("免费尺寸为 5MB，匿名上限即免费尺寸", () => {
+    expect(FREE_CONTENT_SIZE).toBe(5 * 1024 * 1024);
+    expect(MAX_CONTENT_SIZE).toBe(FREE_CONTENT_SIZE);
+  });
+
+  it("登录用户上限为 50MB", () => {
+    expect(MAX_USER_CONTENT_SIZE).toBe(50 * 1024 * 1024);
+  });
+
+  it("计费块 5MB / 10 积分", () => {
+    expect(SIZE_BLOCK_BYTES).toBe(5 * 1024 * 1024);
+    expect(POINTS_PER_SIZE_BLOCK).toBe(10);
+  });
+});
+
+describe("computeSizeFeePoints", () => {
+  const MB = 1024 * 1024;
+
+  it("0 / 小于 5MB → 免费", () => {
+    expect(computeSizeFeePoints(0)).toBe(0);
+    expect(computeSizeFeePoints(MB)).toBe(0);
+    expect(computeSizeFeePoints(5 * MB - 1)).toBe(0);
+  });
+
+  it("恰好 5MB → 免费", () => {
+    expect(computeSizeFeePoints(5 * MB)).toBe(0);
+  });
+
+  it("超过 5MB 即计 1 块", () => {
+    expect(computeSizeFeePoints(5 * MB + 1)).toBe(POINTS_PER_SIZE_BLOCK);
+    expect(computeSizeFeePoints(6 * MB)).toBe(10);
+  });
+
+  it("每 5MB 递增，零头向上取整", () => {
+    expect(computeSizeFeePoints(10 * MB)).toBe(10);
+    expect(computeSizeFeePoints(10 * MB + 1)).toBe(20);
+    expect(computeSizeFeePoints(15 * MB)).toBe(20);
+    expect(computeSizeFeePoints(25 * MB)).toBe(40);
+  });
+
+  it("50MB 上限 → 90 积分", () => {
+    expect(computeSizeFeePoints(50 * MB)).toBe(90);
+  });
+});
+
+// ───────────────────────────────────────────────
+// 9. deductPoints 函数（mock D1，不增加 bonus）
+// ───────────────────────────────────────────────
+describe("deductPoints（mock D1）", () => {
+  function createMockD1(initialPoints: number) {
+    let points = initialPoints;
+    let bonusUpdates = 0;
+    return {
+      prepare: (sql: string) => ({
+        bind: (...args: unknown[]) => ({
+          run: async () => {
+            if (sql.includes("UPDATE")) {
+              if (sql.includes("links_limit_bonus")) bonusUpdates++;
+              const amount = args[0] as number;
+              points = Math.max(0, points - amount);
+            }
+            return { success: true };
+          },
+          all: async () => ({ results: [{ points }] }),
+        }),
+      }),
+      getBonusUpdates: () => bonusUpdates,
+    };
+  }
+
+  it("50 扣 30 → 返回 20，永不触碰 links_limit_bonus", async () => {
+    const d1 = createMockD1(50) as any;
+    expect(await deductPoints(d1, "u", 30)).toBe(20);
+    expect(d1.getBonusUpdates()).toBe(0);
+  });
+
+  it("10 扣 10 → 0", async () => {
+    const d1 = createMockD1(10) as any;
+    expect(await deductPoints(d1, "u", 10)).toBe(0);
+  });
+
+  it("不足时不为负", async () => {
+    const d1 = createMockD1(5) as any;
+    expect(await deductPoints(d1, "u", 10)).toBe(0);
+  });
+});
+
+// ───────────────────────────────────────────────
+// 10. computeUploadFees 组合费用
+// ───────────────────────────────────────────────
+describe("computeUploadFees", () => {
+  const MB = 1024 * 1024;
+  const base = {
+    isAnonymous: false,
+    isMember: false,
+    pageCount: 0,
+    userLimit: 5,
+    contentBytes: MB,
+    points: 50,
+  };
+
+  it("匿名 → 全免，视为可负担", () => {
+    const r = computeUploadFees({ ...base, isAnonymous: true, contentBytes: 40 * MB, points: 0 });
+    expect(r).toEqual({ quotaFee: 0, sizeFee: 0, totalFee: 0, affordable: true });
+  });
+
+  it("会员 → 无配额费，但尺寸费照付", () => {
+    const r = computeUploadFees({ ...base, isMember: true, pageCount: 99, contentBytes: 7 * MB, points: 50 });
+    expect(r.quotaFee).toBe(0);
+    expect(r.sizeFee).toBe(10);
+    expect(r.totalFee).toBe(10);
+    expect(r.affordable).toBe(true);
+  });
+
+  it("非会员未超免费页面数且未超尺寸 → 全免", () => {
+    const r = computeUploadFees({ ...base, pageCount: 4, contentBytes: 5 * MB });
+    expect(r).toEqual({ quotaFee: 0, sizeFee: 0, totalFee: 0, affordable: true });
+  });
+
+  it("非会员恰好用满免费页面数 → 收配额费", () => {
+    const r = computeUploadFees({ ...base, pageCount: 5, userLimit: 5, contentBytes: MB });
+    expect(r.quotaFee).toBe(10);
+    expect(r.sizeFee).toBe(0);
+    expect(r.totalFee).toBe(10);
+  });
+
+  it("非会员超出免费页面数 → 收配额费", () => {
+    const r = computeUploadFees({ ...base, pageCount: 7, userLimit: 5, contentBytes: MB });
+    expect(r.quotaFee).toBe(10);
+  });
+
+  it("配额费与尺寸费叠加", () => {
+    const r = computeUploadFees({ ...base, pageCount: 5, userLimit: 5, contentBytes: 7 * MB });
+    expect(r.quotaFee).toBe(10);
+    expect(r.sizeFee).toBe(10);
+    expect(r.totalFee).toBe(20);
+  });
+
+  it("积分不足 → affordable=false", () => {
+    const r = computeUploadFees({ ...base, pageCount: 5, userLimit: 5, contentBytes: 7 * MB, points: 19 });
+    expect(r.totalFee).toBe(20);
+    expect(r.affordable).toBe(false);
+  });
+
+  it("积分恰好等于总费用 → affordable=true", () => {
+    const r = computeUploadFees({ ...base, pageCount: 5, userLimit: 5, contentBytes: 7 * MB, points: 20 });
+    expect(r.affordable).toBe(true);
+  });
+
+  it("非会员未超页面数 + 超尺寸 → 只收尺寸费", () => {
+    const r = computeUploadFees({ ...base, pageCount: 2, userLimit: 5, contentBytes: 12 * MB, points: 20 });
+    expect(r.quotaFee).toBe(0);
+    expect(r.sizeFee).toBe(20);
+    expect(r.affordable).toBe(true);
   });
 });

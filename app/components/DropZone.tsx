@@ -1,14 +1,17 @@
 import { useRef, useState, useCallback } from "react";
 import { Upload, FileText, Archive, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { MAX_CONTENT_SIZE } from "@shared/types/pages";
 
 interface DropZoneProps {
   file: File | null;
   onFileSelect: (file: File | null) => void;
   acceptZip?: boolean;
+  /** 允许的最大字节数，默认 5MB（匿名上限）；登录用户可传 MAX_USER_CONTENT_SIZE */
+  maxBytes?: number;
 }
 
-export function DropZone({ file, onFileSelect, acceptZip = true }: DropZoneProps) {
+export function DropZone({ file, onFileSelect, acceptZip = true, maxBytes = MAX_CONTENT_SIZE }: DropZoneProps) {
   const { t } = useTranslation();
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -36,13 +39,13 @@ export function DropZone({ file, onFileSelect, acceptZip = true }: DropZoneProps
         alert(t("components.dropzone.invalidType"));
         return;
       }
-      if (f.size > 5 * 1024 * 1024) {
-        alert(t("components.dropzone.invalidSize"));
+      if (f.size > maxBytes) {
+        alert(t("components.dropzone.invalidSize", { max: Math.round(maxBytes / (1024 * 1024)) }));
         return;
       }
       onFileSelect(f);
     },
-    [onFileSelect, t]
+    [onFileSelect, t, maxBytes]
   );
 
   const handleDrop = useCallback(
