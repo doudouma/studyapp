@@ -87,6 +87,15 @@ export interface CleanupTmpResponse {
   deleted: number;
 }
 
+/** POST /api/admin/cleanup-thumbnails 响应 */
+export interface CleanupThumbnailsResponse {
+  success: boolean;
+  /** 删除的孤立缩略图数量 */
+  deleted: number;
+  /** 扫描到的缩略图总数 */
+  scanned: number;
+}
+
 /** POST /api/admin/users/:id/points 请求体 */
 export interface SetPointsRequest {
   points: number;

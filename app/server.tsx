@@ -210,6 +210,17 @@ export async function scheduled(_event: ScheduledEvent, env: Bindings, _ctx: Exe
     }
   }
 
+  // Cleanup orphaned thumbnails (only pages shared to the square keep thumbnails)
+  if (env.D1 && env.BUCKET) {
+    try {
+      const { cleanupOrphanThumbnails } = await import("./../server/features/square/square.service");
+      const { deleted, scanned } = await cleanupOrphanThumbnails(env.D1, env.BUCKET);
+      console.log(`[cron] cleaned up ${deleted}/${scanned} orphan thumbnail(s)`);
+    } catch (err) {
+      console.error("[cron] thumbnail cleanup failed:", err);
+    }
+  }
+
   // Cleanup old logs (90 days)
   if (env.D1) {
     try {

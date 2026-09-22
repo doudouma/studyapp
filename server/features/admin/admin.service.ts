@@ -12,6 +12,7 @@ import type {
   SetMembershipResponse,
   CancelMembershipResponse,
   CleanupTmpResponse,
+  CleanupThumbnailsResponse,
   DeletePageResponse,
 } from "@shared/types/admin";
 import { MEMBERSHIP_DURATIONS } from "@shared/types/admin";
@@ -29,6 +30,7 @@ import {
   deletePageRecord,
 } from "./admin.repo";
 import { cleanupAnonymousUploads, deletePageObjects } from "../pages/pages.storage";
+import { cleanupOrphanThumbnails } from "../square/square.service";
 
 /**
  * Admin 业务逻辑层
@@ -182,6 +184,15 @@ export async function listPages(
 export async function cleanupTmp(bucket: R2Bucket, expiryMs?: number): Promise<CleanupTmpResponse> {
   const deleted = await cleanupAnonymousUploads(bucket, expiryMs);
   return { success: true, deleted };
+}
+
+/** 管理员手动触发孤立缩略图清理 */
+export async function cleanupThumbnails(
+  d1: D1Database,
+  bucket: R2Bucket
+): Promise<CleanupThumbnailsResponse> {
+  const { deleted, scanned } = await cleanupOrphanThumbnails(d1, bucket);
+  return { success: true, deleted, scanned };
 }
 
 /** 管理员删除任意页面（无所有权校验） */

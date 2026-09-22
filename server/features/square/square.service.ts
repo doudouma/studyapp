@@ -3,6 +3,8 @@ import {
   listSharedPages,
   isPageOwnedBy,
   clearSquareSharing,
+  listSharedPageIds,
+  clearNonSharedPreviewPaths,
   type SharedPageRow,
 } from "./square.repo";
 
@@ -60,4 +62,40 @@ export async function unshareFromSquare(
     }
   }
   return true;
+}
+
+const THUMBNAIL_PREFIX = "thumbnails/";
+
+/**
+ * 清理孤立缩略图（只有已分享到广场的页面需要缩略图）：
+ * - 全量扫描 R2 `thumbnails/` 前缀，删除不属于任何已分享页面的对象（含无 D1 记录的残留）；
+ * - 清空非分享页面的 `preview_path` 引用。
+ * 由每日 cron 调用，也可经管理接口手动触发。
+ */
+export async function cleanupOrphanThumbnails(
+  d1: D1Database | undefined,
+  bucket: R2Bucket | undefined
+): Promise<{ deleted: number; scanned: number }> {
+  if (!d1 || !bucket) return { deleted: 0, scanned: 0 };
+
+  const sharedIds = await listSharedPageIds(d1);
+  const keep = new Set(sharedIds.map((id) => `${THUMBNAIL_PREFIX}${id}.webp`));
+
+  let cursor: string | undefined;
+  let scanned = 0;
+  let deleted = 0;
+  do {
+    const listed = await bucket.list({ prefix: THUMBNAIL_PREFIX, cursor });
+    scanned += listed.objects.length;
+    const orphans = listed.objects.map((o) => o.key).filter((key) => !keep.has(key));
+    if (orphans.length > 0) {
+      await bucket.delete(orphans);
+      deleted += orphans.length;
+    }
+    cursor = listed.truncated ? listed.cursor : undefined;
+  } while (cursor);
+
+  await clearNonSharedPreviewPaths(d1);
+
+  return { deleted, scanned };
 }

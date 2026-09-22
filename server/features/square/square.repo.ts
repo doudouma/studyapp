@@ -70,3 +70,21 @@ export async function clearSquareSharing(d1: D1Database, pageId: string): Promis
     .set({ isSharedToSquare: false, sharedAt: null, previewPath: null })
     .where(eq(page.id, pageId));
 }
+
+/** 所有已分享到广场的页面 id（判断缩略图是否仍被需要） */
+export async function listSharedPageIds(d1: D1Database): Promise<string[]> {
+  const db = createDb(d1);
+  const rows = await db
+    .select({ id: page.id })
+    .from(page)
+    .where(eq(page.isSharedToSquare, true));
+  return rows.map((r) => r.id);
+}
+
+/** 清空非分享页面的缩略图引用，返回受影响行数 */
+export async function clearNonSharedPreviewPaths(d1: D1Database): Promise<number> {
+  const res = await d1
+    .prepare("UPDATE page SET preview_path = NULL WHERE is_shared_to_square = 0 AND preview_path IS NOT NULL")
+    .run();
+  return res.meta?.changes ?? 0;
+}

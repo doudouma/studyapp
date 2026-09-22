@@ -9,6 +9,7 @@ import {
   cancelMembership,
   listPages,
   cleanupTmp,
+  cleanupThumbnails,
   deletePage,
   setUserPoints,
 } from "./admin.service";
@@ -100,6 +101,12 @@ export const adminRoutes = new Hono<AppEnv>()
       });
     }
     return c.json(result);
+  })
+
+  // 手动触发孤立缩略图清理（仅已分享页面保留缩略图）
+  .post("/api/admin/cleanup-thumbnails", async (c) => {
+    if (!c.env?.BUCKET || !c.env.D1) return c.json({ error: "storage unavailable" }, 503);
+    return c.json(await cleanupThumbnails(c.env.D1, c.env.BUCKET));
   })
 
   // 删除任意页面（无所有权校验）
