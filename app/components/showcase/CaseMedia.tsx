@@ -4,6 +4,7 @@ import { loadHls, type HlsInstance } from "~/lib/showcase/hls";
 import type { ShowcaseCase } from "@shared/types/showcase";
 
 const HLS_RE = /\.m3u8($|[?#])/i;
+const GIF_RE = /\.gif($|[?#])/i;
 
 /**
  * 详情页首屏素材（案例 cover）
@@ -11,6 +12,7 @@ const HLS_RE = /\.m3u8($|[?#])/i;
  * 只有这里会加载视频：列表页卡片只用静态封面，避免一屏 N 个视频请求。
  * - mp4 → `<video src>` 直接播
  * - HLS（.m3u8）→ Safari 走原生；Chrome/Firefox 按需从 CDN 加载 hls.js 用 MSE 播
+ * - gif → `<img src>` 直接显示动画（`<video>` 播不了 gif）
  * - 仍然失败（CDN 被墙、源失效、无 MSE）→ 回退成封面图，有原站链接时可点
  *
  * 失败判定统一走 `<video>` 的 error 事件 + hls.js 的 fatal error，
@@ -22,6 +24,7 @@ export function CaseMedia({ item }: { item: ShowcaseCase }) {
   const cover = item.cover;
   const videoRef = useRef<HTMLVideoElement>(null);
   const isHls = !!cover.video && HLS_RE.test(cover.video);
+  const isGif = !!cover.video && GIF_RE.test(cover.video);
   /**
    * 记录「哪个 src 失败了」而不是布尔值：/showcase/$slug 是同一条路由，
    * 切换案例不会重建组件，布尔值会把上一个案例的失败状态带到下一个案例上。
@@ -71,6 +74,20 @@ export function CaseMedia({ item }: { item: ShowcaseCase }) {
   }, [cover.video, isHls]);
 
   const poster = cover.videoPoster ?? cover.src;
+
+  // gif 交给 <img> 播动画，<video> 不支持 gif（会直接触发 error 回退到封面）
+  if (isGif && !videoFailed) {
+    return (
+      <figure className="mt-5">
+        <img
+          src={cover.video}
+          alt={item.name}
+          onError={() => setFailedSrc(cover.video!)}
+          className="w-full rounded-lg border border-[#cfcfcf] dark:border-[#243244]"
+        />
+      </figure>
+    );
+  }
 
   if (cover.video && !videoFailed) {
     return (

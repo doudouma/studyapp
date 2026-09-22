@@ -86,7 +86,13 @@ describe("showcase case data（来自 content/showcase/*/*.md）", () => {
         expect(s.url).toMatch(HTTPS);
       }
       if (c.externalUrl) expect(c.externalUrl).toMatch(HTTPS);
-      if (c.cover.video) expect(c.cover.video).toMatch(HTTPS);
+      // video 允许 https 的 mp4/HLS，或本地 public 下的 .gif 动图预览
+      if (c.cover.video) {
+        expect(c.cover.video).toMatch(/^(https:\/\/|\/).+/);
+        if (c.cover.video.startsWith("/")) {
+          expect(c.cover.video, `${c.slug} 本地 video 只能是 .gif`).toMatch(/\.gif($|[?#])/i);
+        }
+      }
       if (c.cover.videoPoster) expect(c.cover.videoPoster).toMatch(/^(https:\/\/|\/)/);
     }
   });

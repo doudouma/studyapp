@@ -21,6 +21,9 @@ function absolute(asset: string): string {
   return asset.startsWith("/") ? BASE_URL + asset : asset;
 }
 
+/** gif 只是动图预览，不是 VideoObject，别塞进 video 结构化数据 */
+const GIF_RE = /\.gif($|[?#])/i;
+
 /** 案例 canonical URL：按内容实际语言加前缀（未翻译的案例指回英文原版） */
 export function caseUrl(slug: string, locale: ShowcaseLocale): string {
   return BASE_URL + withLangPrefix(locale as Lang, `/showcase/${slug}`);
@@ -86,17 +89,18 @@ export function buildArticleJsonLd(item: ShowcaseCase, url: string): Record<stri
       ...(s.date ? { datePublished: s.date } : {}),
     })),
     breadcrumb: { "@id": `${url}#breadcrumb` },
-    video: item.cover?.video
-      ? {
-          "@type": "VideoObject",
-          name: item.name,
-          description: item.summary,
-          contentUrl: item.cover.video,
-          thumbnailUrl: videoPoster ?? image,
-          // uploadDate 是 VideoObject 富结果的必填项
-          uploadDate: item.publishedAt,
-        }
-      : undefined,
+    video:
+      item.cover?.video && !GIF_RE.test(item.cover.video)
+        ? {
+            "@type": "VideoObject",
+            name: item.name,
+            description: item.summary,
+            contentUrl: absolute(item.cover.video),
+            thumbnailUrl: videoPoster ?? image,
+            // uploadDate 是 VideoObject 富结果的必填项
+            uploadDate: item.publishedAt,
+          }
+        : undefined,
   };
 }
 

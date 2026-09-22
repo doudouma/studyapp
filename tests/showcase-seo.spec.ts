@@ -59,8 +59,9 @@ describe("case detail Article structured data", () => {
     }
   });
 
-  it("makes VideoObject valid with an uploadDate when a video exists", () => {
-    const withVideo = ALL.filter((c) => c.cover.video);
+  it("makes VideoObject valid with an uploadDate when a real video exists", () => {
+    const GIF = /\.gif($|[?#])/i;
+    const withVideo = ALL.filter((c) => c.cover.video && !GIF.test(c.cover.video!));
     expect(withVideo.length).toBeGreaterThan(0);
     for (const c of withVideo) {
       const a = buildArticleJsonLd(c, caseUrl(c.slug, c.locale)) as any;
@@ -69,6 +70,14 @@ describe("case detail Article structured data", () => {
       // uploadDate 是 VideoObject 富结果的必填项
       expect(a.video.uploadDate, `${c.slug} video uploadDate`).toBe(c.publishedAt);
       expect(a.video.thumbnailUrl).toMatch(/^https:\/\//);
+    }
+  });
+
+  it("omits VideoObject for gif previews (not a real video)", () => {
+    const GIF = /\.gif($|[?#])/i;
+    for (const c of ALL.filter((x) => x.cover.video && GIF.test(x.cover.video!))) {
+      const a = buildArticleJsonLd(c, caseUrl(c.slug, c.locale)) as any;
+      expect(a.video, `${c.slug} gif 不应生成 VideoObject`).toBeUndefined();
     }
   });
 
