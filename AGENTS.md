@@ -111,29 +111,32 @@ drizzle/            # Drizzle Kit 迁移产物
 
 ## 临时文件清理
 
-匿名上传的文件存储在 R2 `tmp/` 前缀下，7 天后自动销毁。
+匿名上传的文件存储在 R2 `tmp/` 前缀下，默认 7 天后自动销毁（`TMP_EXPIRY_MS` 环境变量可覆盖，见 `server/features/pages/pages.storage.ts`）。
+
+**过期判定**：以 R2 服务端写入时间 `obj.uploaded` 为准（`isExpiredByUploaded()`），**不是** `customMetadata.createdAt`；无上传时间视为过期。上传时仍会写 `customMetadata.createdAt`，仅作元数据留存，不参与清理判断。cron 每天只跑一次，实际最长保留约 8 天。
 
 ### 三路清理机制
 
 | 方式 | 触发 | 位置 | 说明 |
 |---|---|---|---|
-| **定时清理** | cron `0 3 * * *` (每天 3:00 UTC) | `app/server.tsx:98` → `server/api.ts:121` | 全量扫描 `tmp/` 前缀，检查对象 `uploaded` 时间，删除超过 7 天的对象 |
-| **惰性清理** | 用户访问过期页面时 | `server/api.ts:1048` | 访问过期 `tmp/` 页面时触发，删除后返回 404 |
-| **手动清理** | `POST /api/admin/cleanup-tmp` | `server/api.ts:418` | 管理员手动触发，用于验证 |
+| **定时清理** | cron `0 3 * * *`（每天 3:00 UTC） | `app/server.tsx:202` → `pages.storage.ts:78` | 全量扫描 `tmp/` 前缀，删除 `uploaded` 超过 7 天的对象 |
+| **惰性清理** | 用户访问过期页面时 | `pages.service.ts:647`（资产）/ `:676`（主 HTML） | 命中 `tmp/` 且过期则删除整个 `tmp/{id}` 前缀并返回 404 |
+| **手动清理** | `POST /api/admin/cleanup-tmp` | `admin.routes.ts:93` → `admin.service.ts:184` | 管理员手动触发，用于验证 |
 
-### 关键逻辑
+### 关键逻辑（`server/features/pages/pages.storage.ts`）
 
 | 函数 | 位置 | 说明 |
 |---|---|---|
-| `isExpiredByUploaded()` | `server/api.ts:115` | 判断 `uploaded` 是否超过 7 天，无上传时间视为过期 |
-| `cleanupAnonymousUploads()` | `server/api.ts:121` | 全量遍历 R2 `tmp/` 前缀，分页删除 |
-| `deleteTmpByBucketId()` | `server/api.ts:141` | 按 `tmp/{id}` 前缀删除，同时处理 `tmp/{id}.html` 和 `tmp/{id}/...` 两种格式 |
+| `getTmpExpiryMs()` | `:21` | 读取 `env.TMP_EXPIRY_MS`（毫秒），非法值回退默认 7 天 |
+| `isExpiredByUploaded()` | `:72` | 判断 R2 `uploaded` 是否超过阈值，无上传时间视为过期 |
+| `cleanupAnonymousUploads()` | `:78` | 全量遍历 R2 `tmp/` 前缀，分页删除过期对象，返回删除数 |
+| `deleteTmpByBucketId()` | `:102` | 按 `tmp/{id}` 前缀删除，同时处理 `tmp/{id}.html` 和 `tmp/{id}/...` 两种格式 |
 
 ### 存储约定
 
-- **匿名单文件 HTML**: `tmp/{id}.html` + `customMetadata: { createdAt: String(Date.now()) }`
-- **匿名 ZIP 上传**: `tmp/{id}/index.html` + `tmp/{id}/{assets}`，统一 `createdAt`
-- **已登录用户**: 无 `tmp/` 前缀，D1 有记录，走 `expiresAt` 字段过期
+- **匿名单文件 HTML**: `tmp/{id}.html`（附 `customMetadata: { createdAt: String(Date.now()) }`，仅元数据）
+- **匿名 ZIP 上传**: `tmp/{id}/index.html` + `tmp/{id}/{assets}`
+- **已登录用户**: 无 `tmp/` 前缀，D1 有记录，走 `expiresAt` 字段过期（`pages.service.ts:629`）
 
 ## 构建与部署
 

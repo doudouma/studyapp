@@ -8,7 +8,8 @@
  * - 单文件 HTML:  {id}.html            匿名: tmp/{id}.html
  * - ZIP 上传:     {id}/index.html + {id}/{assets}   匿名: tmp/{id}/...
  * - 缩略图:       thumbnails/{id}.webp
- * - 匿名对象 customMetadata.createdAt = String(Date.now())，7 天过期
+ * - 匿名对象 customMetadata.createdAt = String(Date.now())（仅元数据留存，
+ *   过期判断以 R2 服务端写入时间 obj.uploaded 为准），7 天过期
  */
 
 import { MAX_CONTENT_SIZE } from "@shared/types/pages";
