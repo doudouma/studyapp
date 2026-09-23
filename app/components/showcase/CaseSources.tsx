@@ -2,12 +2,12 @@ import { useTranslation } from "react-i18next";
 import type { ShowcaseSource } from "@shared/types/showcase";
 
 /**
- * 详情页编号来源清单（外链，便于正文 [n] 引用）
+ * 详情页编号来源清单（外链，便于正文 [n] 引用）；案例没有外链时整块不渲染。
  * 强调色来自祖先元素的 --sc-accent / --sc-accent-dark 变量
  */
-export function CaseSources({ sources }: { sources: ShowcaseSource[] }) {
+export function CaseSources({ sources }: { sources?: ShowcaseSource[] }) {
   const { t } = useTranslation();
-  if (sources.length === 0) return null;
+  if (!sources || sources.length === 0) return null;
 
   return (
     <section>

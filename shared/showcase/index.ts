@@ -208,6 +208,7 @@ function readFields(
     throw new Error(`${file}: 缺少必填字段 \`facts\``);
   }
 
+  // sources 可选：没有可引用的外链时允许整段省略（空列表也视为「没有外链」）
   let sources: ShowcaseSource[] | undefined;
   if (has(data, "sources")) {
     sources = asList(data.sources, "sources", file).map((entry, i) => {
@@ -223,9 +224,6 @@ function readFields(
         date: str(dict, "date", file, false),
       };
     });
-    if (sources.length === 0) throw new Error(`${file}: sources 至少 1 条`);
-  } else if (required) {
-    throw new Error(`${file}: 缺少必填字段 \`sources\``);
   }
 
   let publishedAt: string | undefined;
@@ -303,7 +301,7 @@ function mergeCase(entry: CaseEntry, base: RawCase, localized: RawCase | undefin
     category: f.category ?? baseFields.category!,
     tags: f.tags ?? baseFields.tags!,
     facts: f.facts ?? baseFields.facts!,
-    sources: f.sources ?? baseFields.sources!,
+    sources: f.sources ?? baseFields.sources,
     body,
     externalUrl: f.externalUrl ?? baseFields.externalUrl,
     author: f.author ?? baseFields.author,

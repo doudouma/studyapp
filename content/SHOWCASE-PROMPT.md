@@ -27,7 +27,7 @@
 - publishedAt:   今天，yyyy-mm-dd
 - updatedAt:     同 publishedAt
 - facts:         5–9 条，见下
-- sources:       至少 1 条，见下
+- sources:       可选，0 条或更多，见下（没有可引用的外链就整段省略）
 - cover:         见下
 
 可选：
@@ -47,7 +47,7 @@ facts:
     value: 170
     highlight: true
 
-【sources 写法】至少 1 条，url 必须 https 且真实存在（不要编造 URL）：
+【sources 写法】可选。有真实出处时才写，url 必须 https 且真实存在（不要编造 URL）；没有可引用的外链就整段省略：
 sources:
   - title: r/vibecoding — Photon project thread
     url: https://www.reddit.com/r/vibecoding/comments/xxxx/...
@@ -80,7 +80,7 @@ Markdown 语法对应关系：
 【硬性校验，不通过会构建失败】
 - slug 只含小写字母、数字、连字符
 - 以上「必填」字段一个都不能缺；category 必须在枚举内
-- sources 至少 1 条，每条 url 必须 https
+- sources 可选；写了就必须每条 url 都是 https
 - publishedAt / updatedAt 必须是 yyyy-mm-dd
 - facts 的 key 不能重复，value 不能为空
 - 不要用 Tab 缩进（用 2 空格）

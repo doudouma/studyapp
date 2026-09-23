@@ -91,7 +91,7 @@ describe("case detail Article structured data", () => {
   });
 
   it("carries source publisher/date into citations", () => {
-    const withMeta = ALL.find((c) => c.sources.some((s) => s.publisher && s.date));
+    const withMeta = ALL.find((c) => c.sources?.some((s) => s.publisher && s.date));
     if (!withMeta) return;
     const a = buildArticleJsonLd(withMeta, caseUrl(withMeta.slug, withMeta.locale)) as any;
     const cited = a.citation.find((x: any) => x.publisher && x.datePublished);

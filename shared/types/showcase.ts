@@ -90,8 +90,11 @@ export interface ShowcaseCase {
   category: ShowcaseCategory;
   tags: string[];
   facts: ShowcaseFact[];
-  /** 至少 1 条 */
-  sources: ShowcaseSource[];
+  /**
+   * 可选来源清单（编号外链，便于正文 [n] 引用）。
+   * 没有可引用的外链时可以整段省略——不是每条案例都必须有出处链接。
+   */
+  sources?: ShowcaseSource[];
   /**
    * 正文 Markdown（frontmatter 之后的内容，**不含** frontmatter）。
    * 渲染时按 `## ` 分节，由 app/features/showcase/markdown.ts 转成 HTML。

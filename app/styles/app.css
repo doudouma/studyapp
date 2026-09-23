@@ -465,6 +465,49 @@ select.input-comic { cursor: pointer; }
   font-size: 0.95em;
 }
 
+/* 提示词代码块：终端风可横向滚动的 pre */
+.sc-md pre {
+  margin: 0 0 1em;
+  padding: 10px 12px;
+  overflow-x: auto;
+  border: 1px solid #cfcfcf;
+  border-radius: 8px;
+  background: #f0f0f0;
+}
+.sc-md pre code {
+  padding: 0;
+  background: none;
+  font-size: 10.5px;
+  line-height: 1.6;
+  white-space: pre;
+}
+
+/* 代码块右上角的复制按钮（由 CaseBody 挂载后注入） */
+.sc-pre { position: relative; margin: 0 0 1em; }
+.sc-pre pre { margin: 0; padding-top: 32px; }
+.sc-copy {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  z-index: 1;
+  padding: 3px 9px;
+  border: 1px solid #cfcfcf;
+  border-radius: 6px;
+  background: #fff;
+  color: #5c5c5c;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.sc-copy:hover,
+.sc-copy[data-copied] {
+  color: var(--sc-accent, #006c49);
+  border-color: var(--sc-accent, #006c49);
+}
+
 .sc-md ul,
 .sc-md ol { margin: 0 0 0.9em; padding-left: 1.4em; }
 .sc-md ul { list-style: disc; }
@@ -524,6 +567,14 @@ select.input-comic { cursor: pointer; }
 .dark .sc-md h2::before { color: rgba(255, 255, 255, 0.28); }
 .dark .sc-md a { color: #7dd3fc; }
 .dark .sc-md code { background: #1b2637; }
+.dark .sc-md pre { background: #101a24; border-color: #243244; }
+.dark .sc-md pre code { background: none; }
+.dark .sc-copy { background: #1b2637; border-color: #243244; color: #9fb0c3; }
+.dark .sc-copy:hover,
+.dark .sc-copy[data-copied] {
+  color: var(--sc-accent-dark, #4edea3);
+  border-color: var(--sc-accent-dark, #4edea3);
+}
 .dark .sc-md li::marker { color: var(--sc-accent-dark, #4edea3); }
 .dark .sc-table-wrap { border-color: #243244; }
 .dark .sc-md thead { background: #151d2b; }

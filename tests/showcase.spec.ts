@@ -42,7 +42,8 @@ describe("showcase case data（来自 content/showcase/*/*.md）", () => {
       expect(c.summary.trim()).not.toBe("");
       expect(c.body.trim()).not.toBe("");
       expect(c.facts.length).toBeGreaterThan(0);
-      expect(c.sources.length).toBeGreaterThan(0);
+      // sources 可选：没有外链的案例可以为空，但存在时必须是数组
+      expect(Array.isArray(c.sources ?? [])).toBe(true);
       expect(CATEGORIES).toContain(c.category);
     }
   });
@@ -81,7 +82,7 @@ describe("showcase case data（来自 content/showcase/*/*.md）", () => {
 
   it("only links out over https", () => {
     for (const c of CASES) {
-      for (const s of c.sources) {
+      for (const s of c.sources ?? []) {
         expect(s.title.trim()).not.toBe("");
         expect(s.url).toMatch(HTTPS);
       }

@@ -81,13 +81,17 @@ export function buildArticleJsonLd(item: ShowcaseCase, url: string): Record<stri
       ? { "@type": "ImageObject", url: image, width: COVER_WIDTH, height: COVER_HEIGHT }
       : undefined,
     isBasedOn: item.externalUrl,
-    citation: item.sources.map((s) => ({
-      "@type": "CreativeWork",
-      name: s.title,
-      url: s.url,
-      ...(s.publisher ? { publisher: { "@type": "Organization", name: s.publisher } } : {}),
-      ...(s.date ? { datePublished: s.date } : {}),
-    })),
+    ...(item.sources?.length
+      ? {
+          citation: item.sources.map((s) => ({
+            "@type": "CreativeWork",
+            name: s.title,
+            url: s.url,
+            ...(s.publisher ? { publisher: { "@type": "Organization", name: s.publisher } } : {}),
+            ...(s.date ? { datePublished: s.date } : {}),
+          })),
+        }
+      : {}),
     breadcrumb: { "@id": `${url}#breadcrumb` },
     video:
       item.cover?.video && !GIF_RE.test(item.cover.video)
