@@ -122,6 +122,11 @@ export function AppFooter() {
           imgSrc="https://deeplaunch.io/badge/badge_light.svg"
           label="DeepLaunch.io"
         />
+        <BadgeLink
+          href="https://tooldirs.com"
+          imgSrc="https://tooldirs.com/badge/badge_light.svg"
+          label="Featured on ToolDirs"
+        />
       </div>
     </footer>
   );
