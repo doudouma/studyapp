@@ -9,12 +9,33 @@ const ShareModal = lazy(() =>
 type Screen = "landing" | "upload" | "crop" | "analysis" | "register" | "badge";
 type Theme = "ins" | "cute" | "y2k" | "cyber" | "biz" | "hk";
 
-const pick = <T,>(a: T[]): T => a[Math.floor(Math.random() * a.length)];
 const rnd = (a: number, b: number) => Math.floor(a + Math.random() * (b - a + 1));
 const todayStr = () => {
   const d = new Date();
   return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
 };
+
+/** FNV-1a 32-bit hash：把名字+照片转成稳定 seed */
+export function hashStr(s: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  return h >>> 0;
+}
+
+/** mulberry32 PRNG：同一 seed 永远产出同一序列 */
+export function mulberry32(seed: number): () => number {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
 
 /* ==================== SVG Helpers ==================== */
 
@@ -536,6 +557,20 @@ const THEME_KEYS: [Theme, string][] = [
 
 const RLBL_KEYS = ["petbadge.radar.颜值", "petbadge.radar.亲和力", "petbadge.radar.观察力", "petbadge.radar.执行力", "petbadge.radar.治愈力", "petbadge.radar.摸鱼能力"];
 
+/** 岗位/HR 评语/薪资/雷达值/工号/验证码全部由「名字+照片」seed 决定：
+ *  同一只宠物同名再生成，徽章内容完全一致，"官方档案"更可信 */
+export function deriveBadge(name: string, avatar: string, dateStr: string = todayStr()) {
+  const r = mulberry32(hashStr(`${name}:${avatar.length}`));
+  return {
+    jobIdx: Math.floor(r() * 16),
+    hrIdx: Math.floor(r() * 7),
+    payIdx: Math.floor(r() * 7),
+    vals: RLBL_KEYS.map(() => 38 + Math.floor(r() * 62)),
+    no: `PCP-${dateStr}-${String(1 + Math.floor(r() * 999)).padStart(3, "0")}`,
+    code: `PET ${1000 + Math.floor(r() * 9000)} ${1000 + Math.floor(r() * 9000)}`,
+  };
+}
+
 function BadgeScreen({
   avatar,
   name,
@@ -550,12 +585,8 @@ function BadgeScreen({
   const [shareOpen, setShareOpen] = useState(false);
   const badgeRef = useRef<HTMLDivElement>(null);
 
-  const jobIdx = useState(() => rnd(0, 15))[0];
-  const hrIdx = useState(() => rnd(0, 6))[0];
-  const payIdx = useState(() => rnd(0, 6))[0];
-  const vals = useState(() => RLBL_KEYS.map(() => rnd(38, 99)))[0];
-  const no = useState(() => `PCP-${todayStr()}-${String(rnd(1, 999)).padStart(3, "0")}`)[0];
-  const code = useState(() => `PET ${rnd(1000, 9999)} ${rnd(1000, 9999)}`)[0];
+  const badge = useState(() => deriveBadge(name, avatar))[0];
+  const { jobIdx, hrIdx, payIdx, vals, no, code } = badge;
 
   const job = t(`petbadge.job.${jobIdx}`);
   const hr = t(`petbadge.hr.${hrIdx}`);
@@ -684,7 +715,11 @@ function BadgeScreen({
         <ShareModal
           open={shareOpen}
           onOpenChange={setShareOpen}
-          text={name ? `我的宠物「${name}」入职了！岗位：${job}` : "看看你家宠物适合什么岗位？"}
+          text={
+            name
+              ? t("petbadge.badge.shareMsgNamed", { name, job })
+              : t("petbadge.badge.shareMsgAnon")
+          }
           captureRef={badgeRef}
           fileName={`petbadge-${name || "share"}.png`}
         />

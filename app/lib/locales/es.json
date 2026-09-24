@@ -653,6 +653,8 @@
   "petbadge.badge.wall": "📌 Fijar en Pared",
   "petbadge.badge.share": "Compartir Placa",
   "petbadge.badge.again": "Ingresar Otro 🐾 Empezar de Nuevo",
+  "petbadge.badge.shareMsgNamed": "¡{{name}} acaba de incorporarse a Paw & Claw Corp.! Puesto: {{job}} 🐾",
+  "petbadge.badge.shareMsgAnon": "¿Qué puesto conseguiría tu mascota? Descúbrelo 🐾",
   "petbadge.share.title": "Compartir Placa",
   "petbadge.share.subtitle": "Comparte la placa de TA con tus amigos 🐾",
   "petbadge.share.preview": "Vista de la placa",

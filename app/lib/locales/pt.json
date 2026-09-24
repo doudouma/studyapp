@@ -653,6 +653,8 @@
   "petbadge.badge.wall": "📌 Fixar na Parede",
   "petbadge.badge.share": "Compartilhar Distintivo",
   "petbadge.badge.again": "Admitir Outro 🐾 Recomeçar",
+  "petbadge.badge.shareMsgNamed": "{{name}} acabou de ser contratado pela Paw & Claw Corp.! Cargo: {{job}} 🐾",
+  "petbadge.badge.shareMsgAnon": "Que cargo o seu pet conseguiria? Descubra 🐾",
   "petbadge.share.title": "Compartilhar Distintivo",
   "petbadge.share.subtitle": "Compartilhe o distintivo de TA com seus amigos 🐾",
   "petbadge.share.preview": "Prévia do distintivo",

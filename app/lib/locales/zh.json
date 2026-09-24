@@ -712,6 +712,8 @@
   "petbadge.badge.wall": "📌 上墙展示",
   "petbadge.badge.share": "分享工牌",
   "petbadge.badge.again": "再入职一只 🐾 重新来过",
+  "petbadge.badge.shareMsgNamed": "我家的「{{name}}」入职 Paw & Claw Corp. 了！岗位：{{job}} 🐾",
+  "petbadge.badge.shareMsgAnon": "来看看你家宠物适合什么岗位？🐾",
   "petbadge.share.title": "分享萌宠工牌",
   "petbadge.share.subtitle": "把 TA 的专属工牌分享给好友吧 🐾",
   "petbadge.share.preview": "工牌预览",

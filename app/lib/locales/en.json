@@ -712,6 +712,8 @@
   "petbadge.badge.wall": "📌 Pin to Wall",
   "petbadge.badge.share": "Share Badge",
   "petbadge.badge.again": "Onboard Another 🐾 Start Over",
+  "petbadge.badge.shareMsgNamed": "{{name}} just onboarded at Paw & Claw Corp.! Position: {{job}} 🐾",
+  "petbadge.badge.shareMsgAnon": "What job would your pet get hired for? Find out 🐾",
   "petbadge.share.title": "Share Pet Badge",
   "petbadge.share.subtitle": "Share TA's badge with your friends 🐾",
   "petbadge.share.preview": "Badge Preview",

@@ -600,6 +600,8 @@
   "petbadge.badge.wall": "📌 Épingler au Mur",
   "petbadge.badge.share": "Partager le Badge",
   "petbadge.badge.again": "Introduire un Autre 🐾 Recommencer",
+  "petbadge.badge.shareMsgNamed": "{{name}} vient d'être recruté par Paw & Claw Corp. ! Poste : {{job}} 🐾",
+  "petbadge.badge.shareMsgAnon": "Quel poste pour votre animal ? Découvrez-le 🐾",
   "petbadge.share.title": "Partager le Badge",
   "petbadge.share.subtitle": "Partagez le badge de TA avec vos amis 🐾",
   "petbadge.share.preview": "Aperçu du badge",
