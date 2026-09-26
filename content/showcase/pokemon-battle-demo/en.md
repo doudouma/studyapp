@@ -31,7 +31,7 @@ sources:
     publisher: Reddit
 cover:
   src: /showcase/pokemon-battle-demo.jpg
-  video: https://v.redd.it/x3cgjarp0rrh1/CMAF_720.mp4
+  video: https://v.redd.it/x3cgjarp0rrh1/CMAF_480.mp4
   videoPoster: /showcase/pokemon-battle-demo.jpg
 ---
 
