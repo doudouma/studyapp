@@ -25,9 +25,9 @@ import {
   deleteTmpByBucketId,
   isExpiredByUploaded,
 } from "./pages.storage";
-import { injectBanner, notFoundHtml, detectLangFromHeader } from "./pages.render";
+import { injectBanner, notFoundHtml, blockedHtml, detectLangFromHeader } from "./pages.render";
 import { log } from "../../lib/log";
-import { insertUploadLog } from "../admin/upload-log.repo";
+import { insertUploadLog, insertScanLog, getLatestBlockedScan } from "../admin/upload-log.repo";
 import {
   getMembershipExpiresAt,
   isMemberByUserId,
@@ -515,6 +515,10 @@ export async function scanHtmlInBackground(
       log.warn("审核不通过", { pageId, status: "blocked", reason: "regex", threats: guard.threats });
       if (ctx.d1) {
         await insertUploadLog(ctx.d1, { pageId, event: "upload", isAnonymous, status: "blocked" });
+        await insertScanLog(ctx.d1, {
+          pageId, status: "blocked", reason: "regex",
+          threats: JSON.stringify(guard.threats), htmlLength: html.length, isAnonymous,
+        });
       }
       await deletePageById(ctx, pageId, isAnonymous);
       return;
@@ -528,6 +532,10 @@ export async function scanHtmlInBackground(
         log.warn("审核不通过", { pageId, status: "blocked", reason: "phishing", threats: domainCheck.threats });
         if (ctx.d1) {
           await insertUploadLog(ctx.d1, { pageId, event: "upload", isAnonymous, status: "blocked" });
+          await insertScanLog(ctx.d1, {
+            pageId, status: "blocked", reason: "phishing",
+            threats: JSON.stringify(domainCheck.threats), htmlLength: html.length, isAnonymous,
+          });
         }
         await deletePageById(ctx, pageId, isAnonymous);
         return;
@@ -541,6 +549,10 @@ export async function scanHtmlInBackground(
         log.warn("审核不通过", { pageId, status: "blocked", reason: "ai", verdict: aiResult.verdict });
         if (ctx.d1) {
           await insertUploadLog(ctx.d1, { pageId, event: "upload", isAnonymous, status: "blocked" });
+          await insertScanLog(ctx.d1, {
+            pageId, status: "blocked", reason: "ai",
+            threats: JSON.stringify({ verdict: aiResult.verdict }), htmlLength: html.length, isAnonymous,
+          });
         }
         await deletePageById(ctx, pageId, isAnonymous);
         return;
@@ -548,9 +560,17 @@ export async function scanHtmlInBackground(
     }
 
     log.info("审核通过", { pageId, status: "approved" });
+    if (ctx.d1) {
+      await insertScanLog(ctx.d1, { pageId, status: "approved", htmlLength: html.length, isAnonymous });
+    }
   } catch (e) {
     // 后台扫描失败不影响已上传的页面
     log.error("审核异常", { pageId, status: "error", error: String(e) });
+    if (ctx.d1) {
+      await insertScanLog(ctx.d1, {
+        pageId, status: "error", threats: JSON.stringify({ error: String(e) }), isAnonymous,
+      });
+    }
   }
 }
 
@@ -669,6 +689,15 @@ export async function serveUserPage(
   if (!obj) obj = await bucket.get(`tmp/${id}.html`);
 
   if (!obj) {
+    // 页面不存在：若是被安全扫描下架的页面，返回带原因的 410 提示页
+    if (env.d1) {
+      try {
+        const blocked = await getLatestBlockedScan(env.d1, id);
+        if (blocked) {
+          return new Response(blockedHtml(lang, blocked), { status: 410, headers: htmlHeaders() });
+        }
+      } catch { /* 查询失败时回退普通 404 */ }
+    }
     return new Response(notFoundHtml(lang), { status: 404, headers: htmlHeaders() });
   }
 

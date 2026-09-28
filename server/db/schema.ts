@@ -173,3 +173,17 @@ export const uploadLog = sqliteTable("upload_log", {
   index("idx_upload_log_time").on(t.createdAt),
   index("idx_upload_log_event").on(t.event),
 ]);
+
+export const scanLog = sqliteTable("scan_log", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  pageId: text("page_id").notNull(),
+  status: text("status").notNull(),           // approved / blocked / error
+  reason: text("reason"),                     // regex / phishing / ai
+  threats: text("threats"),                   // 威胁详情 JSON
+  htmlLength: integer("html_length"),
+  isAnonymous: integer("is_anonymous", { mode: "boolean" }).notNull().default(false),
+  createdAt: integer("created_at").notNull(),
+}, (t) => [
+  index("idx_scan_log_page").on(t.pageId),
+  index("idx_scan_log_time").on(t.createdAt),
+]);

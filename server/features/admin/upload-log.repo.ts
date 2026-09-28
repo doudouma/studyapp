@@ -134,6 +134,73 @@ export async function deleteOldUploadLogs(
   return result.meta.changes ?? 0;
 }
 
+// --- Scan logs ---
+
+export interface ScanLogEntry {
+  pageId: string;
+  status: "approved" | "blocked" | "error";
+  reason?: string | null;
+  threats?: string | null;
+  htmlLength?: number | null;
+  isAnonymous: boolean;
+}
+
+/**
+ * Insert a scan log entry. Errors are swallowed to never block the caller.
+ */
+export function insertScanLog(d1: D1Database, entry: ScanLogEntry): Promise<void> {
+  return d1.prepare(
+    `INSERT INTO scan_log (page_id, status, reason, threats, html_length, is_anonymous, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`
+  )
+    .bind(
+      entry.pageId,
+      entry.status,
+      entry.reason ?? null,
+      entry.threats ?? null,
+      entry.htmlLength ?? null,
+      entry.isAnonymous ? 1 : 0,
+      Date.now()
+    )
+    .run()
+    .then(() => {})
+    .catch((e) => { log.error("scan log write failed", { pageId: entry.pageId, status: entry.status, error: String(e) }); });
+}
+
+export interface BlockedScanInfo {
+  reason: string;
+  labels: string[];
+}
+
+/**
+ * 查询页面最近一次被 block 的原因（供访问下架页面时展示）。
+ * 仅 regex 类别返回命中的标签名，phishing/ai 不向用户暴露细节。
+ */
+export async function getLatestBlockedScan(
+  d1: D1Database,
+  pageId: string
+): Promise<BlockedScanInfo | null> {
+  const rows = await d1.prepare(
+    `SELECT reason, threats FROM scan_log WHERE page_id = ? AND status = 'blocked'
+     ORDER BY created_at DESC LIMIT 1`
+  )
+    .bind(pageId)
+    .all<{ reason: string | null; threats: string | null }>();
+  const row = rows.results[0];
+  if (!row?.reason) return null;
+
+  const labels: string[] = [];
+  if (row.reason === "regex" && row.threats) {
+    try {
+      const parsed = JSON.parse(row.threats) as { label?: string }[];
+      for (const t of parsed) {
+        if (typeof t?.label === "string") labels.push(t.label);
+      }
+    } catch { /* threats 格式异常时仅展示类别文案 */ }
+  }
+  return { reason: row.reason, labels };
+}
+
 export async function deleteOldScanLogs(
   d1: D1Database,
   cutoffMs: number

@@ -107,3 +107,115 @@ export function notFoundHtml(lang: Lang = DEFAULT_LANG): string {
 </div>
 </body></html>`;
 }
+
+/**
+ * 页面因违反内容规范被下架后访问 /p/{id} 的提示页。
+ * detail.reason: regex=含被禁代码 / phishing=钓鱼内容 / ai=AI 审核未通过；
+ * labels 仅 regex 类别提供（命中的被禁标签名）。
+ */
+export function blockedHtml(
+  lang: Lang = DEFAULT_LANG,
+  detail?: { reason: string; labels: string[] }
+): string {
+  const strings: Record<Lang, { title: string; desc: string; headline: string; badge: string; back: string }> = {
+    en: {
+      title: "410 - Page removed | 100mini",
+      desc: "This page has been taken down for violating our content policy.",
+      headline: "This page has been taken down for violating our content policy.",
+      badge: "Removed",
+      back: "Back to Home",
+    },
+    zh: {
+      title: "410 - 页面已下架 | 100mini",
+      desc: "该页面因违反内容规范已被下架。",
+      headline: "该页面因违反内容规范已被下架",
+      badge: "已下架",
+      back: "返回首页",
+    },
+    es: {
+      title: "410 - Página retirada | 100mini",
+      desc: "Esta página ha sido retirada por violar nuestra política de contenido.",
+      headline: "Esta página ha sido retirada por violar nuestra política de contenido",
+      badge: "Retirada",
+      back: "Volver al inicio",
+    },
+    pt: {
+      title: "410 - Página removida | 100mini",
+      desc: "Esta página foi removida por violar nossa política de conteúdo.",
+      headline: "Esta página foi removida por violar nossa política de conteúdo",
+      badge: "Removida",
+      back: "Voltar ao Início",
+    },
+    fr: {
+      title: "410 - Page retirée | 100mini",
+      desc: "Cette page a été retirée pour violation de notre politique de contenu.",
+      headline: "Cette page a été retirée pour violation de notre politique de contenu",
+      badge: "Retirée",
+      back: "Retour à l'accueil",
+    },
+  };
+  const s = strings[lang] ?? strings[DEFAULT_LANG];
+
+  const reasonStrings: Record<Lang, { regex: string; regexList: string; phishing: string; ai: string }> = {
+    en: {
+      regex: "Prohibited code elements were detected",
+      regexList: "Detected prohibited code:",
+      phishing: "The page contained suspected phishing or fraudulent content",
+      ai: "The page content did not pass AI safety review",
+    },
+    zh: {
+      regex: "检测到被禁止的代码",
+      regexList: "检测到被禁止的代码：",
+      phishing: "页面包含疑似钓鱼/欺诈内容",
+      ai: "页面内容未通过 AI 安全审核",
+    },
+    es: {
+      regex: "Se detectaron elementos de código prohibidos",
+      regexList: "Código prohibido detectado:",
+      phishing: "La página contenía contenido sospechoso de phishing o fraude",
+      ai: "El contenido de la página no pasó la revisión de seguridad por IA",
+    },
+    pt: {
+      regex: "Elementos de código proibidos foram detectados",
+      regexList: "Código proibido detectado:",
+      phishing: "A página continha conteúdo suspeito de phishing ou fraude",
+      ai: "O conteúdo da página não passou na revisão de segurança por IA",
+    },
+    fr: {
+      regex: "Des éléments de code interdits ont été détectés",
+      regexList: "Code interdit détecté :",
+      phishing: "La page contenait un contenu suspecté de phishing ou de fraude",
+      ai: "Le contenu de la page n'a pas passé la revue de sécurité par IA",
+    },
+  };
+  const r = reasonStrings[lang] ?? reasonStrings[DEFAULT_LANG];
+
+  let reasonText = "";
+  if (detail) {
+    if (detail.reason === "regex") {
+      reasonText = detail.labels.length > 0
+        ? `${escapeHtml(r.regexList)} ${escapeHtml(detail.labels.map(escapeHtml).join(", "))}`
+        : escapeHtml(r.regex);
+    } else if (detail.reason === "phishing") {
+      reasonText = escapeHtml(r.phishing);
+    } else if (detail.reason === "ai") {
+      reasonText = escapeHtml(r.ai);
+    }
+  }
+
+  return `<!DOCTYPE html>
+<html lang="${getBcp47(lang)}">
+<head><meta charset="utf-8"><meta name="robots" content="noindex"><title>${s.title}</title>
+<meta name="description" content="${s.desc}">
+<style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:system-ui,sans-serif;background:#f5f5f5}</style>
+</head>
+<body>
+<div style="text-align:center;max-width:32rem;padding:0 1.5rem">
+<span style="display:inline-block;padding:0.25rem 0.75rem;border-radius:9999px;background:#fee2e2;color:#b91c1c;font-size:0.875rem;font-weight:600">${s.badge}</span>
+<h1 style="font-size:1.5rem;margin:1rem 0 0.5rem">410</h1>
+<p style="color:#374151;margin:0">${s.headline}</p>
+${reasonText ? `<p style="color:#b91c1c;font-size:0.9rem;margin:0.75rem 0 0">${reasonText}</p>` : ""}
+<a href="/" style="display:inline-block;margin-top:1.5rem;padding:0.5rem 1.5rem;background:#667eea;color:#fff;text-decoration:none;border-radius:8px">${s.back}</a>
+</div>
+</body></html>`;
+}
