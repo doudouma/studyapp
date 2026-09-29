@@ -7,6 +7,10 @@ import {
   MAX_CONTENT_SIZE,
   MAX_USER_CONTENT_SIZE,
   FREE_CONTENT_SIZE,
+  CUSTOM_SLUG_MIN,
+  CUSTOM_SLUG_MAX,
+  POINTS_PER_CUSTOM_SLUG,
+  validateCustomSlug,
   computeSizeFeePoints,
   computeUploadFees,
   type MeResponse,
@@ -26,6 +30,7 @@ import {
   isExpiredByUploaded,
 } from "./pages.storage";
 import { injectBanner, notFoundHtml, blockedHtml, detectLangFromHeader } from "./pages.render";
+import type { Lang } from "../../../app/lib/lang";
 import { log } from "../../lib/log";
 import { insertUploadLog, insertScanLog, getLatestBlockedScan } from "../admin/upload-log.repo";
 import {
@@ -42,6 +47,8 @@ import {
   getUserLinksLimitBonus,
   deductPointsAndAddBonus,
   deductPoints,
+  getPageIdBySlug,
+  slugExists,
   incrementPageViewCount,
   getPageMeta,
   type UserPageRow,
@@ -67,6 +74,7 @@ export class ServiceError extends Error {
 function toUserPageItem(row: UserPageRow): UserPageItem {
   return {
     id: row.id,
+    slug: row.slug ?? null,
     title: row.title || "",
     category: row.category || "general",
     tags: row.tags || "",
@@ -211,18 +219,46 @@ export interface UpdatePageInput {
   title?: string;
   category?: string;
   tags?: string;
+  /** 自定义地址：undefined 不修改；空字符串清除；新地址设置/更换扣 POINTS_PER_CUSTOM_SLUG */
+  slug?: string;
   content?: string;
   file?: PageFileInput;
 }
 
 export async function updateOwnPage(input: UpdatePageInput): Promise<UpdatePageResponse> {
   const { d1, bucket, userId, pageId } = input;
-  if (!(await findOwnedPage(d1, pageId, userId))) throw new ServiceError(404, "页面不存在");
+  const record = await getPageRecord(d1, pageId);
+  if (!record || record.userId !== userId) throw new ServiceError(404, "页面不存在");
 
-  const updates: Record<string, string> = {};
+  const updates: Record<string, string | null> = {};
   if (input.title) updates.title = input.title;
   if (input.category) updates.category = input.category;
   if (input.tags !== undefined) updates.tags = input.tags;
+
+  // 自定义地址：设置/更换扣积分，清除与不变免费
+  let slugFee = 0;
+  if (input.slug !== undefined) {
+    const normalized = input.slug.trim().toLowerCase();
+    if (normalized) {
+      const verdict = validateCustomSlug(normalized);
+      if (verdict === "length") {
+        throw new ServiceError(400, `自定义地址长度需在 ${CUSTOM_SLUG_MIN}-${CUSTOM_SLUG_MAX} 位之间`);
+      }
+      if (verdict === "invalid") {
+        throw new ServiceError(400, "自定义地址仅支持小写字母、数字和连字符，且以字母或数字开头结尾");
+      }
+      if (verdict === "reserved") {
+        throw new ServiceError(400, "该自定义地址为系统保留，请换一个");
+      }
+    }
+    if ((record.slug ?? "") !== normalized) {
+      if (normalized) {
+        if (await slugExists(d1, normalized)) throw new ServiceError(409, "该自定义地址已被占用");
+        slugFee = POINTS_PER_CUSTOM_SLUG;
+      }
+      updates.slug = normalized || null;
+    }
+  }
 
   const maxSizeMB = MAX_USER_CONTENT_SIZE / (1024 * 1024);
 
@@ -242,21 +278,30 @@ export async function updateOwnPage(input: UpdatePageInput): Promise<UpdatePageR
     }
   }
 
-  // 尺寸费：替换超出 5MB 的文件/内容按块扣积分（与发布上传一致，防止先小后大绕过）
+  // 费用：尺寸费（替换超出 5MB 的文件/内容按块扣积分）+ 自定义地址费，叠加校验
   const effectiveSize = preparedFile ? preparedFile.size : contentBytes;
   const sizeFee = computeSizeFeePoints(effectiveSize);
-  if (sizeFee > 0) {
+  const totalFee = sizeFee + slugFee;
+  if (totalFee > 0) {
     const points = await getUserPoints(d1, userId);
-    if (points < sizeFee) {
-      throw new ServiceError(
-        403,
-        `积分不足（当前 ${points}，本次需要 ${sizeFee} 积分）：内容超过 ${FREE_CONTENT_SIZE / (1024 * 1024)}MB 免费尺寸`
-      );
+    if (points < totalFee) {
+      const reasons: string[] = [];
+      if (sizeFee > 0) reasons.push(`内容超过 ${FREE_CONTENT_SIZE / (1024 * 1024)}MB 免费尺寸需 ${sizeFee} 积分`);
+      if (slugFee > 0) reasons.push(`自定义地址需 ${slugFee} 积分`);
+      throw new ServiceError(403, `积分不足（当前 ${points}，本次需要 ${totalFee} 积分）：${reasons.join("；")}`);
     }
   }
 
   if (Object.keys(updates).length > 0) {
-    await updatePageRecord(d1, pageId, updates);
+    try {
+      await updatePageRecord(d1, pageId, updates);
+    } catch (e) {
+      // 并发竞态兜底：check 与 update 之间 slug 被抢占，唯一索引冲突
+      if (updates.slug && String(e).includes("UNIQUE constraint failed")) {
+        throw new ServiceError(409, "该自定义地址已被占用");
+      }
+      throw e;
+    }
   }
 
   if (preparedFile) {
@@ -268,9 +313,9 @@ export async function updateOwnPage(input: UpdatePageInput): Promise<UpdatePageR
     await putHtml(bucket, key, input.content);
   }
 
-  // 替换成功后再扣尺寸费
-  if (sizeFee > 0) {
-    await deductPoints(d1, userId, sizeFee);
+  // 替换成功后再扣费：尺寸费与自定义地址费
+  if (totalFee > 0) {
+    await deductPoints(d1, userId, totalFee);
   }
 
   const updated = (await getPageRecord(d1, pageId))!;
@@ -324,6 +369,8 @@ export interface CreateUploadInput {
   category: string;
   tags: string;
   shareToSquare: boolean;
+  /** 自定义地址（/p/{slug}），仅登录用户生效，匿名忽略 */
+  customSlug?: string;
   content?: string;
   file?: PageFileInput;
 }
@@ -355,6 +402,26 @@ export async function createUpload(input: CreateUploadInput): Promise<UploadResu
       userLimit = FREE_PERMANENT_LIMIT + (await getUserLinksLimitBonus(d1, user.id));
     }
     points = await getUserPoints(d1, user.id);
+  }
+
+  // 自定义地址（仅登录用户；匿名忽略该字段）：校验格式与占用
+  let slug: string | undefined;
+  if (user && d1 && input.customSlug) {
+    const normalized = input.customSlug.trim().toLowerCase();
+    const verdict = validateCustomSlug(normalized);
+    if (verdict === "length") {
+      throw new ServiceError(400, `自定义地址长度需在 ${CUSTOM_SLUG_MIN}-${CUSTOM_SLUG_MAX} 位之间`);
+    }
+    if (verdict === "invalid") {
+      throw new ServiceError(400, "自定义地址仅支持小写字母、数字和连字符，且以字母或数字开头结尾");
+    }
+    if (verdict === "reserved") {
+      throw new ServiceError(400, "该自定义地址为系统保留，请换一个");
+    }
+    if (await slugExists(d1, normalized)) {
+      throw new ServiceError(409, "该自定义地址已被占用");
+    }
+    slug = normalized;
   }
 
   let html: string;
@@ -402,12 +469,14 @@ export async function createUpload(input: CreateUploadInput): Promise<UploadResu
     userLimit,
     contentBytes,
     points,
+    customSlug: !!slug,
   });
 
   if (user && fees.totalFee > 0 && !fees.affordable) {
     const reasons: string[] = [];
     if (fees.quotaFee > 0) reasons.push(`免费额度已用完（${pageCount}/${userLimit}）`);
     if (fees.sizeFee > 0) reasons.push(`内容超过 ${FREE_CONTENT_SIZE / (1024 * 1024)}MB 需 ${fees.sizeFee} 积分`);
+    if (fees.slugFee > 0) reasons.push(`自定义地址需 ${fees.slugFee} 积分`);
     throw new ServiceError(
       403,
       `积分不足（当前 ${points}，本次需要 ${fees.totalFee} 积分）${reasons.length ? "：" + reasons.join("；") : ""}`
@@ -450,30 +519,42 @@ export async function createUpload(input: CreateUploadInput): Promise<UploadResu
 
   // Record in D1 only for logged-in users
   if (user && d1) {
-    await insertPageRecord(d1, {
-      id,
-      userId: user.id,
-      title: title || "未命名",
-      category: input.category,
-      tags: input.tags,
-      isPermanent: true,
-      isSharedToSquare: input.shareToSquare,
-      sharedAt: input.shareToSquare ? new Date(now) : null,
-      createdAt: new Date(now),
-      expiresAt: expiresAt ? new Date(expiresAt) : null,
-    });
-    // 成功落库后再扣分：配额费附带链接额度 +1，尺寸费仅扣积分
+    try {
+      await insertPageRecord(d1, {
+        id,
+        slug: slug ?? null,
+        userId: user.id,
+        title: title || "未命名",
+        category: input.category,
+        tags: input.tags,
+        isPermanent: true,
+        isSharedToSquare: input.shareToSquare,
+        sharedAt: input.shareToSquare ? new Date(now) : null,
+        createdAt: new Date(now),
+        expiresAt: expiresAt ? new Date(expiresAt) : null,
+      });
+    } catch (e) {
+      // 并发竞态兜底：check 与 insert 之间 slug 被抢占，唯一索引冲突
+      if (slug && String(e).includes("UNIQUE constraint failed")) {
+        throw new ServiceError(409, "该自定义地址已被占用");
+      }
+      throw e;
+    }
+    // 成功落库后再扣分：配额费附带链接额度 +1，尺寸费与自定义地址费仅扣积分
     if (fees.quotaFee > 0) {
       await deductPointsAndAddBonus(d1, user.id, fees.quotaFee);
     }
     if (fees.sizeFee > 0) {
       await deductPoints(d1, user.id, fees.sizeFee);
     }
+    if (fees.slugFee > 0) {
+      await deductPoints(d1, user.id, fees.slugFee);
+    }
   }
 
   return {
     id,
-    url: `/p/${id}`,
+    url: slug ? `/p/${slug}` : `/p/${id}`,
     expiresAt,
     isPermanent,
     title,
@@ -635,13 +716,44 @@ export async function serveUserPage(
   acceptLanguage: string | undefined
 ): Promise<Response> {
   const lang = detectLangFromHeader(acceptLanguage);
+  const notFound = () => new Response(notFoundHtml(lang), { status: 404, headers: htmlHeaders() });
 
-  // Parse /{id} or /{id}/{path}
-  const match = rawPath.match(/^([a-zA-Z0-9_-]{7})(?:\/(.*))?$/);
-  if (!match) return new Response(notFoundHtml(lang), { status: 404, headers: htmlHeaders() });
+  // Parse /{first} or /{first}/{path}：first 为 7 位随机 ID 或自定义地址（slug）
+  const match = rawPath.match(/^([^/]+)(?:\/(.*))?$/);
+  if (!match) return notFound();
 
-  const id = match[1];
+  const first = match[1];
   const path = match[2];
+
+  // 先按 7 位随机 ID 尝试（兼容存量页面与匿名 tmp 页面——匿名页无 D1 记录）
+  if (/^[a-zA-Z0-9_-]{7}$/.test(first)) {
+    const res = await servePageById(env, first, path, lang, first);
+    if (res.status !== 404) return res;
+  }
+
+  // 未命中则按自定义地址解析为真实页面 id 后重试
+  if (env.d1) {
+    let pageId: string | null = null;
+    try {
+      pageId = await getPageIdBySlug(env.d1, first);
+    } catch {
+      pageId = null; // slug 查询失败时按 404 处理，不让 D1 异常放大
+    }
+    if (pageId) return servePageById(env, pageId, path, lang, first);
+  }
+
+  return notFound();
+}
+
+/** 按页面 id（R2 key）服务页面：资产文件或主 HTML，urlSegment 用于 baseHref/SEO 展示 */
+async function servePageById(
+  env: ServePageEnv,
+  id: string,
+  path: string | undefined,
+  lang: Lang,
+  urlSegment: string
+): Promise<Response> {
+  const notFound = () => new Response(notFoundHtml(lang), { status: 404, headers: htmlHeaders() });
 
   // Check expiration from D1 (logged-in user pages)
   if (env.d1) {
@@ -649,12 +761,12 @@ export async function serveUserPage(
     if (record && record.expiresAt && new Date(record.expiresAt) < new Date()) {
       if (env.bucket) await deletePageObjects(env.bucket, id);
       await deletePageRecord(env.d1, id);
-      return new Response(notFoundHtml(lang), { status: 404, headers: htmlHeaders() });
+      return notFound();
     }
   }
 
   const bucket = env.bucket;
-  if (!bucket) return new Response(notFoundHtml(lang), { status: 404, headers: htmlHeaders() });
+  if (!bucket) return notFound();
 
   if (path && path !== "index.html") {
     // Serving an asset file (e.g. data.json, image.png)
@@ -722,14 +834,14 @@ export async function serveUserPage(
       pageMeta = {
         title: record.title || "学习页面",
         description,
-        url: `https://100mini.com/p/${id}`,
+        url: `https://100mini.com/p/${urlSegment}`,
       };
     }
     await incrementPageViewCount(env.d1, id);
   }
 
   const rawHtml = await obj.text();
-  const baseHref = isZip ? `/p/${id}/` : undefined;
+  const baseHref = isZip ? `/p/${urlSegment}/` : undefined;
   const injected = injectBanner(rawHtml, pageMeta, baseHref);
 
   return new Response(injected, {

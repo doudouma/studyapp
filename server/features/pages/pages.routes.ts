@@ -16,6 +16,8 @@ import {
 } from "./pages.service";
 import { createApiKey, listApiKeys, revokeApiKey } from "./apikey.service";
 import { detectLangFromHeader } from "./pages.render";
+import { slugExists } from "./pages.repo";
+import { validateCustomSlug } from "@shared/types/pages";
 import { cleanupAnonymousUploads, deletePageObjects, getTmpExpiryMs } from "./pages.storage";
 import { insertUploadLog } from "../admin/upload-log.repo";
 import { log } from "../../lib/log";
@@ -38,6 +40,16 @@ export const pagesRoutes = new Hono<AppEnv>()
   .get("/api/me", async (c) => {
     const user = c.get("user");
     return c.json(await getMeInfo(c.env.D1, user));
+  })
+
+  // 自定义地址可用性检查（前端实时校验，与服务端 createUpload 同一规则）
+  .get("/api/slug/available", async (c) => {
+    const slug = (c.req.query("slug") || "").trim().toLowerCase();
+    const verdict = validateCustomSlug(slug);
+    if (verdict !== "ok") return c.json({ available: false, reason: verdict } as const);
+    if (!c.env.D1) return c.json({ error: "database unavailable" }, 503);
+    const taken = await slugExists(c.env.D1, slug);
+    return c.json(taken ? { available: false, reason: "taken" } as const : { available: true } as const);
   })
 
   // 我的页面列表
@@ -103,6 +115,7 @@ export const pagesRoutes = new Hono<AppEnv>()
           title: ((body.title as string) || "").trim() || undefined,
           category: (body.category as string) || undefined,
           tags: normalizeTags((body.tags as string) || ""),
+          slug: typeof body.slug === "string" ? body.slug : undefined,
           file: fileInput,
         })
       );
@@ -112,6 +125,7 @@ export const pagesRoutes = new Hono<AppEnv>()
       title?: string;
       category?: string;
       tags?: string;
+      slug?: string;
       content?: string;
     }>();
     return c.json(
@@ -123,6 +137,7 @@ export const pagesRoutes = new Hono<AppEnv>()
         title: body.title,
         category: body.category,
         tags: body.tags,
+        slug: body.slug,
         content: body.content,
       })
     );
@@ -192,6 +207,7 @@ export const pagesRoutes = new Hono<AppEnv>()
       category: (body.category as string) || "general",
       tags: normalizeTags((body.tags as string) || ""),
       shareToSquare: body.shareToSquare === "true",
+      customSlug: typeof body.customSlug === "string" ? body.customSlug : undefined,
       content: typeof body.content === "string" ? body.content : undefined,
       file: fileInput,
     });

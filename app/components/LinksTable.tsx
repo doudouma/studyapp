@@ -15,17 +15,21 @@ import {
   DialogClose,
 } from "~/components/ui/dialog";
 import { useTranslation } from "react-i18next";
-import { MAX_USER_CONTENT_SIZE, computeSizeFeePoints } from "@shared/types/pages";
-import { deleteMyPage, fetchPageContent, updatePageFile, updatePageMeta } from "~/features/pages/api";
+import { POINTS_PER_CUSTOM_SLUG, MAX_USER_CONTENT_SIZE, computeSizeFeePoints } from "@shared/types/pages";
+import { checkSlugAvailable, deleteMyPage, fetchPageContent, updatePageFile, updatePageMeta } from "~/features/pages/api";
 
 export interface PageLink {
   id: string;
+  slug: string | null;
   title: string;
   category: string;
   tags: string;
   viewCount: number;
   createdAt: number;
 }
+
+/** 编辑弹窗中自定义地址的可用性状态 */
+type EditSlugStatus = "idle" | "checking" | "ok" | "length" | "invalid" | "reserved" | "taken";
 
 interface LinksTableProps {
   pages: PageLink[];
@@ -353,6 +357,8 @@ function EditDialog({
   const { t } = useTranslation();
   const [tab, setTab] = useState<"meta" | "content">("meta");
   const [title, setTitle] = useState("");
+  const [slug, setSlug] = useState("");
+  const [slugStatus, setSlugStatus] = useState<EditSlugStatus>("idle");
   const [category, setCategory] = useState("general");
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
@@ -367,6 +373,8 @@ function EditDialog({
     if (page) {
       setTab("meta");
       setTitle(page.title);
+      setSlug(page.slug || "");
+      setSlugStatus("idle");
       setCategory(page.category || "general");
       setTags(page.tags ? page.tags.split(",").filter(Boolean) : []);
       setTagInput("");
@@ -375,6 +383,29 @@ function EditDialog({
       setError("");
     }
   }, [page]);
+
+  const currentSlug = page?.slug || "";
+  const slugTrimmed = slug.trim();
+  // 与当前地址不同才算"修改"：设置/更换扣积分，保持或清空不扣
+  const slugChanged = slugTrimmed !== currentSlug;
+
+  // 防抖可用性检查（服务端保存时仍会最终校验）
+  useEffect(() => {
+    if (!slugTrimmed || !slugChanged) {
+      setSlugStatus("idle");
+      return;
+    }
+    setSlugStatus("checking");
+    const timer = setTimeout(async () => {
+      try {
+        const r = await checkSlugAvailable(slugTrimmed);
+        setSlugStatus(r.available ? "ok" : r.reason ?? "taken");
+      } catch {
+        setSlugStatus("idle");
+      }
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [slugTrimmed, slugChanged]);
 
   const loadContent = async () => {
     if (!page) return;
@@ -407,6 +438,8 @@ function EditDialog({
 
   const handleSave = async () => {
     if (!page || saving) return;
+    // 设置/更换自定义地址必须等可用性检查通过
+    if (slugChanged && slugTrimmed && slugStatus !== "ok") return;
     setError("");
     setSaving(true);
     try {
@@ -415,11 +448,12 @@ function EditDialog({
         const formData = new FormData();
         formData.append("file", contentFile);
         formData.append("title", title);
+        formData.append("slug", slugTrimmed);
         formData.append("category", category);
         formData.append("tags", tags.join(","));
         result = await updatePageFile(page.id, formData);
       } else {
-        const body: { title: string; category: string; tags: string; content?: string } = { title, category, tags: tags.join(",") };
+        const body: { title: string; category: string; tags: string; slug: string; content?: string } = { title, category, tags: tags.join(","), slug: slugTrimmed };
         if (content) body.content = content;
         result = await updatePageMeta(page.id, body);
       }
@@ -468,6 +502,50 @@ function EditDialog({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground">
+                {t("home.form.slug")}{" "}
+                <span className="font-normal text-muted-foreground">
+                  {t("home.form.slugFeeHint", { points: POINTS_PER_CUSTOM_SLUG })}
+                </span>
+              </label>
+              <div className="mt-1 flex">
+                <span className="inline-flex items-center rounded-l-lg border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground">
+                  /p/
+                </span>
+                <Input
+                  className="rounded-l-none"
+                  placeholder={t("home.form.slugPlaceholder")}
+                  value={slug}
+                  onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/\s+/g, ""))}
+                />
+              </div>
+              {slugTrimmed ? (
+                slugChanged ? (
+                  slugStatus !== "idle" && (
+                    <p
+                      className={`mt-1 text-xs ${
+                        slugStatus === "ok"
+                          ? "text-[#006c49] dark:text-[#4edea3]"
+                          : slugStatus === "checking"
+                            ? "text-muted-foreground"
+                            : "text-destructive"
+                      }`}
+                    >
+                      {t(`home.form.slugStatus.${slugStatus}`)}
+                    </p>
+                  )
+                ) : (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {t("components.linksTable.editDialog.slugUnchanged")}
+                  </p>
+                )
+              ) : currentSlug ? (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {t("components.linksTable.editDialog.slugClearHint", { slug: currentSlug })}
+                </p>
+              ) : null}
             </div>
             <div>
               <label className="text-sm font-medium text-foreground">{t("home.form.category")}</label>

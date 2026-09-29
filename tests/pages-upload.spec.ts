@@ -8,6 +8,8 @@ vi.mock("../server/features/pages/pages.repo", () => ({
   listUserPages: vi.fn(),
   findOwnedPage: vi.fn(),
   getPageRecord: vi.fn(),
+  getPageIdBySlug: vi.fn(),
+  slugExists: vi.fn(),
   insertPageRecord: vi.fn(),
   updatePageRecord: vi.fn(),
   deletePageRecord: vi.fn(),
@@ -32,14 +34,17 @@ vi.mock("../server/features/pages/pages.storage", async (importOriginal) => {
 vi.mock("../server/features/pages/pages.render", () => ({
   injectBanner: vi.fn(),
   notFoundHtml: vi.fn(),
+  blockedHtml: vi.fn(),
   detectLangFromHeader: vi.fn(),
 }));
 
 vi.mock("../server/features/admin/upload-log.repo", () => ({
   insertUploadLog: vi.fn(),
+  insertScanLog: vi.fn(),
+  getLatestBlockedScan: vi.fn(),
 }));
 
-import { createUpload, updateOwnPage, ServiceError } from "../server/features/pages/pages.service";
+import { createUpload, updateOwnPage, serveUserPage, ServiceError } from "../server/features/pages/pages.service";
 import * as repo from "../server/features/pages/pages.repo";
 import { putHtml, deletePageObjects } from "../server/features/pages/pages.storage";
 
@@ -58,6 +63,8 @@ function makeBucket() {
 function makeRow(overrides: Record<string, unknown> = {}) {
   return {
     id: "p1",
+    userId: "u1",
+    slug: null,
     title: "t",
     category: "general",
     tags: "",
@@ -66,6 +73,16 @@ function makeRow(overrides: Record<string, unknown> = {}) {
     createdAt: new Date(),
     expiresAt: null,
     previewPath: null,
+    ...overrides,
+  } as any;
+}
+
+function baseUpdate(overrides: Record<string, unknown> = {}) {
+  return {
+    d1: {} as any,
+    bucket: makeBucket(),
+    userId: "u1",
+    pageId: "p1",
     ...overrides,
   } as any;
 }
@@ -79,6 +96,8 @@ beforeEach(() => {
   vi.mocked(repo.getUserPoints).mockResolvedValue(50);
   vi.mocked(repo.findOwnedPage).mockResolvedValue(true);
   vi.mocked(repo.getPageRecord).mockResolvedValue(makeRow());
+  vi.mocked(repo.getPageIdBySlug).mockResolvedValue(null);
+  vi.mocked(repo.slugExists).mockResolvedValue(false);
   vi.mocked(repo.insertPageRecord).mockResolvedValue(undefined as any);
   vi.mocked(repo.updatePageRecord).mockResolvedValue(undefined as any);
   vi.mocked(repo.deductPointsAndAddBonus).mockResolvedValue(40);
@@ -287,18 +306,8 @@ describe("createUpload — ZIP", () => {
 // updateOwnPage
 // ───────────────────────────────────────────────
 describe("updateOwnPage", () => {
-  function baseUpdate(overrides: Record<string, unknown> = {}) {
-    return {
-      d1: {} as any,
-      bucket: makeBucket(),
-      userId: "u1",
-      pageId: "p1",
-      ...overrides,
-    } as any;
-  }
-
   it("页面不属于该用户 → 404", async () => {
-    vi.mocked(repo.findOwnedPage).mockResolvedValue(false);
+    vi.mocked(repo.getPageRecord).mockResolvedValue(makeRow({ userId: "other" }));
     await expect(updateOwnPage(baseUpdate({ title: "t" }))).rejects.toMatchObject({ status: 404 });
   });
 
@@ -381,5 +390,175 @@ describe("updateOwnPage", () => {
     const bucket = makeBucket();
     await updateOwnPage(baseUpdate({ bucket, file: { bytes: enc.encode("<p>x</p>"), filename: "a.html" } }));
     expect(bucket.delete).not.toHaveBeenCalled();
+  });
+});
+
+// ───────────────────────────────────────────────
+// updateOwnPage — 自定义地址
+// ───────────────────────────────────────────────
+describe("updateOwnPage — 自定义地址", () => {
+  it("设置新 slug → 落库并扣 10 积分", async () => {
+    await updateOwnPage(baseUpdate({ slug: " My-Page " }));
+    expect(repo.updatePageRecord).toHaveBeenCalledWith(expect.anything(), "p1", { slug: "my-page" });
+    expect(repo.deductPoints).toHaveBeenCalledWith(expect.anything(), "u1", 10);
+  });
+
+  it("slug 与当前相同 → 不更新、不扣分", async () => {
+    vi.mocked(repo.getPageRecord).mockResolvedValue(makeRow({ slug: "my-page" }));
+    const res = await updateOwnPage(baseUpdate({ slug: "my-page" }));
+    expect(repo.updatePageRecord).not.toHaveBeenCalled();
+    expect(repo.deductPoints).not.toHaveBeenCalled();
+    expect(res.success).toBe(true);
+  });
+
+  it("清空 slug → 置 null、不扣分", async () => {
+    vi.mocked(repo.getPageRecord).mockResolvedValue(makeRow({ slug: "old-page" }));
+    await updateOwnPage(baseUpdate({ slug: "" }));
+    expect(repo.updatePageRecord).toHaveBeenCalledWith(expect.anything(), "p1", { slug: null });
+    expect(repo.deductPoints).not.toHaveBeenCalled();
+  });
+
+  it("更换 slug → 扣 10 积分", async () => {
+    vi.mocked(repo.getPageRecord).mockResolvedValue(makeRow({ slug: "old-page" }));
+    await updateOwnPage(baseUpdate({ slug: "new-page" }));
+    expect(repo.updatePageRecord).toHaveBeenCalledWith(expect.anything(), "p1", { slug: "new-page" });
+    expect(repo.deductPoints).toHaveBeenCalledWith(expect.anything(), "u1", 10);
+  });
+
+  it("slug 非法格式 → 400", async () => {
+    await expect(updateOwnPage(baseUpdate({ slug: "ab" }))).rejects.toMatchObject({ status: 400 });
+    expect(repo.updatePageRecord).not.toHaveBeenCalled();
+  });
+
+  it("slug 已被占用 → 409", async () => {
+    vi.mocked(repo.slugExists).mockResolvedValue(true);
+    await expect(updateOwnPage(baseUpdate({ slug: "my-page" }))).rejects.toMatchObject({ status: 409 });
+    expect(repo.updatePageRecord).not.toHaveBeenCalled();
+  });
+
+  it("并发竞态 UNIQUE 冲突 → 409", async () => {
+    vi.mocked(repo.updatePageRecord).mockRejectedValue(new Error("UNIQUE constraint failed: page.slug"));
+    await expect(updateOwnPage(baseUpdate({ slug: "my-page" }))).rejects.toMatchObject({ status: 409 });
+  });
+
+  it("slug 费用 + 尺寸费叠加 → 积分不足 403 且不写库", async () => {
+    vi.mocked(repo.getUserPoints).mockResolvedValue(15);
+    await expect(
+      updateOwnPage(baseUpdate({ slug: "my-page", content: "a".repeat(7 * MB) }))
+    ).rejects.toMatchObject({ status: 403 });
+    expect(repo.updatePageRecord).not.toHaveBeenCalled();
+    expect(putHtml).not.toHaveBeenCalled();
+  });
+});
+
+// ───────────────────────────────────────────────
+// createUpload — 自定义地址
+// ───────────────────────────────────────────────
+describe("createUpload — 自定义地址", () => {
+  const user = { id: "u1", name: "N", email: "e@x.com" };
+
+  it("合法 slug → 归一化小写落库，扣 10 积分，url 返回 /p/{slug}", async () => {
+    const res = await createUpload(baseUpload({ user, title: "t", content: "<p>ok</p>", customSlug: " My-Page " }));
+    expect(repo.slugExists).toHaveBeenCalledWith(expect.anything(), "my-page");
+    expect(repo.insertPageRecord).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ slug: "my-page" }));
+    expect(repo.deductPoints).toHaveBeenCalledWith(expect.anything(), "u1", 10);
+    expect(res.url).toBe("/p/my-page");
+  });
+
+  it("格式非法 → 400", async () => {
+    await expect(
+      createUpload(baseUpload({ user, title: "t", content: "x", customSlug: "abc!" }))
+    ).rejects.toMatchObject({ status: 400 });
+    expect(repo.insertPageRecord).not.toHaveBeenCalled();
+  });
+
+  it("长度不合规 → 400", async () => {
+    await expect(
+      createUpload(baseUpload({ user, title: "t", content: "x", customSlug: "ab" }))
+    ).rejects.toMatchObject({ status: 400 });
+  });
+
+  it("保留字 → 400", async () => {
+    await expect(
+      createUpload(baseUpload({ user, title: "t", content: "x", customSlug: "md2html" }))
+    ).rejects.toMatchObject({ status: 400 });
+  });
+
+  it("已被占用 → 409", async () => {
+    vi.mocked(repo.slugExists).mockResolvedValue(true);
+    await expect(
+      createUpload(baseUpload({ user, title: "t", content: "x", customSlug: "my-page" }))
+    ).rejects.toMatchObject({ status: 409 });
+    expect(repo.insertPageRecord).not.toHaveBeenCalled();
+  });
+
+  it("并发竞态 UNIQUE 冲突 → 409", async () => {
+    vi.mocked(repo.insertPageRecord).mockRejectedValue(new Error("UNIQUE constraint failed: page.slug"));
+    await expect(
+      createUpload(baseUpload({ user, title: "t", content: "x", customSlug: "my-page" }))
+    ).rejects.toMatchObject({ status: 409 });
+  });
+
+  it("slug 费用计入积分不足校验 → 403 且消息含自定义地址", async () => {
+    vi.mocked(repo.getUserPoints).mockResolvedValue(5);
+    const p = createUpload(baseUpload({ user, title: "t", content: "x", customSlug: "my-page" }));
+    await expect(p).rejects.toBeInstanceOf(ServiceError);
+    await p.catch((e: any) => {
+      expect(e.status).toBe(403);
+      expect(e.message).toContain("自定义地址需 10 积分");
+    });
+  });
+
+  it("匿名上传忽略 customSlug → 不校验、不落库、url 为随机 id", async () => {
+    const res = await createUpload(baseUpload({ customSlug: "my-page", content: "<p>hi</p>" }));
+    expect(repo.slugExists).not.toHaveBeenCalled();
+    expect(repo.insertPageRecord).not.toHaveBeenCalled();
+    expect(res.url).toMatch(/^\/p\/[a-zA-Z0-9_-]{7}$/);
+  });
+
+  it("未填 slug → url 返回随机 id", async () => {
+    const res = await createUpload(baseUpload({ user, title: "t", content: "x" }));
+    expect(res.url).toBe(`/p/${res.id}`);
+  });
+});
+
+// ───────────────────────────────────────────────
+// serveUserPage — 自定义地址解析
+// ───────────────────────────────────────────────
+describe("serveUserPage — 自定义地址", () => {
+  function makeObjBucket(acceptKey: string) {
+    return {
+      get: vi.fn(async (key: string) =>
+        key === acceptKey
+          ? { key, text: async () => "<p>hi</p>", arrayBuffer: async () => new ArrayBuffer(4), uploaded: new Date() }
+          : null
+      ),
+    } as any;
+  }
+
+  it("slug 解析 → 按真实 id 取 HTML，浏览量按 id 累加", async () => {
+    const bucket = makeObjBucket("realid/index.html");
+    vi.mocked(repo.getPageIdBySlug).mockResolvedValue("realid");
+    vi.mocked(repo.getPageRecord).mockResolvedValue(makeRow({ id: "realid" }));
+    vi.mocked(repo.getPageMeta).mockResolvedValue({ title: "T", category: "general", tags: "" });
+
+    const res = await serveUserPage({ d1: {} as any, bucket }, "my-page", "zh");
+    expect(res.status).toBe(200);
+    expect(bucket.get).toHaveBeenCalledWith("realid/index.html");
+    expect(repo.incrementPageViewCount).toHaveBeenCalledWith(expect.anything(), "realid");
+  });
+
+  it("slug + 资产路径 → 按真实 id 取资产", async () => {
+    const bucket = makeObjBucket("realid/img.png");
+    vi.mocked(repo.getPageIdBySlug).mockResolvedValue("realid");
+
+    const res = await serveUserPage({ d1: {} as any, bucket }, "my-page/img.png", "zh");
+    expect(res.status).toBe(200);
+    expect(bucket.get).toHaveBeenCalledWith("realid/img.png");
+  });
+
+  it("未知 slug → 404", async () => {
+    const res = await serveUserPage({ d1: {} as any, bucket: makeBucket() }, "no-such-slug", "zh");
+    expect(res.status).toBe(404);
   });
 });

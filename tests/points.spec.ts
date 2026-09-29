@@ -8,8 +8,10 @@ import {
   MAX_USER_CONTENT_SIZE,
   POINTS_PER_SIZE_BLOCK,
   SIZE_BLOCK_BYTES,
+  POINTS_PER_CUSTOM_SLUG,
   computeSizeFeePoints,
   computeUploadFees,
+  validateCustomSlug,
 } from "../shared/types/pages";
 import { deductPointsAndAddBonus, deductPoints } from "../server/features/pages/pages.repo";
 
@@ -23,6 +25,10 @@ describe("积分常量", () => {
 
   it("每个额外链接消耗 10 积分", () => {
     expect(POINTS_PER_UPLOAD).toBe(10);
+  });
+
+  it("自定义地址消耗 10 积分", () => {
+    expect(POINTS_PER_CUSTOM_SLUG).toBe(10);
   });
 
   it("新用户初始积分为 50", () => {
@@ -531,7 +537,7 @@ describe("computeUploadFees", () => {
 
   it("匿名 → 全免，视为可负担", () => {
     const r = computeUploadFees({ ...base, isAnonymous: true, contentBytes: 40 * MB, points: 0 });
-    expect(r).toEqual({ quotaFee: 0, sizeFee: 0, totalFee: 0, affordable: true });
+    expect(r).toEqual({ quotaFee: 0, sizeFee: 0, slugFee: 0, totalFee: 0, affordable: true });
   });
 
   it("会员 → 无配额费，但尺寸费照付", () => {
@@ -544,7 +550,7 @@ describe("computeUploadFees", () => {
 
   it("非会员未超免费页面数且未超尺寸 → 全免", () => {
     const r = computeUploadFees({ ...base, pageCount: 4, contentBytes: 5 * MB });
-    expect(r).toEqual({ quotaFee: 0, sizeFee: 0, totalFee: 0, affordable: true });
+    expect(r).toEqual({ quotaFee: 0, sizeFee: 0, slugFee: 0, totalFee: 0, affordable: true });
   });
 
   it("非会员恰好用满免费页面数 → 收配额费", () => {
@@ -582,5 +588,75 @@ describe("computeUploadFees", () => {
     expect(r.quotaFee).toBe(0);
     expect(r.sizeFee).toBe(20);
     expect(r.affordable).toBe(true);
+  });
+
+  it("使用自定义地址 → 收 slugFee", () => {
+    const r = computeUploadFees({ ...base, contentBytes: MB, customSlug: true });
+    expect(r.slugFee).toBe(10);
+    expect(r.totalFee).toBe(10);
+    expect(r.affordable).toBe(true);
+  });
+
+  it("匿名 + customSlug → 仍全免", () => {
+    const r = computeUploadFees({ ...base, isAnonymous: true, customSlug: true, points: 0 });
+    expect(r.slugFee).toBe(0);
+    expect(r.totalFee).toBe(0);
+  });
+
+  it("配额费 + 尺寸费 + 地址费 三者叠加", () => {
+    const r = computeUploadFees({
+      ...base,
+      pageCount: 5,
+      userLimit: 5,
+      contentBytes: 7 * MB,
+      customSlug: true,
+      points: 50,
+    });
+    expect(r.totalFee).toBe(30);
+    expect(r.affordable).toBe(true);
+  });
+
+  it("三费叠加但积分不足 → affordable=false", () => {
+    const r = computeUploadFees({
+      ...base,
+      pageCount: 5,
+      userLimit: 5,
+      contentBytes: 7 * MB,
+      customSlug: true,
+      points: 29,
+    });
+    expect(r.totalFee).toBe(30);
+    expect(r.affordable).toBe(false);
+  });
+});
+
+// ───────────────────────────────────────────────
+// 11. validateCustomSlug 自定义地址校验
+// ───────────────────────────────────────────────
+describe("validateCustomSlug", () => {
+  it("合法地址 → ok", () => {
+    expect(validateCustomSlug("my-page")).toBe("ok");
+    expect(validateCustomSlug("abc")).toBe("ok");
+    expect(validateCustomSlug("a1-b2-c3")).toBe("ok");
+  });
+
+  it("长度不合规 → length", () => {
+    expect(validateCustomSlug("ab")).toBe("length");
+    expect(validateCustomSlug("a".repeat(31))).toBe("length");
+  });
+
+  it("格式不合规 → invalid", () => {
+    expect(validateCustomSlug("-abc")).toBe("invalid");
+    expect(validateCustomSlug("abc-")).toBe("invalid");
+    expect(validateCustomSlug("My-Page")).toBe("invalid");
+    expect(validateCustomSlug("a b")).toBe("invalid");
+    expect(validateCustomSlug("a_b")).toBe("invalid");
+  });
+
+  it("保留字 → reserved", () => {
+    expect(validateCustomSlug("api")).toBe("reserved");
+    expect(validateCustomSlug("md2html")).toBe("reserved");
+    expect(validateCustomSlug("showcase")).toBe("reserved");
+    expect(validateCustomSlug("zh")).toBe("length"); // 2 位先触发 length
   });
 });

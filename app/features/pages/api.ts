@@ -60,7 +60,7 @@ export async function fetchPageContent(pageId: string): Promise<PageContentRespo
 /** 更新页面元数据（可选带 HTML 内容），JSON 方式 */
 export async function updatePageMeta(
   pageId: string,
-  body: { title?: string; category?: string; tags?: string; content?: string }
+  body: { title?: string; category?: string; tags?: string; slug?: string; content?: string }
 ): Promise<{ ok: boolean; error?: string }> {
   const client = apiClient().api.pages[":id"];
   // 先赋值再传参：PATCH 路由动态解析 body，RPC 输入类型未包含 json，
@@ -97,6 +97,19 @@ export async function uploadPageThumbnail(formData: FormData): Promise<{ ok: boo
   const res = await apiClient().api["upload-thumbnail"].$post({ form: formDataToObject(formData) });
   if (!res.ok) return { ok: false, error: await rpcErrorMessage(res) };
   return { ok: true };
+}
+
+/** 自定义地址可用性检查结果 */
+export interface SlugCheckResponse {
+  available: boolean;
+  reason?: "length" | "invalid" | "reserved" | "taken";
+}
+
+/** 检查自定义地址 /p/{slug} 是否可用 */
+export async function checkSlugAvailable(slug: string): Promise<SlugCheckResponse> {
+  const res = await apiClient().api.slug.available.$get({ query: { slug } });
+  if (!res.ok) throw new Error(await rpcErrorMessage(res));
+  return res.json();
 }
 
 // --- API Key management ---

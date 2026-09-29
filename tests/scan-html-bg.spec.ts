@@ -18,6 +18,7 @@ vi.mock("../server/features/pages/pages.storage", () => ({
 vi.mock("../server/features/pages/pages.repo", () => ({
   deletePageRecord: vi.fn(),
   getPageRecord: vi.fn(),
+  getPageIdBySlug: vi.fn(),
   getPageMeta: vi.fn(),
   incrementPageViewCount: vi.fn(),
 }));

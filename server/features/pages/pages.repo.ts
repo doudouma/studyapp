@@ -72,6 +72,8 @@ export async function countUserPages(d1: D1Database, userId: string): Promise<nu
 
 export interface UserPageRow {
   id: string;
+  userId: string | null;
+  slug: string | null;
   title: string | null;
   category: string | null;
   tags: string | null;
@@ -92,6 +94,8 @@ export async function listUserPages(
   return db
     .select({
       id: page.id,
+      userId: page.userId,
+      slug: page.slug,
       title: page.title,
       category: page.category,
       tags: page.tags,
@@ -134,6 +138,20 @@ export async function getPageRecord(d1: D1Database, pageId: string) {
   const db = createDb(d1);
   const rows = await db.select().from(page).where(eq(page.id, pageId)).limit(1);
   return rows[0] ?? null;
+}
+
+/** 按自定义地址查页面 id，不存在返回 null */
+export async function getPageIdBySlug(d1: D1Database, slug: string): Promise<string | null> {
+  const db = createDb(d1);
+  const rows = await db.select({ id: page.id }).from(page).where(eq(page.slug, slug)).limit(1);
+  return rows[0]?.id ?? null;
+}
+
+/** 自定义地址是否已被占用 */
+export async function slugExists(d1: D1Database, slug: string): Promise<boolean> {
+  const db = createDb(d1);
+  const rows = await db.select({ id: page.id }).from(page).where(eq(page.slug, slug)).limit(1);
+  return rows.length > 0;
 }
 
 export async function insertPageRecord(d1: D1Database, values: typeof page.$inferInsert) {

@@ -1,4 +1,4 @@
-import { useState, useRef, memo, useMemo, useCallback } from "react";
+import { useState, useRef, useEffect, memo, useMemo, useCallback } from "react";
 import { ArrowDown, Code2, Clock, Infinity, Tags, Share2, List, Crown, LogIn, Loader2, Puzzle } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { DropZone } from "~/components/DropZone";
@@ -23,8 +23,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useAuth } from "~/lib/auth-context";
 import { useTranslation } from "react-i18next";
 import i18n from "~/lib/i18n";
-import { uploadPage } from "~/features/pages/api";
-import { MAX_CONTENT_SIZE, MAX_USER_CONTENT_SIZE, computeUploadFees } from "@shared/types/pages";
+import { uploadPage, checkSlugAvailable } from "~/features/pages/api";
+import { MAX_CONTENT_SIZE, MAX_USER_CONTENT_SIZE, POINTS_PER_CUSTOM_SLUG, computeUploadFees } from "@shared/types/pages";
 import type { UploadResult } from "@shared/types/pages";
 
 export const Route = createFileRoute("/")({
@@ -42,6 +42,9 @@ export const Route = createFileRoute("/")({
 
 type TabMode = "paste" | "drop";
 
+/** 自定义地址可用性状态 */
+type SlugStatus = "idle" | "checking" | "ok" | "length" | "invalid" | "reserved" | "taken";
+
 function UploadForm({
   mode,
   setMode,
@@ -57,6 +60,9 @@ function UploadForm({
   setTags,
   shareToSquare,
   setShareToSquare,
+  slug,
+  setSlug,
+  slugStatus,
   loading,
   error,
   handleSubmit,
@@ -81,6 +87,9 @@ function UploadForm({
   setTags: (v: string[]) => void;
   shareToSquare: boolean;
   setShareToSquare: (v: boolean) => void;
+  slug: string;
+  setSlug: (v: string) => void;
+  slugStatus: SlugStatus;
   loading: boolean;
   error: string | null;
   handleSubmit: () => void;
@@ -161,6 +170,39 @@ function UploadForm({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
+            </div>
+
+            <div className="mb-3">
+              <label className="text-sm font-medium text-foreground">
+                {t("home.form.slug")}{" "}
+                <span className="font-normal text-muted-foreground">
+                  {t("home.form.slugFeeHint", { points: POINTS_PER_CUSTOM_SLUG })}
+                </span>
+              </label>
+              <div className="mt-1 flex">
+                <span className="inline-flex items-center rounded-l-lg border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground">
+                  /p/
+                </span>
+                <Input
+                  className="rounded-l-none"
+                  placeholder={t("home.form.slugPlaceholder")}
+                  value={slug}
+                  onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/\s+/g, ""))}
+                />
+              </div>
+              {slug.trim() && slugStatus !== "idle" && (
+                <p
+                  className={`mt-1 text-xs ${
+                    slugStatus === "ok"
+                      ? "text-[#006c49] dark:text-[#4edea3]"
+                      : slugStatus === "checking"
+                        ? "text-muted-foreground"
+                        : "text-destructive"
+                  }`}
+                >
+                  {t(`home.form.slugStatus.${slugStatus}`)}
+                </p>
+              )}
             </div>
 
             <div className="mb-3">
@@ -327,6 +369,8 @@ function HomePage() {
   const [category, setCategory] = useState("general");
   const [tags, setTags] = useState<string[]>([]);
   const [shareToSquare, setShareToSquare] = useState(false);
+  const [slug, setSlug] = useState("");
+  const [slugStatus, setSlugStatus] = useState<SlugStatus>("idle");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<UploadResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -344,7 +388,27 @@ function HomePage() {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
-  // 配额费（非会员超出免费链接数）+ 尺寸费（内容超过 5MB），二者叠加
+  // 自定义地址防抖可用性检查（与服务端同一套校验规则，服务端仍会最终校验）
+  useEffect(() => {
+    const s = slug.trim();
+    if (!s) {
+      setSlugStatus("idle");
+      return;
+    }
+    setSlugStatus("checking");
+    const timer = setTimeout(async () => {
+      try {
+        const r = await checkSlugAvailable(s);
+        setSlugStatus(r.available ? "ok" : r.reason ?? "taken");
+      } catch {
+        // 检查失败不锁定状态，等待用户下次输入重试
+        setSlugStatus("idle");
+      }
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [slug]);
+
+  // 配额费（非会员超出免费链接数）+ 尺寸费（内容超过 5MB）+ 自定义地址费，三者叠加
   const maxBytes = user ? MAX_USER_CONTENT_SIZE : MAX_CONTENT_SIZE;
   const fees = computeUploadFees({
     isAnonymous: !user,
@@ -353,6 +417,7 @@ function HomePage() {
     userLimit: limit,
     contentBytes: contentSize,
     points,
+    customSlug: !!slug.trim(),
   });
   const sizeFee = fees.sizeFee;
   const totalFee = fees.totalFee;
@@ -362,7 +427,8 @@ function HomePage() {
   const canSubmit =
     (mode === "paste" ? htmlContent.trim().length > 0 : file !== null) &&
     (!user || title.trim().length > 0) &&
-    contentSize <= maxBytes;
+    contentSize <= maxBytes &&
+    (!slug.trim() || slugStatus === "ok");
 
   const doSubmit = async () => {
     setLoading(true);
@@ -382,6 +448,9 @@ function HomePage() {
       formData.append("category", category);
       formData.append("tags", tags.join(","));
       formData.append("shareToSquare", String(shareToSquare));
+      if (user && slug.trim()) {
+        formData.append("customSlug", slug.trim());
+      }
 
       const result = await uploadPage(formData);
       if (!result.ok) {
@@ -423,6 +492,8 @@ function HomePage() {
     setTitle("");
     setTags([]);
     setShareToSquare(false);
+    setSlug("");
+    setSlugStatus("idle");
     setError(null);
   };
 
@@ -483,6 +554,9 @@ function HomePage() {
             setTags={setTags}
             shareToSquare={shareToSquare}
             setShareToSquare={setShareToSquare}
+            slug={slug}
+            setSlug={setSlug}
+            slugStatus={slugStatus}
             loading={loading}
             error={error}
             handleSubmit={handleSubmit}

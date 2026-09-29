@@ -27,6 +27,71 @@ export const POINTS_PER_SIZE_BLOCK = 10;
 /** 尺寸计费块大小（5MB） */
 export const SIZE_BLOCK_BYTES = 5 * 1024 * 1024;
 
+/** 自定义地址（slug）每次收费 */
+export const POINTS_PER_CUSTOM_SLUG = 10;
+
+/** 自定义地址长度下限 */
+export const CUSTOM_SLUG_MIN = 3;
+
+/** 自定义地址长度上限 */
+export const CUSTOM_SLUG_MAX = 30;
+
+/**
+ * 自定义地址保留字：顶层路由、系统路径与语言前缀，
+ * 防止自定义地址与站点功能路由冲突。
+ */
+export const RESERVED_SLUGS: ReadonlySet<string> = new Set([
+  // 顶层功能路由
+  "md2html",
+  "any2md",
+  "freetool",
+  "showcase",
+  "square",
+  "rhythm",
+  "pomodoro",
+  "petsafe",
+  "petbadge",
+  "papercut",
+  "view",
+  "idphoto",
+  "wardrobe",
+  "admin",
+  "links",
+  "terms",
+  "privacy",
+  "cookie",
+  "contact",
+  // 系统路径
+  "api",
+  "auth",
+  "assets",
+  "p",
+  "thumbnails",
+  "tmp",
+  "sitemap",
+  "robots",
+  // 语言前缀
+  "zh",
+  "en",
+  "es",
+  "pt",
+  "fr",
+]);
+
+/** 自定义地址格式：小写字母/数字/连字符，首尾必须为字母或数字 */
+const CUSTOM_SLUG_RE = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
+
+/**
+ * 校验自定义地址格式。前后端共用，保证前端实时校验与服务端一致。
+ * 返回 "ok" 或具体不通过原因（length/invalid/reserved）。
+ */
+export function validateCustomSlug(slug: string): "ok" | "length" | "invalid" | "reserved" {
+  if (slug.length < CUSTOM_SLUG_MIN || slug.length > CUSTOM_SLUG_MAX) return "length";
+  if (!CUSTOM_SLUG_RE.test(slug)) return "invalid";
+  if (RESERVED_SLUGS.has(slug)) return "reserved";
+  return "ok";
+}
+
 /**
  * 依据内容尺寸计算尺寸费（积分）。
  * ≤ FREE_CONTENT_SIZE 免费；此后每 SIZE_BLOCK_BYTES（不足一块按一块）
@@ -52,6 +117,8 @@ export interface UploadFeeContext {
   contentBytes: number;
   /** 用户当前积分（匿名传 0） */
   points: number;
+  /** 是否使用自定义地址（slug），登录用户收取 POINTS_PER_CUSTOM_SLUG */
+  customSlug?: boolean;
 }
 
 /** 上传/更新费用明细 */
@@ -60,7 +127,9 @@ export interface UploadFeeBreakdown {
   quotaFee: number;
   /** 尺寸费：内容超过 FREE_CONTENT_SIZE 的按块费用，匿名为 0 */
   sizeFee: number;
-  /** 总费用 = 配额费 + 尺寸费（叠加，互不替代） */
+  /** 自定义地址费：使用自定义地址时为 POINTS_PER_CUSTOM_SLUG，匿名为 0 */
+  slugFee: number;
+  /** 总费用 = 配额费 + 尺寸费 + 自定义地址费（叠加，互不替代） */
   totalFee: number;
   /** 积分是否足够支付总费用 */
   affordable: boolean;
@@ -68,18 +137,20 @@ export interface UploadFeeBreakdown {
 
 /**
  * 计算一次上传/更新的费用明细。
- * 规则：匿名全程免费；会员免配额费但尺寸费照付；
- * 非会员超出免费页面数收配额费，超出免费尺寸收尺寸费，二者叠加。
+ * 规则：匿名全程免费；会员免配额费但尺寸费与自定义地址费照付；
+ * 非会员超出免费页面数收配额费，超出免费尺寸收尺寸费，
+ * 使用自定义地址收地址费，三者叠加。
  */
 export function computeUploadFees(ctx: UploadFeeContext): UploadFeeBreakdown {
   if (ctx.isAnonymous) {
-    return { quotaFee: 0, sizeFee: 0, totalFee: 0, affordable: true };
+    return { quotaFee: 0, sizeFee: 0, slugFee: 0, totalFee: 0, affordable: true };
   }
   const quotaFee =
     !ctx.isMember && ctx.pageCount >= ctx.userLimit ? POINTS_PER_UPLOAD : 0;
   const sizeFee = computeSizeFeePoints(ctx.contentBytes);
-  const totalFee = quotaFee + sizeFee;
-  return { quotaFee, sizeFee, totalFee, affordable: ctx.points >= totalFee };
+  const slugFee = ctx.customSlug ? POINTS_PER_CUSTOM_SLUG : 0;
+  const totalFee = quotaFee + sizeFee + slugFee;
+  return { quotaFee, sizeFee, slugFee, totalFee, affordable: ctx.points >= totalFee };
 }
 
 export interface PageOwnerInfo {
@@ -108,6 +179,8 @@ export interface MeResponse {
 /** 用户页面列表项（登录用户的"我的页面"） */
 export interface UserPageItem {
   id: string;
+  /** 自定义地址，null 表示使用随机 ID */
+  slug: string | null;
   title: string;
   category: string;
   tags: string;

@@ -75,6 +75,7 @@ export const apiKey = sqliteTable("api_key", {
 export const page = sqliteTable("page", {
   id: text("id").primaryKey(),               // nanoid(7), same as R2 key
   userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
+  slug: text("slug").unique(),               // 自定义地址（/p/{slug}），空为随机 ID；R2 仍以 id 为 key
   title: text("title").default(""),
   category: text("category").default("general"),
   tags: text("tags").default(""),
