@@ -642,7 +642,8 @@ describe("validateCustomSlug", () => {
 
   it("长度不合规 → length", () => {
     expect(validateCustomSlug("ab")).toBe("length");
-    expect(validateCustomSlug("a".repeat(31))).toBe("length");
+    expect(validateCustomSlug("a".repeat(51))).toBe("length");
+    expect(validateCustomSlug("a".repeat(50))).toBe("ok");
   });
 
   it("格式不合规 → invalid", () => {

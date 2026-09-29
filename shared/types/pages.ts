@@ -34,7 +34,7 @@ export const POINTS_PER_CUSTOM_SLUG = 10;
 export const CUSTOM_SLUG_MIN = 3;
 
 /** 自定义地址长度上限 */
-export const CUSTOM_SLUG_MAX = 30;
+export const CUSTOM_SLUG_MAX = 50;
 
 /**
  * 自定义地址保留字：顶层路由、系统路径与语言前缀，

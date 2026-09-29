@@ -722,7 +722,7 @@
   "home.form.slugStatus.idle": "",
   "home.form.slugStatus.checking": "Vérification de la disponibilité...",
   "home.form.slugStatus.ok": "Lien disponible",
-  "home.form.slugStatus.length": "Doit contenir entre 3 et 30 caractères",
+  "home.form.slugStatus.length": "Doit contenir entre 3 et 50 caractères",
   "home.form.slugStatus.invalid": "Lettres minuscules, chiffres et tirets uniquement",
   "home.form.slugStatus.reserved": "Ce lien est réservé",
   "home.form.slugStatus.taken": "Ce lien est déjà utilisé",
