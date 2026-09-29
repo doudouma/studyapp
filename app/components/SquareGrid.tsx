@@ -28,7 +28,7 @@ function PreviewCell({ item, index }: { item: SquareItem; index: number }) {
   if (showIframe || !item.previewPath) {
     return (
       <iframe
-        src={`/p/${item.id}`}
+        src={`/p/${item.slug ?? item.id}`}
         className="absolute inset-0 w-full h-full pointer-events-none"
         sandbox="allow-scripts"
         title={item.title}
@@ -91,7 +91,7 @@ export function SquareGrid({ items }: SquareGridProps) {
         >
           {/* HTML preview via iframe */}
           <a
-            href={`/p/${item.id}`}
+            href={`/p/${item.slug ?? item.id}`}
             target="_blank"
             className="relative block overflow-hidden"
           >

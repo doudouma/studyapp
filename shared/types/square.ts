@@ -8,6 +8,8 @@ export const SQUARE_PAGE_SIZE = 12;
 /** 广场列表单项 (面向前端的 DTO，不暴露数据库内部结构) */
 export interface SquareItem {
   id: string;
+  /** 自定义地址，null 表示使用随机 ID；展示链接用 slug 优先 */
+  slug: string | null;
   title: string;
   category: string;
   tags: string;

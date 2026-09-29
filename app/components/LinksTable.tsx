@@ -50,16 +50,16 @@ function formatDate(ts: number): string {
   return `${y}/${m}/${day}`;
 }
 
-function QrPopover({ pageId, onClose }: { pageId: string; onClose: () => void }) {
+function QrPopover({ pagePath, onClose }: { pagePath: string; onClose: () => void }) {
   const [qrSvg, setQrSvg] = useState("");
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const url = `${window.location.origin}/p/${pageId}`;
+    const url = `${window.location.origin}${pagePath}`;
     import("qrcode/lib/browser.js").then((QRCode) => {
       QRCode.toString(url, { type: "svg", width: 160, margin: 2 }).then(setQrSvg);
     });
-  }, [pageId]);
+  }, [pagePath]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -232,14 +232,14 @@ export function LinksTable({ pages, total, limit, page = 1, totalPages = 1, onPa
                           <QrCode className="size-4" />
                         </Button>
                         {qrId === pg.id && (
-                          <QrPopover pageId={pg.id} onClose={() => setQrId(null)} />
+                          <QrPopover pagePath={`/p/${pg.slug ?? pg.id}`} onClose={() => setQrId(null)} />
                         )}
                         <Button
                           variant="ghost"
                           size="icon"
                           className="size-8"
                           title={t("common.view")}
-                          onClick={() => window.open(`/p/${pg.id}`, "_blank")}
+                          onClick={() => window.open(`/p/${pg.slug ?? pg.id}`, "_blank")}
                         >
                           <ExternalLink className="size-4" />
                         </Button>
@@ -248,7 +248,7 @@ export function LinksTable({ pages, total, limit, page = 1, totalPages = 1, onPa
                           size="icon"
                           className="size-8"
                           title={t("common.copy")}
-                          onClick={() => handleCopy(pg.id)}
+                          onClick={() => handleCopy(pg.slug ?? pg.id)}
                         >
                           {copiedId === pg.id ? (
                             <span className="text-xs font-medium text-primary">{t("common.copied")}</span>

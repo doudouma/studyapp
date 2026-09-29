@@ -17,6 +17,7 @@ import {
 function toSquareItem(row: SharedPageRow): SquareItem {
   return {
     id: row.id,
+    slug: row.slug ?? null,
     title: row.title || "",
     category: row.category || "general",
     tags: row.tags || "",

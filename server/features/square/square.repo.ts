@@ -10,6 +10,7 @@ import { page, user } from "../../db/schema";
 /** 广场列表查询的原始行结构 (sharedAt 为 Date，由 service 层转换) */
 export interface SharedPageRow {
   id: string;
+  slug: string | null;
   title: string | null;
   category: string | null;
   tags: string | null;
@@ -30,6 +31,7 @@ export async function listSharedPages(
   return db
     .select({
       id: page.id,
+      slug: page.slug,
       title: page.title,
       category: page.category,
       tags: page.tags,
