@@ -242,7 +242,11 @@ function LinksPage() {
               page={page}
               totalPages={Math.max(1, Math.ceil((data?.total || 0) / pageSize))}
               onPageChange={setPage}
-              onRefresh={fetchPages}
+              onRefresh={() => {
+                fetchPages();
+                // 编辑可能扣了积分（自定义地址费/尺寸费），同步刷新导航与统计卡的积分显示
+                refreshAuth();
+              }}
               onDelete={(id) => {
                 if (!data) return;
                 const remaining = data.pages.filter((p) => p.id !== id);
