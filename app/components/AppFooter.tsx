@@ -97,11 +97,11 @@ export function AppFooter() {
         >
           MossAI Tools
         </a>
-        <BadgeLink
+        {/* <BadgeLink
           href="https://dironix.com"
           imgSrc="https://dironix.com/bage.png"
           label="dironix.com"
-        />
+        /> */}
         <BadgeLink
           href="https://gets.tools"
           imgSrc="https://gets.tools/badge/badge_light.svg"
