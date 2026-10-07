@@ -127,6 +127,11 @@ export function AppFooter() {
           imgSrc="https://tooldirs.com/badge/badge_light.svg"
           label="Featured on ToolDirs"
         />
+        <BadgeLink
+          href="https://firstlook.tools"
+          imgSrc="https://firstlook.tools/badge/badge_transparent.svg"
+          label="Featured on First Look"
+        />
       </div>
     </footer>
   );
