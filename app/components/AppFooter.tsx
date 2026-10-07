@@ -132,6 +132,11 @@ export function AppFooter() {
           imgSrc="https://firstlook.tools/badge/badge_transparent.svg"
           label="Featured on First Look"
         />
+        <BadgeLink
+          href="https://shipgrowth.dev"
+          imgSrc="https://storage.shipgrowth.dev/badge-light.png"
+          label="Featured on ShipGrowth"
+        />
       </div>
     </footer>
   );
