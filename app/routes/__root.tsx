@@ -160,6 +160,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <body>
           <div id="root">{children}</div>
           <Scripts />
+          {/* TRTC Knocket SDK — async 加载，不阻塞渲染 */}
+          <script async src="https://trtc.io/knocket-sdk/sdk.js?identifier=3e226a1d769ff3442f&v=1791514668378"></script>
         </body>
       </html>
     );
