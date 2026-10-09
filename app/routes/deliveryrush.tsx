@@ -10,7 +10,7 @@ import { ShareModal } from "~/components/share/ShareModal";
 import "./deliveryrush.css";
 
 // 页面专属社交分享卡图（og:image / twitter:image），不用站点默认图
-const OG_IMAGE = BASE_URL + "/og-deliveryrush.png";
+const OG_IMAGE = BASE_URL + "/og-deliveryrush.jpg";
 
 export const Route = createFileRoute("/deliveryrush")({
   head: () => {
@@ -38,8 +38,8 @@ export const Route = createFileRoute("/deliveryrush")({
         { property: "og:title", content: i18n.t("deliveryrush.title") },
         { property: "og:description", content: i18n.t("deliveryrush.desc") },
         { property: "og:image", content: OG_IMAGE },
-        { property: "og:image:width", content: "1668" },
-        { property: "og:image:height", content: "1328" },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "955" },
         { property: "og:site_name", content: "100mini" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: i18n.t("deliveryrush.title") },
