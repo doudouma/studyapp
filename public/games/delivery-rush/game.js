@@ -64,7 +64,7 @@ function bgmStop(){ if(AU.bgm){clearInterval(AU.bgm);AU.bgm=null} }
 
 /* ================= three setup ================= */
 const canvas=$('gl');
-const renderer=new T.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
+const renderer=new T.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance',preserveDrawingBuffer:true});
 renderer.outputEncoding=T.sRGBEncoding;
 renderer.shadowMap.enabled=true; renderer.shadowMap.type=T.PCFSoftShadowMap;
 const scene=new T.Scene();

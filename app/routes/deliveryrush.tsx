@@ -3,11 +3,14 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronDown, Maximize, Minimize, Share2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import i18n, { getBcp47 } from "~/lib/i18n";
-import { withLangPrefix, currentLang, BASE_URL, DEFAULT_OG_IMAGE } from "~/lib/seo";
+import { withLangPrefix, currentLang, BASE_URL } from "~/lib/seo";
 import { AppNav } from "~/components/HomeHeader";
 import DeliveryRushGame from "~/components/DeliveryRush/DeliveryRushGame";
 import { ShareModal } from "~/components/share/ShareModal";
 import "./deliveryrush.css";
+
+// 页面专属社交分享卡图（og:image / twitter:image），不用站点默认图
+const OG_IMAGE = BASE_URL + "/og-deliveryrush.png";
 
 export const Route = createFileRoute("/deliveryrush")({
   head: () => {
@@ -34,12 +37,14 @@ export const Route = createFileRoute("/deliveryrush")({
         { property: "og:type", content: "website" },
         { property: "og:title", content: i18n.t("deliveryrush.title") },
         { property: "og:description", content: i18n.t("deliveryrush.desc") },
-        { property: "og:image", content: DEFAULT_OG_IMAGE },
+        { property: "og:image", content: OG_IMAGE },
+        { property: "og:image:width", content: "1668" },
+        { property: "og:image:height", content: "1328" },
         { property: "og:site_name", content: "100mini" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: i18n.t("deliveryrush.title") },
         { name: "twitter:description", content: i18n.t("deliveryrush.desc") },
-        { name: "twitter:image", content: DEFAULT_OG_IMAGE },
+        { name: "twitter:image", content: OG_IMAGE },
       ],
       scripts: [
         {
@@ -85,6 +90,7 @@ export const Route = createFileRoute("/deliveryrush")({
 function DeliveryRushPage() {
   const { t } = useTranslation();
   const gameRef = useRef<HTMLDivElement>(null);
+  const glRef = useRef<HTMLCanvasElement>(null);
   const [isFull, setIsFull] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
 
@@ -131,7 +137,7 @@ function DeliveryRushPage() {
         <section className="relative overflow-hidden bg-gradient-to-b from-[#58b8f5]/10 via-[#58b8f5]/[0.02] to-background dark:from-[#58b8f5]/10 dark:via-[#58b8f5]/[0.02] dark:to-background pb-6 pt-6 sm:pt-10">
           <div className="mx-auto w-full max-w-4xl px-4">
             <div ref={gameRef} id="dr-game" className="relative h-[min(78vh,760px)] min-h-[480px] overflow-hidden rounded-3xl border-2 border-border shadow-lg">
-              <DeliveryRushGame />
+              <DeliveryRushGame canvasRef={glRef} />
             </div>
             <div className="mt-3 flex justify-end gap-2">
               <button
@@ -160,6 +166,7 @@ function DeliveryRushPage() {
               text={t("deliveryrush.share.title")}
               title={t("deliveryrush.share.title")}
               subtitle={t("deliveryrush.share.subtitle")}
+              captureRef={glRef}
               fileName="deliveryrush.png"
             />
           </div>

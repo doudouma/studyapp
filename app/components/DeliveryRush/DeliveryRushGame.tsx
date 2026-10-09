@@ -62,7 +62,12 @@ function loadScript(src: string): Promise<void> {
   });
 }
 
-export default function DeliveryRushGame() {
+export default function DeliveryRushGame({
+  canvasRef,
+}: {
+  /** 把游戏 WebGL canvas 暴露给宿主（用于分享截图） */
+  canvasRef?: React.RefObject<HTMLCanvasElement | null>;
+}) {
   const { t } = useTranslation();
   const [failed, setFailed] = useState(false);
   const bootedRef = useRef(false);
@@ -101,7 +106,7 @@ export default function DeliveryRushGame() {
   return (
     <div className="dr-root h-full w-full" style={{ touchAction: "pan-y" }}>
       <div id="dr-app">
-        <canvas id="gl" width={1440} height={900} />
+        <canvas id="gl" width={1440} height={900} ref={canvasRef} />
 
         <div id="hud" hidden>
           <div id="top">

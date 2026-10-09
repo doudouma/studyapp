@@ -206,13 +206,21 @@ export function ShareModal({
     setGenerating(true);
     try {
       let blob: Blob;
-      if (transparent && el instanceof HTMLCanvasElement) {
+      if (el instanceof HTMLCanvasElement) {
+        // WebGL canvas 无法被 snapdom 可靠序列化（3D 画面会丢失），
+        // 直接 drawImage 复制当前帧到离屏 canvas 生成分享图。
+        // 上限 2560 宽：防止高分屏/大画布下离屏 canvas 过大（内存峰值与 PNG 体积）
+        const scale = Math.min(2, 2560 / el.width);
         const out = document.createElement("canvas");
-        out.width = el.width * 2;
-        out.height = el.height * 2;
+        out.width = Math.round(el.width * scale);
+        out.height = Math.round(el.height * scale);
         const octx = out.getContext("2d");
         if (!octx) throw new Error("No 2D context");
         octx.imageSmoothingQuality = "high";
+        if (!transparent) {
+          octx.fillStyle = "#ffffff";
+          octx.fillRect(0, 0, out.width, out.height);
+        }
         octx.drawImage(el, 0, 0, out.width, out.height);
         blob = await new Promise<Blob>((resolve, reject) =>
           out.toBlob(
