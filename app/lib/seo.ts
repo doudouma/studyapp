@@ -110,6 +110,8 @@ function pageKeys(basePath: string): { name: string; desc: string } {
       return { name: "rhythm.brand", desc: "rhythm.desc" };
     case "/papercut":
       return { name: "papercut.seo.heading", desc: "papercut.desc" };
+    case "/deliveryrush":
+      return { name: "deliveryrush.seo.heading", desc: "deliveryrush.desc" };
     case "/links":
       return { name: "profile.heading", desc: "profile.desc" };
     case "/contact":

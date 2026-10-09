@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Timer, Music, FileText, FileCode2, Camera, ArrowRight, Sparkles, PawPrint, ShieldAlert, Scissors } from "lucide-react";
+import { Timer, Music, FileText, FileCode2, Camera, ArrowRight, Sparkles, PawPrint, ShieldAlert, Scissors, Truck } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { useTranslation } from "react-i18next";
@@ -82,6 +82,12 @@ export const Route = createFileRoute("/freetool")({
                 name: i18n.t("freetool.item.papercut.title"),
                 url: "https://100mini.com/papercut",
               },
+              {
+                "@type": "ListItem",
+                position: 9,
+                name: i18n.t("freetool.item.deliveryrush.title"),
+                url: "https://100mini.com/deliveryrush",
+              },
             ],
           }),
         },
@@ -142,6 +148,12 @@ function FreeToolPage() {
       icon: Scissors,
       title: t("freetool.item.papercut.title"),
       desc: t("freetool.item.papercut.desc"),
+    },
+    {
+      href: "/deliveryrush" as const,
+      icon: Truck,
+      title: t("freetool.item.deliveryrush.title"),
+      desc: t("freetool.item.deliveryrush.desc"),
     },
   ];
 

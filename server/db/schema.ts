@@ -188,3 +188,19 @@ export const scanLog = sqliteTable("scan_log", {
   index("idx_scan_log_page").on(t.pageId),
   index("idx_scan_log_time").on(t.createdAt),
 ]);
+
+// --- Delivery Rush 排行榜 ---
+
+export const deliveryRank = sqliteTable("delivery_rank", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  diff: text("diff").notNull(), // normal / hard / extreme
+  name: text("name").notNull(),
+  score: integer("score").notNull(),
+  delivered: integer("delivered").notNull().default(0),
+  combo: integer("combo").notNull().default(0),
+  playerKey: text("player_key").notNull(), // 设备标识（X-Player-Key）
+  createdAt: integer("created_at").notNull(),
+}, (t) => [
+  index("idx_delivery_rank_diff_score").on(t.diff, t.score),
+  index("idx_delivery_rank_player").on(t.playerKey),
+]);

@@ -233,6 +233,15 @@ export async function scheduled(_event: ScheduledEvent, env: Bindings, _ctx: Exe
     } catch (err) {
       console.error("[cron] log cleanup failed:", err);
     }
+
+    // Cleanup old Delivery Rush rank records (90 days)
+    try {
+      const { cleanupOldRecords } = await import("./../server/features/rank/rank.service");
+      await cleanupOldRecords(env.D1);
+      console.log("[cron] cleaned up old delivery rush rank record(s)");
+    } catch (err) {
+      console.error("[cron] rank cleanup failed:", err);
+    }
   }
 }
 

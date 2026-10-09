@@ -23,6 +23,7 @@ import { Route as Md2htmlRouteImport } from './routes/md2html'
 import { Route as LinksRouteImport } from './routes/links'
 import { Route as IdphotoRouteImport } from './routes/idphoto'
 import { Route as FreetoolRouteImport } from './routes/freetool'
+import { Route as DeliveryrushRouteImport } from './routes/deliveryrush'
 import { Route as CookieRouteImport } from './routes/cookie'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as Any2mdRouteImport } from './routes/any2md'
@@ -101,6 +102,11 @@ const FreetoolRoute = FreetoolRouteImport.update({
   path: '/freetool',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DeliveryrushRoute = DeliveryrushRouteImport.update({
+  id: '/deliveryrush',
+  path: '/deliveryrush',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CookieRoute = CookieRouteImport.update({
   id: '/cookie',
   path: '/cookie',
@@ -143,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/any2md': typeof Any2mdRoute
   '/contact': typeof ContactRoute
   '/cookie': typeof CookieRoute
+  '/deliveryrush': typeof DeliveryrushRoute
   '/freetool': typeof FreetoolRoute
   '/idphoto': typeof IdphotoRoute
   '/links': typeof LinksRoute
@@ -166,6 +173,7 @@ export interface FileRoutesByTo {
   '/any2md': typeof Any2mdRoute
   '/contact': typeof ContactRoute
   '/cookie': typeof CookieRoute
+  '/deliveryrush': typeof DeliveryrushRoute
   '/freetool': typeof FreetoolRoute
   '/idphoto': typeof IdphotoRoute
   '/links': typeof LinksRoute
@@ -190,6 +198,7 @@ export interface FileRoutesById {
   '/any2md': typeof Any2mdRoute
   '/contact': typeof ContactRoute
   '/cookie': typeof CookieRoute
+  '/deliveryrush': typeof DeliveryrushRoute
   '/freetool': typeof FreetoolRoute
   '/idphoto': typeof IdphotoRoute
   '/links': typeof LinksRoute
@@ -215,6 +224,7 @@ export interface FileRouteTypes {
     | '/any2md'
     | '/contact'
     | '/cookie'
+    | '/deliveryrush'
     | '/freetool'
     | '/idphoto'
     | '/links'
@@ -238,6 +248,7 @@ export interface FileRouteTypes {
     | '/any2md'
     | '/contact'
     | '/cookie'
+    | '/deliveryrush'
     | '/freetool'
     | '/idphoto'
     | '/links'
@@ -261,6 +272,7 @@ export interface FileRouteTypes {
     | '/any2md'
     | '/contact'
     | '/cookie'
+    | '/deliveryrush'
     | '/freetool'
     | '/idphoto'
     | '/links'
@@ -285,6 +297,7 @@ export interface RootRouteChildren {
   Any2mdRoute: typeof Any2mdRoute
   ContactRoute: typeof ContactRoute
   CookieRoute: typeof CookieRoute
+  DeliveryrushRoute: typeof DeliveryrushRoute
   FreetoolRoute: typeof FreetoolRoute
   IdphotoRoute: typeof IdphotoRoute
   LinksRoute: typeof LinksRoute
@@ -403,6 +416,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FreetoolRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/deliveryrush': {
+      id: '/deliveryrush'
+      path: '/deliveryrush'
+      fullPath: '/deliveryrush'
+      preLoaderRoute: typeof DeliveryrushRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cookie': {
       id: '/cookie'
       path: '/cookie'
@@ -461,6 +481,7 @@ const rootRouteChildren: RootRouteChildren = {
   Any2mdRoute: Any2mdRoute,
   ContactRoute: ContactRoute,
   CookieRoute: CookieRoute,
+  DeliveryrushRoute: DeliveryrushRoute,
   FreetoolRoute: FreetoolRoute,
   IdphotoRoute: IdphotoRoute,
   LinksRoute: LinksRoute,

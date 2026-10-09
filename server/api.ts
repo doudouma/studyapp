@@ -18,6 +18,7 @@ import { pagesRoutes } from "./features/pages/pages.routes";
 import { adminRoutes } from "./features/admin/admin.routes";
 import { pomodoroRoutes } from "./features/pomodoro/pomodoro.routes";
 import { wardrobeRoutes } from "./features/wardrobe/wardrobe.routes";
+import { rankRoutes } from "./features/rank/rank.routes";
 import { log } from "./lib/log";
 
 type Variables = {
@@ -57,6 +58,7 @@ const STATIC_PAGES: { loc: string; changefreq: string; priority: string }[] = [
   { loc: "/petsafe", changefreq: "weekly", priority: "0.7" },
   { loc: "/petbadge", changefreq: "weekly", priority: "0.7" },
   { loc: "/papercut", changefreq: "weekly", priority: "0.7" },
+  { loc: "/deliveryrush", changefreq: "weekly", priority: "0.7" },
   { loc: "/contact", changefreq: "yearly", priority: "0.3" },
   { loc: "/privacy", changefreq: "yearly", priority: "0.3" },
   { loc: "/terms", changefreq: "yearly", priority: "0.3" },
@@ -189,7 +191,7 @@ api.get("/skill/100mini-upload", (c) => {
 
 
 // Mount feature routers (server/features/*，各自按 repo/service/routes 分层)
-const apiWithFeatures = api.route("/", squareRoutes).route("/", pagesRoutes).route("/", adminRoutes).route("/", pomodoroRoutes).route("/", wardrobeRoutes);
+const apiWithFeatures = api.route("/", squareRoutes).route("/", pagesRoutes).route("/", adminRoutes).route("/", pomodoroRoutes).route("/", wardrobeRoutes).route("/", rankRoutes);
 
 // Hono RPC 类型：前端通过 hc<AppType> 获得端到端类型安全的客户端
 export type AppType = typeof apiWithFeatures;
