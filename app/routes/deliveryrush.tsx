@@ -166,6 +166,7 @@ function DeliveryRushPage() {
         </section>
         <section className="mx-auto w-full max-w-3xl px-4 pb-20 pt-12">
           <h2 className="text-center text-2xl font-bold tracking-tight text-foreground">{t("deliveryrush.guide")}</h2>
+          <p className="mx-auto mt-2 max-w-2xl text-center text-[15px] leading-relaxed text-muted-foreground">{t("deliveryrush.tagline")}</p>
           <div className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
             <h3 className="text-lg font-bold text-primary">{t("deliveryrush.guide.what")}</h3>
             <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">{t("deliveryrush.guide.what.desc")}</p>
