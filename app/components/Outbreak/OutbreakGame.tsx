@@ -37,6 +37,8 @@ const OD_KEYS = [
   "msg.gameoverSub", "msg.timeupSub",
   "res.title",
   "diff.floors", "diff.cap",
+  "item.syringe.name", "item.stick.name",
+  "msg.heal", "msg.gotItem", "msg.kill", "msg.stickCount",
 ] as const;
 
 /** od:result 事件 detail（引擎 lastRes） */
@@ -327,6 +329,7 @@ export default function OutbreakGame({
                 <small>{t("od.hud.cap")}</small>
                 <span id="capText">0 / 6</span>
               </div>
+              <div id="itemHud" hidden />
             </div>
             <div id="btns">
               <button className="ctl" id="btnUp">

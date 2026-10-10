@@ -52,8 +52,8 @@ export function infectionPerSecond(types, scale = 1) {
   return per * scale;
 }
 
-/** 每 120 秒一个强度台阶 */
-const STEP_SEC = 120;
+/** 每 30 秒一个强度台阶 */
+const STEP_SEC = 30;
 
 /**
  * 依据存活秒数与送达数返回当前难度。

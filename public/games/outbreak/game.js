@@ -21,7 +21,7 @@
  * ─────────────────────────────────────────────────────────────────────────
  */
 import {
-  infectionPerSecond, SPIT_INFECTION, SPRAY_INFECTION, LUNGE_INFECTION,
+  infectionPerSecond, SPIT_INFECTION, LUNGE_INFECTION,
   comboMultiplier, packageScore, difficultyAt, rankFor,
 } from "./rules.js";
 
@@ -57,7 +57,16 @@ const PKG={
 };
 const FH=2.4, D=2.6, BX0=-4.6, BX1=4.2, SX0=.9, SX1=3.3, CABX=2.1, QX=.4, QZ=-1.25, VIEW_CX=-.9, VIEW_W=11.8;
 const THREAT_R=3.6; /* 停車時に脅威判定する水平距離（ドア基準） */
-const SPRAY_DOWN=2.4, SPRAY_ALIGN=1.1; /* sprayer：向下噴淋的縱向範圍 / 與電梯對齊的水平範圍 */
+const SPIT_X0=CABX-THREAT_R+.3, SPIT_X1=BX1-1; /* spitter 巡邏範圍：始終保持在可噴酸的對位距離內 */
+/* 测试开关：默认强制刷出的僵尸类型（喷酸者等），不受时间解锁曲线限制；置为 [] 恢复常规难度 */
+const FORCE_ZOMBIES=['spitter'];
+/* 道具类型（V1：针筒 / 棍子）。heal 为针筒回复的感染值；kill 标记棍子。后续道具在此扩展。 */
+const ITEMS={
+  syringe:{name:__('item.syringe.name','針筒'),css:'#7fe0e0',heal:50,weight:.45},
+  stick:  {name:__('item.stick.name','棍子'),  css:'#e8c468',kill:1,weight:.55}
+};
+const ITEM_MAX=3; /* 场上道具上限 */
+const ITEM_SPAWN=[8,16]; /* 刷新间隔（秒） */
 
 /* ================= audio ================= */
 const AU={ctx:null,master:null,on:true,bgm:null,step:0,next:0,fast:false};
@@ -290,7 +299,7 @@ function makePackage(type,dest){
 function killPkg(p){ world.remove(p.v.g); p.lab.material.dispose(); }
 
 /* 僵尸网格（复用 buildCourier 的人形轮廓 + 暗绿/灰调，非血腥） */
-const ZCOL={walker:{skin:'#8a9a7a',cloth:'#3a4a3f',pant:'#2a2f2a'},spitter:{skin:'#9aa878',cloth:'#4a3f5a',pant:'#2e2b3a'},sprayer:{skin:'#c8d06a',cloth:'#6a6a2f',pant:'#4a4a1f'}};
+const ZCOL={walker:{skin:'#8a9a7a',cloth:'#3a4a3f',pant:'#2a2f2a'},spitter:{skin:'#9aa878',cloth:'#4a3f5a',pant:'#2e2b3a'}};
 function buildZombie(type){
   const g=new T.Group(), b=new T.Group(); g.add(b); const u=ZCOL[type].cloth, skin=ZCOL[type].skin;
   const legL=new T.Group(), legR=new T.Group(); legL.position.set(-.12,.42,0); legR.position.set(.12,.42,0); b.add(legL,legR);
@@ -301,19 +310,91 @@ function buildZombie(type){
   SP(up,.05,'#14140f',-.09,1.14,.215); SP(up,.05,'#14140f',.09,1.14,.215);
   B(up,.11,.13,.4,u,-.3,.74,.17,true); B(up,.11,.13,.4,u,.3,.74,.17,true);
   if(type==='spitter'){ SP(up,.2,'#a6d84a',0,.92,.3,true); }
-  else if(type==='sprayer'){ SP(up,.17,'#b6e04a',0,.9,.28,true); B(up,.09,.24,.09,'#7a8a2a',0,1.06,.32,true); B(up,.12,.14,.44,u,-.28,.88,.2,true); B(up,.12,.14,.44,u,.28,.88,.2,true); }
   else { B(up,.4,.02,.3,u,0,.74,.42,true); }
   return {g,b,up,legL,legR};
 }
 function makeZombie(type){
   const fl=1+(Math.random()*(N-1)|0);
   const v=buildZombie(type);
-  const x=type==='walker'?rnd(BX0+1.2,BX1-1.2):type==='sprayer'?clamp(CABX+rnd(-.7,.7),BX0+1,BX1-1):rnd(.4,BX1-1.2);
+  const x=type==='walker'?rnd(BX0+1.2,BX1-1.2):rnd(.4,BX1-1.2);
   const z=-D+.6, y=fl*FH;
   v.g.position.set(x,y,z); world.add(v.g);
-  return {type,v,floor:fl,x,y,z,dir:Math.random()<.5?-1:1,speed:type==='walker'?rnd(.5,.9):0,ph:rnd(0,6),spitT:rnd(.6,1.4)};
+  return {type,v,floor:fl,x,y,z,dir:Math.random()<.5?-1:1,speed:type==='walker'?rnd(.5,.9):type==='spitter'?rnd(.6,.95):0,ph:rnd(0,6),spitT:rnd(.6,1.4),projT:rnd(.6,1.4)};
 }
 function killZombie(z){ world.remove(z.v.g); }
+
+/* ================= 道具（针筒 / 棍子） ================= */
+function buildItem(type){
+  const g=new T.Group();
+  if(type==='syringe'){
+    const body=CY(g,.06,.06,.4,'#e6fbff',0,0,0,true,12); body.rotation.z=Math.PI/2;
+    const liq=CY(g,.045,.045,.28,'#4fd0d0',-.02,0,0,true,12); liq.rotation.z=Math.PI/2;
+    const plunger=CY(g,.052,.052,.1,'#9fd0d8',-.26,0,0,true,10); plunger.rotation.z=Math.PI/2;
+    const needle=CY(g,.012,.012,.2,'#c9d6e0',.3,0,0,true,8); needle.rotation.z=Math.PI/2;
+  } else {
+    const baton=CY(g,.052,.058,.82,'#c08a3e',0,0,0,true,10); baton.rotation.z=Math.PI/2;
+    const grip=CY(g,.062,.062,.2,'#6a4a2a',-.33,0,0,true,10); grip.rotation.z=Math.PI/2;
+    SP(g,.075,'#e8c468',.4,0,0,true);
+  }
+  return {g};
+}
+function pickItemType(){ const ks=Object.keys(ITEMS); let tot=0; for(const k of ks) tot+=ITEMS[k].weight||0;
+  let r=Math.random()*tot; for(const k of ks){ r-=ITEMS[k].weight||0; if(r<=0) return k; } return ks[0]; }
+function spawnItem(type){
+  const t=type||pickItemType();
+  const fl=1+(Math.random()*(N-1)|0);
+  const v=buildItem(t); const x=rnd(BX0+1.2,BX1-1.2), z=-D+.7, y=fl*FH;
+  v.g.position.set(x,y+.55,z); world.add(v.g);
+  const it={type:t,def:ITEMS[t],floor:fl,x,y,z,v,ph:rnd(0,6),taken:false};
+  items.push(it); return it;
+}
+function killItem(it){ world.remove(it.v.g); }
+function updItems(dt,time){ for(const it of items){ it.ph+=dt; it.v.g.rotation.y+=dt*1.8; it.v.g.position.y=it.y+.55+Math.sin(time*2.2+it.ph)*.09; } }
+
+/* ---------- 喷酸者酸液：沿抛物线飞行的液体喷射、锁定配送员 ---------- */
+const spits=[];
+const SPIT_GRAV=16, SPIT_HIT_R=.6, SPIT_CD=1.4, SPIT_R=.16;
+const _zAxis=new T.Vector3(0,0,1), _vDir=new T.Vector3();
+const spitMat=new T.MeshBasicMaterial({color:0xa6d84a,transparent:true,opacity:.92});
+const spitCoreMat=new T.MeshBasicMaterial({color:0xe6ff9a,transparent:true,opacity:.95});
+/* 液滴网格：头大尾小的水滴，沿飞行方向拉长（由 updSpits 朝向速度方向） */
+function buildSpitDrop(){
+  const g=new T.Group(), geo0=geo('spit',()=>new T.SphereGeometry(SPIT_R,12,10));
+  const head=new T.Mesh(geo0,spitMat); head.scale.set(.95,.95,2.2); g.add(head);
+  const mid=new T.Mesh(geo0,spitMat); mid.position.z=-SPIT_R*2.2; mid.scale.set(.7,.7,1.4); g.add(mid);
+  const tail=new T.Mesh(geo0,spitCoreMat); tail.position.z=-SPIT_R*4.0; tail.scale.set(.42,.42,.9); g.add(tail);
+  return g;
+}
+/* 沿轨迹抛洒的小液滴，形成连续的液流 */
+function spitTrail(s){
+  for(let k=0;k<2;k++){ if(parts.length>=PMAX) return;
+    parts.push({x:s.x+rnd(-.07,.07),y:s.y+rnd(-.07,.07),z:s.z+rnd(-.07,.07),
+      vx:rnd(-.5,.5),vy:rnd(-.6,.2),vz:rnd(-.5,.5),g:-3.5,life:rnd(.25,.6),t:0,
+      s:rnd(.05,.13),col:pick(['#b6f04a','#8fd83a','#d6ff7a','#a6d84a']),rot:rnd(0,6),vr:rnd(-4,4),grow:0});
+  }
+}
+function fireSpit(z){
+  const c=courier; if(!c) return;
+  const x0=z.x, y0=z.floor*FH+1.0, z0=z.z+.3;   /* 喷口 */
+  const x1=c.x, y1=c.y+1.0, z1=c.z;             /* 瞄准配送员胸口 */
+  const dist=Math.hypot(x1-x0,y1-y0,z1-z0);
+  const flight=clamp(dist/4.5,.6,1.15);          /* 飞行时间（偏慢，可见的抛物线） */
+  const yLead=y1+(E.v||0)*FH*flight;             /* 电梯移动中：预测飞行落点 */
+  const vx=(x1-x0)/flight, vz=(z1-z0)/flight, vy=(yLead-y0)/flight+.5*SPIT_GRAV*flight;
+  const g=buildSpitDrop(); g.position.set(x0,y0,z0); world.add(g);
+  spits.push({g,x:x0,y:y0,z:z0,vx,vy,vz,t:0,T:flight});
+}
+function killSpit(s){ world.remove(s.g); }
+function updSpits(dt){
+  for(let i=spits.length-1;i>=0;i--){ const s=spits[i]; s.t+=dt;
+    s.vy-=SPIT_GRAV*dt; s.x+=s.vx*dt; s.y+=s.vy*dt; s.z+=s.vz*dt; s.g.position.set(s.x,s.y,s.z);
+    const vl=Math.hypot(s.vx,s.vy,s.vz)||1; s.g.quaternion.setFromUnitVectors(_zAxis,_vDir.set(s.vx/vl,s.vy/vl,s.vz/vl)); /* 朝向飞行方向 */
+    spitTrail(s); /* 抛洒液滴，呈液态 */
+    const c=courier, hit=!!c&&Math.hypot(s.x-c.x,s.y-(c.y+1.0),s.z-c.z)<SPIT_HIT_R;
+    if(hit||s.t>=s.T){ if(hit&&mode==='play'&&!G.over) addInfection(SPIT_INFECTION); burst(s.x,s.y,s.z,12,'acid',3.5); killSpit(s); spits.splice(i,1); }
+  }
+}
+function killAllSpits(){ spits.forEach(killSpit); spits.length=0; }
 
 /* ================= courier（配送员：唯一的搬运者） ================= */
 /* 亮橙马甲 + 深色帽，与暗绿/灰的僵尸形成鲜明对比。复用 buildZombie 的人形结构。 */
@@ -337,7 +418,7 @@ function buildCourierPerson(){
 function makeCourier(){
   const v=buildCourierPerson(), home={x:CABX,z:-1.3};
   v.g.position.set(home.x,E.pos*FH,home.z); world.add(v.g);
-  return {v,state:'cab',x:home.x,y:E.pos*FH,z:home.z,face:0,ph:rnd(0,6),speed:3.4,pkg:null,tx:home.x,tz:home.z,home};
+  return {v,state:'cab',x:home.x,y:E.pos*FH,z:home.z,face:0,ph:rnd(0,6),speed:3.4,pkg:null,tx:home.x,tz:home.z,home,outFloor:0,sticks:0,item:null,target:null};
 }
 /* 挂载包裹时的相对偏移（包裹被搬运时的从属位置） */
 function attachPkg(p){
@@ -354,9 +435,6 @@ function burst(x,y,z,n,kind,pow){ for(let i=0;i<n&&parts.length<PMAX;i++){ const
   if(kind==='smoke') parts.push({x:x+rnd(-.2,.2),y:y+rnd(0,.6),z:z+.3,vx:Math.cos(a)*.8,vy:rnd(.6,1.8),vz:0,g:0,life:rnd(.5,.9),t:0,s:rnd(.25,.5),col:pick(['#5a6570','#8a94a0','#39424e']),rot:0,vr:rnd(-2,2),grow:1.2});
   else parts.push({x,y,z:z+.3,vx:Math.cos(a)*s*.7,vy:Math.abs(Math.sin(a))*s+rnd(1,3),vz:rnd(-.5,1.5),g:-13,life:rnd(.7,1.3),t:0,s:rnd(.1,.2),col:pick(kind==='acid'?['#a6d84a','#6fae3a','#c9e07a']:CONF),rot:rnd(0,6),vr:rnd(-12,12),grow:0}); } }
 function rain(n){ const w=view.h*camera.aspect; for(let i=0;i<n&&parts.length<PMAX;i++) parts.push({x:camT.x+rnd(-w/2,w/2),y:camT.y+view.h/2+rnd(0,6),z:rnd(.5,3),vx:rnd(-1,1),vy:rnd(-9,-4),vz:0,g:-3,life:rnd(1.6,2.6),t:0,s:rnd(.16,.32),col:pick(CONF),rot:rnd(0,6),vr:rnd(-10,10),grow:0}); }
-/* 向下噴射的毒液（sprayer 專用）：從噴口向下墜落，形成可見的液流 */
-function burstDown(x,y,z,n){ for(let i=0;i<n&&parts.length<PMAX;i++){ const a=rnd(0,Math.PI*2),s=rnd(.25,.7);
-  parts.push({x:x+rnd(-.16,.16),y:y+rnd(-.05,.15),z:z+.35,vx:Math.cos(a)*s*.35,vy:-rnd(4,8),vz:Math.sin(a)*s*.35,g:-11,life:rnd(.8,1.4),t:0,s:rnd(.16,.3),col:pick(['#b6f04a','#8fd83a','#d6ff7a']),rot:rnd(0,6),vr:rnd(-6,6),grow:0}); } }
 function updParts(dt){ let n=0; for(let i=parts.length-1;i>=0;i--){ const p=parts[i]; p.t+=dt; if(p.t>=p.life){parts.splice(i,1);continue;}
     p.vy+=p.g*dt; p.x+=p.vx*dt; p.y+=p.vy*dt; p.z+=p.vz*dt; p.rot+=p.vr*dt; }
   for(const p of parts){ const k=1-p.t/p.life, s=p.s*(1+p.grow*p.t)*(p.grow?k:Math.min(1,k*3)); _d.position.set(p.x,p.y,p.z); _d.rotation.set(p.grow?0:p.rot*.7,p.grow?0:p.rot,p.rot); _d.scale.set(s,s*(p.grow?1:.6),s); _d.updateMatrix();
@@ -365,10 +443,10 @@ function updParts(dt){ let n=0; for(let i=parts.length-1;i>=0;i--){ const p=part
 
 /* ================= game state ================= */
 let mode='title', demo=true;
-let packages=[], zombies=[];
+let packages=[], zombies=[], items=[];
 let courier=null; /* 唯一的配送员：包裹的唯一搬运者 */
 const E={pos:0,v:0,mode:'idle',target:0,lastDir:1,lock:0,queued:0,openT:0,door:1,floor:0,tapBase:null};
-const G={elapsed:0,delivered:0,score:0,combo:0,comboT:0,comboW:6,maxCombo:0,inf:0,peakInf:0,spawnT:.4,zSpawnT:.6,over:false,endT:0,diffT:0,beatT:0,autoWait:0};
+const G={elapsed:0,delivered:0,score:0,combo:0,comboT:0,comboW:6,maxCombo:0,inf:0,peakInf:0,spawnT:.4,zSpawnT:.6,over:false,endT:0,diffT:0,beatT:0,autoWait:0,itemT:6};
 const input={up:false,down:false,last:0};
 const held=()=> input.up&&input.down ? input.last : input.up?1 : input.down?-1 : 0;
 let dirty=true, shake=0, lastRes=null;
@@ -389,14 +467,14 @@ function spawnPkg(){
   p.v.g.position.set(p.x,p.y,p.z);
   packages.push(p); return p;
 }
-function killAll(){ packages.forEach(killPkg); packages=[]; zombies.forEach(killZombie); zombies=[]; }
+function killAll(){ packages.forEach(killPkg); packages=[]; zombies.forEach(killZombie); zombies=[]; items.forEach(killItem); items=[]; }
 
 function resetGame(isDemo){
-  demo=isDemo; killAll(); parts.length=0;
+  demo=isDemo; killAll(); parts.length=0; killAllSpits();
   Object.assign(E,{pos:0,v:0,mode:'idle',target:0,lastDir:1,lock:0,queued:0,openT:0,door:1,floor:0,tapBase:null});
-  Object.assign(G,{elapsed:0,delivered:0,score:0,combo:0,comboT:0,comboW:cfg.comboW,maxCombo:0,inf:0,peakInf:0,spawnT:.4,zSpawnT:.6,over:false,endT:0,diffT:0,beatT:0,autoWait:0});
+  Object.assign(G,{elapsed:0,delivered:0,score:0,combo:0,comboT:0,comboW:cfg.comboW,maxCombo:0,inf:0,peakInf:0,spawnT:.4,zSpawnT:.6,over:false,endT:0,diffT:0,beatT:0,autoWait:0,itemT:rnd(ITEM_SPAWN[0],ITEM_SPAWN[1])});
   input.up=input.down=false; if($('btnUp'))$('btnUp').classList.remove('on'); if($('btnDown'))$('btnDown').classList.remove('on');
-  if(courier){ courier.state='cab'; courier.pkg=null; courier.x=courier.home.x; courier.z=courier.home.z; courier.y=E.pos*FH; courier.face=0; courier.ph=rnd(0,6); courier.v.g.position.set(courier.x,courier.y,courier.z); }
+  if(courier){ courier.state='cab'; courier.pkg=null; courier.sticks=0; courier.item=null; courier.target=null; courier.x=courier.home.x; courier.z=courier.home.z; courier.y=E.pos*FH; courier.face=0; courier.ph=rnd(0,6); courier.outFloor=0; courier.v.g.position.set(courier.x,courier.y,courier.z); }
   for(let i=0;i<3;i++) spawnPkg();
   dirty=true; floorsFx.forEach(f=>f.on=false); hudForce();
 }
@@ -416,13 +494,13 @@ function repack(){
 /* 装载：配送员从轿厢走向包裹（靠近楼层的门口）。包裹保持静止，等待被搬起。 */
 function startLoad(p){
   const c=courier; if(!c||c.state!=='cab'||p.state!=='queue') return;
-  c.pkg=p; p.state='toPick'; c.state='toPick'; c.tx=p.x; c.tz=p.z; E.lock=.15; if(!demo) SFX.board();
+  c.pkg=p; p.state='toPick'; c.state='toPick'; c.outFloor=E.floor; c.tx=p.x; c.tz=p.z; E.lock=.15; if(!demo) SFX.board();
 }
 function deliver(p){
   G.delivered++; if(demo) return;
   G.combo=G.comboT>0?G.combo+1:1; G.comboT=cfg.comboW; G.maxCombo=Math.max(G.maxCombo,G.combo);
   const pts=packageScore(p.type,G.combo); G.score+=pts;
-  const wy=E.floor*FH+1.4; popAt(CABX-1.2,wy,0,'+'+pts,'');
+  const wy=(courier&&courier.outFloor!=null?courier.outFloor:E.floor)*FH+1.4; popAt(CABX-1.2,wy,0,'+'+pts,'');
   burst(CABX-1.1,wy-.4,-.6,10,'conf',4); SFX.deliver(G.combo);
   if(G.combo===3) banner('COMBO!','','combo');
   else if(G.combo===5) banner('SUPER COMBO!','','super');
@@ -432,12 +510,23 @@ function deliver(p){
 function startDeliver(p){
   const c=courier; if(!c||c.state!=='cab'||p.state!=='cargo') return;
   c.pkg=p; attachPkg(p);
-  c.state='toDrop'; c.tx=pick([-3.45,-1.35]); c.tz=-D+.6;
+  c.state='toDrop'; c.outFloor=E.floor; c.tx=pick([-3.45,-1.35]); c.tz=-D+.6;
   E.openT=.7;
+}
+/* 拾取道具：配送员从轿厢走向本层道具，到位后拾取（针筒即用 / 棍子入包）。 */
+function startPickup(it){
+  const c=courier; if(!c||c.state!=='cab'||it.taken) return;
+  c.item=it; it.taken=true; c.state='toItem'; c.outFloor=it.floor; c.tx=it.x; c.tz=it.z; E.lock=.2;
+}
+/* 用棍子清僵尸：配送员从轿厢走向本层僵尸，到位后击倒并消耗 1 根棍子。 */
+function startKill(z){
+  const c=courier; if(!c||c.state!=='cab'||c.sticks<=0) return;
+  c.target=z; c.state='toKill'; c.outFloor=z.floor; c.tx=z.x; c.tz=z.z; E.lock=.2;
 }
 function updElev(dt){
   E.openT-=dt;
-  if(E.lock>0){ E.lock-=dt; if(E.lock>0) return; }
+  /* 玩家操作可立即打断装载/装卸的短暂锁定：未装满也能随时出发 */
+  if(E.lock>0){ E.lock-=dt; const want=(demo||G.over)?0:(E.queued||input.up||input.down); if(E.lock>0&&!want) return; if(E.lock>0) E.lock=0; }
   const h=(demo||G.over)?0:held(), q=(demo||G.over)?0:E.queued; E.queued=0;
   if(q){
     if(E.mode==='auto'&&Math.sign(E.target-E.pos)===q){ if(h!==q) E.target=clamp(E.target+q,0,N-1); else { E.tapBase=E.target; E.mode='manual'; E.lastDir=q; } }
@@ -452,10 +541,13 @@ function updElev(dt){
   if(E.mode==='auto'){ const dist=E.target-E.pos, ad=Math.abs(dist);
     const sp=Math.min(Math.max(Math.abs(E.v),START)+cfg.speed*1.3*dt,cfg.speed,Math.max(1.6,ad*5.5)), stp=sp*dt;
     if(stp>=ad) arrive(E.target); else { E.pos+=Math.sign(dist)*stp; E.v=Math.sign(dist)*sp; } }
-  // 停靠自动装卸：仅当配送员空闲在轿厢内时才发起
+  // 停靠自动装卸：仅当配送员空闲在轿厢内时才发起；优先级：送达 > 用棍子清僵尸 > 拾取道具 > 1F 装载
   if(E.mode==='idle'&&E.lock<=0&&!h&&!G.over&&courier&&courier.state==='cab'){
-    if(E.pos===0){ const u=used(); for(const p of lobbyList()){ if(u+p.size<=cfg.cap){ startLoad(p); break; } } }
-    else { for(const p of cargoList()){ if(p.dest===E.pos+1){ startDeliver(p); E.lock=.22; break; } } }
+    let done=false;
+    if(E.pos!==0){ for(const p of cargoList()){ if(p.dest===E.pos+1){ startDeliver(p); E.lock=.22; done=true; break; } } }
+    if(!done&&courier.sticks>0){ const z=zombies.find(z=>z.floor===E.pos); if(z){ startKill(z); done=true; } }
+    if(!done){ const it=items.find(it=>it.floor===E.pos&&!it.taken); if(it){ startPickup(it); done=true; } }
+    if(!done&&E.pos===0){ const u=used(); for(const p of lobbyList()){ if(u+p.size<=cfg.cap){ startLoad(p); break; } } }
   }
 }
 function autopilot(dt){
@@ -487,17 +579,26 @@ function updPkg(p,dt,time){
 /* ---------- courier update（唯一会移动的搬运者） ---------- */
 function updCourier(dt,time){
   const c=courier; if(!c) return;
-  const v=c.v, st=c.state; c.y=E.pos*FH; /* y 始终跟随轿厢高度 */
+  const v=c.v, st=c.state;
+  /* y：在轿厢内跟随电梯；出轿厢后固定在其作业楼层（等待电梯返回，不随电梯上下滑动） */
+  c.y=(st==='cab'?E.pos:(c.outFloor!=null?c.outFloor:E.pos))*FH;
   let moving=false;
-  if(st==='toPick'||st==='toCab'||st==='toDrop'||st==='return'){
+  if(st==='toPick'||st==='toCab'||st==='toDrop'||st==='return'||st==='toItem'||st==='toKill'){
     const dx=c.tx-c.x, dz=c.tz-c.z, d=Math.hypot(dx,dz), s=c.speed*dt;
     if(d>.03){ moving=true; if(s>=d){c.x=c.tx;c.z=c.tz;} else {c.x+=dx/d*s;c.z+=dz/d*s;}
       if(Math.abs(dx)>.05) c.face=dx>0?Math.PI/2:-Math.PI/2; else c.face=0; }
-    else { const p=c.pkg;
+    else { const p=c.pkg, cabHere=E.pos===c.outFloor;
       if(st==='toPick'){ if(p) attachPkg(p); c.state='toCab'; c.tx=CABX; c.tz=-.9; }
-      else if(st==='toCab'){ if(p){ p.state='cargo'; repack(); p.x=p.sx; p.z=p.sz; p.y=E.pos*FH; } c.pkg=null; c.state='return'; c.tx=c.home.x; c.tz=c.home.z; dirty=true; }
+      else if(st==='toCab'){ if(cabHere){ if(p){ p.state='cargo'; repack(); p.x=p.sx; p.z=p.sz; p.y=E.pos*FH; } c.pkg=null; c.state='return'; c.tx=c.home.x; c.tz=c.home.z; dirty=true; } }
       else if(st==='toDrop'){ if(p){ p.lab.visible=false; p.state='gone'; deliver(p); } c.pkg=null; c.state='return'; c.tx=c.home.x; c.tz=c.home.z; }
-      else if(st==='return'){ c.state='cab'; }
+      else if(st==='toItem'){ const it=c.item; if(it){ killItem(it); const i=items.indexOf(it); if(i>=0) items.splice(i,1);
+          if(it.def.heal){ addInfection(-it.def.heal); popAt(it.x,it.y+1.4,it.z,fmt(__('msg.heal','感染 -{n}'),{n:it.def.heal}),'info'); SFX.heart(); }
+          else { c.sticks++; popAt(it.x,it.y+1.4,it.z,fmt(__('msg.gotItem','{name} +1'),{name:it.def.name}),'info'); SFX.bonus(); }
+          c.item=null; } c.state='return'; c.tx=c.home.x; c.tz=c.home.z; dirty=true; }
+      else if(st==='toKill'){ const z=c.target; if(z){ killZombie(z); const i=zombies.indexOf(z); if(i>=0) zombies.splice(i,1);
+          burst(z.x,z.y+1.0,z.z,14,'smoke'); popAt(z.x,z.y+1.6,z.z,__('msg.kill','击倒!'),''); c.sticks--; SFX.miss(); } c.target=null;
+        c.state='return'; c.tx=c.home.x; c.tz=c.home.z; dirty=true; }
+      else if(st==='return'){ if(cabHere) c.state='cab'; }
     }
   }
   if(c.state==='cab'){ c.x=lerp(c.x,c.home.x,Math.min(1,dt*8)); c.z=lerp(c.z,c.home.z,Math.min(1,dt*8)); }
@@ -517,25 +618,17 @@ function updZombie(z,dt,time){
     const sw=Math.sin(z.ph)*.5; v.legL.rotation.x=sw; v.legR.rotation.x=-sw;
     v.b.rotation.y=z.dir>0?Math.PI/2:-Math.PI/2;
     v.up.position.y=Math.sin(time*2+z.ph)*.02;
-  } else if(z.type==='sprayer'){
-    /* 滴液者：站在樓層，往下方噴淋毒液；電梯在它下方且對齊時被淋到即感染（不限停靠） */
-    v.b.rotation.y=Math.PI/2;
-    v.up.position.y=Math.sin(time*1.4+z.ph)*.018;
-    const below=z.floor-E.pos;
-    const active=mode==='play'&&!G.over&&below>0.1&&below<=SPRAY_DOWN&&Math.abs(z.x-CABX)<=SPRAY_ALIGN;
-    if(active){
-      z.emitT=(z.emitT||0)-dt;
-      if(z.emitT<=0){ z.emitT=.06; burstDown(z.x,z.y+1.15,z.z,3); }
-      z.spitT-=dt;
-      if(z.spitT<=0){ z.spitT=.9; addInfection(SPRAY_INFECTION); if(!demo) SFX.spit(); }
-    } else { z.spitT=Math.min(z.spitT,.35); }
   } else {
-    v.b.rotation.y=Math.PI/2;
+    /* 喷酸者：像 walker 一样巡逻；电梯经过或停靠本层且对位时喷酸 */
+    if(z.speed>0){ z.x+=z.dir*z.speed*dt;
+      if(z.x<SPIT_X0){z.x=SPIT_X0;z.dir=1;} else if(z.x>SPIT_X1){z.x=SPIT_X1;z.dir=-1;} }
+    v.b.rotation.y=z.dir>0?Math.PI/2:-Math.PI/2;
+    z.ph+=dt*(2+z.speed*4);
+    const sw=Math.sin(z.ph)*.45; v.legL.rotation.x=sw; v.legR.rotation.x=-sw;
     v.up.position.y=Math.sin(time*1.6+z.ph)*.012;
-    if(mode==='play'&&!G.over&&E.mode==='idle'&&E.floor===z.floor&&Math.abs(z.x-CABX)<=THREAT_R){
-      z.spitT-=dt;
-      if(z.spitT<=0){ z.spitT=1.2; addInfection(SPIT_INFECTION); burst(z.x,z.floor*FH+1.0,z.z+.3,8,'acid',3); if(!demo) SFX.spit(); }
-    }
+    z.spitT-=dt; /* 冷却始终计时：就绪后只要电梯在其下方（含同层）即向配送员喷酸 */
+    const below=!G.over&&(mode==='play'||demo)&&E.pos<z.floor+.5;
+    if(below&&z.spitT<=0){ z.spitT=SPIT_CD; fireSpit(z); if(!demo) SFX.spit(); }
   }
   v.g.position.set(z.x,z.y,z.z);
 }
@@ -544,7 +637,9 @@ function maintainZombies(dt){
   while(zombies.length>target) killZombie(zombies.pop());
   if((mode==='play'||demo)&&!G.over){
     G.zSpawnT-=dt;
-    if(zombies.length<target&&G.zSpawnT<=0){ G.zSpawnT=rnd(.7,1.6)/(d.spawnRate||1); const pool=d.unlocked.filter(t=>t==='walker'||t==='spitter'||t==='sprayer'); zombies.push(makeZombie(pool.length?pick(pool):'walker')); }
+    if(zombies.length<target&&G.zSpawnT<=0){ G.zSpawnT=rnd(.7,1.6)/(d.spawnRate||1);       const pool=d.unlocked.filter(t=>t==='walker'||t==='spitter');
+      for(const t of FORCE_ZOMBIES){ if(ZCOL[t]&&!pool.includes(t)) pool.push(t); }
+      zombies.push(makeZombie(pool.length?pick(pool):'walker')); }
   }
 }
 
@@ -565,6 +660,7 @@ function updHud(){
   setTxt('count',String(G.delivered)); setTxt('score',G.score.toLocaleString());
   setTxt('floorNow',(Math.round(E.pos)+1)+'F');
   setBar(G.inf);
+  { const ih=$('itemHud'); const n=courier?courier.sticks:0; if(ih){ ih.hidden=n<=0; if(n>0) setTxt('itemHud',fmt(__('msg.stickCount','{name} ×{n}'),{name:ITEMS.stick.name,n})); } }
   if(dirty){ dirty=false; const u=used(); const ct=$('capText'); if(ct){ ct.textContent=u+' / '+cfg.cap; ct.classList.toggle('full',u>=cfg.cap); }
     const set=new Set(cargoList().map(p=>p.dest-1)); floorsFx.forEach((f,i)=>{ f.on=set.has(i); }); }
 }
@@ -619,9 +715,12 @@ function frame(ms){
     if(mode!=='count') updElev(dt);
     if((mode==='play'||demo)&&!G.over){ G.spawnT-=dt; if(G.spawnT<=0){ if(lobbyList().length<cfg.maxQ) spawnPkg(); G.spawnT=rnd(cfg.spawn[0],cfg.spawn[1])*(demo?1.4:1); } }
     maintainZombies(dt);
+    if((mode==='play'||demo)&&!G.over){ G.itemT-=dt; if(G.itemT<=0){ G.itemT=rnd(ITEM_SPAWN[0],ITEM_SPAWN[1]); if(items.length<ITEM_MAX) spawnItem(); } }
     updCourier(dt,time); /* 配送员先动，包裹再据此定位 */
     for(const p of packages.slice()) updPkg(p,dt,time);
     for(const z of zombies) updZombie(z,dt,time);
+    updItems(dt,time);
+    updSpits(dt);
     for(let i=packages.length-1;i>=0;i--){ if(packages[i].state==='gone'){ killPkg(packages[i]); packages.splice(i,1); } }
     if(mode==='play'&&!G.over&&E.mode==='idle'){
       const threat=[]; for(const z of zombies){ if(z.floor===E.floor&&Math.abs(z.x-CABX)<=THREAT_R) threat.push(z.type); }
@@ -727,5 +826,5 @@ function destroy(){ if(DY) return; DY=true; clearTimeout(goTimer);
   if(RO) RO.disconnect(); if(rafId) cancelAnimationFrame(rafId);
   if(AU.ctx){ try{ AU.ctx.close(); }catch(_){} AU.ctx=null; }
   if(window.__od) window.__od.destroyed=true; }
-window.__od={G,E,press,release,startGame,setDiff,destroy,zombies:()=>zombies,packages:()=>packages,courier:()=>courier};
+window.__od={G,E,press,release,startGame,setDiff,destroy,zombies:()=>zombies,packages:()=>packages,items:()=>items,spawnItem:(t)=>spawnItem(t),startKill:(z)=>startKill(z),startPickup:(it)=>startPickup(it),courier:()=>courier,spits:()=>spits,parts:()=>parts};
 })();
