@@ -1,28 +1,28 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Timer, Music, FileText, FileCode2, Camera, ArrowRight, Sparkles, PawPrint, ShieldAlert } from "lucide-react";
+import { Gamepad2, ArrowRight, Scissors, Truck } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { useTranslation } from "react-i18next";
 import i18n from "~/lib/i18n";
 import { withLangPrefix, currentLang, BASE_URL, DEFAULT_OG_IMAGE } from "~/lib/seo";
 
-export const Route = createFileRoute("/freetool")({
+export const Route = createFileRoute("/games")({
   head: () => {
-    const pageUrl = BASE_URL + withLangPrefix(currentLang(), "/freetool");
+    const pageUrl = BASE_URL + withLangPrefix(currentLang(), "/games");
     return {
       meta: [
-        { title: i18n.t("freetool.title") },
-        { name: "description", content: i18n.t("freetool.desc") },
-        { name: "keywords", content: i18n.t("freetool.keywords") },
+        { title: i18n.t("games.title") },
+        { name: "description", content: i18n.t("games.desc") },
+        { name: "keywords", content: i18n.t("games.keywords") },
         { name: "robots", content: "index, follow" },
         { property: "og:type", content: "website" },
-        { property: "og:title", content: i18n.t("freetool.title") },
-        { property: "og:description", content: i18n.t("freetool.desc") },
+        { property: "og:title", content: i18n.t("games.title") },
+        { property: "og:description", content: i18n.t("games.desc") },
         { property: "og:image", content: DEFAULT_OG_IMAGE },
         { property: "og:site_name", content: "100mini" },
         { name: "twitter:card", content: "summary_large_image" },
-        { name: "twitter:title", content: i18n.t("freetool.title") },
-        { name: "twitter:description", content: i18n.t("freetool.desc") },
+        { name: "twitter:title", content: i18n.t("games.title") },
+        { name: "twitter:description", content: i18n.t("games.desc") },
         { name: "twitter:image", content: DEFAULT_OG_IMAGE },
       ],
       scripts: [
@@ -31,50 +31,20 @@ export const Route = createFileRoute("/freetool")({
           children: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "ItemList",
-            name: i18n.t("freetool.heading"),
+            name: i18n.t("games.heading"),
             url: pageUrl,
             itemListElement: [
               {
                 "@type": "ListItem",
                 position: 1,
-                name: i18n.t("freetool.item.pomodoro.title"),
-                url: "https://100mini.com/pomodoro",
+                name: i18n.t("games.item.papercut.title"),
+                url: "https://100mini.com/papercut",
               },
               {
                 "@type": "ListItem",
                 position: 2,
-                name: i18n.t("freetool.item.rhythm.title"),
-                url: "https://100mini.com/rhythm",
-              },
-              {
-                "@type": "ListItem",
-                position: 3,
-                name: i18n.t("freetool.item.md2html.title"),
-                url: "https://100mini.com/md2html",
-              },
-              {
-                "@type": "ListItem",
-                position: 4,
-                name: i18n.t("freetool.item.any2md.title"),
-                url: "https://100mini.com/any2md",
-              },
-              {
-                "@type": "ListItem",
-                position: 5,
-                name: i18n.t("freetool.item.idphoto.title"),
-                url: "https://100mini.com/idphoto",
-              },
-              {
-                "@type": "ListItem",
-                position: 6,
-                name: i18n.t("freetool.item.petbadge.title"),
-                url: "https://100mini.com/petbadge",
-              },
-              {
-                "@type": "ListItem",
-                position: 7,
-                name: i18n.t("freetool.item.petsafe.title"),
-                url: "https://100mini.com/petsafe",
+                name: i18n.t("games.item.deliveryrush.title"),
+                url: "https://100mini.com/deliveryrush",
               },
             ],
           }),
@@ -82,54 +52,24 @@ export const Route = createFileRoute("/freetool")({
       ],
     };
   },
-  component: FreeToolPage,
+  component: GamesPage,
 });
 
-function FreeToolPage() {
+function GamesPage() {
   const { t } = useTranslation();
 
-  const tools = [
+  const games = [
     {
-      href: "/pomodoro" as const,
-      icon: Timer,
-      title: t("freetool.item.pomodoro.title"),
-      desc: t("freetool.item.pomodoro.desc"),
+      href: "/papercut" as const,
+      icon: Scissors,
+      title: t("games.item.papercut.title"),
+      desc: t("games.item.papercut.desc"),
     },
     {
-      href: "/rhythm" as const,
-      icon: Music,
-      title: t("freetool.item.rhythm.title"),
-      desc: t("freetool.item.rhythm.desc"),
-    },
-    {
-      href: "/md2html" as const,
-      icon: FileText,
-      title: t("freetool.item.md2html.title"),
-      desc: t("freetool.item.md2html.desc"),
-    },
-    {
-      href: "/any2md" as const,
-      icon: FileCode2,
-      title: t("freetool.item.any2md.title"),
-      desc: t("freetool.item.any2md.desc"),
-    },
-    {
-      href: "/idphoto" as const,
-      icon: Camera,
-      title: t("freetool.item.idphoto.title"),
-      desc: t("freetool.item.idphoto.desc"),
-    },
-    {
-      href: "/petbadge" as const,
-      icon: PawPrint,
-      title: t("freetool.item.petbadge.title"),
-      desc: t("freetool.item.petbadge.desc"),
-    },
-    {
-      href: "/petsafe" as const,
-      icon: ShieldAlert,
-      title: t("freetool.item.petsafe.title"),
-      desc: t("freetool.item.petsafe.desc"),
+      href: "/deliveryrush" as const,
+      icon: Truck,
+      title: t("games.item.deliveryrush.title"),
+      desc: t("games.item.deliveryrush.desc"),
     },
   ];
 
@@ -154,27 +94,27 @@ function FreeToolPage() {
           </div>
           <div className="relative mx-auto max-w-5xl px-6 py-20 text-center sm:py-28">
             <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-sm">
-              <Sparkles className="size-4 text-[#4edea3]" />
-              {t("freetool.more")}
+              <Gamepad2 className="size-4 text-[#4edea3]" />
+              {t("games.more")}
             </div>
             <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
-              {t("freetool.heading")}
+              {t("games.heading")}
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-[#cfe8dd] sm:text-lg">
-              {t("freetool.subheading")}
+              {t("games.subheading")}
             </p>
           </div>
         </section>
 
-        {/* Tool cards grid */}
+        {/* Game cards grid */}
         <section className="mx-auto max-w-5xl px-6 py-12 sm:py-16">
           <div className="grid gap-6 sm:grid-cols-2">
-            {tools.map((tool) => {
-              const Icon = tool.icon;
+            {games.map((game) => {
+              const Icon = game.icon;
               return (
                 <Link
-                  key={tool.href}
-                  to={tool.href}
+                  key={game.href}
+                  to={game.href}
                   className="group relative flex flex-col overflow-hidden rounded-2xl border border-[#d3e4fe]/70 bg-white p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#006c49]/40 hover:shadow-md dark:border-[#3c4a42] dark:bg-[#15243b] dark:hover:border-[#4edea3]/40 sm:p-7"
                 >
                   <div className="flex items-start justify-between">
@@ -183,12 +123,12 @@ function FreeToolPage() {
                     </div>
                     <ArrowRight className="size-5 text-muted-foreground/40 transition-all group-hover:translate-x-0.5 group-hover:text-[#006c49] dark:group-hover:text-[#4edea3]" />
                   </div>
-                  <h2 className="mt-4 text-lg font-semibold text-foreground">{tool.title}</h2>
+                  <h2 className="mt-4 text-lg font-semibold text-foreground">{game.title}</h2>
                   <p className="mt-1.5 flex-1 text-sm leading-relaxed text-muted-foreground">
-                    {tool.desc}
+                    {game.desc}
                   </p>
                   <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-[#006c49] dark:text-[#4edea3]">
-                    {t("freetool.cta")}
+                    {t("games.cta")}
                     <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
                   </span>
                 </Link>

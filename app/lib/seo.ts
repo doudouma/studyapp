@@ -102,6 +102,8 @@ function pageKeys(basePath: string): { name: string; desc: string } {
       return { name: "any2md.heading", desc: "any2md.subtitle" };
     case "/freetool":
       return { name: "freetool.heading", desc: "freetool.desc" };
+    case "/games":
+      return { name: "games.heading", desc: "games.desc" };
     case "/idphoto":
       return { name: "idphoto.heading", desc: "idphoto.desc" };
     case "/pomodoro":

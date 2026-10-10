@@ -22,6 +22,7 @@ import { Route as PapercutRouteImport } from './routes/papercut'
 import { Route as Md2htmlRouteImport } from './routes/md2html'
 import { Route as LinksRouteImport } from './routes/links'
 import { Route as IdphotoRouteImport } from './routes/idphoto'
+import { Route as GamesRouteImport } from './routes/games'
 import { Route as FreetoolRouteImport } from './routes/freetool'
 import { Route as DeliveryrushRouteImport } from './routes/deliveryrush'
 import { Route as CookieRouteImport } from './routes/cookie'
@@ -97,6 +98,11 @@ const IdphotoRoute = IdphotoRouteImport.update({
   path: '/idphoto',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GamesRoute = GamesRouteImport.update({
+  id: '/games',
+  path: '/games',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FreetoolRoute = FreetoolRouteImport.update({
   id: '/freetool',
   path: '/freetool',
@@ -151,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/cookie': typeof CookieRoute
   '/deliveryrush': typeof DeliveryrushRoute
   '/freetool': typeof FreetoolRoute
+  '/games': typeof GamesRoute
   '/idphoto': typeof IdphotoRoute
   '/links': typeof LinksRoute
   '/md2html': typeof Md2htmlRoute
@@ -175,6 +182,7 @@ export interface FileRoutesByTo {
   '/cookie': typeof CookieRoute
   '/deliveryrush': typeof DeliveryrushRoute
   '/freetool': typeof FreetoolRoute
+  '/games': typeof GamesRoute
   '/idphoto': typeof IdphotoRoute
   '/links': typeof LinksRoute
   '/md2html': typeof Md2htmlRoute
@@ -200,6 +208,7 @@ export interface FileRoutesById {
   '/cookie': typeof CookieRoute
   '/deliveryrush': typeof DeliveryrushRoute
   '/freetool': typeof FreetoolRoute
+  '/games': typeof GamesRoute
   '/idphoto': typeof IdphotoRoute
   '/links': typeof LinksRoute
   '/md2html': typeof Md2htmlRoute
@@ -226,6 +235,7 @@ export interface FileRouteTypes {
     | '/cookie'
     | '/deliveryrush'
     | '/freetool'
+    | '/games'
     | '/idphoto'
     | '/links'
     | '/md2html'
@@ -250,6 +260,7 @@ export interface FileRouteTypes {
     | '/cookie'
     | '/deliveryrush'
     | '/freetool'
+    | '/games'
     | '/idphoto'
     | '/links'
     | '/md2html'
@@ -274,6 +285,7 @@ export interface FileRouteTypes {
     | '/cookie'
     | '/deliveryrush'
     | '/freetool'
+    | '/games'
     | '/idphoto'
     | '/links'
     | '/md2html'
@@ -299,6 +311,7 @@ export interface RootRouteChildren {
   CookieRoute: typeof CookieRoute
   DeliveryrushRoute: typeof DeliveryrushRoute
   FreetoolRoute: typeof FreetoolRoute
+  GamesRoute: typeof GamesRoute
   IdphotoRoute: typeof IdphotoRoute
   LinksRoute: typeof LinksRoute
   Md2htmlRoute: typeof Md2htmlRoute
@@ -409,6 +422,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IdphotoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/games': {
+      id: '/games'
+      path: '/games'
+      fullPath: '/games'
+      preLoaderRoute: typeof GamesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/freetool': {
       id: '/freetool'
       path: '/freetool'
@@ -483,6 +503,7 @@ const rootRouteChildren: RootRouteChildren = {
   CookieRoute: CookieRoute,
   DeliveryrushRoute: DeliveryrushRoute,
   FreetoolRoute: FreetoolRoute,
+  GamesRoute: GamesRoute,
   IdphotoRoute: IdphotoRoute,
   LinksRoute: LinksRoute,
   Md2htmlRoute: Md2htmlRoute,

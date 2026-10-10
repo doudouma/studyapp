@@ -45,6 +45,7 @@ export const RESERVED_SLUGS: ReadonlySet<string> = new Set([
   "md2html",
   "any2md",
   "freetool",
+  "games",
   "showcase",
   "square",
   "rhythm",

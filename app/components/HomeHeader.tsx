@@ -66,9 +66,7 @@ function ToolsDropdown() {
     location.pathname.startsWith("/freetool") ||
     location.pathname.startsWith("/idphoto") ||
     location.pathname.startsWith("/petbadge") ||
-    location.pathname.startsWith("/petsafe") ||
-    location.pathname.startsWith("/papercut") ||
-    location.pathname.startsWith("/deliveryrush");
+    location.pathname.startsWith("/petsafe");
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -121,6 +119,53 @@ function ToolsDropdown() {
           <DropdownLink href="/petsafe" onClick={() => setOpen(false)}>
             {t("nav.petsafe")}
           </DropdownLink>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function GamesDropdown() {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+
+  const isActive =
+    location.pathname.startsWith("/games") ||
+    location.pathname.startsWith("/papercut") ||
+    location.pathname.startsWith("/deliveryrush");
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className={
+          isActive || open
+            ? "flex items-center gap-0.5 border-b-2 border-primary pb-0.5 text-sm font-semibold text-primary"
+            : "flex items-center gap-0.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+        }
+      >
+        {t("nav.game")}
+        <ChevronDown className={`size-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div className="absolute left-0 top-full z-50 mt-2 min-w-40 rounded-lg border border-border bg-popover py-1 shadow-lg">
+          <DropdownLink href="/games" onClick={() => setOpen(false)}>
+            {t("nav.gamesAll")}
+          </DropdownLink>
+          <div className="mx-3 my-1 border-t border-border" />
           <DropdownLink href="/papercut" onClick={() => setOpen(false)}>
             {t("nav.papercut")}
           </DropdownLink>
@@ -189,7 +234,6 @@ export function AppNav() {
   const [authOpen, setAuthOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -229,6 +273,7 @@ export function AppNav() {
                 <NavLink href="/square">{t("nav.square")}</NavLink>
               </div>
               <NavLink href="/showcase">{t("nav.showcase")}</NavLink>
+              <GamesDropdown />
               <ToolsDropdown />
             </div>
           </div>
@@ -285,6 +330,10 @@ export function AppNav() {
               <MobileNavLink href="/idphoto" onClick={() => setMobileNavOpen(false)}>{t("nav.idphoto")}</MobileNavLink>
               <MobileNavLink href="/petbadge" onClick={() => setMobileNavOpen(false)}>{t("nav.petbadge")}</MobileNavLink>
               <MobileNavLink href="/petsafe" onClick={() => setMobileNavOpen(false)}>{t("nav.petsafe")}</MobileNavLink>
+              <div className="px-4 pb-1 pt-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                {t("nav.game")}
+              </div>
+              <MobileNavLink href="/games" onClick={() => setMobileNavOpen(false)}>{t("nav.gamesAll")}</MobileNavLink>
               <MobileNavLink href="/papercut" onClick={() => setMobileNavOpen(false)}>{t("nav.papercut")}</MobileNavLink>
               <MobileNavLink href="/deliveryrush" onClick={() => setMobileNavOpen(false)}>{t("nav.deliveryrush")}</MobileNavLink>
               <div className="px-4 pt-2">
@@ -315,6 +364,7 @@ export function AppNav() {
               <NavLink href="/square">{t("nav.square")}</NavLink>
             </div>
             <NavLink href="/showcase">{t("nav.showcase")}</NavLink>
+            <GamesDropdown />
             <ToolsDropdown />
             <NavLink href="/links">{t("nav.profile")}</NavLink>
           </div>
@@ -412,6 +462,10 @@ export function AppNav() {
             <MobileNavLink href="/idphoto" onClick={() => setMobileNavOpen(false)}>{t("nav.idphoto")}</MobileNavLink>
             <MobileNavLink href="/petbadge" onClick={() => setMobileNavOpen(false)}>{t("nav.petbadge")}</MobileNavLink>
             <MobileNavLink href="/petsafe" onClick={() => setMobileNavOpen(false)}>{t("nav.petsafe")}</MobileNavLink>
+            <div className="px-4 pb-1 pt-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              {t("nav.game")}
+            </div>
+            <MobileNavLink href="/games" onClick={() => setMobileNavOpen(false)}>{t("nav.gamesAll")}</MobileNavLink>
             <MobileNavLink href="/papercut" onClick={() => setMobileNavOpen(false)}>{t("nav.papercut")}</MobileNavLink>
             <MobileNavLink href="/deliveryrush" onClick={() => setMobileNavOpen(false)}>{t("nav.deliveryrush")}</MobileNavLink>
             <MobileNavLink href="/links" onClick={() => setMobileNavOpen(false)}>{t("nav.profile")}</MobileNavLink>
