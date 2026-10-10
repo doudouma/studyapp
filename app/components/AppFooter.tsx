@@ -53,6 +53,12 @@ export function AppFooter() {
             {t("footer.tools")}
           </Link>
           <Link
+            to="/games"
+            className="text-xs text-muted-foreground transition-colors hover:text-[#006c49] dark:hover:text-[#4edea3]"
+          >
+            {t("footer.games")}
+          </Link>
+          <Link
             to="/showcase"
             className="text-xs text-muted-foreground transition-colors hover:text-[#006c49] dark:hover:text-[#4edea3]"
           >

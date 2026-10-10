@@ -136,7 +136,7 @@ function DeliveryRushPage() {
       <main className="flex-1">
         <section className="relative overflow-hidden bg-gradient-to-b from-[#58b8f5]/10 via-[#58b8f5]/[0.02] to-background dark:from-[#58b8f5]/10 dark:via-[#58b8f5]/[0.02] dark:to-background pb-6 pt-6 sm:pt-10">
           <div className="mx-auto w-full max-w-4xl px-4">
-            <div ref={gameRef} id="dr-game" className="relative h-[min(78vh,760px)] min-h-[480px] overflow-hidden rounded-3xl border-2 border-border shadow-lg">
+            <div ref={gameRef} id="dr-game" className="relative h-[min(78vh,760px)] min-h-[480px] overflow-hidden rounded-xl border-2 border-border shadow-lg">
               <DeliveryRushGame canvasRef={glRef} />
             </div>
             <div className="mt-3 flex justify-end gap-2">

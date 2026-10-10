@@ -135,7 +135,7 @@ function EnsoPage() {
       <main className="flex-1">
         <section className="relative overflow-hidden bg-gradient-to-b from-[#b3402f]/10 via-[#b3402f]/[0.02] to-background dark:from-[#b3402f]/10 dark:via-[#b3402f]/[0.02] dark:to-background pb-6 pt-6 sm:pt-10">
           <div className="mx-auto w-full max-w-4xl px-4">
-            <div ref={gameRef} id="enso-game" className=" relative h-[min(78vh,760px)] min-h-[520px] overflow-hidden border-2 border-border shadow-lg">
+            <div ref={gameRef} id="enso-game" className="relative h-[min(78vh,760px)] min-h-[520px] overflow-hidden rounded-xl border-2 border-[#d8cdb4] shadow-lg">
               <EnsoGame canvasRef={canvasRef} />
             </div>
             <div className="mt-3 flex justify-end gap-2">
@@ -143,7 +143,7 @@ function EnsoPage() {
                 type="button"
                 onClick={() => setShareOpen(true)}
                 aria-label={t("enso.share.button")}
-                className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+                className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-[#d8cdb4] bg-card px-3 py-1.5 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
               >
                 <Share2 className="size-4" />
                 {t("enso.share.button")}
@@ -152,7 +152,7 @@ function EnsoPage() {
                 type="button"
                 onClick={toggleFullscreen}
                 aria-label={isFull ? t("enso.fullscreenExit") : t("enso.fullscreen")}
-                className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+                className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-[#d8cdb4] bg-card px-3 py-1.5 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
               >
                 {isFull ? <Minimize className="size-4" /> : <Maximize className="size-4" />}
                 {isFull ? t("enso.fullscreenExit") : t("enso.fullscreen")}
@@ -173,7 +173,7 @@ function EnsoPage() {
         <section className="mx-auto w-full max-w-3xl px-4 pb-20 pt-12">
           <h2 className="text-center text-2xl font-bold tracking-tight text-foreground">{t("enso.guide")}</h2>
           <p className="mx-auto mt-2 max-w-2xl text-center text-[15px] leading-relaxed text-muted-foreground">{t("enso.tagline")}</p>
-          <div className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
+          <div className="mt-8 rounded-2xl border border-[#d8cdb4] bg-card p-6 shadow-sm sm:p-8">
             <h3 className="text-lg font-bold text-primary">{t("enso.guide.what")}</h3>
             <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">{t("enso.guide.what.desc")}</p>
             <ol className="mt-6 list-decimal space-y-2.5 pl-5">
@@ -186,7 +186,7 @@ function EnsoPage() {
         </section>
         <section className="mx-auto w-full max-w-3xl px-4 pb-20">
           <h2 className="text-center text-2xl font-bold tracking-tight text-foreground">{t("enso.faq")}</h2>
-          <div className="mt-8 rounded-2xl border border-border bg-card px-6 shadow-sm">
+          <div className="mt-8 rounded-2xl border border-[#d8cdb4] bg-card px-6 shadow-sm">
             {faqs.map((faq) => (
               <FaqItem key={faq.name} name={faq.name} text={faq.text} />
             ))}
@@ -200,7 +200,7 @@ function EnsoPage() {
 function FaqItem({ name, text }: { name: string; text: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border-b border-border last:border-b-0">
+    <div className="border-b border-[#d8cdb4] last:border-b-0">
       <button
         className="flex w-full cursor-pointer items-center justify-between gap-4 py-4 text-left text-sm font-medium transition-colors hover:text-foreground/80"
         onClick={() => setOpen(!open)}
