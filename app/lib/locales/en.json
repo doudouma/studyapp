@@ -1642,6 +1642,7 @@
   "enso.lb.title": "Leaderboard TOP100",
   "enso.lb.close": "Close",
   "enso.lb.loading": "Loading…",
+  "enso.lb.loadError": "Couldn't load the leaderboard. Please reopen it later.",
   "enso.lb.empty": "No records yet. Be the first!",
   "enso.lb.myPos": "Your rank: ",
   "enso.lb.unregistered": "Not ranked yet",

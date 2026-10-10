@@ -1525,6 +1525,7 @@
   "enso.lb.title": "Classement TOP100",
   "enso.lb.close": "Fermer",
   "enso.lb.loading": "Chargement…",
+  "enso.lb.loadError": "Impossible de charger le classement. Réouvrez-le plus tard.",
   "enso.lb.empty": "Aucun score pour l'instant. Soyez le premier !",
   "enso.lb.myPos": "Votre rang : ",
   "enso.lb.unregistered": "Non classé",

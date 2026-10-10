@@ -1621,6 +1621,7 @@
   "enso.lb.title": "排行榜 TOP100",
   "enso.lb.close": "关闭",
   "enso.lb.loading": "加载中…",
+  "enso.lb.loadError": "排行榜加载失败，请稍后重开。",
   "enso.lb.empty": "还没有记录，来做第一个吧！",
   "enso.lb.myPos": "你的名次：",
   "enso.lb.unregistered": "尚未上榜",

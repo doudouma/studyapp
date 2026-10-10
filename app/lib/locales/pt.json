@@ -1533,6 +1533,7 @@
   "enso.lb.title": "Ranking TOP100",
   "enso.lb.close": "Fechar",
   "enso.lb.loading": "Carregando…",
+  "enso.lb.loadError": "Falha ao carregar o ranking. Abra novamente mais tarde.",
   "enso.lb.empty": "Ainda sem registros. Seja o primeiro!",
   "enso.lb.myPos": "Sua posição: ",
   "enso.lb.unregistered": "Sem ranking",
