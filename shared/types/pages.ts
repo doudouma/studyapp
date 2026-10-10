@@ -55,6 +55,7 @@ export const RESERVED_SLUGS: ReadonlySet<string> = new Set([
   "papercut",
   "deliveryrush",
   "enso",
+  "outbreak",
   "view",
   "idphoto",
   "wardrobe",
