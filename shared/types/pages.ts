@@ -53,6 +53,8 @@ export const RESERVED_SLUGS: ReadonlySet<string> = new Set([
   "petsafe",
   "petbadge",
   "papercut",
+  "deliveryrush",
+  "enso",
   "view",
   "idphoto",
   "wardrobe",

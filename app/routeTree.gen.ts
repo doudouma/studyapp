@@ -24,6 +24,7 @@ import { Route as LinksRouteImport } from './routes/links'
 import { Route as IdphotoRouteImport } from './routes/idphoto'
 import { Route as GamesRouteImport } from './routes/games'
 import { Route as FreetoolRouteImport } from './routes/freetool'
+import { Route as EnsoRouteImport } from './routes/enso'
 import { Route as DeliveryrushRouteImport } from './routes/deliveryrush'
 import { Route as CookieRouteImport } from './routes/cookie'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -108,6 +109,11 @@ const FreetoolRoute = FreetoolRouteImport.update({
   path: '/freetool',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EnsoRoute = EnsoRouteImport.update({
+  id: '/enso',
+  path: '/enso',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DeliveryrushRoute = DeliveryrushRouteImport.update({
   id: '/deliveryrush',
   path: '/deliveryrush',
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/cookie': typeof CookieRoute
   '/deliveryrush': typeof DeliveryrushRoute
+  '/enso': typeof EnsoRoute
   '/freetool': typeof FreetoolRoute
   '/games': typeof GamesRoute
   '/idphoto': typeof IdphotoRoute
@@ -181,6 +188,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/cookie': typeof CookieRoute
   '/deliveryrush': typeof DeliveryrushRoute
+  '/enso': typeof EnsoRoute
   '/freetool': typeof FreetoolRoute
   '/games': typeof GamesRoute
   '/idphoto': typeof IdphotoRoute
@@ -207,6 +215,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/cookie': typeof CookieRoute
   '/deliveryrush': typeof DeliveryrushRoute
+  '/enso': typeof EnsoRoute
   '/freetool': typeof FreetoolRoute
   '/games': typeof GamesRoute
   '/idphoto': typeof IdphotoRoute
@@ -234,6 +243,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cookie'
     | '/deliveryrush'
+    | '/enso'
     | '/freetool'
     | '/games'
     | '/idphoto'
@@ -259,6 +269,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cookie'
     | '/deliveryrush'
+    | '/enso'
     | '/freetool'
     | '/games'
     | '/idphoto'
@@ -284,6 +295,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cookie'
     | '/deliveryrush'
+    | '/enso'
     | '/freetool'
     | '/games'
     | '/idphoto'
@@ -310,6 +322,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   CookieRoute: typeof CookieRoute
   DeliveryrushRoute: typeof DeliveryrushRoute
+  EnsoRoute: typeof EnsoRoute
   FreetoolRoute: typeof FreetoolRoute
   GamesRoute: typeof GamesRoute
   IdphotoRoute: typeof IdphotoRoute
@@ -436,6 +449,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FreetoolRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/enso': {
+      id: '/enso'
+      path: '/enso'
+      fullPath: '/enso'
+      preLoaderRoute: typeof EnsoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/deliveryrush': {
       id: '/deliveryrush'
       path: '/deliveryrush'
@@ -502,6 +522,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   CookieRoute: CookieRoute,
   DeliveryrushRoute: DeliveryrushRoute,
+  EnsoRoute: EnsoRoute,
   FreetoolRoute: FreetoolRoute,
   GamesRoute: GamesRoute,
   IdphotoRoute: IdphotoRoute,

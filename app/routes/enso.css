@@ -1,0 +1,61 @@
+/* /enso 一笔禅圆 页面样式 */
+
+.enso-root {
+  background: linear-gradient(180deg, #eee4cd 0%, #f7f2e2 100%);
+}
+
+.enso-serif {
+  font-family: "Shippori Mincho B1", "Songti SC", "Noto Serif SC", Georgia, serif;
+}
+
+.enso-paper {
+  background-color: #f7f2e2;
+  cursor: crosshair;
+}
+
+/* 中央百分比浮现 */
+.enso-center-pct {
+  animation: enso-center-in 0.25s ease-out;
+}
+
+@keyframes enso-center-in {
+  from {
+    opacity: 0;
+    transform: scale(1.15);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 印章盖下 */
+.enso-stamp {
+  animation: enso-stamp-in 0.35s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+
+@keyframes enso-stamp-in {
+  from {
+    opacity: 0;
+    transform: scale(1.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 提示呼吸 */
+.enso-hint {
+  animation: enso-hint-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes enso-hint-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
