@@ -133,7 +133,7 @@ function EnsoPage() {
     <div className="flex min-h-screen flex-col">
       <AppNav />
       <main className="flex-1">
-        <section className="relative overflow-hidden bg-gradient-to-b from-[#b3402f]/10 via-[#b3402f]/[0.02] to-background dark:from-[#b3402f]/10 dark:via-[#b3402f]/[0.02] dark:to-background pb-6 pt-6 sm:pt-10">
+        <section className="relative overflow-hidden pb-6 pt-6 sm:pt-10">
           <div className="mx-auto w-full max-w-4xl px-4">
             <div ref={gameRef} id="enso-game" className="relative h-[min(78vh,760px)] min-h-[520px] overflow-hidden rounded-xl border-2 border-[#d8cdb4] shadow-lg">
               <EnsoGame canvasRef={canvasRef} />
