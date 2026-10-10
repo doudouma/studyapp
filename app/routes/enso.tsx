@@ -16,7 +16,7 @@ export const Route = createFileRoute("/enso")({
   head: () => {
     const bcp = getBcp47(i18n.language);
     const pageUrl = BASE_URL + withLangPrefix(currentLang(), "/enso");
-    const faqs = Array.from({ length: 6 }, (_, i) => ({
+    const faqs = Array.from({ length: 7 }, (_, i) => ({
       name: i18n.t(`enso.faq${i + 1}.q`),
       text: i18n.t(`enso.faq${i + 1}.a`),
     }));
@@ -125,7 +125,7 @@ function EnsoPage() {
     t("enso.guide.step4"),
     t("enso.guide.step5"),
   ];
-  const faqs = Array.from({ length: 6 }, (_, i) => ({
+  const faqs = Array.from({ length: 7 }, (_, i) => ({
     name: t(`enso.faq${i + 1}.q`),
     text: t(`enso.faq${i + 1}.a`),
   }));
