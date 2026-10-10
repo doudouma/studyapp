@@ -204,3 +204,18 @@ export const deliveryRank = sqliteTable("delivery_rank", {
   index("idx_delivery_rank_diff_score").on(t.diff, t.score),
   index("idx_delivery_rank_player").on(t.playerKey),
 ]);
+
+// --- Enso (一笔禅圆) 排行榜 ---
+
+export const ensoRank = sqliteTable("enso_rank", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(),
+  score: integer("score").notNull(),
+  passed: integer("passed").notNull().default(0), // 结业时通过题数
+  avg: integer("avg").notNull().default(0), // 结业时平均准确率（整数 %）
+  playerKey: text("player_key").notNull(), // 设备标识（X-Player-Key）
+  createdAt: integer("created_at").notNull(),
+}, (t) => [
+  index("idx_enso_rank_score").on(t.score),
+  index("idx_enso_rank_player").on(t.playerKey),
+]);

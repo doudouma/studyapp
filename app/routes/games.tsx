@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Gamepad2, ArrowRight, Scissors, Truck } from "lucide-react";
+import { Gamepad2, ArrowRight, Scissors, Truck, Brush } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { useTranslation } from "react-i18next";
@@ -46,6 +46,12 @@ export const Route = createFileRoute("/games")({
                 name: i18n.t("games.item.deliveryrush.title"),
                 url: "https://100mini.com/deliveryrush",
               },
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: i18n.t("games.item.enso.title"),
+                url: "https://100mini.com/enso",
+              },
             ],
           }),
         },
@@ -70,6 +76,12 @@ function GamesPage() {
       icon: Truck,
       title: t("games.item.deliveryrush.title"),
       desc: t("games.item.deliveryrush.desc"),
+    },
+    {
+      href: "/enso" as const,
+      icon: Brush,
+      title: t("games.item.enso.title"),
+      desc: t("games.item.enso.desc"),
     },
   ];
 
