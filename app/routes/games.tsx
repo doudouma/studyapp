@@ -74,40 +74,27 @@ function GamesPage() {
   ];
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-[#f4f4f4]">
       <AppNav />
-      <main className="flex-1">
+      <main className="flex-1 font-mono">
         {/* Hero */}
-        <section className="relative overflow-hidden bg-[#006c49] dark:bg-[#0b1c30]">
-          {/* 装饰：光晕 + 点阵纹理 */}
-          <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-            <div className="absolute -left-24 -top-24 size-72 rounded-full bg-[#4edea3]/20 blur-3xl" />
-            <div className="absolute -bottom-32 -right-24 size-80 rounded-full bg-white/10 blur-3xl" />
-            <div
-              className="absolute inset-0 opacity-[0.15]"
-              style={{
-                backgroundImage:
-                  "radial-gradient(circle, #fff 1px, transparent 1px)",
-                backgroundSize: "24px 24px",
-              }}
-            />
-          </div>
-          <div className="relative mx-auto max-w-5xl px-6 py-20 text-center sm:py-28">
-            <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-sm">
-              <Gamepad2 className="size-4 text-[#4edea3]" />
+        <section className="bg-[#1a1c2c] px-4 py-12 md:px-8 md:py-20">
+          <div className="mx-auto max-w-5xl text-center">
+            <div className="mb-6 inline-flex items-center gap-2 border-4 border-[#1a1c2c] bg-[#ffec27] px-4 py-1.5 text-sm font-bold text-[#1a1c2c] shadow-[4px_4px_0_#ff004d]">
+              <Gamepad2 className="size-4" />
               {t("games.more")}
             </div>
-            <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+            <h1 className="text-3xl font-bold uppercase tracking-wider text-[#ffec27] md:text-5xl">
               {t("games.heading")}
             </h1>
-            <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-[#cfe8dd] sm:text-lg">
+            <p className="mx-auto mt-4 max-w-2xl text-base text-[#f4f4f4] md:text-lg">
               {t("games.subheading")}
             </p>
           </div>
         </section>
 
         {/* Game cards grid */}
-        <section className="mx-auto max-w-5xl px-6 py-12 sm:py-16">
+        <section className="mx-auto max-w-5xl px-4 py-12 md:px-8 md:py-20">
           <div className="grid gap-6 sm:grid-cols-2">
             {games.map((game) => {
               const Icon = game.icon;
@@ -115,21 +102,21 @@ function GamesPage() {
                 <Link
                   key={game.href}
                   to={game.href}
-                  className="group relative flex flex-col overflow-hidden rounded-2xl border border-[#d3e4fe]/70 bg-white p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#006c49]/40 hover:shadow-md dark:border-[#3c4a42] dark:bg-[#15243b] dark:hover:border-[#4edea3]/40 sm:p-7"
+                  className="group flex flex-col rounded-none border-4 border-[#1a1c2c] bg-white p-6 shadow-[4px_4px_0_#1a1c2c] transition-none hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0_#1a1c2c] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none focus:outline-none focus:shadow-[inset_0_0_0_3px_#29adff] motion-reduce:transform-none"
                 >
                   <div className="flex items-start justify-between">
-                    <div className="flex size-12 items-center justify-center rounded-xl bg-[#006c49]/10 text-[#006c49] transition-colors group-hover:bg-[#006c49] group-hover:text-white dark:bg-[#4edea3]/10 dark:text-[#4edea3] dark:group-hover:bg-[#4edea3] dark:group-hover:text-[#002113]">
+                    <div className="flex size-12 items-center justify-center border-4 border-[#1a1c2c] bg-[#29adff] text-[#1a1c2c] transition-none group-hover:bg-[#ff004d] group-hover:text-[#ffec27]">
                       <Icon className="size-6" />
                     </div>
-                    <ArrowRight className="size-5 text-muted-foreground/40 transition-all group-hover:translate-x-0.5 group-hover:text-[#006c49] dark:group-hover:text-[#4edea3]" />
+                    <ArrowRight className="size-5 text-[#1a1c2c] transition-none group-hover:translate-x-1" />
                   </div>
-                  <h2 className="mt-4 text-lg font-semibold text-foreground">{game.title}</h2>
-                  <p className="mt-1.5 flex-1 text-sm leading-relaxed text-muted-foreground">
-                    {game.desc}
-                  </p>
-                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-[#006c49] dark:text-[#4edea3]">
+                  <h2 className="mt-4 text-lg font-bold uppercase tracking-wider text-[#1a1c2c] md:text-xl">
+                    {game.title}
+                  </h2>
+                  <p className="mt-1.5 flex-1 text-sm leading-relaxed text-[#5f574f]">{game.desc}</p>
+                  <span className="mt-4 inline-flex w-fit items-center gap-1 border-4 border-[#1a1c2c] bg-[#ffec27] px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#1a1c2c] shadow-[2px_2px_0_#1a1c2c]">
                     {t("games.cta")}
-                    <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+                    <ArrowRight className="size-3.5" />
                   </span>
                 </Link>
               );
