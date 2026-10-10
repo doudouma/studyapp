@@ -52,6 +52,24 @@ function MobileNavLink({ href, onClick, children }: { href: string; onClick: () 
   );
 }
 
+function MobileGroup({ label, children }: { label: string; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="mt-1">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between rounded-lg px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground transition-colors hover:bg-[#e5eeff] dark:hover:bg-[#1e314a]"
+      >
+        {label}
+        <ChevronDown className={`size-4 transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && <div className="flex flex-col gap-1 pt-0.5">{children}</div>}
+    </div>
+  );
+}
+
 function ToolsDropdown() {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -323,24 +341,22 @@ export function AppNav() {
                 <MobileNavLink href="/square" onClick={() => setMobileNavOpen(false)}>{t("nav.square")}</MobileNavLink>
               </div>
               <MobileNavLink href="/showcase" onClick={() => setMobileNavOpen(false)}>{t("nav.showcase")}</MobileNavLink>
-              <div className="px-4 pb-1 pt-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {t("nav.tools")}
-              </div>
-              <MobileNavLink href="/freetool" onClick={() => setMobileNavOpen(false)}>{t("nav.toolsAll")}</MobileNavLink>
-              <MobileNavLink href="/pomodoro" onClick={() => setMobileNavOpen(false)}>{t("nav.pomodoro")}</MobileNavLink>
-              <MobileNavLink href="/rhythm" onClick={() => setMobileNavOpen(false)}>{t("nav.rhythm")}</MobileNavLink>
-              <MobileNavLink href="/md2html" onClick={() => setMobileNavOpen(false)}>{t("nav.md2html")}</MobileNavLink>
-              <MobileNavLink href="/any2md" onClick={() => setMobileNavOpen(false)}>{t("nav.any2md")}</MobileNavLink>
-              <MobileNavLink href="/idphoto" onClick={() => setMobileNavOpen(false)}>{t("nav.idphoto")}</MobileNavLink>
-              <MobileNavLink href="/petbadge" onClick={() => setMobileNavOpen(false)}>{t("nav.petbadge")}</MobileNavLink>
-              <MobileNavLink href="/petsafe" onClick={() => setMobileNavOpen(false)}>{t("nav.petsafe")}</MobileNavLink>
-              <div className="px-4 pb-1 pt-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {t("nav.game")}
-              </div>
-              <MobileNavLink href="/games" onClick={() => setMobileNavOpen(false)}>{t("nav.gamesAll")}</MobileNavLink>
-              <MobileNavLink href="/papercut" onClick={() => setMobileNavOpen(false)}>{t("nav.papercut")}</MobileNavLink>
-              <MobileNavLink href="/deliveryrush" onClick={() => setMobileNavOpen(false)}>{t("nav.deliveryrush")}</MobileNavLink>
-              <MobileNavLink href="/enso" onClick={() => setMobileNavOpen(false)}>{t("nav.enso")}</MobileNavLink>
+              <MobileGroup label={t("nav.tools")}>
+                <MobileNavLink href="/freetool" onClick={() => setMobileNavOpen(false)}>{t("nav.toolsAll")}</MobileNavLink>
+                <MobileNavLink href="/pomodoro" onClick={() => setMobileNavOpen(false)}>{t("nav.pomodoro")}</MobileNavLink>
+                <MobileNavLink href="/rhythm" onClick={() => setMobileNavOpen(false)}>{t("nav.rhythm")}</MobileNavLink>
+                <MobileNavLink href="/md2html" onClick={() => setMobileNavOpen(false)}>{t("nav.md2html")}</MobileNavLink>
+                <MobileNavLink href="/any2md" onClick={() => setMobileNavOpen(false)}>{t("nav.any2md")}</MobileNavLink>
+                <MobileNavLink href="/idphoto" onClick={() => setMobileNavOpen(false)}>{t("nav.idphoto")}</MobileNavLink>
+                <MobileNavLink href="/petbadge" onClick={() => setMobileNavOpen(false)}>{t("nav.petbadge")}</MobileNavLink>
+                <MobileNavLink href="/petsafe" onClick={() => setMobileNavOpen(false)}>{t("nav.petsafe")}</MobileNavLink>
+              </MobileGroup>
+              <MobileGroup label={t("nav.game")}>
+                <MobileNavLink href="/games" onClick={() => setMobileNavOpen(false)}>{t("nav.gamesAll")}</MobileNavLink>
+                <MobileNavLink href="/papercut" onClick={() => setMobileNavOpen(false)}>{t("nav.papercut")}</MobileNavLink>
+                <MobileNavLink href="/deliveryrush" onClick={() => setMobileNavOpen(false)}>{t("nav.deliveryrush")}</MobileNavLink>
+                <MobileNavLink href="/enso" onClick={() => setMobileNavOpen(false)}>{t("nav.enso")}</MobileNavLink>
+              </MobileGroup>
               <div className="px-4 pt-2">
                 <LangSwitcher />
               </div>
@@ -456,24 +472,22 @@ export function AppNav() {
               <MobileNavLink href="/square" onClick={() => setMobileNavOpen(false)}>{t("nav.square")}</MobileNavLink>
             </div>
             <MobileNavLink href="/showcase" onClick={() => setMobileNavOpen(false)}>{t("nav.showcase")}</MobileNavLink>
-            <div className="px-4 pb-1 pt-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              {t("nav.tools")}
-            </div>
-            <MobileNavLink href="/freetool" onClick={() => setMobileNavOpen(false)}>{t("nav.toolsAll")}</MobileNavLink>
-            <MobileNavLink href="/pomodoro" onClick={() => setMobileNavOpen(false)}>{t("nav.pomodoro")}</MobileNavLink>
-            <MobileNavLink href="/rhythm" onClick={() => setMobileNavOpen(false)}>{t("nav.rhythm")}</MobileNavLink>
-            <MobileNavLink href="/md2html" onClick={() => setMobileNavOpen(false)}>{t("nav.md2html")}</MobileNavLink>
-            <MobileNavLink href="/any2md" onClick={() => setMobileNavOpen(false)}>{t("nav.any2md")}</MobileNavLink>
-            <MobileNavLink href="/idphoto" onClick={() => setMobileNavOpen(false)}>{t("nav.idphoto")}</MobileNavLink>
-            <MobileNavLink href="/petbadge" onClick={() => setMobileNavOpen(false)}>{t("nav.petbadge")}</MobileNavLink>
-            <MobileNavLink href="/petsafe" onClick={() => setMobileNavOpen(false)}>{t("nav.petsafe")}</MobileNavLink>
-            <div className="px-4 pb-1 pt-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              {t("nav.game")}
-            </div>
-            <MobileNavLink href="/games" onClick={() => setMobileNavOpen(false)}>{t("nav.gamesAll")}</MobileNavLink>
-            <MobileNavLink href="/papercut" onClick={() => setMobileNavOpen(false)}>{t("nav.papercut")}</MobileNavLink>
-            <MobileNavLink href="/deliveryrush" onClick={() => setMobileNavOpen(false)}>{t("nav.deliveryrush")}</MobileNavLink>
-            <MobileNavLink href="/enso" onClick={() => setMobileNavOpen(false)}>{t("nav.enso")}</MobileNavLink>
+            <MobileGroup label={t("nav.tools")}>
+              <MobileNavLink href="/freetool" onClick={() => setMobileNavOpen(false)}>{t("nav.toolsAll")}</MobileNavLink>
+              <MobileNavLink href="/pomodoro" onClick={() => setMobileNavOpen(false)}>{t("nav.pomodoro")}</MobileNavLink>
+              <MobileNavLink href="/rhythm" onClick={() => setMobileNavOpen(false)}>{t("nav.rhythm")}</MobileNavLink>
+              <MobileNavLink href="/md2html" onClick={() => setMobileNavOpen(false)}>{t("nav.md2html")}</MobileNavLink>
+              <MobileNavLink href="/any2md" onClick={() => setMobileNavOpen(false)}>{t("nav.any2md")}</MobileNavLink>
+              <MobileNavLink href="/idphoto" onClick={() => setMobileNavOpen(false)}>{t("nav.idphoto")}</MobileNavLink>
+              <MobileNavLink href="/petbadge" onClick={() => setMobileNavOpen(false)}>{t("nav.petbadge")}</MobileNavLink>
+              <MobileNavLink href="/petsafe" onClick={() => setMobileNavOpen(false)}>{t("nav.petsafe")}</MobileNavLink>
+            </MobileGroup>
+            <MobileGroup label={t("nav.game")}>
+              <MobileNavLink href="/games" onClick={() => setMobileNavOpen(false)}>{t("nav.gamesAll")}</MobileNavLink>
+              <MobileNavLink href="/papercut" onClick={() => setMobileNavOpen(false)}>{t("nav.papercut")}</MobileNavLink>
+              <MobileNavLink href="/deliveryrush" onClick={() => setMobileNavOpen(false)}>{t("nav.deliveryrush")}</MobileNavLink>
+              <MobileNavLink href="/enso" onClick={() => setMobileNavOpen(false)}>{t("nav.enso")}</MobileNavLink>
+            </MobileGroup>
             <MobileNavLink href="/links" onClick={() => setMobileNavOpen(false)}>{t("nav.profile")}</MobileNavLink>
             {user.role === "admin" && (
               <MobileNavLink href="/admin" onClick={() => setMobileNavOpen(false)}>{t("nav.admin")}</MobileNavLink>
