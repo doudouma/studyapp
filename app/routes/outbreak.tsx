@@ -181,6 +181,7 @@ function OutbreakPage() {
         <section className="mx-auto w-full max-w-3xl px-4 pb-20">
           <h2 className="ob-h2 text-center text-2xl font-bold tracking-tight">{t("od.item.title")}</h2>
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            {/* 道具清单需与 public/games/outbreak/game.js 的 ITEMS 保持一致（新增道具时同步） */}
             {[
               { key: "syringe", color: "#7fe0e0" },
               { key: "stick", color: "#e8c468" },

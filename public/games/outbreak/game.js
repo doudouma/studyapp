@@ -56,7 +56,7 @@ const PKG={
   bulk:  {name:__('pkg.bulk.name','大型'), tag:__('pkg.bulk.tag','大型'),css:'#e8c468',size:2,qw:.86,desc:__('pkg.bulk.desc','かさばる荷物。2スロットを占有する。')}
 };
 const FH=2.4, D=2.6, BX0=-4.6, BX1=4.2, SX0=.9, SX1=3.3, CABX=2.1, QX=.4, QZ=-1.25, VIEW_CX=-.9, VIEW_W=11.8;
-const THREAT_R=3.6; /* 停車時に脅威判定する水平距離（ドア基準） */
+const THREAT_R=3.6; /* 水平威胁距离基准：现仅用于限定喷酸者的巡逻范围（SPIT_X0） */
 const COLLIDE_R=1.1; /* 僵尸与配送员「碰撞/接触」判定半径（同层且贴身才算感染） */
 const SPIT_X0=CABX-THREAT_R+.3, SPIT_X1=BX1-1; /* spitter 巡邏範圍：始終保持在可噴酸的對位距離內 */
 /* 测试开关：默认强制刷出的僵尸类型（喷酸者等），不受时间解锁曲线限制；置为 [] 恢复常规难度 */
@@ -741,8 +741,8 @@ function frame(ms){
     updItems(dt,time);
     updSpits(dt);
     for(let i=packages.length-1;i>=0;i--){ if(packages[i].state==='gone'){ killPkg(packages[i]); packages.splice(i,1); } }
-    if(mode==='play'&&!G.over&&courier){
-      /* 只有僵尸「碰到」配送员（同层且贴身）才产生接触感染，不是同层就感染 */
+    if(mode==='play'&&!G.over&&E.mode==='idle'&&courier){
+      /* 电梯停靠时，只有僵尸「碰到」配送员（同层且贴身）才产生接触感染，不是同层就感染 */
       const cf=Math.round(courier.y/FH), threat=[];
       for(const z of zombies){ if(z.floor===cf&&Math.hypot(z.x-courier.x,z.z-courier.z)<COLLIDE_R) threat.push(z.type); }
       if(threat.length) damage(infectionPerSecond(threat,cfg.infectionScale)*dt);
