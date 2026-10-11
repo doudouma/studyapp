@@ -3,6 +3,7 @@ import { OUTBREAK_TOP_LIMIT } from "@shared/types/outbreak";
 import {
   comboMultiplier,
   packageScore,
+  zombieScore,
   infectionPerSecond,
   difficultyAt,
   rankFor,
@@ -34,6 +35,17 @@ describe("packageScore", () => {
   it("疫苗件 150、生物样本 300", () => {
     expect(packageScore("vaccine", 1)).toBe(150);
     expect(packageScore("bio", 1)).toBe(300);
+  });
+});
+
+describe("zombieScore", () => {
+  it("不同僵尸基础分不同", () => {
+    expect(zombieScore("walker")).toBe(50);
+    expect(zombieScore("spitter")).toBe(150);
+    expect(zombieScore("spitter")).toBeGreaterThan(zombieScore("walker"));
+  });
+  it("随连击倍率提升，四舍五入到十位", () => {
+    expect(zombieScore("walker", 11)).toBe(100);
   });
 });
 

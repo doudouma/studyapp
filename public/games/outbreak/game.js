@@ -22,7 +22,7 @@
  */
 import {
   infectionPerSecond, SPIT_INFECTION, LUNGE_INFECTION,
-  comboMultiplier, packageScore, difficultyAt, rankFor,
+  comboMultiplier, packageScore, zombieScore, difficultyAt, rankFor,
 } from "./rules.js";
 
 (()=>{
@@ -595,8 +595,9 @@ function updCourier(dt,time){
           if(it.def.heal){ addInfection(-it.def.heal); popAt(it.x,it.y+1.4,it.z,fmt(__('msg.heal','感染 -{n}'),{n:it.def.heal}),'info'); SFX.heart(); }
           else { c.sticks++; popAt(it.x,it.y+1.4,it.z,fmt(__('msg.gotItem','{name} +1'),{name:it.def.name}),'info'); SFX.bonus(); }
           c.item=null; } c.state='return'; c.tx=c.home.x; c.tz=c.home.z; dirty=true; }
-      else if(st==='toKill'){ const z=c.target; if(z){ killZombie(z); const i=zombies.indexOf(z); if(i>=0) zombies.splice(i,1);
-          burst(z.x,z.y+1.0,z.z,14,'smoke'); popAt(z.x,z.y+1.6,z.z,__('msg.kill','击倒!'),''); c.sticks--; SFX.miss(); } c.target=null;
+      else if(st==='toKill'){ const z=c.target; if(z){ const zt=z.type; killZombie(z); const i=zombies.indexOf(z); if(i>=0) zombies.splice(i,1);
+          let pts=0; if(!demo){ pts=zombieScore(zt,G.combo); G.score+=pts; }
+          burst(z.x,z.y+1.0,z.z,14,'smoke'); popAt(z.x,z.y+1.6,z.z,(pts?'+'+pts+' ':'')+__('msg.kill','击倒!'),''); c.sticks--; SFX.miss(); } c.target=null;
         c.state='return'; c.tx=c.home.x; c.tz=c.home.z; dirty=true; }
       else if(st==='return'){ if(cabHere) c.state='cab'; }
     }
@@ -745,7 +746,7 @@ function frame(ms){
 
 /* ================= flow ================= */
 function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('show',s.id===id)); }
-function setHud(on){ const hud=$('hud'); if(hud) hud.hidden=!on; resize(); }
+function setHud(on){ const hud=$('hud'); if(hud) hud.hidden=!on; const mini=$('mini'); if(mini) mini.hidden=!(on&&N>=10); resize(); }
 function toTitle(){ bgmStop(); mode='title'; setHud(false); resetGame(true); show('title'); const cd=$('cd'); if(cd) cd.classList.remove('show'); }
 function startGame(){
   auInit(); if(AU.ctx&&AU.ctx.state==='suspended') AU.ctx.resume();

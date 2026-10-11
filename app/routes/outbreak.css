@@ -190,3 +190,13 @@
 /* 全屏态：游戏容器撑满视口，去掉圆角与边框 */
 #outbreak-game:fullscreen{width:100vw;height:100vh;border-radius:0;border:none}
 #outbreak-game:-webkit-full-screen{width:100vw;height:100vh;border-radius:0;border:none}
+
+/* ── Outbreak 页面（游戏外围）生化危机风格：仅作用于页面 main，不改游戏内 ── */
+.outbreak-page main{background:radial-gradient(ellipse at 50% -10%,#1c0d0d 0,#0c0e0c 55%,#0c0e0c 100%) #0c0e0c;color:#e6e0d4}
+.outbreak-page .outbreak-hero{background:linear-gradient(#1a0d0d 0,#0c0e0c 78%)}
+.outbreak-page .ob-h2{font-family:"Mochiy Pop One","M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;color:#c62828;text-shadow:0 0 18px #c6282855,0 2px 0 #050604}
+.outbreak-page .ob-h2::before{content:'☣ ';filter:drop-shadow(0 0 6px #c6282899)}
+.outbreak-page .ob-p{color:#9a9a86}
+.outbreak-page .ob-card{position:relative;overflow:hidden;box-shadow:0 0 0 1px #00000000,0 8px 30px #00000066}
+.outbreak-page .ob-card::before{content:'';position:absolute;left:0;right:0;top:0;height:5px;background:repeating-linear-gradient(45deg,#d4b106 0 7px,#050604 7px 14px);opacity:.9}
+.outbreak-page .ob-card::after{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,#c62828,#c6282800)}

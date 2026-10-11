@@ -124,12 +124,12 @@ function OutbreakPage() {
     text: t(`outbreak.faq${i + 1}.a`),
   }));
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="outbreak-page flex min-h-screen flex-col">
       <AppNav />
       <main className="flex-1">
-        <section className="relative overflow-hidden bg-gradient-to-b from-[#ff2e4d]/10 via-[#ff2e4d]/[0.02] to-background dark:from-[#ff2e4d]/10 dark:via-[#ff2e4d]/[0.02] dark:to-background pb-6 pt-6 sm:pt-10">
+        <section className="outbreak-hero relative overflow-hidden pb-6 pt-6 sm:pt-10">
           <div className="mx-auto w-full max-w-4xl px-4">
-            <div ref={gameRef} id="outbreak-game" className="relative h-[min(78vh,760px)] min-h-[520px] overflow-hidden rounded-xl border-2 border-border shadow-lg">
+            <div ref={gameRef} id="outbreak-game" className="relative h-[min(78vh,760px)] min-h-[520px] overflow-hidden rounded-xl border-2 border-[#7a2a2a] shadow-[0_0_34px_#c6282833]">
               <OutbreakGame canvasRef={canvasRef} />
             </div>
             <div className="mt-3 flex justify-end gap-2">
@@ -137,7 +137,7 @@ function OutbreakPage() {
                 type="button"
                 onClick={() => setShareOpen(true)}
                 aria-label={t("outbreak.share.button")}
-                className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+                className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-[#3a2a24] bg-[#141410] px-3 py-1.5 text-sm font-medium text-[#e6e0d4] shadow-sm transition-colors hover:bg-[#241a1a] hover:text-[#c62828]"
               >
                 <Share2 className="size-4" />
                 {t("outbreak.share.button")}
@@ -146,7 +146,7 @@ function OutbreakPage() {
                 type="button"
                 onClick={toggleFullscreen}
                 aria-label={isFull ? t("outbreak.fullscreenExit") : t("outbreak.fullscreen")}
-                className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+                className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-[#3a2a24] bg-[#141410] px-3 py-1.5 text-sm font-medium text-[#e6e0d4] shadow-sm transition-colors hover:bg-[#241a1a] hover:text-[#c62828]"
               >
                 {isFull ? <Minimize className="size-4" /> : <Maximize className="size-4" />}
                 {isFull ? t("outbreak.fullscreenExit") : t("outbreak.fullscreen")}
@@ -165,19 +165,19 @@ function OutbreakPage() {
           </div>
         </section>
         <section className="mx-auto w-full max-w-3xl px-4 pb-20 pt-12">
-          <h2 className="text-center text-2xl font-bold tracking-tight text-foreground">{t("outbreak.how.title")}</h2>
-          <p className="mx-auto mt-2 max-w-2xl text-center text-[15px] leading-relaxed text-muted-foreground">{t("outbreak.desc")}</p>
-          <div className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
+          <h2 className="ob-h2 text-center text-2xl font-bold tracking-tight">{t("outbreak.how.title")}</h2>
+          <p className="ob-p mx-auto mt-2 max-w-2xl text-center text-[15px] leading-relaxed">{t("outbreak.desc")}</p>
+          <div className="ob-card mt-8 rounded-2xl border border-[#3a2a24] bg-[#141410] p-6 shadow-sm sm:p-8">
             <ol className="list-decimal space-y-2.5 pl-5">
               {guideSteps.map((step) => (
-                <li key={step} className="text-[15px] leading-relaxed text-muted-foreground">{step}</li>
+                <li key={step} className="ob-p text-[15px] leading-relaxed">{step}</li>
               ))}
             </ol>
           </div>
         </section>
         <section className="mx-auto w-full max-w-3xl px-4 pb-20">
-          <h2 className="text-center text-2xl font-bold tracking-tight text-foreground">{t("outbreak.faq")}</h2>
-          <div className="mt-8 rounded-2xl border border-border bg-card px-6 shadow-sm">
+          <h2 className="ob-h2 text-center text-2xl font-bold tracking-tight">{t("outbreak.faq")}</h2>
+          <div className="ob-card mt-8 rounded-2xl border border-[#3a2a24] bg-[#141410] px-6 shadow-sm">
             {faqs.map((faq) => (
               <FaqItem key={faq.name} name={faq.name} text={faq.text} />
             ))}
@@ -192,19 +192,19 @@ function OutbreakPage() {
 function FaqItem({ name, text }: { name: string; text: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border-b border-border last:border-b-0">
+    <div className="border-b border-[#3a2a24] last:border-b-0">
       <button
-        className="flex w-full cursor-pointer items-center justify-between gap-4 py-4 text-left text-sm font-medium transition-colors hover:text-foreground/80"
+        className="flex w-full cursor-pointer items-center justify-between gap-4 py-4 text-left text-sm font-medium text-[#e6e0d4] transition-colors hover:text-[#c62828]"
         onClick={() => setOpen(!open)}
       >
         <span>{name}</span>
         <ChevronDown
-          className={`size-4 shrink-0 text-muted-foreground transition-transform duration-200 ${
+          className={`size-4 shrink-0 text-[#9a9a86] transition-transform duration-200 ${
             open ? "rotate-180" : ""
           }`}
         />
       </button>
-      {open && <div className="pb-4 text-sm leading-relaxed text-muted-foreground">{text}</div>}
+      {open && <div className="ob-p pb-4 text-sm leading-relaxed">{text}</div>}
     </div>
   );
 }

@@ -27,6 +27,21 @@ export const PACKAGE_POINTS = {
   bio: 300,
 };
 
+/** 击杀各僵尸的基础分（不同僵尸不同） */
+export const ZOMBIE_POINTS = {
+  walker: 50,
+  spitter: 150,
+  sprayer: 100,
+  runner: 120,
+  brute: 250,
+};
+
+/** 击杀得分：基础分 × 连击倍率，四舍五入到十位 */
+export function zombieScore(type, combo = 1) {
+  const base = ZOMBIE_POINTS[type] ?? ZOMBIE_POINTS.walker;
+  return Math.round((base * comboMultiplier(combo)) / 10) * 10;
+}
+
 /** combo 倍率：min(3, 1 + 0.1*(combo-1)) */
 export function comboMultiplier(combo) {
   const c = Math.max(1, combo | 0);
