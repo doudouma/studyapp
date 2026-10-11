@@ -69,7 +69,7 @@ const ITEM_MAX=3; /* 场上道具上限 */
 const ITEM_SPAWN=[8,16]; /* 刷新间隔（秒） */
 
 /* ================= audio ================= */
-const AU={ctx:null,master:null,on:true,bgm:null,step:0,next:0,fast:false};
+const AU={ctx:null,master:null,on:true,bgm:null,bgmEl:null};
 function auInit(){ if(AU.ctx) return; try{ const C=window.AudioContext||window.webkitAudioContext; AU.ctx=new C(); AU.master=AU.ctx.createGain(); AU.master.gain.value=AU.on?.9:0; AU.master.connect(AU.ctx.destination);}catch(e){AU.ctx=null} }
 function tone(f,dur,type,vol,when,to){ if(!AU.ctx||!AU.on) return; const c=AU.ctx,t=c.currentTime+(when||0),o=c.createOscillator(),g=c.createGain();
   o.type=type||'square'; o.frequency.setValueAtTime(f,t); if(to) o.frequency.exponentialRampToValueAtTime(to,t+dur);
@@ -91,15 +91,12 @@ const SFX={
   end(){[84,79,76,72].forEach((m,i)=>tone(mf(m),.25,'triangle',.15,i*.14))},
   click(){tone(660,.06,'square',.06,0,990)}
 };
-const BASS=[48,45,41,43], MEL=[[76,79,84,79,76,79,72,0],[76,81,84,81,76,81,72,0],[77,81,84,81,77,81,72,0],[79,83,86,83,79,74,79,0]];
-function bgmStart(){ if(!AU.ctx||AU.bgm) return; AU.step=0; AU.next=AU.ctx.currentTime+.1; AU.fast=false;
-  AU.bgm=setInterval(()=>{ if(!AU.ctx||AU.ctx.state!=='running') return; const st=AU.fast?.165:.2;
-    while(AU.next<AU.ctx.currentTime+.25){ const bar=(AU.step>>3)&3,i=AU.step&7,w=AU.next-AU.ctx.currentTime;
-      tone(mf(BASS[bar]+(i%4===2?7:0)-(i%2?0:0)),st*.9,'triangle',i%2?.05:.1,w);
-      const m=MEL[bar][i]; if(m) tone(mf(m),st*.8,'square',.03,w);
-      if(i%2===1) tone(6000,.03,'square',.012,w);
-      AU.step++; AU.next+=st; } },60); }
-function bgmStop(){ if(AU.bgm){clearInterval(AU.bgm);AU.bgm=null} }
+/* 背景音乐：使用 /games/outbreak/outbreak.mp3（循环播放，随声音开关静音） */
+function bgmStart(){ if(AU.bgm) return;
+  if(!AU.bgmEl){ const a=new Audio('/games/outbreak/outbreak.mp3'); a.loop=true; a.preload='auto'; AU.bgmEl=a; }
+  AU.bgm=AU.bgmEl; AU.bgmEl.volume=AU.on?.55:0;
+  const p=AU.bgmEl.play(); if(p&&p.catch) p.catch(()=>{}); }
+function bgmStop(){ if(AU.bgmEl){ try{ AU.bgmEl.pause(); AU.bgmEl.currentTime=0; }catch(e){} } AU.bgm=null; }
 
 /* ================= three setup ================= */
 const canvas=$('gl');
@@ -827,5 +824,5 @@ function destroy(){ if(DY) return; DY=true; clearTimeout(goTimer);
   if(RO) RO.disconnect(); if(rafId) cancelAnimationFrame(rafId);
   if(AU.ctx){ try{ AU.ctx.close(); }catch(_){} AU.ctx=null; }
   if(window.__od) window.__od.destroyed=true; }
-window.__od={G,E,press,release,startGame,setDiff,destroy,zombies:()=>zombies,packages:()=>packages,items:()=>items,spawnItem:(t)=>spawnItem(t),startKill:(z)=>startKill(z),startPickup:(it)=>startPickup(it),courier:()=>courier,spits:()=>spits,parts:()=>parts};
+window.__od={G,E,AU,press,release,startGame,setDiff,destroy,zombies:()=>zombies,packages:()=>packages,items:()=>items,spawnItem:(t)=>spawnItem(t),startKill:(z)=>startKill(z),startPickup:(it)=>startPickup(it),courier:()=>courier,spits:()=>spits,parts:()=>parts};
 })();
