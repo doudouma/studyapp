@@ -19,6 +19,7 @@ import { Route as PomodoroRouteImport } from './routes/pomodoro'
 import { Route as PetsafeRouteImport } from './routes/petsafe'
 import { Route as PetbadgeRouteImport } from './routes/petbadge'
 import { Route as PapercutRouteImport } from './routes/papercut'
+import { Route as OutbreakRouteImport } from './routes/outbreak'
 import { Route as Md2htmlRouteImport } from './routes/md2html'
 import { Route as LinksRouteImport } from './routes/links'
 import { Route as IdphotoRouteImport } from './routes/idphoto'
@@ -82,6 +83,11 @@ const PetbadgeRoute = PetbadgeRouteImport.update({
 const PapercutRoute = PapercutRouteImport.update({
   id: '/papercut',
   path: '/papercut',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OutbreakRoute = OutbreakRouteImport.update({
+  id: '/outbreak',
+  path: '/outbreak',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Md2htmlRoute = Md2htmlRouteImport.update({
@@ -168,6 +174,7 @@ export interface FileRoutesByFullPath {
   '/idphoto': typeof IdphotoRoute
   '/links': typeof LinksRoute
   '/md2html': typeof Md2htmlRoute
+  '/outbreak': typeof OutbreakRoute
   '/papercut': typeof PapercutRoute
   '/petbadge': typeof PetbadgeRoute
   '/petsafe': typeof PetsafeRoute
@@ -194,6 +201,7 @@ export interface FileRoutesByTo {
   '/idphoto': typeof IdphotoRoute
   '/links': typeof LinksRoute
   '/md2html': typeof Md2htmlRoute
+  '/outbreak': typeof OutbreakRoute
   '/papercut': typeof PapercutRoute
   '/petbadge': typeof PetbadgeRoute
   '/petsafe': typeof PetsafeRoute
@@ -221,6 +229,7 @@ export interface FileRoutesById {
   '/idphoto': typeof IdphotoRoute
   '/links': typeof LinksRoute
   '/md2html': typeof Md2htmlRoute
+  '/outbreak': typeof OutbreakRoute
   '/papercut': typeof PapercutRoute
   '/petbadge': typeof PetbadgeRoute
   '/petsafe': typeof PetsafeRoute
@@ -249,6 +258,7 @@ export interface FileRouteTypes {
     | '/idphoto'
     | '/links'
     | '/md2html'
+    | '/outbreak'
     | '/papercut'
     | '/petbadge'
     | '/petsafe'
@@ -275,6 +285,7 @@ export interface FileRouteTypes {
     | '/idphoto'
     | '/links'
     | '/md2html'
+    | '/outbreak'
     | '/papercut'
     | '/petbadge'
     | '/petsafe'
@@ -301,6 +312,7 @@ export interface FileRouteTypes {
     | '/idphoto'
     | '/links'
     | '/md2html'
+    | '/outbreak'
     | '/papercut'
     | '/petbadge'
     | '/petsafe'
@@ -328,6 +340,7 @@ export interface RootRouteChildren {
   IdphotoRoute: typeof IdphotoRoute
   LinksRoute: typeof LinksRoute
   Md2htmlRoute: typeof Md2htmlRoute
+  OutbreakRoute: typeof OutbreakRoute
   PapercutRoute: typeof PapercutRoute
   PetbadgeRoute: typeof PetbadgeRoute
   PetsafeRoute: typeof PetsafeRoute
@@ -412,6 +425,13 @@ declare module '@tanstack/react-router' {
       path: '/papercut'
       fullPath: '/papercut'
       preLoaderRoute: typeof PapercutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/outbreak': {
+      id: '/outbreak'
+      path: '/outbreak'
+      fullPath: '/outbreak'
+      preLoaderRoute: typeof OutbreakRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/md2html': {
@@ -528,6 +548,7 @@ const rootRouteChildren: RootRouteChildren = {
   IdphotoRoute: IdphotoRoute,
   LinksRoute: LinksRoute,
   Md2htmlRoute: Md2htmlRoute,
+  OutbreakRoute: OutbreakRoute,
   PapercutRoute: PapercutRoute,
   PetbadgeRoute: PetbadgeRoute,
   PetsafeRoute: PetsafeRoute,

@@ -153,7 +153,8 @@ function GamesDropdown() {
     location.pathname.startsWith("/games") ||
     location.pathname.startsWith("/papercut") ||
     location.pathname.startsWith("/deliveryrush") ||
-    location.pathname.startsWith("/enso");
+    location.pathname.startsWith("/enso") ||
+    location.pathname.startsWith("/outbreak");
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -193,6 +194,9 @@ function GamesDropdown() {
           </DropdownLink>
           <DropdownLink href="/enso" onClick={() => setOpen(false)}>
             {t("nav.enso")}
+          </DropdownLink>
+          <DropdownLink href="/outbreak" onClick={() => setOpen(false)}>
+            {t("nav.outbreak")}
           </DropdownLink>
         </div>
       )}
@@ -356,6 +360,7 @@ export function AppNav() {
                 <MobileNavLink href="/papercut" onClick={() => setMobileNavOpen(false)}>{t("nav.papercut")}</MobileNavLink>
                 <MobileNavLink href="/deliveryrush" onClick={() => setMobileNavOpen(false)}>{t("nav.deliveryrush")}</MobileNavLink>
                 <MobileNavLink href="/enso" onClick={() => setMobileNavOpen(false)}>{t("nav.enso")}</MobileNavLink>
+                <MobileNavLink href="/outbreak" onClick={() => setMobileNavOpen(false)}>{t("nav.outbreak")}</MobileNavLink>
               </MobileGroup>
               <div className="px-4 pt-2">
                 <LangSwitcher />
@@ -487,6 +492,7 @@ export function AppNav() {
               <MobileNavLink href="/papercut" onClick={() => setMobileNavOpen(false)}>{t("nav.papercut")}</MobileNavLink>
               <MobileNavLink href="/deliveryrush" onClick={() => setMobileNavOpen(false)}>{t("nav.deliveryrush")}</MobileNavLink>
               <MobileNavLink href="/enso" onClick={() => setMobileNavOpen(false)}>{t("nav.enso")}</MobileNavLink>
+              <MobileNavLink href="/outbreak" onClick={() => setMobileNavOpen(false)}>{t("nav.outbreak")}</MobileNavLink>
             </MobileGroup>
             <MobileNavLink href="/links" onClick={() => setMobileNavOpen(false)}>{t("nav.profile")}</MobileNavLink>
             {user.role === "admin" && (

@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+<title>Outbreak Delivery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=M+PLUS+Rounded+1c:wght@700;900&display=swap" crossorigin="anonymous" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="od-root" id="game">
+  <div id="od-app">
+    <canvas id="gl" width="1440" height="900"></canvas>
+
+    <div id="hud" hidden>
+      <div id="top">
+        <div class="pill" id="timePill"><small data-t="od.hud.time">TIME</small><b id="time">180</b></div>
+        <div class="pill" id="countPill">
+          <div class="col"><small data-t="od.hud.delivered">DELIVERED</small><b id="count">0</b></div>
+          <div class="col"><small data-t="od.hud.score">SCORE</small><b id="score">0</b></div>
+        </div>
+        <div class="pill" id="infPill"><small data-t="od.hud.inf">INFECTION</small><div class="bar"><i id="infBar" class="lv1"></i></div><b id="infVal">0%</b></div>
+        <button id="pauseBtn" data-ta="od.hud.pauseAria" aria-label="Pause"><i></i></button>
+      </div>
+      <div id="bottom">
+        <div id="cabin">
+          <div id="floorNow">1F</div>
+          <div id="capBox"><small data-t="od.hud.cap">LOAD</small><span id="capText">0 / 6</span></div>
+          <div id="itemHud" hidden></div>
+        </div>
+        <div id="btns">
+          <button class="ctl" id="btnUp"><span class="ar">&#9650;</span></button>
+          <button class="ctl" id="btnDown"><span class="ar">&#9660;</span></button>
+        </div>
+      </div>
+      <canvas id="mini" hidden width="30" height="790"></canvas>
+    </div>
+
+    <div id="pops"></div>
+    <div id="flash"></div>
+    <div id="vign"></div>
+    <div class="banner" id="banner"><div class="rays"></div><div><div class="bt"></div><div class="bs" style="text-align:center"></div></div></div>
+    <div class="banner small" id="banner2"><div class="bt"></div></div>
+    <div id="alert"></div>
+    <div id="cd"></div>
+
+    <div class="screen show" id="title">
+      <div style="text-align:center"><div class="logo"><span class="l1" data-t="outbreak.heading">Outbreak Delivery</span></div></div>
+      <div class="menu">
+        <button class="btn primary" id="startBtn" data-t="od.game.start">START</button>
+        <button class="btn" id="diffBtn"><span data-t="od.game.menuDiff">Difficulty</span> <small id="diffNow">NORMAL</small></button>
+        <button class="btn" id="howBtn" data-t="od.game.menuHow">How to play</button>
+        <div class="langrow"><select id="langSel" aria-label="Language">
+          <option value="en">English</option>
+          <option value="zh">中文</option>
+          <option value="es">Español</option>
+          <option value="pt">Português</option>
+          <option value="fr">Français</option>
+        </select></div>
+      </div>
+    </div>
+
+    <div class="screen dim" id="diffPanel">
+      <div class="card">
+        <h2 data-t="od.game.menuDiff">Difficulty</h2>
+        <div class="diffs" id="diffs"></div>
+        <button class="btn" data-close data-t="od.game.back">Back</button>
+      </div>
+    </div>
+
+    <div class="screen dim" id="howPanel">
+      <div class="card">
+        <h2 data-t="outbreak.how.title">How to play</h2>
+        <div class="tabs">
+          <button class="htab sel" data-h="A" data-t="od.game.htabHow">How to play</button>
+          <button class="htab" data-h="B" data-t="od.game.htabTypes">Packages</button>
+        </div>
+        <ul class="how" id="howA">
+          <li data-t="outbreak.how.1"></li>
+          <li data-t="outbreak.how.2"></li>
+          <li data-t="outbreak.how.3"></li>
+        </ul>
+        <div class="types" id="typeList" hidden></div>
+        <button class="btn" data-close data-t="od.game.back">Back</button>
+      </div>
+    </div>
+
+    <div class="screen dim" id="result">
+      <div class="card" id="resCard">
+        <h2 id="resTitle" data-t="od.res.title">You turned</h2>
+        <div class="rhero">
+          <div><small data-t="od.res.delivered">Delivered</small><b id="rDel">0</b></div>
+          <div class="rkbox"><small data-t="od.game.resRank">RANK</small><div id="rank">C</div></div>
+        </div>
+        <div class="rgrid">
+          <div><small data-t="od.hud.score">SCORE</small><b id="rScore">0</b></div>
+          <div><small data-t="od.res.time">Survived</small><b id="rTime">0</b></div>
+          <div><small data-t="od.res.combo">Max combo</small><b id="rCombo">0</b></div>
+          <div><small data-t="od.res.peak">Peak infection</small><b id="rPeak">0</b></div>
+        </div>
+        <div class="row"><button class="btn" id="againBtn" data-t="od.game.resAgain">Play again</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>window.OD_I18N_BY_LANG={"en":{"od.diff.easy.note":"5-floor building · low infection","od.diff.easy.sub":"Learn the controls and the danger of stopping","od.diff.normal.note":"10-floor building · standard survival","od.diff.normal.sub":"Weigh the danger of stopping against delivery efficiency","od.diff.hard.note":"20-floor building · many infected","od.diff.hard.sub":"Beware the Spitter's ranged attack","od.diff.extreme.note":"30-floor building · quarantined zone","od.diff.extreme.sub":"Survival is near impossible. Keep the infection peak down","od.pkg.normal.name":"Standard","od.pkg.normal.tag":"","od.pkg.normal.desc":"A standard package. Takes 1 slot.","od.pkg.bulk.name":"Bulk","od.pkg.bulk.tag":"Bulk","od.pkg.bulk.desc":"A bulky package. Takes 2 slots.","od.style.easy.bname":"Moonlit Apartments","od.style.easy.kind":"low-rise apartment","od.style.normal.bname":"Dimly Lit Mansion","od.style.normal.kind":"apartment","od.style.hard.bname":"Quarantined Residence","od.style.hard.kind":"large apartment","od.style.extreme.bname":"Infection Tower","od.style.extreme.kind":"tower apartment","od.truck.label":"SUPPLY","od.msg.gameoverSub":"Infection exceeded the limit…","od.msg.timeupSub":"You survived well!","od.res.title":"You turned","od.diff.floors":"{n}-floor building · {k}","od.diff.cap":"Capacity {c} · survive the infection","od.item.syringe.name":"Syringe","od.item.stick.name":"Baton","od.item.syringe.desc":"Used on pickup, infection -50.","od.item.stick.desc":"On pickup, get 3 — knock down zombies on the same floor 3 times.","od.item.title":"Items","od.pkg.title":"Packages","od.msg.heal":"Infection -{n}","od.msg.gotItem":"{name} +{n}","od.msg.kill":"Down!","od.msg.stickCount":"{name} ×{n}","outbreak.heading":"Outbreak Delivery","outbreak.how.title":"The Rules of Outbreak Night","outbreak.how.1":"Stock Up at Ground Zero: hit the Lobby to load emergency crates before heading up into the dark.","outbreak.how.2":"Evade the Roaming Horde: infected patrol every floor. Opening elevator doors near them spikes your viral exposure immediately.","outbreak.how.3":"Manage the Infection Gauge: keep your viral load strictly below 100%. Once it maxes out, you turn — game over.","od.hud.time":"TIME","od.hud.delivered":"DELIVERED","od.hud.score":"SCORE","od.hud.inf":"INFECTION","od.hud.cap":"LOAD","od.hud.pauseAria":"Pause","od.game.start":"START","od.game.menuDiff":"Difficulty","od.game.menuHow":"How to play","od.game.back":"Back","od.game.htabHow":"How to play","od.game.htabTypes":"Packages","od.game.resRank":"RANK","od.game.resAgain":"Play again","od.res.delivered":"Delivered","od.res.time":"Survived","od.res.combo":"Max combo","od.res.peak":"Peak infection"},"zh":{"od.diff.easy.note":"5 层建筑 · 感染较少","od.diff.easy.sub":"先熟悉操作和停车的危险","od.diff.normal.note":"10 层建筑 · 标准生存","od.diff.normal.sub":"权衡停车的危险与配送效率","od.diff.hard.note":"20 层建筑 · 感染者众多","od.diff.hard.sub":"小心喷酸者的远程攻击","od.diff.extreme.note":"30 层建筑 · 封锁区域","od.diff.extreme.sub":"生存极其艰难，压低感染峰值","od.pkg.normal.name":"标准","od.pkg.normal.tag":"","od.pkg.normal.desc":"标准包裹，占 1 个货位。","od.pkg.bulk.name":"大型","od.pkg.bulk.tag":"大型","od.pkg.bulk.desc":"笨重的包裹，占 2 个货位。","od.style.easy.bname":"月光公寓","od.style.easy.kind":"低层公寓","od.style.normal.bname":"昏暗公馆","od.style.normal.kind":"公寓楼","od.style.hard.bname":"封锁住宅区","od.style.hard.kind":"大型公寓","od.style.extreme.bname":"感染之塔","od.style.extreme.kind":"高层公寓","od.truck.label":"补给","od.msg.gameoverSub":"感染超出极限…","od.msg.timeupSub":"你活下来了！","od.res.title":"你变异了","od.diff.floors":"{n} 层建筑 · {k}","od.diff.cap":"容量 {c} · 抵抗感染活下去","od.item.syringe.name":"针筒","od.item.stick.name":"棍子","od.item.syringe.desc":"拾取即用，感染 -50。","od.item.stick.desc":"拾取获得 3 根，可击倒同层僵尸 3 次。","od.item.title":"道具","od.pkg.title":"包裹","od.msg.heal":"感染 -{n}","od.msg.gotItem":"{name} +{n}","od.msg.kill":"击倒！","od.msg.stickCount":"{name} ×{n}","outbreak.heading":"末世配送","outbreak.how.title":"爆发之夜的规则","outbreak.how.1":"先在一楼囤货：进入大厅装载应急货箱，再往黑暗的高层进发。","outbreak.how.2":"躲开游荡的尸群：感染者巡逻每一层，在他们附近开门会立刻飙升病毒暴露。","outbreak.how.3":"管好感染值：让病毒量严格低于 100%。一旦拉满，你就变异——游戏结束。","od.hud.time":"时间","od.hud.delivered":"送达","od.hud.score":"分数","od.hud.inf":"感染","od.hud.cap":"载货","od.hud.pauseAria":"暂停","od.game.start":"开始","od.game.menuDiff":"难度","od.game.menuHow":"玩法说明","od.game.back":"返回","od.game.htabHow":"玩法","od.game.htabTypes":"包裹","od.game.resRank":"评级","od.game.resAgain":"再来一局","od.res.delivered":"送达","od.res.time":"存活","od.res.combo":"最高连击","od.res.peak":"感染峰值"},"es":{"od.diff.easy.note":"Edificio de 5 pisos · poca infección","od.diff.easy.sub":"Aprende los controles y el peligro de detenerse","od.diff.normal.note":"Edificio de 10 pisos · supervivencia estándar","od.diff.normal.sub":"Sopesa el peligro de parar contra la eficiencia de reparto","od.diff.hard.note":"Edificio de 20 pisos · muchos infectados","od.diff.hard.sub":"Cuidado con el ataque a distancia del Escupidor","od.diff.extreme.note":"Edificio de 30 pisos · zona en cuarentena","od.diff.extreme.sub":"Sobrevivir es casi imposible. Controla el pico de infección","od.pkg.normal.name":"Estándar","od.pkg.normal.tag":"","od.pkg.normal.desc":"Un paquete estándar. Ocupa 1 espacio.","od.pkg.bulk.name":"Voluminoso","od.pkg.bulk.tag":"Grande","od.pkg.bulk.desc":"Un paquete voluminoso. Ocupa 2 espacios.","od.style.easy.bname":"Apartamentos a la luz de la luna","od.style.easy.kind":"apartamento bajo","od.style.normal.bname":"Mansión en penumbra","od.style.normal.kind":"apartamento","od.style.hard.bname":"Residencia en cuarentena","od.style.hard.kind":"apartamento grande","od.style.extreme.bname":"Torre de la infección","od.style.extreme.kind":"torre de apartamentos","od.truck.label":"SUMINISTRO","od.msg.gameoverSub":"La infección superó el límite…","od.msg.timeupSub":"¡Sobreviviste bien!","od.res.title":"Te transformaste","od.diff.floors":"Edificio de {n} pisos · {k}","od.diff.cap":"Capacidad {c} · sobrevive a la infección","od.item.syringe.name":"Jeringa","od.item.stick.name":"Porra","od.item.syringe.desc":"Se usa al recogerla, infección -50.","od.item.stick.desc":"Al recogerla, obtienes 3: derriba 3 veces a los zombis del mismo piso.","od.item.title":"Objetos","od.pkg.title":"Paquetes","od.msg.heal":"Infección -{n}","od.msg.gotItem":"{name} +{n}","od.msg.kill":"¡Derribado!","od.msg.stickCount":"{name} ×{n}","outbreak.heading":"Outbreak Delivery","outbreak.how.title":"Las reglas de la noche del brote","outbreak.how.1":"Abastécete en el punto cero: ve al vestíbulo a cargar cajas de emergencia antes de subir a la oscuridad.","outbreak.how.2":"Esquiva a la horda errante: los infectados patrullan cada piso. Abrir el ascensor cerca de ellos dispara tu exposición viral al instante.","outbreak.how.3":"Controla el medidor de infección: mantén tu carga viral por debajo del 100%. Si se llena, te transformas — fin del juego.","od.hud.time":"TIEMPO","od.hud.delivered":"ENTREGADOS","od.hud.score":"PUNTOS","od.hud.inf":"INFECCIÓN","od.hud.cap":"CARGA","od.hud.pauseAria":"Pausa","od.game.start":"EMPEZAR","od.game.menuDiff":"Dificultad","od.game.menuHow":"Cómo jugar","od.game.back":"Volver","od.game.htabHow":"Cómo jugar","od.game.htabTypes":"Paquetes","od.game.resRank":"RANGO","od.game.resAgain":"Jugar de nuevo","od.res.delivered":"Entregados","od.res.time":"Sobreviviste","od.res.combo":"Combo máximo","od.res.peak":"Infección máxima"},"pt":{"od.diff.easy.note":"Prédio de 5 andares · pouca infecção","od.diff.easy.sub":"Aprenda os controles e o perigo de parar","od.diff.normal.note":"Prédio de 10 andares · sobrevivência padrão","od.diff.normal.sub":"Pese o perigo de parar contra a eficiência das entregas","od.diff.hard.note":"Prédio de 20 andares · muitos infectados","od.diff.hard.sub":"Cuidado com o ataque à distância do Cuspidor","od.diff.extreme.note":"Prédio de 30 andares · zona em quarentena","od.diff.extreme.sub":"Sobreviver é quase impossível. Controle o pico de infecção","od.pkg.normal.name":"Padrão","od.pkg.normal.tag":"","od.pkg.normal.desc":"Um pacote padrão. Ocupa 1 espaço.","od.pkg.bulk.name":"Volumoso","od.pkg.bulk.tag":"Grande","od.pkg.bulk.desc":"Um pacote volumoso. Ocupa 2 espaços.","od.style.easy.bname":"Apartamentos ao luar","od.style.easy.kind":"prédio baixo","od.style.normal.bname":"Casarão sombrio","od.style.normal.kind":"prédio","od.style.hard.bname":"Residência em quarentena","od.style.hard.kind":"prédio grande","od.style.extreme.bname":"Torre da infecção","od.style.extreme.kind":"torre de apartamentos","od.truck.label":"SUPRIMENTO","od.msg.gameoverSub":"A infecção passou do limite…","od.msg.timeupSub":"Você sobreviveu bem!","od.res.title":"Você se transformou","od.diff.floors":"Prédio de {n} andares · {k}","od.diff.cap":"Capacidade {c} · sobreviva à infecção","od.item.syringe.name":"Seringa","od.item.stick.name":"Cassetete","od.item.syringe.desc":"Usada ao pegar, infecção -50.","od.item.stick.desc":"Ao pegar, você ganha 3 — derrube 3 vezes os zumbis do mesmo andar.","od.item.title":"Itens","od.pkg.title":"Pacotes","od.msg.heal":"Infecção -{n}","od.msg.gotItem":"{name} +{n}","od.msg.kill":"No chão!","od.msg.stickCount":"{name} ×{n}","outbreak.heading":"Outbreak Delivery","outbreak.how.title":"As regras da noite do surto","outbreak.how.1":"Reabasteça no ponto zero: vá ao saguão carregar caixas de emergência antes de subir para o escuro.","outbreak.how.2":"Desvie da horda errante: os infectados patrulham cada andar. Abrir o elevador perto deles dispara sua exposição viral na hora.","outbreak.how.3":"Controle o medidor de infecção: mantenha sua carga viral estritamente abaixo de 100%. Se encher, você se transforma — fim de jogo.","od.hud.time":"TEMPO","od.hud.delivered":"ENTREGUES","od.hud.score":"PONTOS","od.hud.inf":"INFECÇÃO","od.hud.cap":"CARGA","od.hud.pauseAria":"Pausar","od.game.start":"INICIAR","od.game.menuDiff":"Dificuldade","od.game.menuHow":"Como jogar","od.game.back":"Voltar","od.game.htabHow":"Como jogar","od.game.htabTypes":"Pacotes","od.game.resRank":"RANQUE","od.game.resAgain":"Jogar de novo","od.res.delivered":"Entregues","od.res.time":"Sobreviveu","od.res.combo":"Combo máximo","od.res.peak":"Infecção máxima"},"fr":{"od.diff.easy.note":"Immeuble de 5 étages · peu d'infection","od.diff.easy.sub":"Apprenez les commandes et le danger de s'arrêter","od.diff.normal.note":"Immeuble de 10 étages · survie standard","od.diff.normal.sub":"Pesez le danger de s'arrêter face à l'efficacité des livraisons","od.diff.hard.note":"Immeuble de 20 étages · nombreux infectés","od.diff.hard.sub":"Attention à l'attaque à distance du Cracheur","od.diff.extreme.note":"Immeuble de 30 étages · zone en quarantaine","od.diff.extreme.sub":"La survie est presque impossible. Limitez le pic d'infection","od.pkg.normal.name":"Standard","od.pkg.normal.tag":"","od.pkg.normal.desc":"Un colis standard. Occupe 1 emplacement.","od.pkg.bulk.name":"Encombrant","od.pkg.bulk.tag":"Grand","od.pkg.bulk.desc":"Un colis encombrant. Occupe 2 emplacements.","od.style.easy.bname":"Appartements au clair de lune","od.style.easy.kind":"petit immeuble","od.style.normal.bname":"Maison sombre","od.style.normal.kind":"immeuble","od.style.hard.bname":"Résidence en quarantaine","od.style.hard.kind":"grand immeuble","od.style.extreme.bname":"Tour de l'infection","od.style.extreme.kind":"tour d'appartements","od.truck.label":"RAVITAILLEMENT","od.msg.gameoverSub":"L'infection a dépassé la limite…","od.msg.timeupSub":"Vous avez bien survécu !","od.res.title":"Vous avez muté","od.diff.floors":"Immeuble de {n} étages · {k}","od.diff.cap":"Capacité {c} · survivez à l'infection","od.item.syringe.name":"Seringue","od.item.stick.name":"Matraque","od.item.syringe.desc":"Utilisée à la prise, infection -50.","od.item.stick.desc":"À la prise, vous en obtenez 3 : assommez 3 fois les zombies du même étage.","od.item.title":"Objets","od.pkg.title":"Colis","od.msg.heal":"Infection -{n}","od.msg.gotItem":"{name} +{n}","od.msg.kill":"À terre !","od.msg.stickCount":"{name} ×{n}","outbreak.heading":"Outbreak Delivery","outbreak.how.title":"Les règles de la nuit de l'épidémie","outbreak.how.1":"Faites le plein au point zéro : passez au hall charger des caisses d'urgence avant de monter dans le noir.","outbreak.how.2":"Évitez la horde errante : les infectés patrouillent à chaque étage. Ouvrir l'ascenseur près d'eux fait grimper votre exposition virale aussitôt.","outbreak.how.3":"Gérez la jauge d'infection : gardez votre charge virale strictement sous 100 %. Une fois au max, vous vous transformez — partie terminée.","od.hud.time":"TEMPS","od.hud.delivered":"LIVRÉS","od.hud.score":"SCORE","od.hud.inf":"INFECTION","od.hud.cap":"CHARGEMENT","od.hud.pauseAria":"Pause","od.game.start":"DÉMARRER","od.game.menuDiff":"Difficulté","od.game.menuHow":"Comment jouer","od.game.back":"Retour","od.game.htabHow":"Comment jouer","od.game.htabTypes":"Colis","od.game.resRank":"RANG","od.game.resAgain":"Rejouer","od.res.delivered":"Livrés","od.res.time":"Survie","od.res.combo":"Combo max","od.res.peak":"Infection max"}};</script>
+<script src="three.min.js"></script>
+<script>(function(){
+  var KEYS=["diff.easy.note","diff.easy.sub","diff.normal.note","diff.normal.sub","diff.hard.note","diff.hard.sub","diff.extreme.note","diff.extreme.sub","pkg.normal.name","pkg.normal.tag","pkg.normal.desc","pkg.bulk.name","pkg.bulk.tag","pkg.bulk.desc","style.easy.bname","style.easy.kind","style.normal.bname","style.normal.kind","style.hard.bname","style.hard.kind","style.extreme.bname","style.extreme.kind","truck.label","msg.gameoverSub","msg.timeupSub","res.title","diff.floors","diff.cap","item.syringe.name","item.stick.name","item.syringe.desc","item.stick.desc","item.title","pkg.title","msg.heal","msg.gotItem","msg.kill","msg.stickCount"];
+  var ALL=window.OD_I18N_BY_LANG||{};
+  function pick(){
+    var q=new URLSearchParams(location.search).get("lang");
+    if(q&&ALL[q])return q;
+    var ls=navigator.languages||[navigator.language||"en"];
+    for(var i=0;i<ls.length;i++){
+      var l=String(ls[i]).toLowerCase();
+      for(var k in ALL){ if(l===k||l.indexOf(k+"-")===0) return k; }
+    }
+    return ALL.en?"en":(Object.keys(ALL)[0]||"en");
+  }
+  var lang=pick(), L=ALL[lang]||{};
+  document.documentElement.lang=lang;
+  var od={};
+  for(var i=0;i<KEYS.length;i++){ var k=KEYS[i]; if(L["od."+k]!=null) od[k]=L["od."+k]; }
+  window.OD_I18N=od;
+  Array.prototype.forEach.call(document.querySelectorAll("[data-t]"),function(el){ var k=el.getAttribute("data-t"); if(L[k]!=null) el.textContent=L[k]; });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-ta]"),function(el){ var k=el.getAttribute("data-ta"); if(L[k]!=null) el.setAttribute("aria-label",L[k]); });
+  if(L["outbreak.heading"]) document.title=L["outbreak.heading"]+" — 100mini";
+  var sel=document.getElementById("langSel");
+  if(sel){ sel.value=lang; sel.addEventListener("change",function(){ var u=new URL(location.href); u.searchParams.set("lang",sel.value); location.href=u.href; }); }
+  var s=document.createElement("script"); s.type="module"; s.src="game.js"; document.body.appendChild(s);
+})();</script>
+</body>
+</html>

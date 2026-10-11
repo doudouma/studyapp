@@ -219,3 +219,18 @@ export const ensoRank = sqliteTable("enso_rank", {
   index("idx_enso_rank_score").on(t.score),
   index("idx_enso_rank_player").on(t.playerKey),
 ]);
+
+// --- Outbreak Delivery 排行榜 ---
+
+export const outbreakRank = sqliteTable("outbreak_rank", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(),
+  score: integer("score").notNull(),
+  delivered: integer("delivered").notNull().default(0),
+  timeSec: integer("time_sec").notNull().default(0),
+  playerKey: text("player_key").notNull(), // 设备标识（X-Player-Key）
+  createdAt: integer("created_at").notNull(),
+}, (t) => [
+  index("idx_outbreak_rank_score").on(t.score),
+  index("idx_outbreak_rank_player").on(t.playerKey),
+]);

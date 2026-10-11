@@ -251,6 +251,15 @@ export async function scheduled(_event: ScheduledEvent, env: Bindings, _ctx: Exe
     } catch (err) {
       console.error("[cron] enso rank cleanup failed:", err);
     }
+
+    // Cleanup old Outbreak Delivery rank records (90 days)
+    try {
+      const { cleanupOldOutbreakRecords } = await import("./../server/features/outbreak/outbreak.service");
+      await cleanupOldOutbreakRecords(env.D1);
+      console.log("[cron] cleaned up old outbreak rank record(s)");
+    } catch (err) {
+      console.error("[cron] outbreak rank cleanup failed:", err);
+    }
   }
 }
 

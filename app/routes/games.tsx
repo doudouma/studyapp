@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Gamepad2, ArrowRight, Scissors, Truck, Brush } from "lucide-react";
+import { Gamepad2, ArrowRight, Scissors, Truck, Brush, Biohazard } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { useTranslation } from "react-i18next";
@@ -52,6 +52,12 @@ export const Route = createFileRoute("/games")({
                 name: i18n.t("games.item.enso.title"),
                 url: "https://100mini.com/enso",
               },
+              {
+                "@type": "ListItem",
+                position: 4,
+                name: i18n.t("games.item.outbreak.title"),
+                url: "https://100mini.com/outbreak",
+              },
             ],
           }),
         },
@@ -82,6 +88,12 @@ function GamesPage() {
       icon: Brush,
       title: t("games.item.enso.title"),
       desc: t("games.item.enso.desc"),
+    },
+    {
+      href: "/outbreak" as const,
+      icon: Biohazard,
+      title: t("games.item.outbreak.title"),
+      desc: t("games.item.outbreak.desc"),
     },
   ];
 
