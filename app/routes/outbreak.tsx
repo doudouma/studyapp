@@ -152,6 +152,10 @@ function OutbreakPage() {
                 {isFull ? t("outbreak.fullscreenExit") : t("outbreak.fullscreen")}
               </button>
             </div>
+            <div className="mt-6 text-center">
+              <h1 className="ob-h1 text-balance text-3xl font-bold tracking-tight sm:text-4xl">{t("outbreak.hero.title")}</h1>
+              <p className="ob-p mx-auto mt-3 max-w-2xl text-[15px] leading-relaxed">{t("outbreak.hero.tagline")}</p>
+            </div>
             <ShareModal
               open={shareOpen}
               onOpenChange={setShareOpen}
@@ -166,13 +170,29 @@ function OutbreakPage() {
         </section>
         <section className="mx-auto w-full max-w-3xl px-4 pb-20 pt-12">
           <h2 className="ob-h2 text-center text-2xl font-bold tracking-tight">{t("outbreak.how.title")}</h2>
-          <p className="ob-p mx-auto mt-2 max-w-2xl text-center text-[15px] leading-relaxed">{t("outbreak.desc")}</p>
           <div className="ob-card mt-8 rounded-2xl border border-[#3a2a24] bg-[#141410] p-6 shadow-sm sm:p-8">
             <ol className="list-decimal space-y-2.5 pl-5">
               {guideSteps.map((step) => (
                 <li key={step} className="ob-p text-[15px] leading-relaxed">{step}</li>
               ))}
             </ol>
+          </div>
+        </section>
+        <section className="mx-auto w-full max-w-3xl px-4 pb-20">
+          <h2 className="ob-h2 text-center text-2xl font-bold tracking-tight">{t("od.item.title")}</h2>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            {[
+              { key: "syringe", color: "#7fe0e0" },
+              { key: "stick", color: "#e8c468" },
+            ].map((it) => (
+              <div key={it.key} className="ob-card rounded-2xl border border-[#3a2a24] bg-[#141410] p-5 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <span className="inline-block size-5 shrink-0 rounded-full border-2 border-[#050604]" style={{ background: it.color }} />
+                  <h3 className="font-bold text-[#e6e0d4]">{t(`od.item.${it.key}.name`)}</h3>
+                </div>
+                <p className="ob-p mt-2 text-sm leading-relaxed">{t(`od.item.${it.key}.desc`)}</p>
+              </div>
+            ))}
           </div>
         </section>
         <section className="mx-auto w-full max-w-3xl px-4 pb-20">

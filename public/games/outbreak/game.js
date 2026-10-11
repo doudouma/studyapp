@@ -57,13 +57,14 @@ const PKG={
 };
 const FH=2.4, D=2.6, BX0=-4.6, BX1=4.2, SX0=.9, SX1=3.3, CABX=2.1, QX=.4, QZ=-1.25, VIEW_CX=-.9, VIEW_W=11.8;
 const THREAT_R=3.6; /* 停車時に脅威判定する水平距離（ドア基準） */
+const COLLIDE_R=1.1; /* 僵尸与配送员「碰撞/接触」判定半径（同层且贴身才算感染） */
 const SPIT_X0=CABX-THREAT_R+.3, SPIT_X1=BX1-1; /* spitter 巡邏範圍：始終保持在可噴酸的對位距離內 */
 /* 测试开关：默认强制刷出的僵尸类型（喷酸者等），不受时间解锁曲线限制；置为 [] 恢复常规难度 */
 const FORCE_ZOMBIES=['spitter'];
 /* 道具类型（V1：针筒 / 棍子）。heal 为针筒回复的感染值；kill 标记棍子。后续道具在此扩展。 */
 const ITEMS={
-  syringe:{name:__('item.syringe.name','針筒'),css:'#7fe0e0',heal:50,weight:.45},
-  stick:  {name:__('item.stick.name','棍子'),  css:'#e8c468',kill:1,weight:.55}
+  syringe:{name:__('item.syringe.name','針筒'),css:'#7fe0e0',heal:50,weight:.45,desc:__('item.syringe.desc','拾取即用，感染 -50。')},
+  stick:  {name:__('item.stick.name','棍子'),  css:'#e8c468',kill:1,gain:3,weight:.55,desc:__('item.stick.desc','拾取获得 3 根，可击倒同层僵尸 3 次。')}
 };
 const ITEM_MAX=3; /* 场上道具上限 */
 const ITEM_SPAWN=[8,16]; /* 刷新间隔（秒） */
@@ -88,6 +89,7 @@ const SFX={
   alert(){tone(1568,.08,'square',.08);tone(1568,.08,'square',.08,.12);tone(2093,.16,'square',.08,.24)},
   spit(){tone(300,.2,'sawtooth',.09,0,110)},
   heart(){tone(58,.16,'sine',.14)},
+  hurt(){tone(150,.22,'sawtooth',.09,0,70);tone(92,.3,'square',.05,.04,55)},
   end(){[84,79,76,72].forEach((m,i)=>tone(mf(m),.25,'triangle',.15,i*.14))},
   click(){tone(660,.06,'square',.06,0,990)}
 };
@@ -388,7 +390,7 @@ function updSpits(dt){
     const vl=Math.hypot(s.vx,s.vy,s.vz)||1; s.g.quaternion.setFromUnitVectors(_zAxis,_vDir.set(s.vx/vl,s.vy/vl,s.vz/vl)); /* 朝向飞行方向 */
     spitTrail(s); /* 抛洒液滴，呈液态 */
     const c=courier, hit=!!c&&Math.hypot(s.x-c.x,s.y-(c.y+1.0),s.z-c.z)<SPIT_HIT_R;
-    if(hit||s.t>=s.T){ if(hit&&mode==='play'&&!G.over) addInfection(SPIT_INFECTION); burst(s.x,s.y,s.z,12,'acid',3.5); killSpit(s); spits.splice(i,1); }
+    if(hit||s.t>=s.T){ if(hit&&mode==='play'&&!G.over) damage(SPIT_INFECTION,true); burst(s.x,s.y,s.z,12,'acid',3.5); killSpit(s); spits.splice(i,1); }
   }
 }
 function killAllSpits(){ spits.forEach(killSpit); spits.length=0; }
@@ -396,6 +398,7 @@ function killAllSpits(){ spits.forEach(killSpit); spits.length=0; }
 /* ================= courier（配送员：唯一的搬运者） ================= */
 /* 亮橙马甲 + 深色帽，与暗绿/灰的僵尸形成鲜明对比。复用 buildZombie 的人形结构。 */
 const COU={skin:'#e8b98a',vest:'#f0a500',cap:'#2a2f3a',pant:'#2a2f3a'};
+const _hurtRed=new T.Color(0xff2a2a).convertSRGBToLinear(); /* 受伤闪红目标色 */
 function buildCourierPerson(){
   const g=new T.Group(), b=new T.Group(); g.add(b);
   const legL=new T.Group(), legR=new T.Group(); legL.position.set(-.12,.42,0); legR.position.set(.12,.42,0); b.add(legL,legR);
@@ -415,7 +418,9 @@ function buildCourierPerson(){
 function makeCourier(){
   const v=buildCourierPerson(), home={x:CABX,z:-1.3};
   v.g.position.set(home.x,E.pos*FH,home.z); world.add(v.g);
-  return {v,state:'cab',x:home.x,y:E.pos*FH,z:home.z,face:0,ph:rnd(0,6),speed:3.4,pkg:null,tx:home.x,tz:home.z,home,outFloor:0,sticks:0,item:null,target:null};
+  /* 给配送员独立材质（克隆），以便受伤时单独闪红而不影响其他物体 */
+  const mats=[]; v.g.traverse(o=>{ if(o.isMesh&&o.material){ o.material=o.material.clone(); mats.push({m:o.material,base:o.material.color.clone()}); } });
+  return {v,state:'cab',x:home.x,y:E.pos*FH,z:home.z,face:0,ph:rnd(0,6),speed:3.4,pkg:null,tx:home.x,tz:home.z,home,outFloor:0,sticks:0,item:null,target:null,hurtT:0,mats};
 }
 /* 挂载包裹时的相对偏移（包裹被搬运时的从属位置） */
 function attachPkg(p){
@@ -453,6 +458,10 @@ const cargoList=()=>packages.filter(inCab);
 const lobbyList=()=>packages.filter(p=>p.state==='queue');
 function used(){ let s=0; for(const p of cargoList()) s+=p.size; return s; }
 function addInfection(amt){ G.inf=clamp(G.inf+amt,0,100); if(G.inf>G.peakInf) G.peakInf=G.inf; }
+let hurtCd=0;
+/* 受伤反馈：配送员后仰抖动 + 屏幕红脉冲 + 痛苦音效（持续小伤害按节流周期性触发） */
+function damage(amt,big){ if(amt<=0) return; addInfection(amt);
+  if(big||hurtCd<=0){ hurtCd=big?.35:.6; if(courier) courier.hurtT=big?.5:.32; redFlash(); SFX.hurt(); } }
 
 function rollDest(){ return 2+(Math.random()*(N-1)|0); }
 function spawnPkg(){
@@ -471,7 +480,7 @@ function resetGame(isDemo){
   Object.assign(E,{pos:0,v:0,mode:'idle',target:0,lastDir:1,lock:0,queued:0,openT:0,door:1,floor:0,tapBase:null});
   Object.assign(G,{elapsed:0,delivered:0,score:0,combo:0,comboT:0,comboW:cfg.comboW,maxCombo:0,inf:0,peakInf:0,spawnT:.4,zSpawnT:.6,over:false,endT:0,diffT:0,beatT:0,autoWait:0,itemT:rnd(ITEM_SPAWN[0],ITEM_SPAWN[1])});
   input.up=input.down=false; if($('btnUp'))$('btnUp').classList.remove('on'); if($('btnDown'))$('btnDown').classList.remove('on');
-  if(courier){ courier.state='cab'; courier.pkg=null; courier.sticks=0; courier.item=null; courier.target=null; courier.x=courier.home.x; courier.z=courier.home.z; courier.y=E.pos*FH; courier.face=0; courier.ph=rnd(0,6); courier.outFloor=0; courier.v.g.position.set(courier.x,courier.y,courier.z); }
+  if(courier){ courier.state='cab'; courier.pkg=null; courier.sticks=0; courier.item=null; courier.target=null; courier.hurtT=0; courier.x=courier.home.x; courier.z=courier.home.z; courier.y=E.pos*FH; courier.face=0; courier.ph=rnd(0,6); courier.outFloor=0; courier.v.g.position.set(courier.x,courier.y,courier.z); }
   for(let i=0;i<3;i++) spawnPkg();
   dirty=true; floorsFx.forEach(f=>f.on=false); hudForce();
 }
@@ -538,17 +547,22 @@ function updElev(dt){
   if(E.mode==='auto'){ const dist=E.target-E.pos, ad=Math.abs(dist);
     const sp=Math.min(Math.max(Math.abs(E.v),START)+cfg.speed*1.3*dt,cfg.speed,Math.max(1.6,ad*5.5)), stp=sp*dt;
     if(stp>=ad) arrive(E.target); else { E.pos+=Math.sign(dist)*stp; E.v=Math.sign(dist)*sp; } }
-  // 停靠自动装卸：仅当配送员空闲在轿厢内时才发起；优先级：送达 > 用棍子清僵尸 > 拾取道具 > 1F 装载
+  // 停靠自动装卸：仅当配送员空闲在轿厢内时才发起；优先级：用棍子清僵尸 > 送达 > 拾取道具 > 1F 装载
   if(E.mode==='idle'&&E.lock<=0&&!h&&!G.over&&courier&&courier.state==='cab'){
     let done=false;
-    if(E.pos!==0){ for(const p of cargoList()){ if(p.dest===E.pos+1){ startDeliver(p); E.lock=.22; done=true; break; } } }
-    if(!done&&courier.sticks>0){ const z=zombies.find(z=>z.floor===E.pos); if(z){ startKill(z); done=true; } }
+    if(courier.sticks>0){ const z=zombies.find(z=>z.floor===E.pos); if(z){ startKill(z); done=true; } }
+    if(!done&&E.pos!==0){ for(const p of cargoList()){ if(p.dest===E.pos+1){ startDeliver(p); E.lock=.22; done=true; break; } } }
     if(!done){ const it=items.find(it=>it.floor===E.pos&&!it.taken); if(it){ startPickup(it); done=true; } }
     if(!done&&E.pos===0){ const u=used(); for(const p of lobbyList()){ if(u+p.size<=cfg.cap){ startLoad(p); break; } } }
   }
 }
 function autopilot(dt){
   if(E.mode!=='idle'||E.lock>0) return;
+  /* 快递员不在轿厢（在外面装卸）时，先回到它所在楼层接上，避免把它落下导致演示卡住 */
+  if(courier&&courier.state!=='cab'){
+    if(courier.outFloor!=null&&E.pos!==courier.outFloor){ E.target=courier.outFloor; E.mode='auto'; }
+    return;
+  }
   if(E.pos===0){ if(!lobbyList().length) return; G.autoWait+=dt; if(G.autoWait<1.2) return; G.autoWait=0; }
   G.autoWait=0;
   const ups=cargoList().filter(p=>p.state==='cargo').map(p=>p.dest-1);
@@ -590,7 +604,7 @@ function updCourier(dt,time){
       else if(st==='toDrop'){ if(p){ p.lab.visible=false; p.state='gone'; deliver(p); } c.pkg=null; c.state='return'; c.tx=c.home.x; c.tz=c.home.z; }
       else if(st==='toItem'){ const it=c.item; if(it){ killItem(it); const i=items.indexOf(it); if(i>=0) items.splice(i,1);
           if(it.def.heal){ addInfection(-it.def.heal); popAt(it.x,it.y+1.4,it.z,fmt(__('msg.heal','感染 -{n}'),{n:it.def.heal}),'info'); SFX.heart(); }
-          else { c.sticks++; popAt(it.x,it.y+1.4,it.z,fmt(__('msg.gotItem','{name} +1'),{name:it.def.name}),'info'); SFX.bonus(); }
+          else { const n=it.def.gain||1; c.sticks+=n; popAt(it.x,it.y+1.4,it.z,fmt(__('msg.gotItem','{name} +{n}'),{name:it.def.name,n}),'info'); SFX.bonus(); }
           c.item=null; } c.state='return'; c.tx=c.home.x; c.tz=c.home.z; dirty=true; }
       else if(st==='toKill'){ const z=c.target; if(z){ const zt=z.type; killZombie(z); const i=zombies.indexOf(z); if(i>=0) zombies.splice(i,1);
           let pts=0; if(!demo){ pts=zombieScore(zt,G.combo); G.score+=pts; }
@@ -604,6 +618,11 @@ function updCourier(dt,time){
   else { v2.legL.rotation.x*=.7; v2.legR.rotation.x*=.7; v2.up.position.y=Math.sin(time*3+c.ph)*.012; }
   let dr=c.face-v2.b.rotation.y; v2.b.rotation.y+=dr*Math.min(1,dt*12);
   v2.g.position.set(c.x,c.y,c.z);
+  /* 受伤反应：后仰 + 抖动 */
+  if(c.hurtT>0){ c.hurtT-=dt; const k=Math.max(0,c.hurtT)/.5; v2.b.rotation.z=Math.sin(time*46)*.16*k; v2.up.rotation.x=-.4*k; v2.g.position.y=c.y+Math.abs(Math.sin(time*30))*.04*k; }
+  else { v2.b.rotation.z*=.8; v2.up.rotation.x*=.8; }
+  /* 受伤闪红：把配送员独立材质向红色插值 */
+  { const hk=c.hurtT>0?Math.min(1,c.hurtT/.5):0; if(c.mats) for(const it of c.mats) it.m.color.copy(it.base).lerp(_hurtRed,hk*.85); }
 }
 
 /* ---------- zombie update ---------- */
@@ -647,6 +666,7 @@ function popAt(x,y,z,txt,cls){ const el0=$('pops'); if(!el0) return; const p=new
 function banner(t,s,cls){ const b=$('banner'); if(!b) return; b.className='banner'; void b.offsetWidth; b.className='banner show '+cls; const bt=b.querySelector('.bt'), bs=b.querySelector('.bs'); if(bt) bt.textContent=t; if(bs) bs.textContent=s||''; clearTimeout(banner.t); banner.t=setTimeout(()=>b.classList.remove('show'),1500); }
 function banner2(t){ const b=$('banner2'); if(!b) return; b.className='banner small'; void b.offsetWidth; b.className='banner small show'; const bt=b.querySelector('.bt'); if(bt) bt.textContent=t; clearTimeout(banner2.t); banner2.t=setTimeout(()=>b.classList.remove('show'),1500); }
 function alertMsg(t){ const a=$('alert'); if(!a) return; a.textContent=t; a.classList.remove('go'); void a.offsetWidth; a.classList.add('go'); }
+function redFlash(){ const v=$('vign'); if(!v) return; v.classList.remove('go'); void v.offsetWidth; v.classList.add('go'); }
 const shown={};
 function setTxt(id,v){ const el=$(id); if(!el) return; if(shown[id]!==v){ shown[id]=v; el.textContent=v; } }
 function hudForce(){ for(const k in shown) delete shown[k]; }
@@ -709,6 +729,7 @@ function frame(ms){
       G.beatT-=dt; if(G.inf>=40&&G.beatT<=0){ G.beatT=lerp(.9,.3,G.inf/100); SFX.heart(); }
     }
     if(G.comboT>0){ G.comboT-=dt; if(G.comboT<=0) G.combo=0; }
+    if(hurtCd>0) hurtCd-=dt;
     if(demo) autopilot(dt);
     if(mode!=='count') updElev(dt);
     if((mode==='play'||demo)&&!G.over){ G.spawnT-=dt; if(G.spawnT<=0){ if(lobbyList().length<cfg.maxQ) spawnPkg(); G.spawnT=rnd(cfg.spawn[0],cfg.spawn[1])*(demo?1.4:1); } }
@@ -720,9 +741,11 @@ function frame(ms){
     updItems(dt,time);
     updSpits(dt);
     for(let i=packages.length-1;i>=0;i--){ if(packages[i].state==='gone'){ killPkg(packages[i]); packages.splice(i,1); } }
-    if(mode==='play'&&!G.over&&E.mode==='idle'){
-      const threat=[]; for(const z of zombies){ if(z.floor===E.floor&&Math.abs(z.x-CABX)<=THREAT_R) threat.push(z.type); }
-      addInfection(infectionPerSecond(threat,cfg.infectionScale)*dt);
+    if(mode==='play'&&!G.over&&courier){
+      /* 只有僵尸「碰到」配送员（同层且贴身）才产生接触感染，不是同层就感染 */
+      const cf=Math.round(courier.y/FH), threat=[];
+      for(const z of zombies){ if(z.floor===cf&&Math.hypot(z.x-courier.x,z.z-courier.z)<COLLIDE_R) threat.push(z.type); }
+      if(threat.length) damage(infectionPerSecond(threat,cfg.infectionScale)*dt);
     }
     if(G.inf>=100&&!G.over) finish(true);
     if(mode==='end'){ G.endT-=dt; if(G.endT<=0) showResult(); }
@@ -807,7 +830,12 @@ document.querySelectorAll('.htab').forEach(b=>b.addEventListener('click',()=>{ S
 { const dd=$('diffs'); if(dd){ let h=''; for(const k in DIFFS){ const d=DIFFS[k];
     h+='<button class="diff" data-k="'+k+'"><b style="background:'+d.col+'">'+d.name+'</b><span>'+STYLES[k].bname+'</span><small><i>'+fmt(__('diff.floors','{n}階建て・{k}'),{n:d.floors,k:STYLES[k].kind})+'</i><br><i>'+fmt(__('diff.cap','定員{c}・感染に耐えて生き延びろ'),{c:d.cap})+'</i></small></button>'; }
     dd.innerHTML=h; document.querySelectorAll('.diff').forEach(b=>b.addEventListener('click',()=>{ auInit(); SFX.click(); setDiff(b.dataset.k); })); } }
-{ const tl=$('typeList'); if(tl){ let t=''; for(const k in PKG){ const d=PKG[k]; t+='<i style="background:'+d.css+'">'+d.name+'</i><span>'+d.desc+'</span>'; } tl.innerHTML=t; } }
+{ const tl=$('typeList'); if(tl){ let t='';
+  t+='<b style="grid-column:1/-1;color:var(--muted);font-size:11px">'+__('pkg.title','包裹')+'</b>';
+  for(const k in PKG){ const d=PKG[k]; t+='<i style="background:'+d.css+'">'+d.name+'</i><span>'+d.desc+'</span>'; }
+  t+='<b style="grid-column:1/-1;color:var(--muted);font-size:11px;margin-top:4px">'+__('item.title','道具')+'</b>';
+  for(const k in ITEMS){ const d=ITEMS[k]; t+='<i style="background:'+d.css+'">'+d.name+'</i><span>'+d.desc+'</span>'; }
+  tl.innerHTML=t; } }
 
 /* ================= boot ================= */
 let DY=false, RO=null, rafId=0, goTimer=0;

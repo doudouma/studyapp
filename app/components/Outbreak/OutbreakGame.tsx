@@ -38,6 +38,7 @@ const OD_KEYS = [
   "res.title",
   "diff.floors", "diff.cap",
   "item.syringe.name", "item.stick.name",
+  "item.syringe.desc", "item.stick.desc", "item.title", "pkg.title",
   "msg.heal", "msg.gotItem", "msg.kill", "msg.stickCount",
 ] as const;
 

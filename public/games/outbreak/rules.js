@@ -63,7 +63,7 @@ export function infectionPerSecond(types, scale = 1) {
   if (!types || types.length === 0) return 0;
   let per = 0;
   for (const t of types) per += ZOMBIE_INFECTION[t] ?? 0;
-  if (per <= 0) per = 2; // 只有 spitter/runner 在近距时给一个基础威胁
+  /* 喷酸者（spitter）等爆发型僵尸无接触感染：只有被酸液喷中才感染（见 SPIT_INFECTION） */
   return per * scale;
 }
 

@@ -61,6 +61,10 @@ describe("infectionPerSecond", () => {
   it("brute 比 walker 更狠", () => {
     expect(infectionPerSecond(["brute"], 1)).toBeGreaterThan(infectionPerSecond(["walker"], 1));
   });
+  it("只有喷酸者时不产生接触感染（仅被酸液喷中才感染）", () => {
+    expect(infectionPerSecond(["spitter"], 1)).toBe(0);
+    expect(infectionPerSecond(["spitter", "spitter"], 3)).toBe(0);
+  });
 });
 
 describe("difficultyAt", () => {
