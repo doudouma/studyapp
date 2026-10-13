@@ -33,17 +33,17 @@ export const Route = createFileRoute("/any2md")({
     return {
       meta: [
         { title: i18n.t("any2md.title") },
-        { name: "description", content: i18n.t("any2md.subtitle") },
+        { name: "description", content: i18n.t("any2md.seoDesc") },
         { name: "keywords", content: i18n.t("any2md.keywords") },
         { name: "robots", content: "index, follow" },
         { property: "og:type", content: "website" },
         { property: "og:title", content: i18n.t("any2md.title") },
-        { property: "og:description", content: i18n.t("any2md.subtitle") },
+        { property: "og:description", content: i18n.t("any2md.seoDesc") },
         { property: "og:image", content: DEFAULT_OG_IMAGE },
         { property: "og:site_name", content: "100mini" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: i18n.t("any2md.title") },
-        { name: "twitter:description", content: i18n.t("any2md.subtitle") },
+        { name: "twitter:description", content: i18n.t("any2md.seoDesc") },
         { name: "twitter:image", content: DEFAULT_OG_IMAGE },
       ],
       scripts: [

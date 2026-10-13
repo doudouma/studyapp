@@ -1,28 +1,21 @@
-import { useState } from "react";
 import { FileText, Upload, Share2, ChevronDown, FileImage, ImageDown, TestTube, Tag } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 function FaqItem({ q, a }: { q: string; a: string }) {
-  const [open, setOpen] = useState(false);
+  // Use native <details>/<summary> so the answer text is always present in the
+  // server-rendered HTML (crawlers + AI engines extract it) while staying
+  // collapsed until the user opens it. The previous `{open && …}` unmounted the
+  // answer entirely, making it invisible to non-JS crawlers.
   return (
-    <div className="border-b border-border">
-      <button
-        className="flex w-full items-center justify-between gap-4 py-4 text-left text-sm font-medium transition-colors hover:text-foreground/80 cursor-pointer"
-        onClick={() => setOpen(!open)}
-      >
+    <details className="group border-b border-border">
+      <summary className="flex w-full cursor-pointer list-none items-center justify-between gap-4 py-4 text-left text-sm font-medium transition-colors hover:text-foreground/80 [&::-webkit-details-marker]:hidden">
         <span>{q}</span>
-        <ChevronDown
-          className={`size-4 shrink-0 text-muted-foreground transition-transform duration-200 ${
-            open ? "rotate-180" : ""
-          }`}
-        />
-      </button>
-      {open && (
-        <div className="pb-4 text-sm text-muted-foreground leading-relaxed">
-          {a}
-        </div>
-      )}
-    </div>
+        <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180" />
+      </summary>
+      <div className="pb-4 text-sm text-muted-foreground leading-relaxed">
+        {a}
+      </div>
+    </details>
   );
 }
 

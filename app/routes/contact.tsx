@@ -175,10 +175,12 @@ function ContactPage() {
       <div className="relative z-10 flex-1 flex items-start justify-center pt-16 sm:pt-20 md:pt-24">
         <div className="text-center max-w-3xl px-5">
           <h1 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-[1.05] tracking-[-0.02em]">
-            {t("contact.heading")}<br />
-            <span className="text-white/60">{t("contact.subtitle")}</span><br />
-            <span className="text-white/60">{t("contact.subtitle2")}</span>
+            {t("contact.heading")}
           </h1>
+          <p className="text-white/60 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-[1.05] tracking-[-0.02em]">
+            {t("contact.subtitle")}<br />
+            {t("contact.subtitle2")}
+          </p>
           <p className="text-white/80 text-sm sm:text-base md:text-lg leading-relaxed max-w-md mx-auto mt-6 sm:mt-8">
             {t("contact.message")}
           </p>

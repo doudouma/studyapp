@@ -12,9 +12,14 @@ import { useTranslation } from "react-i18next";
 import i18n from "~/lib/i18n";
 
 export const Route = createFileRoute("/square")({
-  validateSearch: (search: Record<string, string | undefined>) => ({
-    q: search.q || "",
-  }),
+  // Only carry `q` when it is actually present. Returning a default `{ q: "" }`
+  // makes TanStack Router normalize the URL and 307-redirect `/square` to
+  // `/square?q=` — but `/square` is the canonical URL (and the sitemap entry),
+  // so the redirect created a canonical↔redirect loop.
+  validateSearch: (search: Record<string, string | undefined>): { q?: string } => {
+    const q = typeof search.q === "string" ? search.q : "";
+    return q ? { q } : {};
+  },
   loader: async () => {
     return fetchSquareItems(0);
   },
@@ -59,7 +64,7 @@ const CATEGORIES = [
 
 function SquarePage() {
   const { t } = useTranslation();
-  const { q } = Route.useSearch();
+  const { q = "" } = Route.useSearch();
   const { items: initialItems, hasMore: initialHasMore } = useLoaderData({ from: Route.id });
   const [allItems, setAllItems] = useState<SquareItem[]>(initialItems);
   const [hasMore, setHasMore] = useState(initialHasMore);

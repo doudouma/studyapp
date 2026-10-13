@@ -218,6 +218,24 @@ export function buildJsonLd(basePath: string, lang: Lang): object[] {
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
       publisher: { "@id": `${BASE_URL}/#organization` },
     });
+
+    // Homepage FAQ — mirrors the visible "Frequently Asked Questions" section
+    // (components/GuideSection.tsx). Kept in sync via the same i18n keys so the
+    // markup always matches the rendered answer blocks.
+    const homeFaqs = Array.from({ length: 9 }, (_, i) => ({
+      name: i18n.t(`components.guide.faq${i + 1}.q`),
+      text: i18n.t(`components.guide.faq${i + 1}.a`),
+    }));
+    blocks.push({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      inLanguage: bcp,
+      mainEntity: homeFaqs.map((f) => ({
+        "@type": "Question",
+        name: f.name,
+        acceptedAnswer: { "@type": "Answer", text: f.text },
+      })),
+    });
   }
   return blocks;
 }

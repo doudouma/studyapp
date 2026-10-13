@@ -18,9 +18,17 @@ export function escapeHtml(str: string): string {
 export function injectBanner(
   html: string,
   meta?: { title?: string; description?: string; url?: string },
-  baseHref?: string
+  baseHref?: string,
+  noindex = false
 ): string {
   const baseTag = baseHref ? `<base href="${escapeHtml(baseHref)}">` : "";
+  // Anonymous tmp uploads are ephemeral (auto-destroyed after 7 days) and are
+  // never shared to the Square, so they are excluded from the sitemap. Keep them
+  // out of the index too, otherwise a stream of thin, short-lived pages drags
+  // down site-wide quality signals. Indexed pages are the curated, shared ones.
+  const robotsTag = noindex
+    ? `<meta name="robots" content="noindex, nofollow">`
+    : "";
   const seoTags = meta ? `
     <meta property="og:type" content="website">
     <meta property="og:title" content="${escapeHtml(meta.title || "学习页面")} | 100mini">
@@ -34,7 +42,8 @@ export function injectBanner(
 
   let result = html;
   if (baseTag) result = result.replace(/<head\b[^>]*>/i, (m) => `${m}${baseTag}`);
-  if (seoTags) result = result.replace(/<\/head\s*>/i, (m) => `${seoTags}${m}`);
+  const tailTags = robotsTag + seoTags;
+  if (tailTags) result = result.replace(/<\/head\s*>/i, (m) => `${tailTags}${m}`);
   return result;
 }
 

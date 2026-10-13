@@ -158,7 +158,7 @@ function PomodoroPage() {
           .pomodoro-app { height: auto; padding: 12px 0; border-radius: 32px; border: 1px solid #e5e5e5; }
           .pomodoro-outer { min-height: 100dvh; overflow-y: auto; }
           .p-hdr { padding: 4px 16px; }
-          .p-hdr h1 { font-size: 14px; }
+          .p-hdr .p-hdr-title { font-size: 14px; }
           .p-hdr button { width: 32px; height: 32px; }
           .p-hdr svg { width: 16px; height: 16px; }
           .p-main { padding: 0 12px; gap: 8px; }
@@ -178,7 +178,7 @@ function PomodoroPage() {
           transition: transform .2s, background .2s; backdrop-filter: blur(4px);
         }
         .p-hdr button:hover { background: rgba(255,255,255,0.7); transform: scale(1.05); }
-        .p-hdr h1 { font-size: 17px; font-weight: 600; letter-spacing: 1px; color: #5a5a5a; }
+        .p-hdr .p-hdr-title { font-size: 17px; font-weight: 600; letter-spacing: 1px; color: #5a5a5a; }
         .p-hdr svg { width: 20px; height: 20px; color: #5a5a5a; }
         .p-main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 28px; position: relative; }
         .p-timer-wrap { position: relative; width: min(76vw, 320px); aspect-ratio: 1; margin-bottom: 36px; }
@@ -577,6 +577,7 @@ function PomodoroTimer() {
 
   return (
     <div className="pomodoro-app" style={{ background: `linear-gradient(180deg, ${colors.bgTop} 0%, ${colors.bgBot} 100%)` }}>
+      <h1 className="sr-only">{t("pomodoro.heading")}</h1>
       <div className="p-drawer-overlay" style={{ display: showDrawer ? "block" : "none" }} onClick={() => setShowDrawer(false)} />
       <div className={`p-drawer${showDrawer ? " open" : ""}`}>
         <Link to="/" className="p-drawer-home">{t("pomodoro.drawerBack")}</Link>
@@ -623,7 +624,7 @@ function PomodoroTimer() {
         <button aria-label={t("nav.menu")} onClick={() => setShowDrawer(true)}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
         </button>
-        <h1>{completed ? t("pomodoro.completed", { mode: modeLabel }) : t("pomodoro.inProgress", { mode: modeLabel })}</h1>
+        <div className="p-hdr-title">{completed ? t("pomodoro.completed", { mode: modeLabel }) : t("pomodoro.inProgress", { mode: modeLabel })}</div>
         <div className="flex items-center gap-1">
           <button aria-label={t("pomodoro.sound")} onClick={() => {
             setSoundEnabled(s => { const n = !s; try { localStorage.setItem('pomodoro_sound', n ? 'on' : 'off'); } catch {} return n; });

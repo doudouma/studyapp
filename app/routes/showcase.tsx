@@ -88,12 +88,14 @@ function ShowcasePage() {
       <main className="flex-1">
         <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
           <TerminalWindow title="100mini ~ /showcase — zsh" bodyClassName="p-4 text-[11px] sm:p-5">
-            <h1 className="font-bold text-[15px] leading-snug text-[#000000] dark:text-[#e6edf6]">
-              <span aria-hidden className="text-muted-foreground/40">
-                #{" "}
+            <div className="flex items-baseline gap-1.5">
+              <span aria-hidden className="font-bold text-[15px] leading-snug text-muted-foreground/40">
+                #
               </span>
-              {t("showcase.h1")}
-            </h1>
+              <h1 className="font-bold text-[15px] leading-snug text-[#000000] dark:text-[#e6edf6]">
+                {t("showcase.h1")}
+              </h1>
+            </div>
             <p className="mt-1 text-muted-foreground">{t("showcase.subtitle")}</p>
 
             {/* 命令栏 + 分类过滤 */}

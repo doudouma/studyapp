@@ -842,7 +842,9 @@ async function servePageById(
 
   const rawHtml = await obj.text();
   const baseHref = isZip ? `/p/${urlSegment}/` : undefined;
-  const injected = injectBanner(rawHtml, pageMeta, baseHref);
+  // Anonymous uploads live under the `tmp/` R2 prefix; keep them out of search.
+  const isAnonymousTmp = obj.key?.startsWith("tmp/") ?? false;
+  const injected = injectBanner(rawHtml, pageMeta, baseHref, isAnonymousTmp);
 
   return new Response(injected, {
     status: 200,

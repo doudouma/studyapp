@@ -44,6 +44,43 @@ const startHandler = createStartHandler(defaultStreamHandler);
 
 const app = new Hono<{ Bindings: Bindings; Variables: { user: any; session: any } }>();
 
+const HSTS = "max-age=31536000; includeSubDomains";
+
+// Canonical host + URL hygiene. Runs first so redirects happen before any
+// binding/SSR work:
+//   - www.100mini.com → 100mini.com (301): the two hosts served identical
+//     content; only the apex is canonical.
+//   - Trailing slashes (except root) → 301 to the slash-less path. TanStack
+//     Router emitted 307 here; a permanent redirect is the correct signal.
+app.use("*", async (c, next) => {
+  const url = new URL(c.req.url);
+  let canonicalize = false;
+
+  if (url.hostname.startsWith("www.")) {
+    url.hostname = url.hostname.slice("www.".length);
+    canonicalize = true;
+  }
+
+  if (
+    (c.req.method === "GET" || c.req.method === "HEAD") &&
+    url.pathname.length > 1 &&
+    url.pathname.endsWith("/") &&
+    !url.pathname.startsWith("/assets/")
+  ) {
+    url.pathname = url.pathname.replace(/\/+$/, "");
+    canonicalize = true;
+  }
+
+  if (canonicalize) {
+    const res = c.redirect(url.toString(), 301);
+    res.headers.set("Strict-Transport-Security", HSTS);
+    return res;
+  }
+
+  await next();
+  c.header("Strict-Transport-Security", HSTS);
+});
+
 // Inject local Cloudflare bindings in dev mode
 app.use("*", async (c, next) => {
   if (!c.env?.D1) {

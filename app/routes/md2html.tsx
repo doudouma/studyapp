@@ -787,6 +787,7 @@ function Md2HtmlPage() {
       )}
       <AppNav />
       <main className="flex w-full flex-1 flex-col overflow-hidden">
+        <h1 className="sr-only">{t("md2html.heading")}</h1>
         <div className="flex shrink-0 items-center gap-3 border-b border-border bg-background px-3 py-2">
           <div className="min-w-0 flex-1">
             <TemplatePicker value={templateId} variantIndex={variantIndex} onChange={handleTemplateChange} />
