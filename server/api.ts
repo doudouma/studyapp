@@ -56,6 +56,8 @@ const STATIC_PAGES: { loc: string; changefreq: string; priority: string }[] = [
   { loc: "/md2html", changefreq: "weekly", priority: "0.8" },
   { loc: "/any2md", changefreq: "weekly", priority: "0.8" },
   { loc: "/claude-artifact-to-link", changefreq: "weekly", priority: "0.8" },
+  { loc: "/alternatives", changefreq: "weekly", priority: "0.7" },
+  { loc: "/alternatives/netlify-drop", changefreq: "monthly", priority: "0.7" },
   { loc: "/freetool", changefreq: "weekly", priority: "0.7" },
   { loc: "/games", changefreq: "weekly", priority: "0.8" },
   { loc: "/idphoto", changefreq: "weekly", priority: "0.7" },

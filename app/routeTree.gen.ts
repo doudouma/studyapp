@@ -31,10 +31,12 @@ import { Route as CookieRouteImport } from './routes/cookie'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ClaudeArtifactToLinkRouteImport } from './routes/claude-artifact-to-link'
 import { Route as Any2mdRouteImport } from './routes/any2md'
+import { Route as AlternativesRouteImport } from './routes/alternatives'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShowcaseSlugRouteImport } from './routes/showcase_.$slug'
 import { Route as PapercutViewRouteImport } from './routes/papercut_.view'
+import { Route as AlternativesCompetitorRouteImport } from './routes/alternatives_.$competitor'
 
 const WardrobeRoute = WardrobeRouteImport.update({
   id: '/wardrobe',
@@ -146,6 +148,11 @@ const Any2mdRoute = Any2mdRouteImport.update({
   path: '/any2md',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AlternativesRoute = AlternativesRouteImport.update({
+  id: '/alternatives',
+  path: '/alternatives',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -166,10 +173,16 @@ const PapercutViewRoute = PapercutViewRouteImport.update({
   path: '/papercut/view',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AlternativesCompetitorRoute = AlternativesCompetitorRouteImport.update({
+  id: '/alternatives_/$competitor',
+  path: '/alternatives/$competitor',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/alternatives': typeof AlternativesRoute
   '/any2md': typeof Any2mdRoute
   '/claude-artifact-to-link': typeof ClaudeArtifactToLinkRoute
   '/contact': typeof ContactRoute
@@ -192,12 +205,14 @@ export interface FileRoutesByFullPath {
   '/square': typeof SquareRoute
   '/terms': typeof TermsRoute
   '/wardrobe': typeof WardrobeRoute
+  '/alternatives/$competitor': typeof AlternativesCompetitorRoute
   '/papercut/view': typeof PapercutViewRoute
   '/showcase/$slug': typeof ShowcaseSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/alternatives': typeof AlternativesRoute
   '/any2md': typeof Any2mdRoute
   '/claude-artifact-to-link': typeof ClaudeArtifactToLinkRoute
   '/contact': typeof ContactRoute
@@ -220,6 +235,7 @@ export interface FileRoutesByTo {
   '/square': typeof SquareRoute
   '/terms': typeof TermsRoute
   '/wardrobe': typeof WardrobeRoute
+  '/alternatives/$competitor': typeof AlternativesCompetitorRoute
   '/papercut/view': typeof PapercutViewRoute
   '/showcase/$slug': typeof ShowcaseSlugRoute
 }
@@ -227,6 +243,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/alternatives': typeof AlternativesRoute
   '/any2md': typeof Any2mdRoute
   '/claude-artifact-to-link': typeof ClaudeArtifactToLinkRoute
   '/contact': typeof ContactRoute
@@ -249,6 +266,7 @@ export interface FileRoutesById {
   '/square': typeof SquareRoute
   '/terms': typeof TermsRoute
   '/wardrobe': typeof WardrobeRoute
+  '/alternatives_/$competitor': typeof AlternativesCompetitorRoute
   '/papercut_/view': typeof PapercutViewRoute
   '/showcase_/$slug': typeof ShowcaseSlugRoute
 }
@@ -257,6 +275,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/alternatives'
     | '/any2md'
     | '/claude-artifact-to-link'
     | '/contact'
@@ -279,12 +298,14 @@ export interface FileRouteTypes {
     | '/square'
     | '/terms'
     | '/wardrobe'
+    | '/alternatives/$competitor'
     | '/papercut/view'
     | '/showcase/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
+    | '/alternatives'
     | '/any2md'
     | '/claude-artifact-to-link'
     | '/contact'
@@ -307,12 +328,14 @@ export interface FileRouteTypes {
     | '/square'
     | '/terms'
     | '/wardrobe'
+    | '/alternatives/$competitor'
     | '/papercut/view'
     | '/showcase/$slug'
   id:
     | '__root__'
     | '/'
     | '/admin'
+    | '/alternatives'
     | '/any2md'
     | '/claude-artifact-to-link'
     | '/contact'
@@ -335,6 +358,7 @@ export interface FileRouteTypes {
     | '/square'
     | '/terms'
     | '/wardrobe'
+    | '/alternatives_/$competitor'
     | '/papercut_/view'
     | '/showcase_/$slug'
   fileRoutesById: FileRoutesById
@@ -342,6 +366,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  AlternativesRoute: typeof AlternativesRoute
   Any2mdRoute: typeof Any2mdRoute
   ClaudeArtifactToLinkRoute: typeof ClaudeArtifactToLinkRoute
   ContactRoute: typeof ContactRoute
@@ -364,6 +389,7 @@ export interface RootRouteChildren {
   SquareRoute: typeof SquareRoute
   TermsRoute: typeof TermsRoute
   WardrobeRoute: typeof WardrobeRoute
+  AlternativesCompetitorRoute: typeof AlternativesCompetitorRoute
   PapercutViewRoute: typeof PapercutViewRoute
   ShowcaseSlugRoute: typeof ShowcaseSlugRoute
 }
@@ -524,6 +550,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Any2mdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/alternatives': {
+      id: '/alternatives'
+      path: '/alternatives'
+      fullPath: '/alternatives'
+      preLoaderRoute: typeof AlternativesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -552,12 +585,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PapercutViewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/alternatives_/$competitor': {
+      id: '/alternatives_/$competitor'
+      path: '/alternatives/$competitor'
+      fullPath: '/alternatives/$competitor'
+      preLoaderRoute: typeof AlternativesCompetitorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  AlternativesRoute: AlternativesRoute,
   Any2mdRoute: Any2mdRoute,
   ClaudeArtifactToLinkRoute: ClaudeArtifactToLinkRoute,
   ContactRoute: ContactRoute,
@@ -580,6 +621,7 @@ const rootRouteChildren: RootRouteChildren = {
   SquareRoute: SquareRoute,
   TermsRoute: TermsRoute,
   WardrobeRoute: WardrobeRoute,
+  AlternativesCompetitorRoute: AlternativesCompetitorRoute,
   PapercutViewRoute: PapercutViewRoute,
   ShowcaseSlugRoute: ShowcaseSlugRoute,
 }

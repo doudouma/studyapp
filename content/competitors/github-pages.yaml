@@ -1,0 +1,24 @@
+# Single source of truth — GitHub Pages
+slug: github-pages
+name: GitHub Pages
+domain: github.io / github.com
+as_of: "2026-10"
+positioning: "Free static hosting served from a GitHub repository."
+audience: "Developers who already use Git and GitHub."
+signup: "Required (GitHub account + repository)."
+pricing:
+  free: "$0 — public repos only; 1 GB published site, 100 GB/mo soft bandwidth, 10 builds/hr soft"
+  pro: "from $4/mo — private source repo (the published site is still public)"
+strengths:
+  - Free and Git-based
+  - Custom domains
+  - CI via GitHub Actions
+weaknesses_for_our_use_case:
+  - Requires Git and a repository
+  - Static only; no server-side code, no custom headers or redirects
+  - Terms forbid commercial/SaaS hosting use
+  - No anonymous or ephemeral mode
+best_for: "Documentation, blogs, and project pages tied to a repository."
+not_ideal_for: "Pasting an AI-generated HTML file and sharing a link in 30 seconds."
+sources:
+  - https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits

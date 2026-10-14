@@ -1,4 +1,5 @@
 import i18n from "./i18n";
+import { getCompetitor } from "~/features/alternatives/data";
 import { getCaseLocales } from "@shared/showcase";
 import type { ShowcaseLocale } from "@shared/types/showcase";
 import {
@@ -126,8 +127,18 @@ function pageKeys(basePath: string): { name: string; desc: string } {
       return { name: "terms.heading", desc: "terms.desc" };
     case "/cookie":
       return { name: "cookie.heading", desc: "cookie.desc" };
-    default:
+    case "/alternatives":
+      return { name: "alternatives.h1", desc: "alternatives.desc" };
+    default: {
+      const altPrefix = "/alternatives/";
+      if (basePath.startsWith(altPrefix)) {
+        const competitor = getCompetitor(basePath.slice(altPrefix.length));
+        if (competitor) {
+          return { name: `${competitor.i18nKey}.h1`, desc: `${competitor.i18nKey}.desc` };
+        }
+      }
       return { name: "app.title", desc: "app.desc" };
+    }
   }
 }
 

@@ -1,0 +1,27 @@
+# Single source of truth — Claude artifacts & ChatGPT Canvas (AI-native sharing)
+slug: ai-native-share
+name: Claude artifacts / ChatGPT Canvas
+domain: claude.ai / chatgpt.com
+as_of: "2026-10"
+positioning: "AI platforms' built-in share for artifacts (Claude) and canvas (ChatGPT)."
+audience: "Claude and ChatGPT users sharing what the model produced."
+signup: "Claude: public artifact link on Free/Pro/Max; Team/Enterprise internal-only unless an Owner enables external sharing. ChatGPT: canvas sharing on all plans."
+pricing:
+  claude: "Public artifact link on Free/Pro/Max"
+  chatgpt: "Canvas sharing on Free/Plus/Pro/Team/Enterprise/Edu"
+strengths:
+  - One-click sharing inside the tool
+  - Interactive artifact / sandboxed React
+  - No copy-paste
+weaknesses_for_our_use_case:
+  - Runs on the AI platform's infrastructure
+  - Sandboxed to that platform's runtime
+  - Connector-backed artifacts can't be public
+  - Viewer sees "user-generated and unverified"
+  - Can't host arbitrary full-page HTML/CSS/JS; not portable across AI tools
+best_for: "Quickly sharing a model-native artifact."
+not_ideal_for: "A portable, full-page HTML link you fully control, from any AI tool."
+sources:
+  - https://support.claude.com/en/articles/9547008-share-artifacts
+  - https://code.claude.com/docs/en/artifacts
+  - https://help.openai.com/en/articles/9930697

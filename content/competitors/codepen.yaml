@@ -1,0 +1,25 @@
+# Single source of truth — CodePen
+slug: codepen
+name: CodePen
+domain: codepen.io
+as_of: "2026-10"
+positioning: "Online front-end editor and playground with a social community."
+audience: "Front-end developers sharing demos and code snippets."
+signup: "Required to save and publish."
+pricing:
+  free: "$0 — unlimited public Pens, 3 files per Pen, no privacy"
+  starter: "$8/mo ($96/yr)"
+  developer: "$12/mo ($144/yr)"
+  super: "$26/mo ($312/yr)"
+strengths:
+  - Live editing with instant preview
+  - Embeds and a large community
+  - Asset hosting on PRO
+weaknesses_for_our_use_case:
+  - Editor-first, not full-page hosting
+  - Public by default (privacy needs PRO)
+  - Account required
+best_for: "Sharing editable code snippets and demos."
+not_ideal_for: "Hosting a finished full-screen HTML page produced by an AI tool."
+sources:
+  - https://codepen.io/pricing

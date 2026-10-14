@@ -65,6 +65,12 @@ export function AppFooter() {
             {t("footer.showcase")}
           </Link>
           <Link
+            to="/alternatives"
+            className="text-xs text-muted-foreground transition-colors hover:text-[#006c49] dark:hover:text-[#4edea3]"
+          >
+            {t("footer.alternatives")}
+          </Link>
+          <Link
             to="/contact"
             className="text-xs text-muted-foreground transition-colors hover:text-[#006c49] dark:hover:text-[#4edea3]"
           >

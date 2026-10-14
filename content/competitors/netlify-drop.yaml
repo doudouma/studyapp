@@ -1,0 +1,30 @@
+# Single source of truth — Netlify Drop
+# Re-verify pricing/features before republishing. "Not listed" ≠ "doesn't have".
+slug: netlify-drop
+name: Netlify Drop
+domain: netlify.com
+as_of: "2026-10"
+positioning: "Drag-and-drop deploy from the Netlify platform; a doorway into the full Netlify product."
+audience: "Developers deploying real projects (frameworks, functions, CI/CD)."
+signup: "Not required to run a Drop deploy; an account is needed to claim and manage the site."
+pricing:
+  free: "$0 — 300 credits/month"
+  personal: "$9/month — 1,000 credits"
+  pro: "$20/month — team, 3,000 credits"
+strengths:
+  - Framework builds (deploy any framework)
+  - Functions and edge functions
+  - Custom domains with SSL on the free plan
+  - Deploy from Git, CLI, or API; unlimited deploy previews
+  - Large ecosystem
+weaknesses_for_our_use_case:
+  - Heavier than needed for a single AI-generated HTML file
+  - Usage-credit model
+  - No built-in "anonymous, auto-expiring" privacy default
+  - No Claude-artifact-oriented paste flow
+best_for: "Production web apps and sites with a build step."
+not_ideal_for: "Someone who just wants to paste one AI-generated HTML file and share a link in seconds."
+migration: "For a single static file, 100mini needs no repo, build, or account — copy-paste replaces zip-upload + claim."
+sources:
+  - https://www.netlify.com/pricing/
+  - https://docs.netlify.com/deploy/create-deploys

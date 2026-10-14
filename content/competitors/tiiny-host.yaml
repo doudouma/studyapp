@@ -1,0 +1,29 @@
+# Single source of truth — Tiiny Host
+slug: tiiny-host
+name: Tiiny Host
+domain: tiiny.host
+as_of: "2026-09"
+positioning: "Simplest way to share a static site or file — zip upload, instant tiiny.site link."
+audience: "Individuals sharing landing pages, decks, portfolios, prototypes."
+signup: "Required (free plan needs an account; log in at least once every 3 months to keep links)."
+pricing:
+  free: "$0 — 1 site, 3 MB upload, 5,000 visits/mo, banner"
+  tiny: "$9/mo ($60/yr) — 25 MB, banner removed"
+  solo: "$18/mo ($156/yr) — 5 sites, custom domains, password protection"
+  pro: "$38/mo ($372/yr) — 15 sites, 10 GB"
+  pro_max: "$89/mo ($888/yr) — unlimited sites, 2 TB"
+strengths:
+  - Zip or single-file upload
+  - PDF and office file formats
+  - Custom domains and password protection on paid tiers
+  - API
+weaknesses_for_our_use_case:
+  - Account required
+  - 3 MB free upload cap
+  - Banner on the free plan
+  - Visit-metered tiers
+best_for: "A persistent single-site link, optionally on your own domain."
+not_ideal_for: "No-signup, ephemeral sharing of AI-generated HTML."
+sources:
+  - https://tiiny.host/pricing
+  - https://helpdesk.tiiny.host/en/article/pricing-plans-1i3vkky
