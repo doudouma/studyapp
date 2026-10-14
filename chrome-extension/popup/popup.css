@@ -694,6 +694,65 @@ select.input {
   pointer-events: none;
 }
 
+/* Expiry & burn */
+.expiry-box {
+  padding: 10px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  background: var(--bg-secondary);
+  margin-bottom: 10px;
+}
+
+.expiry-box .label {
+  margin-bottom: 6px;
+}
+
+.seg {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.seg-btn {
+  flex: 1 0 auto;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.seg-btn:hover {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.seg-btn.active {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+
+.expiry-custom {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.expiry-custom .input {
+  width: auto;
+  flex: 1;
+}
+
+.one-time-label {
+  margin-bottom: 0;
+}
+
 /* User badge */
 .user-badge {
   font-size: 11px;

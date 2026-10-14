@@ -101,7 +101,42 @@
           <label class="label">Tags</label>
           <input type="text" id="tagsInput" class="input" placeholder="Separate with commas">
         </div>
-        <label class="checkbox-label">
+
+        <!-- Expiry & burn -->
+        <div class="expiry-box">
+          <label class="label">Expiry</label>
+          <div class="seg" id="expirySeg">
+            <button type="button" class="seg-btn active" data-expiry="permanent">Permanent</button>
+            <button type="button" class="seg-btn" data-expiry="1h">1h</button>
+            <button type="button" class="seg-btn" data-expiry="1d">1d</button>
+            <button type="button" class="seg-btn" data-expiry="7d">7d</button>
+            <button type="button" class="seg-btn" data-expiry="30d">30d</button>
+            <button type="button" class="seg-btn" data-expiry="custom">Custom</button>
+          </div>
+          <div class="expiry-custom hidden" id="expiryCustom">
+            <input type="number" id="expiryAmount" class="input" min="1" value="1">
+            <select id="expiryUnit" class="input">
+              <option value="h">hours</option>
+              <option value="d" selected>days</option>
+            </select>
+          </div>
+
+          <label class="label">Max views</label>
+          <div class="seg" id="viewsSeg">
+            <button type="button" class="seg-btn" data-views="1">1</button>
+            <button type="button" class="seg-btn" data-views="3">3</button>
+            <button type="button" class="seg-btn" data-views="5">5</button>
+            <button type="button" class="seg-btn" data-views="10">10</button>
+            <button type="button" class="seg-btn active" data-views="inf">∞</button>
+          </div>
+
+          <label class="checkbox-label one-time-label">
+            <input type="checkbox" id="oneTimeCheck">
+            One-time link · burn after opening
+          </label>
+        </div>
+
+        <label class="checkbox-label" id="shareLabel">
           <input type="checkbox" id="shareCheck">
           Share to Square
         </label>

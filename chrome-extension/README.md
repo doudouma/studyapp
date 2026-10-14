@@ -16,6 +16,7 @@ Think of it as **instant hosting for AI output**: your AI writes the HTML, 100mi
 | **One-click upload** | Paste HTML or drag `.html` / `.zip` files |
 | **Anonymous mode** | No login needed — upload and share instantly |
 | **7d auto-destroy** | Anonymous pages expire after 7 days, auto-cleaned |
+| **Expiry & burn** | Signed in: set an expiry (1h/1d/7d/30d/custom), cap views (1/3/5/10/∞), or make a one-time burn-after-reading link — free |
 | **Permanent storage** | Sign in to keep pages forever |
 | **Share to Square** | Publish to the 100mini learning community |
 | **Category & tags** | Organize pages by subject (Math, English, Science, etc.) |

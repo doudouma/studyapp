@@ -6,7 +6,8 @@
  * Publish HTML/ZIP pages to 100mini as shareable links.
  * Two modes:
  *   - Anonymous: no token, 5 uploads/day/IP, 7-day expiry
- *   - Authenticated (--token / MINI_TOKEN): permanent pages, no daily cap
+ *   - Authenticated (--token / MINI_TOKEN): permanent pages by default, no daily cap,
+ *     and optional lifetime control (--expire / --max-views / --one-time)
  *
  * Zero dependencies. Requires Node.js >= 18 (fetch, FormData, Blob).
  */
@@ -19,6 +20,21 @@ import { basename } from "node:path";
 const BASE_URL_DEFAULT = "https://www.100mini.com";
 const MAX_SIZE = 5 * 1024 * 1024;
 const ALLOWED_EXT = [".html", ".htm", ".zip"];
+
+// Lifetime options (authenticated uploads only)
+const VALID_EXPIRY = ["permanent", "1h", "1d", "7d", "30d", "custom"];
+const MIN_EXPIRY_MS = 60 * 1000;                 // 1 minute
+const MAX_EXPIRY_MS = 30 * 24 * 60 * 60 * 1000;  // 30 days
+
+/** Parse a duration like "45m", "12h", "5d" into milliseconds; null if invalid. */
+function parseDurationMs(str) {
+  const m = /^(\d+)\s*(m|h|d)$/i.exec(String(str).trim());
+  if (!m) return null;
+  const n = Number(m[1]);
+  const unit = m[2].toLowerCase();
+  const mult = unit === "m" ? 60_000 : unit === "h" ? 3_600_000 : 86_400_000;
+  return n * mult;
+}
 
 // ── Argument parsing ────────────────────────────────────────────────────────
 
@@ -33,6 +49,8 @@ function parseArgs(argv) {
       opts.quiet = true;
     } else if (a === "--anonymous") {
       opts.anonymous = true;
+    } else if (a === "--one-time") {
+      opts["one-time"] = true;
     } else if (a.startsWith("--") && i + 1 < args.length) {
       const key = a.slice(2);
       opts[key] = args[++i];
@@ -66,6 +84,12 @@ Options:
   --quiet         print only the final URL
   -h, --help      show this help
 
+Lifetime options (authenticated uploads only; free, no points):
+  --expire <p>         permanent | 1h | 1d | 7d | 30d | custom (default: permanent)
+  --expire-custom <d>  duration for --expire custom: <n>m/h/d (e.g. 45m, 12h, 5d; max 30d)
+  --max-views <n>      max opens before burning: a positive integer or inf (default: inf)
+  --one-time           burn-after-reading link (shorthand for --max-views 1)
+
 Environment:
   MINI_TOKEN      default API key (overridden by --token; ignored with --anonymous)
 
@@ -73,6 +97,9 @@ Examples:
   node upload.mjs --file page.html
   node upload.mjs --content "<h1>hi</h1>" --quiet
   node upload.mjs --token 100m_xxxx --file app.zip --title "My App"
+  node upload.mjs --token 100m_xxxx --file quiz.html --title "Quiz" --one-time
+  node upload.mjs --token 100m_xxxx --file notes.html --title "Notes" --expire 1d
+  node upload.mjs --token 100m_xxxx --file draft.html --title "Draft" --expire custom --expire-custom 12h
   cat page.html | node upload.mjs --anonymous
 `.trim();
   console.error(usage);
@@ -110,6 +137,57 @@ async function main() {
     opts.anonymous
       ? null
       : opts.token || process.env.MINI_TOKEN || null;
+
+  // Resolve lifetime options (expiry / max views / one-time)
+  let expiryPreset; // undefined = not requested, else preset string
+  let expiryCustomMs = null;
+
+  if (opts["one-time"] && opts["max-views"] !== undefined && Number(opts["max-views"]) !== 1) {
+    err(2, `--one-time conflicts with --max-views ${opts["max-views"]} (one-time means max views = 1).`);
+  }
+
+  let maxViews; // undefined = not requested, null = ∞, number = limit
+  if (opts["one-time"]) {
+    maxViews = 1;
+  } else if (opts["max-views"] !== undefined) {
+    const raw = String(opts["max-views"]).trim().toLowerCase();
+    if (["inf", "infinity", "∞", "unlimited"].includes(raw)) {
+      maxViews = null;
+    } else {
+      const n = Number(raw);
+      if (!Number.isFinite(n) || n < 1) {
+        err(2, `Invalid --max-views "${opts["max-views"]}". Use a positive integer or "inf".`);
+      }
+      maxViews = Math.floor(n);
+    }
+  }
+
+  if (opts.expire !== undefined) {
+    const p = String(opts.expire).trim();
+    if (!VALID_EXPIRY.includes(p)) {
+      err(2, `Invalid --expire "${opts.expire}". Use one of: ${VALID_EXPIRY.join(", ")}.`);
+    }
+    expiryPreset = p;
+    if (p === "custom") {
+      if (opts["expire-custom"] === undefined) {
+        err(2, "--expire custom requires --expire-custom <duration> (e.g. 45m, 12h, 5d).");
+      }
+      const ms = parseDurationMs(opts["expire-custom"]);
+      if (ms === null || ms < MIN_EXPIRY_MS || ms > MAX_EXPIRY_MS) {
+        err(2, `Invalid --expire-custom "${opts["expire-custom"]}". Use <n>m/h/d within 1 minute–30 days (e.g. 45m, 12h, 5d).`);
+      }
+      expiryCustomMs = ms;
+    }
+  } else if (opts["expire-custom"] !== undefined) {
+    err(2, "--expire-custom requires --expire custom.");
+  }
+
+  const usesLifetimeFlags = expiryPreset !== undefined || maxViews !== undefined;
+  if (!token && usesLifetimeFlags) {
+    process.stderr.write(
+      "Note: --expire / --max-views / --one-time apply to authenticated uploads only; ignored in anonymous mode.\n"
+    );
+  }
 
   // Resolve input
   let inputMode = null; // "file" | "content" | "stdin"
@@ -161,6 +239,17 @@ async function main() {
   if (opts.title) formData.append("title", opts.title);
   if (opts.category) formData.append("category", opts.category);
   if (opts.tags) formData.append("tags", opts.tags);
+
+  // Lifetime options (authenticated only; server ignores them for anonymous)
+  if (token && usesLifetimeFlags) {
+    formData.append("expiryPreset", expiryPreset ?? "permanent");
+    if (expiryPreset === "custom" && expiryCustomMs != null) {
+      formData.append("expiryCustomMs", String(expiryCustomMs));
+    }
+    if (maxViews !== undefined) {
+      formData.append("maxViews", maxViews == null ? "inf" : String(maxViews));
+    }
+  }
 
   const baseUrl = (opts["base-url"] || BASE_URL_DEFAULT).replace(/\/+$/, "");
 

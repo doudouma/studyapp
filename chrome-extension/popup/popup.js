@@ -17,6 +17,37 @@ function $$(sel) { return document.querySelectorAll(sel); }
 let file = null;
 let loggedIn = false;
 let currentUser = null;
+let expiryPreset = 'permanent';   // permanent | 1h | 1d | 7d | 30d | custom
+let maxViews = null;              // null = unlimited (∞); 1 = one-time
+
+const HOUR_MS = 60 * 60 * 1000;
+const DAY_MS = 24 * HOUR_MS;
+const MAX_EXPIRY_MS = 30 * DAY_MS;
+
+function computeCustomMs() {
+  const amount = Math.max(1, Math.floor(Number($('#expiryAmount').value) || 1));
+  const unit = $('#expiryUnit').value;
+  const ms = amount * (unit === 'h' ? HOUR_MS : DAY_MS);
+  return Math.min(Math.max(ms, 60 * 1000), MAX_EXPIRY_MS);
+}
+
+// Truly permanent = no expiry and no view limit. Limited links burn and
+// therefore cannot be shared to the Square (matches the web UI).
+function isTrulyPermanent() {
+  return expiryPreset === 'permanent' && maxViews == null;
+}
+
+function renderExpiryState() {
+  $$('#expirySeg .seg-btn').forEach((b) => b.classList.toggle('active', b.dataset.expiry === expiryPreset));
+  $$('#viewsSeg .seg-btn').forEach((b) => {
+    const v = b.dataset.views;
+    const active = v === 'inf' ? maxViews == null : maxViews === Number(v);
+    b.classList.toggle('active', active);
+  });
+  $('#expiryCustom').classList.toggle('hidden', expiryPreset !== 'custom');
+  $('#oneTimeCheck').checked = maxViews === 1;
+  $('#shareLabel').classList.toggle('hidden', !isTrulyPermanent());
+}
 
 // --- Init ---
 document.addEventListener('DOMContentLoaded', async () => {
@@ -119,6 +150,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Title input
   $('#titleInput').addEventListener('input', updateUploadState);
+
+  // Expiry & burn options
+  $$('#expirySeg .seg-btn').forEach((b) => {
+    b.addEventListener('click', () => {
+      expiryPreset = b.dataset.expiry;
+      renderExpiryState();
+    });
+  });
+  $$('#viewsSeg .seg-btn').forEach((b) => {
+    b.addEventListener('click', () => {
+      const v = b.dataset.views;
+      maxViews = v === 'inf' ? null : Number(v);
+      renderExpiryState();
+    });
+  });
+  $('#oneTimeCheck').addEventListener('change', (e) => {
+    maxViews = e.target.checked ? 1 : null;
+    renderExpiryState();
+  });
+  renderExpiryState();
 
   // Check for pending HTML from context menu (retry a few times since background
   // may still be fetching it from the content script)
@@ -278,7 +329,15 @@ async function handleUpload() {
     formData.append('title', title);
     formData.append('category', category);
     formData.append('tags', tags);
-    formData.append('shareToSquare', String(shareToSquare));
+    // Limited (expiring / view-capped / one-time) links cannot be shared
+    formData.append('shareToSquare', String(shareToSquare && isTrulyPermanent()));
+    if (loggedIn) {
+      formData.append('expiryPreset', expiryPreset);
+      if (expiryPreset === 'custom') {
+        formData.append('expiryCustomMs', String(computeCustomMs()));
+      }
+      formData.append('maxViews', maxViews == null ? 'inf' : String(maxViews));
+    }
 
     const res = await fetch(`${apiBase}/api/upload`, {
       method: 'POST',
@@ -354,6 +413,9 @@ function resetUpload() {
   $('#titleInput').value = '';
   $('#tagsInput').value = '';
   $('#shareCheck').checked = false;
+  expiryPreset = 'permanent';
+  maxViews = null;
+  renderExpiryState();
   renderAuthState();
   updateSize();
 }
