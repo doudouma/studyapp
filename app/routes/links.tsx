@@ -19,6 +19,8 @@ export const Route = createFileRoute("/links")({
         name: "description",
         content: i18n.t("profile.desc"),
       },
+      // Private, login-gated dashboard — keep it out of search results.
+      { name: "robots", content: "noindex, nofollow" },
     ],
   }),
   component: LinksPage,

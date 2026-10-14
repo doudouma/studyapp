@@ -122,7 +122,7 @@ export function GuideSection() {
                   <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-[#006c49]/10 text-[#006c49] dark:bg-[#4edea3]/10 dark:text-[#4edea3]">
                     <Icon className="size-7" />
                   </div>
-                  <h4 className="text-lg font-semibold">{step.title}</h4>
+                  <h3 className="text-lg font-semibold">{step.title}</h3>
                   <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed max-w-xs">
                     {step.description}
                   </p>
@@ -164,7 +164,7 @@ export function GuideSection() {
                   <div className="mb-4 flex size-12 items-center justify-center rounded-xl bg-[#006c49]/10 text-[#006c49] dark:bg-[#4edea3]/10 dark:text-[#4edea3]">
                     <Icon className="size-6" />
                   </div>
-                  <h4 className="text-base font-semibold">{tip.title}</h4>
+                  <h3 className="text-base font-semibold">{tip.title}</h3>
                   <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
                     {tip.description}
                   </p>

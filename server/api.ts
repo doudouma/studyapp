@@ -61,7 +61,9 @@ const STATIC_PAGES: { loc: string; changefreq: string; priority: string }[] = [
   { loc: "/freetool", changefreq: "weekly", priority: "0.7" },
   { loc: "/games", changefreq: "weekly", priority: "0.8" },
   { loc: "/idphoto", changefreq: "weekly", priority: "0.7" },
-  { loc: "/links", changefreq: "weekly", priority: "0.7" },
+  // /links (My Pages) is a login-gated dashboard — intentionally excluded from
+  // the sitemap and marked noindex (see app/routes/links.tsx).
+  { loc: "/burn-after-reading-link", changefreq: "weekly", priority: "0.8" },
   { loc: "/pomodoro", changefreq: "weekly", priority: "0.6" },
   { loc: "/rhythm", changefreq: "weekly", priority: "0.6" },
   { loc: "/petsafe", changefreq: "weekly", priority: "0.7" },

@@ -30,6 +30,7 @@ import { Route as DeliveryrushRouteImport } from './routes/deliveryrush'
 import { Route as CookieRouteImport } from './routes/cookie'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ClaudeArtifactToLinkRouteImport } from './routes/claude-artifact-to-link'
+import { Route as BurnAfterReadingLinkRouteImport } from './routes/burn-after-reading-link'
 import { Route as Any2mdRouteImport } from './routes/any2md'
 import { Route as AlternativesRouteImport } from './routes/alternatives'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -143,6 +144,11 @@ const ClaudeArtifactToLinkRoute = ClaudeArtifactToLinkRouteImport.update({
   path: '/claude-artifact-to-link',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BurnAfterReadingLinkRoute = BurnAfterReadingLinkRouteImport.update({
+  id: '/burn-after-reading-link',
+  path: '/burn-after-reading-link',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const Any2mdRoute = Any2mdRouteImport.update({
   id: '/any2md',
   path: '/any2md',
@@ -184,6 +190,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/alternatives': typeof AlternativesRoute
   '/any2md': typeof Any2mdRoute
+  '/burn-after-reading-link': typeof BurnAfterReadingLinkRoute
   '/claude-artifact-to-link': typeof ClaudeArtifactToLinkRoute
   '/contact': typeof ContactRoute
   '/cookie': typeof CookieRoute
@@ -214,6 +221,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/alternatives': typeof AlternativesRoute
   '/any2md': typeof Any2mdRoute
+  '/burn-after-reading-link': typeof BurnAfterReadingLinkRoute
   '/claude-artifact-to-link': typeof ClaudeArtifactToLinkRoute
   '/contact': typeof ContactRoute
   '/cookie': typeof CookieRoute
@@ -245,6 +253,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/alternatives': typeof AlternativesRoute
   '/any2md': typeof Any2mdRoute
+  '/burn-after-reading-link': typeof BurnAfterReadingLinkRoute
   '/claude-artifact-to-link': typeof ClaudeArtifactToLinkRoute
   '/contact': typeof ContactRoute
   '/cookie': typeof CookieRoute
@@ -277,6 +286,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/alternatives'
     | '/any2md'
+    | '/burn-after-reading-link'
     | '/claude-artifact-to-link'
     | '/contact'
     | '/cookie'
@@ -307,6 +317,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/alternatives'
     | '/any2md'
+    | '/burn-after-reading-link'
     | '/claude-artifact-to-link'
     | '/contact'
     | '/cookie'
@@ -337,6 +348,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/alternatives'
     | '/any2md'
+    | '/burn-after-reading-link'
     | '/claude-artifact-to-link'
     | '/contact'
     | '/cookie'
@@ -368,6 +380,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AlternativesRoute: typeof AlternativesRoute
   Any2mdRoute: typeof Any2mdRoute
+  BurnAfterReadingLinkRoute: typeof BurnAfterReadingLinkRoute
   ClaudeArtifactToLinkRoute: typeof ClaudeArtifactToLinkRoute
   ContactRoute: typeof ContactRoute
   CookieRoute: typeof CookieRoute
@@ -543,6 +556,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClaudeArtifactToLinkRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/burn-after-reading-link': {
+      id: '/burn-after-reading-link'
+      path: '/burn-after-reading-link'
+      fullPath: '/burn-after-reading-link'
+      preLoaderRoute: typeof BurnAfterReadingLinkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/any2md': {
       id: '/any2md'
       path: '/any2md'
@@ -600,6 +620,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AlternativesRoute: AlternativesRoute,
   Any2mdRoute: Any2mdRoute,
+  BurnAfterReadingLinkRoute: BurnAfterReadingLinkRoute,
   ClaudeArtifactToLinkRoute: ClaudeArtifactToLinkRoute,
   ContactRoute: ContactRoute,
   CookieRoute: CookieRoute,
