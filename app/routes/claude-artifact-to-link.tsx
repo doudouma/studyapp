@@ -19,10 +19,18 @@ export const Route = createFileRoute("/claude-artifact-to-link")({
   head: () => {
     const bcp = getBcp47(i18n.language);
     const pageUrl = BASE_URL + withLangPrefix(currentLang(), "/claude-artifact-to-link");
-    const faqs = Array.from({ length: 5 }, (_, i) => ({
-      name: i18n.t(`claudeArtifact.faq${i + 1}.q`),
-      text: i18n.t(`claudeArtifact.faq${i + 1}.a`),
-    }));
+    // The definition block is rendered visibly in the hero, so it belongs in the
+    // FAQ schema too (schema must mirror visible content).
+    const faqs = [
+      {
+        name: i18n.t("claudeArtifact.definition.q"),
+        text: i18n.t("claudeArtifact.definition.a"),
+      },
+      ...Array.from({ length: 5 }, (_, i) => ({
+        name: i18n.t(`claudeArtifact.faq${i + 1}.q`),
+        text: i18n.t(`claudeArtifact.faq${i + 1}.a`),
+      })),
+    ];
     return {
       meta: [
         { title: i18n.t("claudeArtifact.title") },
@@ -174,6 +182,14 @@ function ClaudeArtifactPage() {
             <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground leading-relaxed">
               {t("claudeArtifact.subtitle")}
             </p>
+            <div className="mx-auto mt-8 max-w-2xl rounded-xl border border-border/70 bg-card/60 px-5 py-4 text-left">
+              <p className="text-sm font-semibold text-foreground">
+                {t("claudeArtifact.definition.q")}
+              </p>
+              <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                {t("claudeArtifact.definition.a")}
+              </p>
+            </div>
           </div>
         </section>
 

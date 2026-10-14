@@ -7,6 +7,7 @@ import { FileDrop } from "~/components/any2md/FileDrop";
 import { withLangPrefix, currentLang, BASE_URL, DEFAULT_OG_IMAGE } from "~/lib/seo";
 import { ResultPanel } from "~/components/any2md/ResultPanel";
 import { MdView } from "~/components/any2md/MdView";
+import { ToolSeoBlock } from "~/components/ToolSeoBlock";
 import {
   ensureEngine,
   toMarkdownFromFile,
@@ -79,6 +80,22 @@ export const Route = createFileRoute("/any2md")({
               "@type": "Question",
               name: faq.name,
               acceptedAnswer: { "@type": "Answer", text: faq.text },
+            })),
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "HowTo",
+            name: i18n.t("any2md.howto.title"),
+            description: i18n.t("any2md.seo.lead"),
+            inLanguage: bcp,
+            totalTime: "PT1M",
+            step: Array.from({ length: 3 }, (_, i) => ({
+              "@type": "HowToStep",
+              position: i + 1,
+              text: i18n.t(`any2md.howto.step${i + 1}`),
             })),
           }),
         },
@@ -249,6 +266,19 @@ function Any2MdPage() {
               ))}
             </div>
           </section>
+
+          {/* How to */}
+          <ToolSeoBlock
+            className="mt-14"
+            center
+            title={t("any2md.howto.title")}
+            answer={t("any2md.seo.lead")}
+            steps={[
+              t("any2md.howto.step1"),
+              t("any2md.howto.step2"),
+              t("any2md.howto.step3"),
+            ]}
+          />
 
           {/* Pain points */}
           <section className="mt-12">

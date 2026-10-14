@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { IdPhotoWorkbench } from "~/components/idphoto/IdPhotoWorkbench";
+import { ToolSeoBlock } from "~/components/ToolSeoBlock";
 import i18n, { getBcp47 } from "~/lib/i18n";
 import { withLangPrefix, currentLang } from "~/lib/seo";
 
@@ -41,6 +42,22 @@ export const Route = createFileRoute("/idphoto")({
               "@type": "Question",
               name: faq.name,
               acceptedAnswer: { "@type": "Answer", text: faq.text },
+            })),
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "HowTo",
+            name: i18n.t("idphoto.howto.title"),
+            description: i18n.t("idphoto.des.text"),
+            inLanguage: getBcp47(i18n.language),
+            totalTime: "PT2M",
+            step: Array.from({ length: 4 }, (_, i) => ({
+              "@type": "HowToStep",
+              position: i + 1,
+              text: i18n.t(`idphoto.howto.step${i + 1}`),
             })),
           }),
         },
@@ -158,6 +175,19 @@ function IdPhotoPage() {
             <p className="text-[14px] leading-relaxed text-muted-foreground">{t("idphoto.des.intro")}</p>
           </div>
         </section>
+
+        {/* How to */}
+        <ToolSeoBlock
+          className="mx-auto max-w-5xl px-6 pt-14"
+          title={t("idphoto.howto.title")}
+          answer={t("idphoto.des.text")}
+          steps={[
+            t("idphoto.howto.step1"),
+            t("idphoto.howto.step2"),
+            t("idphoto.howto.step3"),
+            t("idphoto.howto.step4"),
+          ]}
+        />
 
         {/* 核心特点 */}
         <section className="mx-auto max-w-5xl px-6 pt-14">
