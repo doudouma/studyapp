@@ -84,6 +84,37 @@ function escapeXml(s: string): string {
   );
 }
 
+// AI crawlers, grouped by documented purpose:
+//  - Retrieval bots drive citations (ChatGPT / Perplexity / Claude / Copilot)
+//  - Training bots are a deliberate policy choice, not an oversight
+// Each group repeats the private-path Disallows because a specific
+// User-agent group overrides the "*" group entirely.
+const AI_RETRIEVAL_BOTS = [
+  "OAI-SearchBot", // ChatGPT search index
+  "ChatGPT-User", // user-triggered fetch in ChatGPT
+  "PerplexityBot", // Perplexity index
+  "Perplexity-User", // user-triggered fetch in Perplexity
+  "Claude-SearchBot", // Claude search index
+  "Claude-User", // user-triggered fetch in Claude
+];
+const AI_TRAINING_BOTS = [
+  "GPTBot", // OpenAI model training
+  "ClaudeBot", // Anthropic model training
+  "Google-Extended", // controls Gemini training/grounding of crawled content
+];
+
+function aiBotGroup(agents: string[]): string {
+  return agents
+    .map(
+      (a) => `User-agent: ${a}
+Allow: /
+Allow: /p/
+Disallow: /api/
+Disallow: /admin`
+    )
+    .join("\n\n");
+}
+
 api.get("/robots.txt", (c) => {
   const sitemapLines = LANGS.map((l) => `Sitemap: ${BASE_URL}/sitemap-${l}.xml`).join("\n");
   return c.text(`User-agent: *
@@ -91,6 +122,14 @@ Allow: /
 Allow: /p/
 Disallow: /api/
 Disallow: /admin
+
+# AI search & retrieval crawlers — allowed so pages can be cited by
+# ChatGPT, Perplexity, Claude, and Copilot.
+${aiBotGroup(AI_RETRIEVAL_BOTS)}
+
+# AI training crawlers — allowed by policy to maximize brand presence.
+# Change "Allow: /" to "Disallow: /" on any agent to opt out of training.
+${aiBotGroup(AI_TRAINING_BOTS)}
 
 ${sitemapLines}
 `);
