@@ -100,6 +100,8 @@ function pageKeys(basePath: string): { name: string; desc: string } {
       return { name: "md2html.seoTitle", desc: "md2html.seoDesc" };
     case "/any2md":
       return { name: "any2md.heading", desc: "any2md.subtitle" };
+    case "/claude-artifact-to-link":
+      return { name: "claudeArtifact.h1", desc: "claudeArtifact.desc" };
     case "/freetool":
       return { name: "freetool.heading", desc: "freetool.desc" };
     case "/games":

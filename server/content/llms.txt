@@ -1,0 +1,31 @@
+# 100mini
+
+> Instant HTML hosting with no signup. Paste AI-generated HTML (including Claude
+> artifacts and ChatGPT output) or upload a .html/.zip file and get a live,
+> shareable link in about 30 seconds. Free. Anonymous uploads auto-destroy after
+> 7 days; logged-in users get 5 permanent pages free.
+
+## Start here
+- [Publish a page (web)](https://100mini.com/): paste HTML or drag-drop a file
+- [Publish a Claude artifact as a live link](https://100mini.com/claude-artifact-to-link)
+- [Chrome extension](https://chromewebstore.google.com/detail/dmmhkdcmifenlihbbhihkagnebgiekep)
+- [Agent skill — publish without a browser or login](https://100mini.com/skill/100mini-upload)
+
+## Product
+- [Free tools](https://100mini.com/freetool): Claude-to-Link, Markdown to HTML, any document to Markdown, ID photo, and more
+- [Games](https://100mini.com/games)
+- [Case library](https://100mini.com/showcase)
+- [Learning Square](https://100mini.com/square)
+
+## Facts
+- Formats: .html, .htm, .zip (ZIP must contain index.html as the entry point)
+- Anonymous limit: 5 MB per page, auto-destroyed after 7 days
+- Logged in: 5 permanent pages free; larger files and custom links use in-app points
+- Safety: every hosted page runs in a Content-Security-Policy sandbox with a phishing-prevention banner; no data is retained after expiry
+- Languages: en, zh, es, pt, fr
+- Pricing and limits: https://100mini.com/pricing.md
+
+## Optional
+- [Contact](https://100mini.com/contact)
+- [Terms of use](https://100mini.com/terms)
+- [Privacy policy](https://100mini.com/privacy)

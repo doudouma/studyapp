@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Timer, Music, FileText, FileCode2, Camera, ArrowRight, Sparkles, PawPrint, ShieldAlert } from "lucide-react";
+import { Timer, Music, FileText, FileCode2, Camera, ArrowRight, Sparkles, PawPrint, ShieldAlert, Link2 } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { useTranslation } from "react-i18next";
@@ -37,42 +37,48 @@ export const Route = createFileRoute("/freetool")({
               {
                 "@type": "ListItem",
                 position: 1,
+                name: i18n.t("claudeArtifact.h1"),
+                url: "https://100mini.com/claude-artifact-to-link",
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
                 name: i18n.t("freetool.item.pomodoro.title"),
                 url: "https://100mini.com/pomodoro",
               },
               {
                 "@type": "ListItem",
-                position: 2,
+                position: 3,
                 name: i18n.t("freetool.item.rhythm.title"),
                 url: "https://100mini.com/rhythm",
               },
               {
                 "@type": "ListItem",
-                position: 3,
+                position: 4,
                 name: i18n.t("freetool.item.md2html.title"),
                 url: "https://100mini.com/md2html",
               },
               {
                 "@type": "ListItem",
-                position: 4,
+                position: 5,
                 name: i18n.t("freetool.item.any2md.title"),
                 url: "https://100mini.com/any2md",
               },
               {
                 "@type": "ListItem",
-                position: 5,
+                position: 6,
                 name: i18n.t("freetool.item.idphoto.title"),
                 url: "https://100mini.com/idphoto",
               },
               {
                 "@type": "ListItem",
-                position: 6,
+                position: 7,
                 name: i18n.t("freetool.item.petbadge.title"),
                 url: "https://100mini.com/petbadge",
               },
               {
                 "@type": "ListItem",
-                position: 7,
+                position: 8,
                 name: i18n.t("freetool.item.petsafe.title"),
                 url: "https://100mini.com/petsafe",
               },
@@ -89,6 +95,12 @@ function FreeToolPage() {
   const { t } = useTranslation();
 
   const tools = [
+    {
+      href: "/claude-artifact-to-link" as const,
+      icon: Link2,
+      title: t("claudeArtifact.h1"),
+      desc: t("claudeArtifact.desc"),
+    },
     {
       href: "/pomodoro" as const,
       icon: Timer,

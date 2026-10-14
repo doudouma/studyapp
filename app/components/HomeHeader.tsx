@@ -77,6 +77,7 @@ function ToolsDropdown() {
   const location = useLocation();
 
   const isActive =
+    location.pathname.startsWith("/claude-artifact-to-link") ||
     location.pathname.startsWith("/pomodoro") ||
     location.pathname.startsWith("/rhythm") ||
     location.pathname.startsWith("/md2html") ||
@@ -116,6 +117,9 @@ function ToolsDropdown() {
             {t("nav.toolsAll")}
           </DropdownLink>
           <div className="mx-3 my-1 border-t border-border" />
+          <DropdownLink href="/claude-artifact-to-link" onClick={() => setOpen(false)}>
+            {t("nav.claudeArtifact")}
+          </DropdownLink>
           <DropdownLink href="/pomodoro" onClick={() => setOpen(false)}>
             {t("nav.pomodoro")}
           </DropdownLink>
@@ -347,6 +351,7 @@ export function AppNav() {
               <MobileNavLink href="/showcase" onClick={() => setMobileNavOpen(false)}>{t("nav.showcase")}</MobileNavLink>
               <MobileGroup label={t("nav.tools")}>
                 <MobileNavLink href="/freetool" onClick={() => setMobileNavOpen(false)}>{t("nav.toolsAll")}</MobileNavLink>
+                <MobileNavLink href="/claude-artifact-to-link" onClick={() => setMobileNavOpen(false)}>{t("nav.claudeArtifact")}</MobileNavLink>
                 <MobileNavLink href="/pomodoro" onClick={() => setMobileNavOpen(false)}>{t("nav.pomodoro")}</MobileNavLink>
                 <MobileNavLink href="/rhythm" onClick={() => setMobileNavOpen(false)}>{t("nav.rhythm")}</MobileNavLink>
                 <MobileNavLink href="/md2html" onClick={() => setMobileNavOpen(false)}>{t("nav.md2html")}</MobileNavLink>

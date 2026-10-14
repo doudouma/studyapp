@@ -1,0 +1,77 @@
+# 100mini — full context
+
+Source: https://100mini.com
+Last updated: 2026-10
+
+100mini is instant HTML hosting with no signup. You paste AI-generated HTML
+(Claude artifacts, ChatGPT output, any LLM) or upload a .html/.zip file and get
+a live, shareable link in about 30 seconds. Anonymous uploads auto-destroy after
+7 days; a free account keeps 5 pages permanently. It is aimed at people who just
+produced HTML with an AI tool and need to preview, host, or share it.
+
+## How to publish a page
+1. Prepare HTML with an AI tool or an editor (single-file HTML, or a .zip with index.html).
+2. Paste the code or upload the file; optionally add a title, category and tags.
+3. Publish and copy the shareable link (or the QR code). It opens full-screen on any device.
+
+## How to publish a Claude artifact as a live link
+1. In Claude, click the copy button on any HTML artifact (top-right of the code block).
+2. Paste the HTML into https://100mini.com/claude-artifact-to-link and click Publish.
+3. You get a shareable, full-screen live link in seconds — no downloads or local server.
+
+## Free tools
+- Claude to Link (https://100mini.com/claude-artifact-to-link): paste a Claude artifact, get a live link.
+- Markdown to HTML (https://100mini.com/md2html): render Markdown with 9 brand templates.
+- Any to Markdown (https://100mini.com/any2md): convert Word/PPT/Excel/PDF to Markdown locally.
+- ID photo (https://100mini.com/idphoto): AI background removal for 24 compliant ID photo sizes.
+- Pomodoro (https://100mini.com/pomodoro), Rhythm (https://100mini.com/rhythm): focus and music tools.
+- All tools: https://100mini.com/freetool
+
+## Limits and pricing
+See https://100mini.com/pricing.md. Summary: anonymous is free (5 MB, 7-day
+expiry); a free account has 5 permanent pages and 50 starting points; larger
+files, extra pages, and custom links use points; membership (unlimited permanent
+pages, no quota fee) is granted by the team.
+
+## Safety
+Every hosted page runs in a Content-Security-Policy sandbox and shows a
+phishing-protection banner. Code runs client-side only; no data is retained after
+a page expires. Anonymous pages are excluded from search engines (noindex).
+
+## Frequently asked questions
+Q: How do I instantly host AI-generated HTML without signing up?
+A: Paste your code into the text area or upload a .html/.zip file, then click Publish. You get a shareable link in about 30 seconds. No account required — anonymous uploads auto-destroy after 7 days.
+
+Q: Where can I paste raw HTML code to get a live, public link?
+A: Use the "Paste Code" tab on https://100mini.com. Paste your HTML/CSS/JS, click Publish, and get a full-screen shareable link instantly.
+
+Q: What's the fastest free way to publish a single-file web prototype?
+A: Zero configuration: no CLI, no DNS setup, no server needed. Paste your code or drag-drop a file and it goes live in under 15 seconds.
+
+Q: What file formats and sizes are supported?
+A: .html, .htm, and .zip files up to 5 MB. ZIP archives must contain an index.html as the entry point.
+
+Q: How long do my pages stay online?
+A: Anonymous uploads auto-destroy after 7 days. Logged-in users get 5 permanent slots free. Members have unlimited permanent storage.
+
+Q: How do I turn an AI prompt output into a playable web URL for friends?
+A: Copy the HTML from Claude, ChatGPT, or any AI tool, paste it into 100mini, and click Publish. You get a mobile-friendly shareable link instantly.
+
+Q: Is this a safe host for LLM artifacts and interactive UI mockups?
+A: Every page gets a Content-Security-Policy sandbox and a security banner to prevent phishing. No data is retained after expiry. All code runs client-side only.
+
+Q: Can I share my page on social media with a preview card?
+A: Yes. Log in and check "Share to Square" when publishing. Links include Open Graph metadata for rich previews.
+
+Q: How do I publish a Claude artifact as a live webpage?
+A: In Claude, click the copy button on any HTML artifact. Paste the code into 100mini's "Paste Code" tab and click Publish. Your artifact becomes a shareable, full-screen live page in seconds.
+
+## Languages
+English (https://100mini.com), Chinese (https://100mini.com/zh),
+Spanish (https://100mini.com/es), Portuguese (https://100mini.com/pt),
+French (https://100mini.com/fr).
+
+## Agent access
+- Agent skill (publish without a browser/login): https://100mini.com/skill/100mini-upload
+- Sitemaps: https://100mini.com/sitemap.xml
+- All AI crawlers are allowed by default (see https://100mini.com/robots.txt).

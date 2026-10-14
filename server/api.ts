@@ -22,6 +22,9 @@ import { rankRoutes } from "./features/rank/rank.routes";
 import { ensoRoutes } from "./features/enso/enso.routes";
 import { outbreakRoutes } from "./features/outbreak/outbreak.routes";
 import { log } from "./lib/log";
+import llmsTxt from "./content/llms.txt?raw";
+import llmsFullTxt from "./content/llms-full.txt?raw";
+import pricingMd from "./content/pricing.md?raw";
 
 type Variables = {
   user: { id: string; name: string; email: string; image?: string; role?: string } | null;
@@ -52,6 +55,7 @@ const STATIC_PAGES: { loc: string; changefreq: string; priority: string }[] = [
   { loc: "/showcase", changefreq: "weekly", priority: "0.8" },
   { loc: "/md2html", changefreq: "weekly", priority: "0.8" },
   { loc: "/any2md", changefreq: "weekly", priority: "0.8" },
+  { loc: "/claude-artifact-to-link", changefreq: "weekly", priority: "0.8" },
   { loc: "/freetool", changefreq: "weekly", priority: "0.7" },
   { loc: "/games", changefreq: "weekly", priority: "0.8" },
   { loc: "/idphoto", changefreq: "weekly", priority: "0.7" },
@@ -89,6 +93,14 @@ Disallow: /admin
 ${sitemapLines}
 `);
 });
+
+// --- Machine-readable files for AI agents (ChatGPT/Claude/Perplexity) ---
+// Not required by Google, but they help non-Google AI engines and autonomous
+// buying agents read the product, its limits, and its pricing without scraping.
+const MD_HEADERS = { "Content-Type": "text/markdown; charset=utf-8" };
+api.get("/llms.txt", (c) => c.text(llmsTxt, 200, MD_HEADERS));
+api.get("/llms-full.txt", (c) => c.text(llmsFullTxt, 200, MD_HEADERS));
+api.get("/pricing.md", (c) => c.text(pricingMd, 200, MD_HEADERS));
 
 // Sitemap index — lists each per-language sitemap.
 api.get("/sitemap.xml", (c) => {
