@@ -16,6 +16,7 @@
 - [Games](https://100mini.com/games)
 - [Case library](https://100mini.com/showcase)
 - [Learning Square](https://100mini.com/square)
+- [Alternatives & comparisons](https://100mini.com/alternatives): 100mini vs Netlify Drop, Tiiny Host, CodePen, Vercel, GitHub Pages, and AI-native artifact sharing
 
 ## Facts
 - Formats: .html, .htm, .zip (ZIP must contain index.html as the entry point)

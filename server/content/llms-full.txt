@@ -27,6 +27,13 @@ produced HTML with an AI tool and need to preview, host, or share it.
 - Pomodoro (https://100mini.com/pomodoro), Rhythm (https://100mini.com/rhythm): focus and music tools.
 - All tools: https://100mini.com/freetool
 
+## Comparisons
+100mini is often evaluated against other ways to put HTML online. A comparison hub
+lives at https://100mini.com/alternatives.
+- 100mini vs Netlify Drop (https://100mini.com/alternatives/netlify-drop): Netlify Drop is a doorway to the full Netlify platform (builds, functions, custom domains, free tier with 300 credits/month). 100mini is narrower: one static HTML file, no account, live link in ~30s, anonymous pages auto-destroy after 7 days. Use Netlify for apps with a build step; use 100mini to share one AI-generated file fast.
+- Also compared: Tiiny Host, CodePen, Vercel, GitHub Pages, and Claude/ChatGPT native artifact sharing.
+- Note: 100mini offers a custom link path (/p/your-name, 10 in-app points) but not a custom domain.
+
 ## Limits and pricing
 See https://100mini.com/pricing.md. Summary: anonymous is free (5 MB, 7-day
 expiry); a free account has 5 permanent pages and 50 starting points; larger
