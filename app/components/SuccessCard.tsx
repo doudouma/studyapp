@@ -16,9 +16,13 @@ interface SuccessCardProps {
   user?: any;
   /** 是否已分享到广场：只有分享的页面才生成缩略图 */
   shareToSquare?: boolean;
+  /** 最大访问次数；null = 不限次（∞） */
+  maxViews?: number | null;
+  /** 是否一次性链接（打开即焚） */
+  isOneTime?: boolean;
 }
 
-export function SuccessCard({ url, expiresAt, isPermanent, pageId, onReset, user, shareToSquare }: SuccessCardProps) {
+export function SuccessCard({ url, expiresAt, isPermanent, pageId, onReset, user, shareToSquare, maxViews, isOneTime }: SuccessCardProps) {
   const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState("");
@@ -86,6 +90,13 @@ export function SuccessCard({ url, expiresAt, isPermanent, pageId, onReset, user
         <p className="text-sm text-muted-foreground">
           {isPermanent ? t("components.success.permanent") : t("components.success.autoDestroy", { time: expiryDate })}
         </p>
+        {(isOneTime || (maxViews != null && maxViews > 1)) && (
+          <p className="text-sm font-medium text-[#ff5100]">
+            {isOneTime
+              ? t("components.success.oneTime")
+              : t("components.success.maxViews", { count: maxViews })}
+          </p>
+        )}
 
         {/* Thumbnail status — only for pages shared to the square */}
         {shouldGenerateThumbnail && !thumbnailReady && !thumbnailFailed && (

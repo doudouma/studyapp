@@ -208,6 +208,15 @@ export const pagesRoutes = new Hono<AppEnv>()
       tags: normalizeTags((body.tags as string) || ""),
       shareToSquare: body.shareToSquare === "true",
       customSlug: typeof body.customSlug === "string" ? body.customSlug : undefined,
+      expiryPreset: typeof body.expiryPreset === "string" ? body.expiryPreset : undefined,
+      expiryCustomMs:
+        typeof body.expiryCustomMs === "string" && body.expiryCustomMs !== ""
+          ? Number(body.expiryCustomMs)
+          : undefined,
+      maxViews:
+        typeof body.maxViews === "string" && body.maxViews !== "" ? body.maxViews : undefined,
+      ip,
+      userAgent: c.req.header("user-agent") || undefined,
       content: typeof body.content === "string" ? body.content : undefined,
       file: fileInput,
     });
@@ -320,10 +329,26 @@ export const pagesRoutes = new Hono<AppEnv>()
     return res;
   })
 
-  // 用户页面访问（HTML + 资产），含过期惰性清理
+  // 用户页面访问（HTML + 资产），含过期惰性清理与焚毁
   .get("/p/*", async (c) => {
+    const purpose = [
+      c.req.header("purpose"),
+      c.req.header("sec-purpose"),
+      c.req.header("x-purpose"),
+      c.req.header("x-moz"),
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+    const isPrefetch = purpose.includes("prefetch") || purpose.includes("preview") || purpose.includes("prerender");
     return serveUserPage(
-      { d1: c.env.D1, bucket: c.env?.BUCKET, tmpExpiryMs: getTmpExpiryMs(c.env) },
+      {
+        d1: c.env.D1,
+        bucket: c.env?.BUCKET,
+        tmpExpiryMs: getTmpExpiryMs(c.env),
+        userAgent: c.req.header("user-agent") || undefined,
+        isPrefetch,
+      },
       c.req.path.replace(/^\/p\//, ""),
       c.req.header("accept-language")
     );

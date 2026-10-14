@@ -81,6 +81,19 @@ export const page = sqliteTable("page", {
   tags: text("tags").default(""),
   isPermanent: integer("is_permanent", { mode: "boolean" }).notNull().default(false),
   viewCount: integer("view_count").notNull().default(0),
+  /** 最大访问次数；null = 不限次（∞）；一次性链接 = 1 */
+  maxViews: integer("max_views"),
+  /** 生命周期状态：active=正常，burned=已焚毁/已过期（内容已删，元数据留存） */
+  state: text("state").notNull().default("active"),
+  /** 焚毁原因：views=达访问上限，expired=到期，manual=手动 */
+  burnReason: text("burn_reason"),
+  burnedAt: integer("burned_at", { mode: "timestamp" }),
+  /** 上传者指纹（SHA-256(ip|ua)，仅哈希，用于滥用处置） */
+  uploaderFp: text("uploader_fp"),
+  /** 主 HTML 内容哈希（SHA-256，用于滥用/去重关联） */
+  contentHash: text("content_hash"),
+  /** 上传时选择的到期预设：permanent|1h|1d|7d|30d|custom（用于分布统计） */
+  expiryPreset: text("expiry_preset"),
   isSharedToSquare: integer("is_shared_to_square", { mode: "boolean" }).notNull().default(false),
   sharedAt: integer("shared_at", { mode: "timestamp" }),
   previewPath: text("preview_path"),
@@ -187,6 +200,24 @@ export const scanLog = sqliteTable("scan_log", {
 }, (t) => [
   index("idx_scan_log_page").on(t.pageId),
   index("idx_scan_log_time").on(t.createdAt),
+]);
+
+// --- 到期/焚毁事件（KPI 埋点：选用到期分布、一次性占比、焚烧量） ---
+
+export const burnEvent = sqliteTable("burn_event", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  pageId: text("page_id").notNull(),
+  userId: text("user_id"),
+  event: text("event").notNull(), // created | burned
+  expiryPreset: text("expiry_preset"), // permanent|1h|1d|7d|30d|custom
+  maxViews: integer("max_views"), // null = ∞
+  isOneTime: integer("is_one_time", { mode: "boolean" }).notNull().default(false),
+  burnReason: text("burn_reason"), // views|expired|manual
+  viewCountAtBurn: integer("view_count_at_burn"),
+  createdAt: integer("created_at").notNull(),
+}, (t) => [
+  index("idx_burn_event_time").on(t.createdAt),
+  index("idx_burn_event_page").on(t.pageId),
 ]);
 
 // --- Delivery Rush 排行榜 ---

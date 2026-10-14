@@ -25,7 +25,8 @@ import { useTranslation } from "react-i18next";
 import i18n from "~/lib/i18n";
 import { uploadPage, checkSlugAvailable } from "~/features/pages/api";
 import { MAX_CONTENT_SIZE, MAX_USER_CONTENT_SIZE, POINTS_PER_CUSTOM_SLUG, computeUploadFees } from "@shared/types/pages";
-import type { UploadResult } from "@shared/types/pages";
+import type { UploadResult, UploadExpiryOptions } from "@shared/types/pages";
+import { ExpiryOptions, DEFAULT_EXPIRY_OPTIONS } from "~/components/ExpiryOptions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -60,6 +61,8 @@ function UploadForm({
   setTags,
   shareToSquare,
   setShareToSquare,
+  expiry,
+  setExpiry,
   slug,
   setSlug,
   slugStatus,
@@ -87,6 +90,8 @@ function UploadForm({
   setTags: (v: string[]) => void;
   shareToSquare: boolean;
   setShareToSquare: (v: boolean) => void;
+  expiry: UploadExpiryOptions;
+  setExpiry: (v: UploadExpiryOptions) => void;
   slug: string;
   setSlug: (v: string) => void;
   slugStatus: SlugStatus;
@@ -239,15 +244,19 @@ function UploadForm({
               />
             </div>
 
-            <label className="mb-3 flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                className="size-4 rounded border-border accent-primary"
-                checked={shareToSquare}
-                onChange={(e) => setShareToSquare(e.target.checked)}
-              />
-              <span className="text-sm text-foreground">{t("home.form.shareToSquare")}</span>
-            </label>
+            <ExpiryOptions value={expiry} onChange={setExpiry} />
+
+            {expiry.expiryPreset === "permanent" && (
+              <label className="mb-3 flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="size-4 rounded border-border accent-primary"
+                  checked={shareToSquare}
+                  onChange={(e) => setShareToSquare(e.target.checked)}
+                />
+                <span className="text-sm text-foreground">{t("home.form.shareToSquare")}</span>
+              </label>
+            )}
           </>
         )}
 
@@ -369,6 +378,7 @@ function HomePage() {
   const [category, setCategory] = useState("general");
   const [tags, setTags] = useState<string[]>([]);
   const [shareToSquare, setShareToSquare] = useState(false);
+  const [expiry, setExpiry] = useState<UploadExpiryOptions>(DEFAULT_EXPIRY_OPTIONS);
   const [slug, setSlug] = useState("");
   const [slugStatus, setSlugStatus] = useState<SlugStatus>("idle");
   const [loading, setLoading] = useState(false);
@@ -410,10 +420,12 @@ function HomePage() {
 
   // 配额费（非会员超出免费链接数）+ 尺寸费（内容超过 5MB）+ 自定义地址费，三者叠加
   const maxBytes = user ? MAX_USER_CONTENT_SIZE : MAX_CONTENT_SIZE;
+  const isPermanentUpload = expiry.expiryPreset === "permanent";
   const fees = computeUploadFees({
     isAnonymous: !user,
     isMember,
-    pageCount,
+    // 到期/限次（即焚）页面不占用永久配额 → 免配额费
+    pageCount: isPermanentUpload ? pageCount : 0,
     userLimit: limit,
     contentBytes: contentSize,
     points,
@@ -448,6 +460,13 @@ function HomePage() {
       formData.append("category", category);
       formData.append("tags", tags.join(","));
       formData.append("shareToSquare", String(shareToSquare));
+      if (user) {
+        formData.append("expiryPreset", expiry.expiryPreset);
+        if (expiry.expiryPreset === "custom" && expiry.expiryCustomMs) {
+          formData.append("expiryCustomMs", String(expiry.expiryCustomMs));
+        }
+        formData.append("maxViews", expiry.maxViews == null ? "inf" : String(expiry.maxViews));
+      }
       if (user && slug.trim()) {
         formData.append("customSlug", slug.trim());
       }
@@ -492,6 +511,7 @@ function HomePage() {
     setTitle("");
     setTags([]);
     setShareToSquare(false);
+    setExpiry(DEFAULT_EXPIRY_OPTIONS);
     setSlug("");
     setSlugStatus("idle");
     setError(null);
@@ -515,6 +535,8 @@ function HomePage() {
             onReset={handleReset}
             user={user}
             shareToSquare={result.isSharedToSquare}
+            maxViews={result.maxViews}
+            isOneTime={result.isOneTime}
           />
         </main>
         <MemoAppFooter />
@@ -554,6 +576,8 @@ function HomePage() {
             setTags={setTags}
             shareToSquare={shareToSquare}
             setShareToSquare={setShareToSquare}
+            expiry={expiry}
+            setExpiry={setExpiry}
             slug={slug}
             setSlug={setSlug}
             slugStatus={slugStatus}

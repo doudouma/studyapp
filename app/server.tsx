@@ -247,6 +247,31 @@ export async function scheduled(_event: ScheduledEvent, env: Bindings, _ctx: Exe
     }
   }
 
+  // Burn expired pages (到期自选）并清理过期焚毁事件
+  if (env.D1) {
+    try {
+      const { listExpiredActivePages } = await import("./../server/features/pages/pages.repo");
+      const { burnPageContent } = await import("./../server/features/pages/pages.service");
+      const now = Date.now();
+      const expired = await listExpiredActivePages(env.D1, now);
+      for (const p of expired) {
+        await burnPageContent({ d1: env.D1, bucket: env.BUCKET }, p.id, "expired");
+      }
+      console.log(`[cron] burned ${expired.length} expired page(s)`);
+    } catch (err) {
+      console.error("[cron] expired page burn failed:", err);
+    }
+
+    try {
+      const { deleteOldBurnEvents } = await import("./../server/features/pages/pages.repo");
+      const cutoff = Date.now() - 90 * 24 * 60 * 60 * 1000;
+      const burnCount = await deleteOldBurnEvents(env.D1, cutoff);
+      console.log(`[cron] cleaned up ${burnCount} burn event(s)`);
+    } catch (err) {
+      console.error("[cron] burn event cleanup failed:", err);
+    }
+  }
+
   // Cleanup orphaned thumbnails (only pages shared to the square keep thumbnails)
   if (env.D1 && env.BUCKET) {
     try {

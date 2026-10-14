@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { escapeHtml, injectBanner, detectLangFromHeader } from "../server/features/pages/pages.render";
+import { escapeHtml, injectBanner, detectLangFromHeader, burnedHtml, isLikelyCrawler } from "../server/features/pages/pages.render";
 
 describe("escapeHtml", () => {
   it("转义 & 字符", () => {
@@ -141,5 +141,53 @@ describe("detectLangFromHeader", () => {
 
   it("不支持的语言跳过", () => {
     expect(detectLangFromHeader("ja,ko,en")).toBe("en");
+  });
+});
+
+describe("isLikelyCrawler", () => {
+  it("预取/预览请求 → true", () => {
+    expect(isLikelyCrawler("Mozilla/5.0", true)).toBe(true);
+  });
+
+  it("缺失 UA → true（视为非真人访问，不计数）", () => {
+    expect(isLikelyCrawler(undefined)).toBe(true);
+    expect(isLikelyCrawler("")).toBe(true);
+  });
+
+  it("常见爬虫/预览 UA → true", () => {
+    for (const ua of [
+      "Googlebot/2.1 (+http://www.google.com/bot.html)",
+      "facebookexternalhit/1.1",
+      "Slackbot-LinkExpanding 1.0",
+      "curl/8.0.1",
+      "python-requests/2.31",
+    ]) {
+      expect(isLikelyCrawler(ua)).toBe(true);
+    }
+  });
+
+  it("普通浏览器 UA → false", () => {
+    expect(
+      isLikelyCrawler(
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36"
+      )
+    ).toBe(false);
+  });
+});
+
+describe("burnedHtml", () => {
+  it("返回 100mini 品牌灰烬页且按 reason 区分文案", () => {
+    const views = burnedHtml("zh", "views");
+    expect(views).toContain("100mini");
+    expect(views).toContain("一次性链接");
+    expect(views).toContain('name="robots" content="noindex"');
+
+    const expired = burnedHtml("zh", "expired");
+    expect(expired).toContain("到期");
+    expect(expired).not.toContain("一次性链接，已经被看完了");
+
+    const generic = burnedHtml("en");
+    expect(generic).toContain("digital ashes");
+    expect(generic).toContain('lang="en');
   });
 });

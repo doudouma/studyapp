@@ -5,6 +5,11 @@ vi.mock("../server/features/pages/pages.repo", () => ({
   getMembershipExpiresAt: vi.fn(),
   isMemberByUserId: vi.fn(),
   countUserPages: vi.fn(),
+  countPermanentPages: vi.fn(),
+  claimPageView: vi.fn(),
+  markPageBurned: vi.fn(),
+  listExpiredActivePages: vi.fn(),
+  insertBurnEvent: vi.fn(),
   listUserPages: vi.fn(),
   findOwnedPage: vi.fn(),
   getPageRecord: vi.fn(),
@@ -33,9 +38,11 @@ vi.mock("../server/features/pages/pages.storage", async (importOriginal) => {
 
 vi.mock("../server/features/pages/pages.render", () => ({
   injectBanner: vi.fn(),
-  notFoundHtml: vi.fn(),
-  blockedHtml: vi.fn(),
-  detectLangFromHeader: vi.fn(),
+  notFoundHtml: vi.fn(() => "<404>"),
+  blockedHtml: vi.fn(() => "<410>"),
+  burnedHtml: vi.fn(() => "<burned>"),
+  isLikelyCrawler: vi.fn(() => false),
+  detectLangFromHeader: vi.fn(() => "zh"),
 }));
 
 vi.mock("../server/features/admin/upload-log.repo", () => ({
@@ -46,6 +53,7 @@ vi.mock("../server/features/admin/upload-log.repo", () => ({
 
 import { createUpload, updateOwnPage, serveUserPage, ServiceError } from "../server/features/pages/pages.service";
 import * as repo from "../server/features/pages/pages.repo";
+import { isLikelyCrawler } from "../server/features/pages/pages.render";
 import { putHtml, deletePageObjects } from "../server/features/pages/pages.storage";
 
 const MB = 1024 * 1024;
@@ -70,6 +78,12 @@ function makeRow(overrides: Record<string, unknown> = {}) {
     tags: "",
     isPermanent: true,
     viewCount: 0,
+    maxViews: null,
+    state: "active",
+    burnReason: null,
+    expiryPreset: "permanent",
+    contentHash: null,
+    uploaderFp: null,
     createdAt: new Date(),
     expiresAt: null,
     previewPath: null,
@@ -92,6 +106,10 @@ beforeEach(() => {
   vi.mocked(repo.getMembershipExpiresAt).mockResolvedValue(null);
   vi.mocked(repo.isMemberByUserId).mockResolvedValue(false);
   vi.mocked(repo.countUserPages).mockResolvedValue(0);
+  vi.mocked(repo.countPermanentPages).mockResolvedValue(0);
+  vi.mocked(repo.claimPageView).mockResolvedValue({ claimed: true, viewCount: 1 });
+  vi.mocked(repo.markPageBurned).mockResolvedValue(undefined as any);
+  vi.mocked(repo.insertBurnEvent).mockResolvedValue(undefined as any);
   vi.mocked(repo.getUserLinksLimitBonus).mockResolvedValue(0);
   vi.mocked(repo.getUserPoints).mockResolvedValue(50);
   vi.mocked(repo.findOwnedPage).mockResolvedValue(true);
@@ -173,14 +191,14 @@ describe("createUpload — 登录用户", () => {
   });
 
   it("超出免费页面数、积分足够 → 扣配额费并加 bonus", async () => {
-    vi.mocked(repo.countUserPages).mockResolvedValue(5);
+    vi.mocked(repo.countPermanentPages).mockResolvedValue(5);
     await createUpload(baseUpload({ user, title: "t", content: "x" }));
     expect(repo.deductPointsAndAddBonus).toHaveBeenCalledWith(expect.anything(), "u1", 10);
     expect(repo.deductPoints).not.toHaveBeenCalled();
   });
 
   it("超出免费页面数、积分不足 → 403", async () => {
-    vi.mocked(repo.countUserPages).mockResolvedValue(5);
+    vi.mocked(repo.countPermanentPages).mockResolvedValue(5);
     vi.mocked(repo.getUserPoints).mockResolvedValue(5);
     await expect(createUpload(baseUpload({ user, title: "t", content: "x" }))).rejects.toMatchObject({ status: 403 });
     expect(repo.insertPageRecord).not.toHaveBeenCalled();
@@ -193,14 +211,14 @@ describe("createUpload — 登录用户", () => {
   });
 
   it("配额费 + 尺寸费叠加 → 各扣 10", async () => {
-    vi.mocked(repo.countUserPages).mockResolvedValue(5);
+    vi.mocked(repo.countPermanentPages).mockResolvedValue(5);
     await createUpload(baseUpload({ user, title: "t", content: "a".repeat(7 * MB) }));
     expect(repo.deductPointsAndAddBonus).toHaveBeenCalledWith(expect.anything(), "u1", 10);
     expect(repo.deductPoints).toHaveBeenCalledWith(expect.anything(), "u1", 10);
   });
 
   it("叠加费用积分不足 → 403 且消息含两种原因", async () => {
-    vi.mocked(repo.countUserPages).mockResolvedValue(5);
+    vi.mocked(repo.countPermanentPages).mockResolvedValue(5);
     vi.mocked(repo.getUserPoints).mockResolvedValue(15);
     const p = createUpload(baseUpload({ user, title: "t", content: "a".repeat(7 * MB) }));
     await expect(p).rejects.toBeInstanceOf(ServiceError);
@@ -215,7 +233,7 @@ describe("createUpload — 登录用户", () => {
   it("会员 → 免配额费，但 7MB 仍扣尺寸费", async () => {
     const future = Date.now() + 86_400_000;
     vi.mocked(repo.getMembershipExpiresAt).mockResolvedValue(future);
-    vi.mocked(repo.countUserPages).mockResolvedValue(99);
+    vi.mocked(repo.countPermanentPages).mockResolvedValue(99);
     await createUpload(baseUpload({ user, title: "t", content: "a".repeat(7 * MB) }));
     expect(repo.deductPointsAndAddBonus).not.toHaveBeenCalled();
     expect(repo.deductPoints).toHaveBeenCalledWith(expect.anything(), "u1", 10);
@@ -540,12 +558,11 @@ describe("serveUserPage — 自定义地址", () => {
     const bucket = makeObjBucket("realid/index.html");
     vi.mocked(repo.getPageIdBySlug).mockResolvedValue("realid");
     vi.mocked(repo.getPageRecord).mockResolvedValue(makeRow({ id: "realid" }));
-    vi.mocked(repo.getPageMeta).mockResolvedValue({ title: "T", category: "general", tags: "" });
 
     const res = await serveUserPage({ d1: {} as any, bucket }, "my-page", "zh");
     expect(res.status).toBe(200);
     expect(bucket.get).toHaveBeenCalledWith("realid/index.html");
-    expect(repo.incrementPageViewCount).toHaveBeenCalledWith(expect.anything(), "realid");
+    expect(repo.claimPageView).toHaveBeenCalledWith(expect.anything(), "realid", expect.any(Number));
   });
 
   it("slug + 资产路径 → 按真实 id 取资产", async () => {
@@ -560,5 +577,113 @@ describe("serveUserPage — 自定义地址", () => {
   it("未知 slug → 404", async () => {
     const res = await serveUserPage({ d1: {} as any, bucket: makeBucket() }, "no-such-slug", "zh");
     expect(res.status).toBe(404);
+  });
+});
+
+// ───────────────────────────────────────────────
+// createUpload — 到期 / 限次 / 一次性
+// ───────────────────────────────────────────────
+describe("createUpload — 到期 / 限次 / 一次性", () => {
+  const user = { id: "u1", name: "N", email: "e@x.com" };
+
+  it("到期预设 1d → 非永久、落库、不占永久配额、记录事件", async () => {
+    const res = await createUpload(baseUpload({ user, title: "t", content: "x", expiryPreset: "1d" }));
+    expect(res.isPermanent).toBe(false);
+    expect(res.expiresAt).toBeGreaterThan(Date.now());
+    expect(repo.insertPageRecord).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ isPermanent: false, expiryPreset: "1d", maxViews: null, state: "active" })
+    );
+    expect(repo.countPermanentPages).not.toHaveBeenCalled();
+    expect(repo.insertBurnEvent).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ event: "created", expiryPreset: "1d" })
+    );
+  });
+
+  it("自定义到期超过 30 天 → 400", async () => {
+    await expect(
+      createUpload(
+        baseUpload({ user, title: "t", content: "x", expiryPreset: "custom", expiryCustomMs: 31 * 24 * 3600 * 1000 })
+      )
+    ).rejects.toMatchObject({ status: 400 });
+    expect(repo.insertPageRecord).not.toHaveBeenCalled();
+  });
+
+  it("maxViews=1 → 一次性链接", async () => {
+    const res = await createUpload(baseUpload({ user, title: "t", content: "x", maxViews: "1" }));
+    expect(res.maxViews).toBe(1);
+    expect(res.isOneTime).toBe(true);
+    expect(repo.insertPageRecord).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ maxViews: 1 }));
+  });
+
+  it("非永久页面强制不分享广场", async () => {
+    const res = await createUpload(baseUpload({ user, title: "t", content: "x", expiryPreset: "7d", shareToSquare: true }));
+    expect(res.isSharedToSquare).toBe(false);
+    expect(repo.insertPageRecord).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ isSharedToSquare: false })
+    );
+  });
+
+  it("缺省（无 expiryPreset）→ 永久", async () => {
+    const res = await createUpload(baseUpload({ user, title: "t", content: "x" }));
+    expect(res.isPermanent).toBe(true);
+    expect(res.expiresAt).toBeNull();
+    expect(res.maxViews).toBeNull();
+  });
+});
+
+// ───────────────────────────────────────────────
+// serveUserPage — 焚毁 / 到期 / 限次
+// ───────────────────────────────────────────────
+describe("serveUserPage — 焚毁 / 到期 / 限次", () => {
+  function objBucket(key: string) {
+    return {
+      get: vi.fn(async (k: string) =>
+        k === key
+          ? { key, text: async () => "<p>hi</p>", arrayBuffer: async () => new ArrayBuffer(4), uploaded: new Date() }
+          : null
+      ),
+      delete: vi.fn(async () => undefined),
+      list: vi.fn(async () => ({ objects: [], truncated: false })),
+    } as any;
+  }
+
+  it("已焚毁记录 → 410 灰烬页", async () => {
+    vi.mocked(repo.getPageRecord).mockResolvedValue(makeRow({ id: "realid7", state: "burned", burnReason: "views" }));
+    const res = await serveUserPage({ d1: {} as any, bucket: makeBucket() }, "realid7", "zh");
+    expect(res.status).toBe(410);
+  });
+
+  it("到期记录 → 焚毁并 410", async () => {
+    vi.mocked(repo.getPageRecord).mockResolvedValue(
+      makeRow({ id: "realid7", expiresAt: new Date(Date.now() - 1000) })
+    );
+    const res = await serveUserPage({ d1: {} as any, bucket: makeBucket() }, "realid7", "zh");
+    expect(res.status).toBe(410);
+    expect(repo.markPageBurned).toHaveBeenCalledWith(expect.anything(), "realid7", "expired", expect.any(Number));
+  });
+
+  it("达最大访问次数 → 先服务后焚毁", async () => {
+    vi.mocked(repo.getPageRecord).mockResolvedValue(makeRow({ id: "realid7", maxViews: 1 }));
+    vi.mocked(repo.claimPageView).mockResolvedValue({ claimed: true, viewCount: 1 });
+    const res = await serveUserPage({ d1: {} as any, bucket: objBucket("realid7.html") }, "realid7", "zh");
+    expect(res.status).toBe(200);
+    expect(repo.markPageBurned).toHaveBeenCalledWith(expect.anything(), "realid7", "views", expect.any(Number));
+  });
+
+  it("爬虫请求 → 不计数、不焚毁", async () => {
+    vi.mocked(isLikelyCrawler).mockReturnValue(true);
+    vi.mocked(repo.getPageRecord).mockResolvedValue(makeRow({ id: "realid7", maxViews: 1 }));
+    const res = await serveUserPage(
+      { d1: {} as any, bucket: objBucket("realid7.html"), userAgent: "Googlebot" },
+      "realid7",
+      "zh"
+    );
+    expect(res.status).toBe(200);
+    expect(repo.claimPageView).not.toHaveBeenCalled();
+    expect(repo.markPageBurned).not.toHaveBeenCalled();
+    vi.mocked(isLikelyCrawler).mockReturnValue(false);
   });
 });

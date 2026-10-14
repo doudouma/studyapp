@@ -154,6 +154,8 @@ function ClaudeArtifactPage() {
             onReset={handleReset}
             user={user}
             shareToSquare={result.isSharedToSquare}
+            maxViews={result.maxViews}
+            isOneTime={result.isOneTime}
           />
         </main>
         <AppFooter />

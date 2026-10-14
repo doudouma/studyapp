@@ -13,6 +13,9 @@ import {
   validateCustomSlug,
   computeSizeFeePoints,
   computeUploadFees,
+  resolveExpiryMs,
+  resolveMaxViews,
+  EXPIRY_PRESETS,
   type MeResponse,
   type PagesListResponse,
   type UserPageItem,
@@ -29,7 +32,7 @@ import {
   deleteTmpByBucketId,
   isExpiredByUploaded,
 } from "./pages.storage";
-import { injectBanner, notFoundHtml, blockedHtml, detectLangFromHeader } from "./pages.render";
+import { injectBanner, notFoundHtml, blockedHtml, burnedHtml, isLikelyCrawler, detectLangFromHeader } from "./pages.render";
 import type { Lang } from "../../../app/lib/lang";
 import { log } from "../../lib/log";
 import { insertUploadLog, insertScanLog, getLatestBlockedScan } from "../admin/upload-log.repo";
@@ -37,6 +40,11 @@ import {
   getMembershipExpiresAt,
   isMemberByUserId,
   countUserPages,
+  countPermanentPages,
+  claimPageView,
+  markPageBurned,
+  insertBurnEvent,
+  listExpiredActivePages,
   listUserPages,
   findOwnedPage,
   getPageRecord,
@@ -49,8 +57,6 @@ import {
   deductPoints,
   getPageIdBySlug,
   slugExists,
-  incrementPageViewCount,
-  getPageMeta,
   type UserPageRow,
 } from "./pages.repo";
 
@@ -69,6 +75,13 @@ export class ServiceError extends Error {
   }
 }
 
+/** SHA-256 十六进制摘要（内容哈希 / 上传者指纹用） */
+async function sha256Hex(data: string): Promise<string> {
+  const bytes = new TextEncoder().encode(data);
+  const digest = await crypto.subtle.digest("SHA-256", bytes.buffer as ArrayBuffer);
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 // ---------- DTO 转换 ----------
 
 function toUserPageItem(row: UserPageRow): UserPageItem {
@@ -80,6 +93,9 @@ function toUserPageItem(row: UserPageRow): UserPageItem {
     tags: row.tags || "",
     isPermanent: row.isPermanent,
     viewCount: row.viewCount,
+    maxViews: row.maxViews ?? null,
+    state: row.state === "burned" ? "burned" : "active",
+    burnReason: row.burnReason ?? null,
     createdAt: row.createdAt ? new Date(row.createdAt).getTime() : 0,
     expiresAt: row.expiresAt ? new Date(row.expiresAt).getTime() : null,
     previewPath: row.previewPath,
@@ -96,7 +112,7 @@ export async function getMeInfo(
     return { user: user ?? null, pageCount: 0, isMember: false, membershipExpiresAt: null, limit: 0, points: 0, extraUploads: 0 };
   }
 
-  const pageCount = await countUserPages(d1, user.id);
+  const pageCount = await countPermanentPages(d1, user.id);
   const expiresAt = await getMembershipExpiresAt(d1, user.id);
   const isMember = expiresAt !== null && expiresAt > Date.now();
   const points = await getUserPoints(d1, user.id);
@@ -371,6 +387,16 @@ export interface CreateUploadInput {
   shareToSquare: boolean;
   /** 自定义地址（/p/{slug}），仅登录用户生效，匿名忽略 */
   customSlug?: string;
+  /** 到期预设：permanent|1h|1d|7d|30d|custom（仅登录用户生效；缺省 permanent） */
+  expiryPreset?: string;
+  /** 自定义到期毫秒数（expiryPreset=custom 时使用） */
+  expiryCustomMs?: number;
+  /** 最大访问次数：null/缺省=不限次；1=一次性链接 */
+  maxViews?: string | number | null;
+  /** 来源 IP（计算上传者指纹用） */
+  ip?: string;
+  /** User-Agent（计算上传者指纹用） */
+  userAgent?: string;
   content?: string;
   file?: PageFileInput;
 }
@@ -383,10 +409,33 @@ export async function createUpload(input: CreateUploadInput): Promise<UploadResu
 
   // 配额费（非会员超出免费链接数）与尺寸费（内容超过 5MB）由共享纯函数计算，
   // 合并校验，成功后一并扣除，失败不扣分。
-  const wantPermanent = !!user;
   const isAnonymous = !user;
   const maxSize = isAnonymous ? MAX_CONTENT_SIZE : MAX_USER_CONTENT_SIZE;
   const maxSizeMB = maxSize / (1024 * 1024);
+
+  // 到期 / 限次 / 一次性（仅登录用户可选）。匿名维持 7 天自动销毁。
+  // 到期或限次的页面属「即焚」免费能力：不占用永久配额、不收配额费。
+  let permanent = !!user;
+  let expiryMs: number | null = isAnonymous ? EXPIRY_PRESETS["7d"] : null;
+  let expiryPreset: string | null = isAnonymous ? null : "permanent";
+  if (user && input.expiryPreset) {
+    const resolved = resolveExpiryMs(input.expiryPreset, input.expiryCustomMs);
+    if (resolved === undefined) {
+      throw new ServiceError(400, "到期时间无效（需在 1 分钟至 30 天之间）");
+    }
+    expiryMs = resolved;
+    permanent = resolved === null;
+    expiryPreset = input.expiryPreset;
+  }
+  let maxViews: number | null = null;
+  if (user && input.maxViews !== undefined) {
+    const resolvedViews = resolveMaxViews(input.maxViews);
+    if (resolvedViews === undefined) throw new ServiceError(400, "最大访问次数无效");
+    maxViews = resolvedViews;
+  }
+  const isOneTime = maxViews === 1;
+  // 到期/限次页面不进广场（广场是长期精选位）
+  const shareToSquare = permanent && input.shareToSquare;
 
   // 取配额与积分（仅登录用户；会员无配额费，但仍需积分支付尺寸费）
   let isMember = false;
@@ -395,10 +444,11 @@ export async function createUpload(input: CreateUploadInput): Promise<UploadResu
   let points = 0;
   if (user) {
     if (!d1) throw new ServiceError(503, "database unavailable");
-    const expiresAt = await getMembershipExpiresAt(d1, user.id);
-    isMember = expiresAt !== null && expiresAt > Date.now();
+    const membershipExpiresAt = await getMembershipExpiresAt(d1, user.id);
+    isMember = membershipExpiresAt !== null && membershipExpiresAt > Date.now();
     if (!isMember) {
-      pageCount = await countUserPages(d1, user.id);
+      // 即焚页面不计入永久配额
+      pageCount = permanent ? await countPermanentPages(d1, user.id) : 0;
       userLimit = FREE_PERMANENT_LIMIT + (await getUserLinksLimitBonus(d1, user.id));
     }
     points = await getUserPoints(d1, user.id);
@@ -514,11 +564,19 @@ export async function createUpload(input: CreateUploadInput): Promise<UploadResu
     await putHtml(bucket, `${id}.html`, html);
   }
 
-  const isPermanent = wantPermanent;
-  const expiresAt = isPermanent ? null : now + 7 * 24 * 60 * 60 * 1000;
+  const isPermanent = permanent;
+  const expiresAt = isPermanent ? null : now + (expiryMs ?? EXPIRY_PRESETS["7d"]);
 
   // Record in D1 only for logged-in users
   if (user && d1) {
+    let contentHash: string | null = null;
+    let uploaderFp: string | null = null;
+    try {
+      contentHash = await sha256Hex(html);
+      uploaderFp = await sha256Hex(`${input.ip ?? ""}|${input.userAgent ?? ""}`);
+    } catch {
+      // 哈希失败不影响上传（仅失去去重/指纹能力）
+    }
     try {
       await insertPageRecord(d1, {
         id,
@@ -527,9 +585,14 @@ export async function createUpload(input: CreateUploadInput): Promise<UploadResu
         title: title || "未命名",
         category: input.category,
         tags: input.tags,
-        isPermanent: true,
-        isSharedToSquare: input.shareToSquare,
-        sharedAt: input.shareToSquare ? new Date(now) : null,
+        isPermanent,
+        maxViews,
+        state: "active",
+        expiryPreset,
+        contentHash,
+        uploaderFp,
+        isSharedToSquare: shareToSquare,
+        sharedAt: shareToSquare ? new Date(now) : null,
         createdAt: new Date(now),
         expiresAt: expiresAt ? new Date(expiresAt) : null,
       });
@@ -540,6 +603,15 @@ export async function createUpload(input: CreateUploadInput): Promise<UploadResu
       }
       throw e;
     }
+    // 埋点：记录上传时选用的到期/限次选项（KPI：到期分布、一次性占比）
+    await insertBurnEvent(d1, {
+      pageId: id,
+      userId: user.id,
+      event: "created",
+      expiryPreset,
+      maxViews,
+      isOneTime,
+    });
     // 成功落库后再扣分：配额费附带链接额度 +1，尺寸费与自定义地址费仅扣积分
     if (fees.quotaFee > 0) {
       await deductPointsAndAddBonus(d1, user.id, fees.quotaFee);
@@ -558,8 +630,10 @@ export async function createUpload(input: CreateUploadInput): Promise<UploadResu
     expiresAt,
     isPermanent,
     title,
-    isSharedToSquare: input.shareToSquare,
+    isSharedToSquare: shareToSquare,
     previewPath: null,
+    maxViews,
+    isOneTime,
     /** @internal 后台扫描用，不暴露给前端 */
     _html: html,
     _isAnonymous: isAnonymous,
@@ -707,6 +781,10 @@ export interface ServePageEnv {
   bucket?: R2Bucket;
   /** tmp 匿名上传过期毫秒数，默认 7 天（可由环境变量覆盖） */
   tmpExpiryMs?: number;
+  /** 请求 User-Agent（用于识别爬虫/预取，决定是否计入访问次数） */
+  userAgent?: string;
+  /** 是否为预取/预览请求（不计数，避免一次性链接被提前焚毁） */
+  isPrefetch?: boolean;
 }
 
 /** 服务用户页面 HTML 或其资产文件，含过期惰性清理、浏览量与 SEO 注入 */
@@ -754,14 +832,16 @@ async function servePageById(
   urlSegment: string
 ): Promise<Response> {
   const notFound = () => new Response(notFoundHtml(lang), { status: 404, headers: htmlHeaders() });
+  const ashes = (reason?: string) =>
+    new Response(burnedHtml(lang, reason), { status: 410, headers: htmlHeaders() });
 
-  // Check expiration from D1 (logged-in user pages)
-  if (env.d1) {
-    const record = await getPageRecord(env.d1, id);
-    if (record && record.expiresAt && new Date(record.expiresAt) < new Date()) {
-      if (env.bucket) await deletePageObjects(env.bucket, id);
-      await deletePageRecord(env.d1, id);
-      return notFound();
+  // D1 记录（仅登录用户页面有）：已焚毁 / 已到期 → 灰烬页（保留元数据）
+  const record = env.d1 ? await getPageRecord(env.d1, id) : null;
+  if (record) {
+    if (record.state === "burned") return ashes(record.burnReason ?? undefined);
+    if (record.expiresAt && new Date(record.expiresAt).getTime() < Date.now()) {
+      await burnPageContent(env, id, "expired");
+      return ashes("expired");
     }
   }
 
@@ -819,25 +899,36 @@ async function servePageById(
     return new Response(notFoundHtml(lang), { status: 404, headers: htmlHeaders() });
   }
 
-  // Increment view count + build SEO meta if tracked in D1
+  // SEO meta + 访问占位（仅登录用户页面有 record；匿名 tmp 不计数）
   let pageMeta: { title?: string; description?: string; url?: string } | undefined;
-  if (env.d1) {
-    const record = await getPageMeta(env.d1, id);
-    if (record) {
-      const categoryLabels: Record<string, string> = {
-        general: "通用", chinese: "语文", math: "数学", english: "英语",
-        physics: "物理", chemistry: "化学", history: "历史",
-        biology: "生物", geography: "地理", other: "其他",
-      };
-      const categoryLabel = categoryLabels[record.category ?? "general"] || "学习";
-      const description = record.tags ? `${categoryLabel} - ${record.tags}` : categoryLabel;
-      pageMeta = {
-        title: record.title || "学习页面",
-        description,
-        url: `https://100mini.com/p/${urlSegment}`,
-      };
+  let burnAfterServe = false;
+  if (record) {
+    const categoryLabels: Record<string, string> = {
+      general: "通用", chinese: "语文", math: "数学", english: "英语",
+      physics: "物理", chemistry: "化学", history: "历史",
+      biology: "生物", geography: "地理", other: "其他",
+    };
+    const categoryLabel = categoryLabels[record.category ?? "general"] || "学习";
+    const description = record.tags ? `${categoryLabel} - ${record.tags}` : categoryLabel;
+    pageMeta = {
+      title: record.title || "学习页面",
+      description,
+      url: `https://100mini.com/p/${urlSegment}`,
+    };
+
+    // 爬虫/预取请求不计入访问次数，避免一次性链接被提前焚毁
+    if (env.d1 && !isLikelyCrawler(env.userAgent, env.isPrefetch)) {
+      const claim = await claimPageView(env.d1, id, Date.now());
+      if (!claim.claimed) {
+        // 并发抢占 / 已达上限：重读状态后给灰烬页
+        const fresh = await getPageRecord(env.d1, id);
+        if (fresh?.state === "burned") return ashes(fresh.burnReason ?? undefined);
+        await burnPageContent(env, id, "views");
+        return ashes("views");
+      }
+      // 达到上限：本次服务后焚毁（一次性链接即 maxViews=1）
+      if (record.maxViews != null && claim.viewCount >= record.maxViews) burnAfterServe = true;
     }
-    await incrementPageViewCount(env.d1, id);
   }
 
   const rawHtml = await obj.text();
@@ -846,6 +937,11 @@ async function servePageById(
   const isAnonymousTmp = obj.key?.startsWith("tmp/") ?? false;
   const injected = injectBanner(rawHtml, pageMeta, baseHref, isAnonymousTmp);
 
+  // 内容已读取：本次达上限后焚毁（一次性链接打开即焚）
+  if (burnAfterServe) {
+    await burnPageContent(env, id, "views");
+  }
+
   return new Response(injected, {
     status: 200,
     headers: {
@@ -853,6 +949,40 @@ async function servePageById(
       "Content-Security-Policy": "form-action 'none';",
     },
   });
+}
+
+/**
+ * 焚毁页面内容：删除 R2 对象并标记 D1 记录为 burned，
+ * 保留元数据（state/burn_reason/burned_at）与 burn_event 供滥用处置与统计。
+ */
+export async function burnPageContent(
+  env: ServePageEnv,
+  id: string,
+  reason: "views" | "expired" | "manual"
+): Promise<void> {
+  const now = Date.now();
+  try {
+    if (env.bucket) await deletePageObjects(env.bucket, id);
+    if (env.d1) {
+      const record = await getPageRecord(env.d1, id);
+      await markPageBurned(env.d1, id, reason, now);
+      if (record) {
+        await insertBurnEvent(env.d1, {
+          pageId: id,
+          userId: record.userId,
+          event: "burned",
+          expiryPreset: record.expiryPreset ?? null,
+          maxViews: record.maxViews ?? null,
+          isOneTime: record.maxViews === 1,
+          burnReason: reason,
+          viewCountAtBurn: record.viewCount ?? 0,
+        });
+      }
+    }
+    log.info("页面已焚毁", { pageId: id, reason });
+  } catch (e) {
+    log.error("焚毁失败", { pageId: id, reason, error: String(e) });
+  }
 }
 
 function htmlHeaders(): HeadersInit {

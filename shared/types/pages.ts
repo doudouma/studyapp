@@ -30,6 +30,65 @@ export const SIZE_BLOCK_BYTES = 5 * 1024 * 1024;
 /** 自定义地址（slug）每次收费 */
 export const POINTS_PER_CUSTOM_SLUG = 10;
 
+// ---------- 到期 / 限次 / 一次性（焚毁）----------
+
+/** 登录用户到期预设：键为预设标识，值为毫秒时长 */
+export const EXPIRY_PRESETS = {
+  "1h": 60 * 60 * 1000,
+  "1d": 24 * 60 * 60 * 1000,
+  "7d": 7 * 24 * 60 * 60 * 1000,
+  "30d": 30 * 24 * 60 * 60 * 1000,
+} as const;
+
+/** 到期预设标识（含永久与自定义） */
+export type ExpiryPreset = keyof typeof EXPIRY_PRESETS | "permanent" | "custom";
+
+/** 自定义到期上限（登录用户 30 天） */
+export const MAX_USER_EXPIRY_MS = 30 * 24 * 60 * 60 * 1000;
+
+/** 自定义到期下限（1 分钟） */
+export const MIN_USER_EXPIRY_MS = 60 * 1000;
+
+/** 最大访问次数的可选项；∞ 用 null 表示 */
+export const MAX_VIEWS_OPTIONS = [1, 3, 5, 10] as const;
+
+/** 上传到期 / 限次选项（前端面板 ↔ 上传接口共用） */
+export interface UploadExpiryOptions {
+  expiryPreset: ExpiryPreset;
+  /** 自定义到期毫秒数（expiryPreset=custom 时有效） */
+  expiryCustomMs: number | null;
+  /** 最大访问次数；null = 不限次（∞） */
+  maxViews: number | null;
+}
+
+/** 最大访问次数上限（防滥用） */
+export const MAX_VIEWS_LIMIT = 1000;
+
+/**
+ * 将到期预设解析为毫秒时长：permanent → null（永久）；
+ * 合法预设/自定义 → 时长；非法 → undefined（调用方回退默认）。
+ */
+export function resolveExpiryMs(preset: string, customMs?: number): number | null | undefined {
+  if (preset === "permanent") return null;
+  if (preset === "custom") {
+    if (typeof customMs !== "number" || !Number.isFinite(customMs)) return undefined;
+    if (customMs < MIN_USER_EXPIRY_MS || customMs > MAX_USER_EXPIRY_MS) return undefined;
+    return Math.floor(customMs);
+  }
+  return (EXPIRY_PRESETS as Record<string, number>)[preset];
+}
+
+/**
+ * 解析最大访问次数：null / 空 / ∞ → null（不限次）；
+ * 正整数字符串/数字 → 归一化后的次数；非法 → undefined。
+ */
+export function resolveMaxViews(raw: string | number | null | undefined): number | null | undefined {
+  if (raw === null || raw === undefined || raw === "" || raw === "inf" || raw === "∞") return null;
+  const n = typeof raw === "number" ? raw : Number(raw);
+  if (!Number.isFinite(n) || n < 1) return undefined;
+  return Math.min(Math.floor(n), MAX_VIEWS_LIMIT);
+}
+
 /** 自定义地址长度下限 */
 export const CUSTOM_SLUG_MIN = 3;
 
@@ -190,6 +249,12 @@ export interface UserPageItem {
   tags: string;
   isPermanent: boolean;
   viewCount: number;
+  /** 最大访问次数；null = 不限次（∞） */
+  maxViews: number | null;
+  /** 生命周期状态：active=正常，burned=已焚毁/已过期 */
+  state: "active" | "burned";
+  /** 焚毁原因：views | expired | manual，未焚毁为 null */
+  burnReason: string | null;
   /** Unix 毫秒 */
   createdAt: number;
   /** Unix 毫秒，null 表示永久 */
@@ -228,6 +293,10 @@ export interface UploadResult {
   title: string;
   isSharedToSquare: boolean;
   previewPath: string | null;
+  /** 最大访问次数；null = 不限次（∞） */
+  maxViews: number | null;
+  /** 是否一次性链接（打开即焚，等价于 maxViews=1） */
+  isOneTime: boolean;
 }
 
 /** POST /api/upload-thumbnail 响应 */

@@ -16,7 +16,8 @@ import { useTranslation } from "react-i18next";
 import i18n from "~/lib/i18n";
 import { TagInput } from "~/components/TagInput";
 import { uploadPage } from "~/features/pages/api";
-import type { UploadResult } from "@shared/types/pages";
+import { ExpiryOptions, DEFAULT_EXPIRY_OPTIONS } from "~/components/ExpiryOptions";
+import type { UploadResult, UploadExpiryOptions } from "@shared/types/pages";
 import { PUBLISH_LIMIT } from "~/lib/any2md/convert";
 import {
   Dialog,
@@ -602,6 +603,7 @@ function Md2HtmlPage() {
   const [category, setCategory] = useState("general");
   const [tags, setTags] = useState<string[]>([]);
   const [shareToSquare, setShareToSquare] = useState(false);
+  const [expiry, setExpiry] = useState<UploadExpiryOptions>(DEFAULT_EXPIRY_OPTIONS);
   const fileRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [importToast, setImportToast] = useState(false);
@@ -709,6 +711,13 @@ function Md2HtmlPage() {
     formData.append("category", category);
     formData.append("tags", tags.join(","));
     formData.append("shareToSquare", String(shareToSquare));
+    if (userRef.current) {
+      formData.append("expiryPreset", expiry.expiryPreset);
+      if (expiry.expiryPreset === "custom" && expiry.expiryCustomMs) {
+        formData.append("expiryCustomMs", String(expiry.expiryCustomMs));
+      }
+      formData.append("maxViews", expiry.maxViews == null ? "inf" : String(expiry.maxViews));
+    }
 
     const result = await uploadPage(formData);
     if (!result.ok) throw new Error(result.error || t("common.error"));
@@ -755,6 +764,8 @@ function Md2HtmlPage() {
     setMd(currentDefault);
     setTitle("");
     setTags([]);
+    setShareToSquare(false);
+    setExpiry(DEFAULT_EXPIRY_OPTIONS);
     setError(null);
   };
 
@@ -771,6 +782,8 @@ function Md2HtmlPage() {
             onReset={handleReset}
             user={user}
             shareToSquare={result.isSharedToSquare}
+            maxViews={result.maxViews}
+            isOneTime={result.isOneTime}
           />
         </main>
         <AppFooter />
@@ -911,15 +924,19 @@ function Md2HtmlPage() {
                 <TagInput tags={tags} onChange={setTags} placeholder={t("home.form.tagsPlaceholder")} />
               </div>
             </div>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                className="size-4 rounded border-border accent-primary"
-                checked={shareToSquare}
-                onChange={(e) => setShareToSquare(e.target.checked)}
-              />
-              <span className="text-sm text-foreground">{t("home.form.shareToSquare")}</span>
-            </label>
+            <ExpiryOptions value={expiry} onChange={setExpiry} />
+
+            {expiry.expiryPreset === "permanent" && (
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="size-4 rounded border-border accent-primary"
+                  checked={shareToSquare}
+                  onChange={(e) => setShareToSquare(e.target.checked)}
+                />
+                <span className="text-sm text-foreground">{t("home.form.shareToSquare")}</span>
+              </label>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setPublishOpen(false)}>
