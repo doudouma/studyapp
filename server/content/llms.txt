@@ -3,7 +3,8 @@
 > Instant HTML hosting with no signup. Paste AI-generated HTML (including Claude
 > artifacts and ChatGPT output) or upload a .html/.zip file and get a live,
 > shareable link in about 30 seconds. Free. Anonymous uploads auto-destroy after
-> 7 days; logged-in users get 5 permanent pages free.
+> 7 days; logged-in users get 5 permanent pages free, and can set an expiry
+> (1 hour–30 days), cap views, or create a one-time burn-after-reading link.
 
 ## Start here
 - [Publish a page (web)](https://100mini.com/): paste HTML or drag-drop a file
@@ -22,7 +23,8 @@
 - Formats: .html, .htm, .zip (ZIP must contain index.html as the entry point)
 - Anonymous limit: 5 MB per page, auto-destroyed after 7 days
 - Logged in: 5 permanent pages free; larger files and custom links use in-app points
-- Safety: every hosted page runs in a Content-Security-Policy sandbox with a phishing-prevention banner; no data is retained after expiry
+- Expiry & burn (free, logged in): set an expiry (1h / 1d / 7d / 30d / custom ≤30d), a max view count (1 / 3 / 5 / 10 / ∞), or a one-time burn-after-reading link that deletes its content on first open and leaves only a playful "digital ashes" notice. Crawlers and link previews do not count as views.
+- Safety: every hosted page runs in a Content-Security-Policy sandbox with a phishing-prevention banner; content is deleted on expiry or burn (a minimal content-free metadata record may be retained for abuse prevention)
 - Languages: en, zh, es, pt, fr
 - Pricing and limits: https://100mini.com/pricing.md
 

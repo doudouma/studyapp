@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, memo, useMemo, useCallback } from "react";
-import { ArrowDown, Code2, Clock, Infinity, Tags, Share2, List, Crown, LogIn, Loader2, Puzzle } from "lucide-react";
+import { ArrowDown, Code2, Clock, Infinity, Tags, Share2, List, Crown, LogIn, Loader2, Puzzle, Flame } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { DropZone } from "~/components/DropZone";
 import { SuccessCard } from "~/components/SuccessCard";
@@ -246,7 +246,7 @@ function UploadForm({
 
             <ExpiryOptions value={expiry} onChange={setExpiry} />
 
-            {expiry.expiryPreset === "permanent" && (
+            {expiry.expiryPreset === "permanent" && expiry.maxViews == null && (
               <label className="mb-3 flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
@@ -297,6 +297,13 @@ function UploadForm({
               <div className="flex items-center gap-2">
                 <List className="size-3.5 text-[#006c49] dark:text-[#4edea3]" />
                 <span className="text-xs text-[#006c49] dark:text-[#4edea3] font-medium">{t("home.upsell.canManage")}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">{t("home.upsell.anonFixedExpiry")}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Flame className="size-3.5 text-[#006c49] dark:text-[#4edea3]" />
+                <span className="text-xs text-[#006c49] dark:text-[#4edea3] font-medium">{t("home.upsell.userExpiry")}</span>
               </div>
             </div>
           </div>
@@ -420,7 +427,7 @@ function HomePage() {
 
   // 配额费（非会员超出免费链接数）+ 尺寸费（内容超过 5MB）+ 自定义地址费，三者叠加
   const maxBytes = user ? MAX_USER_CONTENT_SIZE : MAX_CONTENT_SIZE;
-  const isPermanentUpload = expiry.expiryPreset === "permanent";
+  const isPermanentUpload = expiry.expiryPreset === "permanent" && expiry.maxViews == null;
   const fees = computeUploadFees({
     isAnonymous: !user,
     isMember,

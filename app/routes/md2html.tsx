@@ -926,7 +926,7 @@ function Md2HtmlPage() {
             </div>
             <ExpiryOptions value={expiry} onChange={setExpiry} />
 
-            {expiry.expiryPreset === "permanent" && (
+            {expiry.expiryPreset === "permanent" && expiry.maxViews == null && (
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"

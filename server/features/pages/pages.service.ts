@@ -434,8 +434,10 @@ export async function createUpload(input: CreateUploadInput): Promise<UploadResu
     maxViews = resolvedViews;
   }
   const isOneTime = maxViews === 1;
-  // 到期/限次页面不进广场（广场是长期精选位）
-  const shareToSquare = permanent && input.shareToSquare;
+  // 「真正永久」= 无到期时间且不限访问次数。到期或限次的页面属即焚能力：
+  // 不进广场（广场是长期精选位），也不占用永久配额。
+  const trulyPermanent = permanent && maxViews == null;
+  const shareToSquare = trulyPermanent && input.shareToSquare;
 
   // 取配额与积分（仅登录用户；会员无配额费，但仍需积分支付尺寸费）
   let isMember = false;
@@ -447,8 +449,8 @@ export async function createUpload(input: CreateUploadInput): Promise<UploadResu
     const membershipExpiresAt = await getMembershipExpiresAt(d1, user.id);
     isMember = membershipExpiresAt !== null && membershipExpiresAt > Date.now();
     if (!isMember) {
-      // 即焚页面不计入永久配额
-      pageCount = permanent ? await countPermanentPages(d1, user.id) : 0;
+      // 即焚（到期或限次）页面不计入永久配额
+      pageCount = trulyPermanent ? await countPermanentPages(d1, user.id) : 0;
       userLimit = FREE_PERMANENT_LIMIT + (await getUserLinksLimitBonus(d1, user.id));
     }
     points = await getUserPoints(d1, user.id);
@@ -564,8 +566,10 @@ export async function createUpload(input: CreateUploadInput): Promise<UploadResu
     await putHtml(bucket, `${id}.html`, html);
   }
 
-  const isPermanent = permanent;
-  const expiresAt = isPermanent ? null : now + (expiryMs ?? EXPIRY_PRESETS["7d"]);
+  // isPermanent 表示「真正永久」(无到期且不限次)，用于配额/广场/展示；
+  // expiresAt 仅由到期时间决定，限次页面仍可永久（在时间维度上）。
+  const isPermanent = trulyPermanent;
+  const expiresAt = permanent ? null : now + (expiryMs ?? EXPIRY_PRESETS["7d"]);
 
   // Record in D1 only for logged-in users
   if (user && d1) {

@@ -87,9 +87,11 @@ export function SuccessCard({ url, expiresAt, isPermanent, pageId, onReset, user
           <CheckCircle2 className="size-8 text-[#006c49] dark:text-[#4edea3]" />
         </div>
         <h2 className="text-2xl font-bold text-foreground">{t("components.success.heading")}</h2>
-        <p className="text-sm text-muted-foreground">
-          {isPermanent ? t("components.success.permanent") : t("components.success.autoDestroy", { time: expiryDate })}
-        </p>
+        {(isPermanent || expiresAt) && (
+          <p className="text-sm text-muted-foreground">
+            {isPermanent ? t("components.success.permanent") : t("components.success.autoDestroy", { time: expiryDate })}
+          </p>
+        )}
         {(isOneTime || (maxViews != null && maxViews > 1)) && (
           <p className="text-sm font-medium text-[#ff5100]">
             {isOneTime

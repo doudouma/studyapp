@@ -626,6 +626,23 @@ describe("createUpload — 到期 / 限次 / 一次性", () => {
     );
   });
 
+  it("永久到期 + 限次 → 视为即焚：不永久、不进广场、不占配额", async () => {
+    vi.mocked(repo.countPermanentPages).mockResolvedValue(5);
+    const res = await createUpload(
+      baseUpload({ user, title: "t", content: "x", maxViews: "3", shareToSquare: true })
+    );
+    expect(res.isPermanent).toBe(false);
+    expect(res.expiresAt).toBeNull();
+    expect(res.isSharedToSquare).toBe(false);
+    expect(res.maxViews).toBe(3);
+    expect(repo.countPermanentPages).not.toHaveBeenCalled();
+    expect(repo.deductPointsAndAddBonus).not.toHaveBeenCalled();
+    expect(repo.insertPageRecord).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ isPermanent: false, isSharedToSquare: false, maxViews: 3 })
+    );
+  });
+
   it("缺省（无 expiryPreset）→ 永久", async () => {
     const res = await createUpload(baseUpload({ user, title: "t", content: "x" }));
     expect(res.isPermanent).toBe(true);

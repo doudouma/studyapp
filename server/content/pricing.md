@@ -20,6 +20,7 @@ Prices below are in points, an internal credit — not currency.
   - Custom link (/p/your-slug): 10 points each
   - Content over 5 MB: 10 points per 5 MB block
 - Can add title/category/tags, share to the Learning Square, and manage all links
+- Free extras: set an expiry (1 hour–30 days), cap views (1 / 3 / 5 / 10 / ∞), or create one-time burn-after-reading links. No points charged and no permanent slot used.
 
 ## Member
 - Price: contact the team (granted, not self-serve)
@@ -29,6 +30,7 @@ Prices below are in points, an internal credit — not currency.
 
 ## Notes
 - Points are an internal credit used to meter uploads; they are not purchased or refundable.
+- Expiry, view limits, and one-time burn-after-reading links are free for logged-in users (no points, no permanent-page quota). When a page expires or is burned its content is deleted; only a minimal content-free record may remain for abuse prevention.
 - Pages are stored on Cloudflare R2; metadata is stored in Cloudflare D1.
 - Hosted pages run in a Content-Security-Policy sandbox with a phishing-prevention banner.
 
