@@ -14,6 +14,7 @@ function BadgeLink({ href, imgSrc, label }: { href: string; imgSrc: string; labe
     <a
       href={href}
       target="_blank"
+      rel="sponsored nofollow noopener"
       className="inline-flex items-center text-xs text-muted-foreground transition-colors hover:text-[#006c49] dark:hover:text-[#4edea3]"
     >
       {failed ? (
@@ -148,6 +149,11 @@ export function AppFooter() {
           href="https://shipgrowth.dev"
           imgSrc="https://storage.shipgrowth.dev/badge-light.png"
           label="Featured on ShipGrowth"
+        />
+        <BadgeLink
+          href="https://submitaitools.org"
+          imgSrc="https://submitaitools.org/static_submitaitools/images/submitaitools.png"
+          label="Submit AI Tools"
         />
       </div>
     </footer>
