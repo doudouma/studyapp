@@ -5,9 +5,10 @@
  *
  * Publish HTML/ZIP pages to 100mini as shareable links.
  * Two modes:
- *   - Anonymous: no token, 5 uploads/day/IP, 7-day expiry
- *   - Authenticated (--token / MINI_TOKEN): permanent pages by default, no daily cap,
- *     and optional lifetime control (--expire / --max-views / --one-time)
+ *   - Anonymous: no token, 5 uploads/day/IP, 7-day expiry, 5MB
+ *   - Authenticated (--token / MINI_TOKEN): permanent by default, no daily cap, 50MB,
+ *     and optional lifetime control (--expire / --max-views / --one-time),
+ *     custom address (--slug) and Square sharing (--share-to-square)
  *
  * Zero dependencies. Requires Node.js >= 18 (fetch, FormData, Blob).
  */
@@ -17,14 +18,18 @@ import { basename } from "node:path";
 
 // ── Defaults ────────────────────────────────────────────────────────────────
 
-const BASE_URL_DEFAULT = "https://www.100mini.com";
-const MAX_SIZE = 5 * 1024 * 1024;
+// NOTE: use the apex host. https://www.100mini.com 301-redirects to it, and a
+// 301 on a POST is downgraded to GET by fetch, which 404s on /api/upload.
+const BASE_URL_DEFAULT = "https://100mini.com";
+const ANON_MAX_SIZE = 5 * 1024 * 1024; // MAX_CONTENT_SIZE
+const USER_MAX_SIZE = 50 * 1024 * 1024; // MAX_USER_CONTENT_SIZE
 const ALLOWED_EXT = [".html", ".htm", ".zip"];
 
 // Lifetime options (authenticated uploads only)
 const VALID_EXPIRY = ["permanent", "1h", "1d", "7d", "30d", "custom"];
 const MIN_EXPIRY_MS = 60 * 1000;                 // 1 minute
 const MAX_EXPIRY_MS = 30 * 24 * 60 * 60 * 1000;  // 30 days
+const MAX_VIEWS_LIMIT = 1000;
 
 /** Parse a duration like "45m", "12h", "5d" into milliseconds; null if invalid. */
 function parseDurationMs(str) {
@@ -38,6 +43,8 @@ function parseDurationMs(str) {
 
 // ── Argument parsing ────────────────────────────────────────────────────────
 
+const BOOLEAN_FLAGS = new Set(["quiet", "anonymous", "one-time", "share-to-square", "square"]);
+
 function parseArgs(argv) {
   const args = argv.slice(2);
   const opts = {};
@@ -45,12 +52,8 @@ function parseArgs(argv) {
     const a = args[i];
     if (a === "-h" || a === "--help") {
       opts.help = true;
-    } else if (a === "--quiet") {
-      opts.quiet = true;
-    } else if (a === "--anonymous") {
-      opts.anonymous = true;
-    } else if (a === "--one-time") {
-      opts["one-time"] = true;
+    } else if (a.startsWith("--") && BOOLEAN_FLAGS.has(a.slice(2))) {
+      opts[a.slice(2)] = true;
     } else if (a.startsWith("--") && i + 1 < args.length) {
       const key = a.slice(2);
       opts[key] = args[++i];
@@ -67,8 +70,8 @@ function printHelp() {
 Usage: node upload.mjs [options]
 
 Modes:
-  (default)       Anonymous upload — 5/day/IP, 7-day expiry
-  --token <key>   Authenticated upload — permanent, no daily cap
+  (default)       Anonymous upload — 5/day/IP, 7-day expiry, 5MB
+  --token <key>   Authenticated upload — permanent or expiring, 50MB, no cap
   --anonymous     Force anonymous even if MINI_TOKEN env is set
 
 Input (exactly one required):
@@ -76,19 +79,23 @@ Input (exactly one required):
   --content <str> HTML string
   (stdin)         pipe HTML via stdin
 
-Options:
-  --title <str>   page title (required for authenticated uploads)
-  --tags <a,b>    comma-separated tags
-  --category <s>  category (default: general)
-  --base-url <u>  upload target (default: https://www.100mini.com)
-  --quiet         print only the final URL
-  -h, --help      show this help
+Metadata (authenticated):
+  --title <str>       page title (required for authenticated uploads)
+  --tags <a,b>        comma-separated tags
+  --category <s>      category (default: general)
+  --slug <s>          custom address /p/<slug> (costs 10 points)
+  --share-to-square   share to the Learning Square (permanent + unlimited views only)
 
-Lifetime options (authenticated uploads only; free, no points):
+Lifetime options (authenticated; free, no points):
   --expire <p>         permanent | 1h | 1d | 7d | 30d | custom (default: permanent)
   --expire-custom <d>  duration for --expire custom: <n>m/h/d (e.g. 45m, 12h, 5d; max 30d)
-  --max-views <n>      max opens before burning: a positive integer or inf (default: inf)
+  --max-views <n>      max opens before burning: a positive integer (≤1000) or inf (default: inf)
   --one-time           burn-after-reading link (shorthand for --max-views 1)
+
+Common:
+  --base-url <u>      upload target (default: https://100mini.com)
+  --quiet             print only the final URL
+  -h, --help          show this help
 
 Environment:
   MINI_TOKEN      default API key (overridden by --token; ignored with --anonymous)
@@ -100,6 +107,7 @@ Examples:
   node upload.mjs --token 100m_xxxx --file quiz.html --title "Quiz" --one-time
   node upload.mjs --token 100m_xxxx --file notes.html --title "Notes" --expire 1d
   node upload.mjs --token 100m_xxxx --file draft.html --title "Draft" --expire custom --expire-custom 12h
+  node upload.mjs --token 100m_xxxx --file page.html --title "Home" --slug my-home
   cat page.html | node upload.mjs --anonymous
 `.trim();
   console.error(usage);
@@ -155,8 +163,8 @@ async function main() {
       maxViews = null;
     } else {
       const n = Number(raw);
-      if (!Number.isFinite(n) || n < 1) {
-        err(2, `Invalid --max-views "${opts["max-views"]}". Use a positive integer or "inf".`);
+      if (!Number.isFinite(n) || n < 1 || n > MAX_VIEWS_LIMIT) {
+        err(2, `Invalid --max-views "${opts["max-views"]}". Use a positive integer ≤ ${MAX_VIEWS_LIMIT} or "inf".`);
       }
       maxViews = Math.floor(n);
     }
@@ -182,14 +190,21 @@ async function main() {
     err(2, "--expire-custom requires --expire custom.");
   }
 
+  // Metadata options (authenticated only)
+  const slug = typeof opts.slug === "string" ? opts.slug.trim() : "";
+  const shareToSquare = !!(opts["share-to-square"] || opts.square);
+
   const usesLifetimeFlags = expiryPreset !== undefined || maxViews !== undefined;
-  if (!token && usesLifetimeFlags) {
+  const usesAuthOnlyFlags = usesLifetimeFlags || slug !== "" || shareToSquare;
+  if (!token && usesAuthOnlyFlags) {
     process.stderr.write(
-      "Note: --expire / --max-views / --one-time apply to authenticated uploads only; ignored in anonymous mode.\n"
+      "Note: --expire / --max-views / --one-time / --slug / --share-to-square apply to authenticated uploads only; ignored in anonymous mode.\n"
     );
   }
 
   // Resolve input
+  const maxSize = token ? USER_MAX_SIZE : ANON_MAX_SIZE;
+  const maxSizeMB = (maxSize / 1024 / 1024).toFixed(0);
   let inputMode = null; // "file" | "content" | "stdin"
   let fileBytes = null;
   let filename = null;
@@ -201,7 +216,7 @@ async function main() {
     try {
       const st = statSync(filePath);
       if (!st.isFile()) err(2, `Not a file: ${filePath}`);
-      if (st.size > MAX_SIZE) err(2, `File too large (${(st.size / 1024 / 1024).toFixed(1)}MB > 5MB limit)`);
+      if (st.size > maxSize) err(2, `File too large (${(st.size / 1024 / 1024).toFixed(1)}MB > ${maxSizeMB}MB limit)`);
       const ext = filePath.toLowerCase().match(/\.(\w+)$/)?.[0];
       if (!ext || !ALLOWED_EXT.includes(ext)) {
         err(2, `Unsupported file type "${ext}". Allowed: ${ALLOWED_EXT.join(", ")}`);
@@ -215,13 +230,13 @@ async function main() {
     inputMode = "content";
     contentStr = opts.content;
     const size = Buffer.byteLength(contentStr, "utf-8");
-    if (size > MAX_SIZE) err(2, `Content too large (${(size / 1024 / 1024).toFixed(1)}MB > 5MB limit)`);
+    if (size > maxSize) err(2, `Content too large (${(size / 1024 / 1024).toFixed(1)}MB > ${maxSizeMB}MB limit)`);
   } else if (hasStdin()) {
     inputMode = "stdin";
     contentStr = await readStdin();
     if (!contentStr.trim()) err(2, "No input from stdin");
     const size = Buffer.byteLength(contentStr, "utf-8");
-    if (size > MAX_SIZE) err(2, `Content too large (${(size / 1024 / 1024).toFixed(1)}MB > 5MB limit)`);
+    if (size > maxSize) err(2, `Content too large (${(size / 1024 / 1024).toFixed(1)}MB > ${maxSizeMB}MB limit)`);
   } else {
     err(2, "No input. Provide --file, --content, or pipe via stdin. Use -h for help.");
   }
@@ -240,15 +255,19 @@ async function main() {
   if (opts.category) formData.append("category", opts.category);
   if (opts.tags) formData.append("tags", opts.tags);
 
-  // Lifetime options (authenticated only; server ignores them for anonymous)
-  if (token && usesLifetimeFlags) {
-    formData.append("expiryPreset", expiryPreset ?? "permanent");
-    if (expiryPreset === "custom" && expiryCustomMs != null) {
-      formData.append("expiryCustomMs", String(expiryCustomMs));
+  // Authenticated-only options (server ignores them for anonymous)
+  if (token) {
+    if (usesLifetimeFlags) {
+      formData.append("expiryPreset", expiryPreset ?? "permanent");
+      if (expiryPreset === "custom" && expiryCustomMs != null) {
+        formData.append("expiryCustomMs", String(expiryCustomMs));
+      }
+      if (maxViews !== undefined) {
+        formData.append("maxViews", maxViews == null ? "inf" : String(maxViews));
+      }
     }
-    if (maxViews !== undefined) {
-      formData.append("maxViews", maxViews == null ? "inf" : String(maxViews));
-    }
+    if (slug) formData.append("customSlug", slug);
+    if (shareToSquare) formData.append("shareToSquare", "true");
   }
 
   const baseUrl = (opts["base-url"] || BASE_URL_DEFAULT).replace(/\/+$/, "");
@@ -287,7 +306,17 @@ async function main() {
     console.log(`${baseUrl}${json.url}`);
   } else {
     console.log(JSON.stringify(json, null, 2));
-    process.stderr.write(`\nPage: ${baseUrl}${json.url}\n`);
+    const bits = [];
+    if (json.isOneTime) bits.push("one-time (burns after first view)");
+    else if (json.maxViews != null) bits.push(`max ${json.maxViews} views`);
+    if (json.expiresAt) bits.push(`expires ${new Date(json.expiresAt).toISOString()}`);
+    const note = bits.length ? ` (${bits.join(", ")})` : "";
+    process.stderr.write(`\nPage: ${baseUrl}${json.url}${note}\n`);
+  }
+
+  // Burn/expiring pages can never be shared to the Square.
+  if (usesLifetimeFlags && shareToSquare) {
+    process.stderr.write("Note: expiring/view-limited pages are excluded from the Learning Square.\n");
   }
 }
 
