@@ -155,6 +155,11 @@ export function AppFooter() {
           imgSrc="https://submitaitools.org/static_submitaitools/images/submitaitools.png"
           label="Submit AI Tools"
         />
+        <BadgeLink
+          href="https://doforai.tools"
+          imgSrc="https://doforai.tools/badge/feature-badge-white.webp"
+          label="Featured on doforai.tools"
+        />
       </div>
     </footer>
   );
