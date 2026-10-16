@@ -14,21 +14,65 @@ export const Route = createFileRoute("/contact")({
   component: ContactPage,
 });
 
+type ContactNavLink = { label: string; href: string; divider?: boolean };
+type ContactNavGroup = { label: string; links: ContactNavLink[] };
+
 function ContactPage() {
   const { t } = useTranslation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [openMobileGroup, setOpenMobileGroup] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const navRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+        setOpenDropdown(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const navItems = [
     { label: t("nav.home"), href: "/" },
     { label: t("nav.square"), href: "/square" },
-    { label: t("nav.pomodoroShort"), href: "/pomodoro" },
+    { label: t("nav.showcase"), href: "/showcase" },
+  ];
+
+  const navGroups: ContactNavGroup[] = [
+    {
+      label: t("nav.tools"),
+      links: [
+        { label: t("nav.toolsAll"), href: "/freetool" },
+        { label: "", href: "", divider: true },
+        { label: t("nav.claudeArtifact"), href: "/claude-artifact-to-link" },
+        { label: t("nav.pomodoro"), href: "/pomodoro" },
+        { label: t("nav.rhythm"), href: "/rhythm" },
+        { label: t("nav.md2html"), href: "/md2html" },
+        { label: t("nav.any2md"), href: "/any2md" },
+        { label: t("nav.idphoto"), href: "/idphoto" },
+        { label: t("nav.petbadge"), href: "/petbadge" },
+        { label: t("nav.petsafe"), href: "/petsafe" },
+      ],
+    },
+    {
+      label: t("nav.game"),
+      links: [
+        { label: t("nav.gamesAll"), href: "/games" },
+        { label: "", href: "", divider: true },
+        { label: t("nav.papercut"), href: "/papercut" },
+        { label: t("nav.deliveryrush"), href: "/deliveryrush" },
+        { label: t("nav.enso"), href: "/enso" },
+        { label: t("nav.outbreak"), href: "/outbreak" },
+      ],
+    },
   ];
 
   const copyEmail = async () => {
     try {
-      await navigator.clipboard.writeText("hello@100mini.com");
+      await navigator.clipboard.writeText("icreativechina@gmail.com");
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch { /* ignore */ }
@@ -85,7 +129,7 @@ function ContactPage() {
 
       {/* Navigation */}
       <nav className="relative z-10 px-5 sm:px-6 md:px-12 lg:px-16 py-4 sm:py-5">
-        <div className="flex items-center justify-between">
+        <div ref={navRef} className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
@@ -100,11 +144,41 @@ function ContactPage() {
             {navItems.map((item) => (
               <Link
                 key={item.label}
-                to={item.href as "/" | "/square" | "/pomodoro"}
+                to={item.href}
                 className="text-white/90 hover:text-white text-sm font-medium transition-colors"
               >
                 {item.label}
               </Link>
+            ))}
+            {navGroups.map((group) => (
+              <div key={group.label} className="relative">
+                <button
+                  type="button"
+                  onClick={() => setOpenDropdown(openDropdown === group.label ? null : group.label)}
+                  className="flex items-center gap-0.5 text-white/90 hover:text-white text-sm font-medium transition-colors"
+                >
+                  {group.label}
+                  <ChevronDown className={`size-3.5 transition-transform ${openDropdown === group.label ? "rotate-180" : ""}`} />
+                </button>
+                {openDropdown === group.label && (
+                  <div className="absolute left-0 top-full z-50 mt-2 min-w-44 liquid-glass rounded-2xl py-2 animate-dropdown">
+                    {group.links.map((link, i) =>
+                      link.divider ? (
+                        <div key={`divider-${i}`} className="mx-3 my-1 border-t border-white/10" />
+                      ) : (
+                        <Link
+                          key={link.href}
+                          to={link.href}
+                          onClick={() => setOpenDropdown(null)}
+                          className="block px-4 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+                        >
+                          {link.label}
+                        </Link>
+                      )
+                    )}
+                  </div>
+                )}
+              </div>
             ))}
           </div>
 
@@ -143,12 +217,40 @@ function ContactPage() {
               {navItems.map((item) => (
                 <Link
                   key={item.label}
-                  to={item.href as "/" | "/square" | "/pomodoro"}
+                  to={item.href}
                   className="text-white/90 hover:text-white text-lg font-medium"
                   onClick={() => setMobileOpen(false)}
                 >
                   {item.label}
                 </Link>
+              ))}
+              {navGroups.map((group) => (
+                <div key={group.label}>
+                  <button
+                    type="button"
+                    onClick={() => setOpenMobileGroup(openMobileGroup === group.label ? null : group.label)}
+                    className="flex w-full items-center justify-between text-white/90 hover:text-white text-lg font-medium"
+                  >
+                    {group.label}
+                    <ChevronDown className={`size-4 transition-transform ${openMobileGroup === group.label ? "rotate-180" : ""}`} />
+                  </button>
+                  {openMobileGroup === group.label && (
+                    <div className="flex flex-col gap-3 mt-3 pl-3 border-l border-white/10">
+                      {group.links.map((link, i) =>
+                        link.divider ? null : (
+                          <Link
+                            key={`${link.href}-${i}`}
+                            to={link.href}
+                            className="text-white/70 hover:text-white text-base font-medium"
+                            onClick={() => setMobileOpen(false)}
+                          >
+                            {link.label}
+                          </Link>
+                        )
+                      )}
+                    </div>
+                  )}
+                </div>
               ))}
               <Link
                 to="/links"
@@ -187,7 +289,7 @@ function ContactPage() {
 
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mt-6 sm:mt-8">
             <a
-              href="mailto:hello@100mini.com"
+              href="mailto:icreativechina@gmail.com"
               className="px-5 sm:px-6 py-2.5 sm:py-3 bg-white text-gray-900 text-sm font-semibold rounded-full hover:bg-white/90 transition-colors"
             >
               {t("contact.sendEmail")}
