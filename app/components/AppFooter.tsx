@@ -8,6 +8,20 @@ import { useTranslation } from "react-i18next";
  * 徽章图是对方站点的外链，可能挂掉或被墙；只放 <img> 的话加载失败会渲染成一个
  * 空锚点，页面上看起来这条外链「消失了」。回退文字保证链接始终可见。
  */
+function TextLink({ href, label }: { href: string; label: string }) {
+  return (
+    <a
+      href={href}
+      title={label}
+      target="_blank"
+      rel="sponsored nofollow noopener"
+      className="text-xs text-muted-foreground transition-colors hover:text-[#006c49] dark:hover:text-[#4edea3]"
+    >
+      {label}
+    </a>
+  );
+}
+
 function BadgeLink({ href, imgSrc, label }: { href: string; imgSrc: string; label: string }) {
   const [failed, setFailed] = useState(false);
   return (
@@ -101,15 +115,8 @@ export function AppFooter() {
         {/* 目录站/徽章互链：显式标注 sponsored + nofollow。
             这些链接出现在全站共享页脚，N 个页面 × N 条即跨全站 dofollow 外链，
             会触发 link spam 判定（降权的是链接来源站，也就是我们自己）。 */}
-        <a
-          href="https://mossai.org"
-          title="MossAI Tools"
-          target="_blank"
-          rel="sponsored nofollow noopener"
-          className="text-xs text-muted-foreground transition-colors hover:text-[#006c49] dark:hover:text-[#4edea3]"
-        >
-          MossAI Tools
-        </a>
+        <TextLink href="https://mossai.org" label="MossAI Tools" />
+        <TextLink href="https://realisticai.io" label="Realistic AI" />
         {/* <BadgeLink
           href="https://dironix.com"
           imgSrc="https://dironix.com/bage.png"
