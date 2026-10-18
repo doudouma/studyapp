@@ -163,6 +163,16 @@ export function AppFooter() {
           label="Submit AI Tools"
         />
         <BadgeLink
+          href="https://launchigniter.com/product/100mini-instant-html-hosting-no-signup?ref=badge-100mini-instant-html-hosting-no-signup"
+          imgSrc="https://launchigniter.com/api/badge/100mini-instant-html-hosting-no-signup?theme=light"
+          label="Featured on LaunchIgniter"
+        />
+        <BadgeLink
+          href="https://startuptrusted.com?ref=100mini.com"
+          imgSrc="https://startuptrusted.com/api/badge?type=featured&style=light"
+          label="100mini on StartupTrusted"
+        />
+        <BadgeLink
           href="https://doforai.tools"
           imgSrc="https://doforai.tools/badge/feature-badge-white.webp"
           label="Featured on doforai.tools"
