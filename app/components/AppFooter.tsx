@@ -219,6 +219,14 @@ export function AppFooter() {
           height={24}
           rel=""
         />
+        <BadgeLink
+          href="https://tinylaunch.com"
+          imgSrc="https://tinylaunch.com/tinylaunch_badge_featured_on.svg"
+          label="Featured on TinyLaunch"
+          width={79}
+          height={24}
+          rel="noopener"
+        />
         {/* Fazier 校验器要求链接不含 nofollow，故此处用 rel="noopener"（跟随链接）。 */}
         <BadgeLink
           href="https://fazier.com/launches/100mini.com"
