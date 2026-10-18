@@ -22,13 +22,29 @@ function TextLink({ href, label }: { href: string; label: string }) {
   );
 }
 
-function BadgeLink({ href, imgSrc, label }: { href: string; imgSrc: string; label: string }) {
+function BadgeLink({
+  href,
+  imgSrc,
+  label,
+  width,
+  height,
+  rel = "sponsored nofollow noopener",
+  eager = false,
+}: {
+  href: string;
+  imgSrc: string;
+  label: string;
+  width?: number;
+  height?: number;
+  rel?: string;
+  eager?: boolean;
+}) {
   const [failed, setFailed] = useState(false);
   return (
     <a
       href={href}
       target="_blank"
-      rel="sponsored nofollow noopener"
+      {...(rel ? { rel } : {})}
       className="inline-flex items-center text-xs text-muted-foreground transition-colors hover:text-[#006c49] dark:hover:text-[#4edea3]"
     >
       {failed ? (
@@ -37,8 +53,14 @@ function BadgeLink({ href, imgSrc, label }: { href: string; imgSrc: string; labe
         <img
           src={imgSrc}
           alt={label}
-          style={{ height: 24, width: "auto" }}
-          loading="lazy"
+          width={width}
+          height={height}
+          style={
+            width || height
+              ? { width: width ?? "auto", height: height ?? "auto" }
+              : { height: 24, width: "auto" }
+          }
+          loading={eager ? "eager" : "lazy"}
           onError={() => setFailed(true)}
         />
       )}
@@ -134,8 +156,12 @@ export function AppFooter() {
         />
         <BadgeLink
           href="https://startupfa.me/s/100mini?utm_source=100mini.com"
-          imgSrc="https://startupfa.me/badges/featured-badge-small.webp"
+          imgSrc="https://startupfa.me/badges/featured/default.webp"
           label="100mini - Featured on Startup Fame"
+          width={76}
+          height={24}
+          rel=""
+          eager
         />
         <BadgeLink
           href="https://deeplaunch.io"
@@ -176,6 +202,13 @@ export function AppFooter() {
           href="https://doforai.tools"
           imgSrc="https://doforai.tools/badge/feature-badge-white.webp"
           label="Featured on doforai.tools"
+        />
+        {/* Fazier 校验器要求链接不含 nofollow，故此处用 rel="noopener"（跟随链接）。 */}
+        <BadgeLink
+          href="https://fazier.com/launches/100mini.com"
+          imgSrc="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=featured&theme=light"
+          label="Featured on Fazier"
+          rel="noopener"
         />
       </div>
     </footer>
