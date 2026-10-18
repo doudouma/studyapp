@@ -203,6 +203,14 @@ export function AppFooter() {
           imgSrc="https://doforai.tools/badge/feature-badge-white.webp"
           label="Featured on doforai.tools"
         />
+        <BadgeLink
+          href="https://findly.tools/100mini?utm_source=100mini"
+          imgSrc="https://findly.tools/badges/findly-tools-badge-light.svg"
+          label="Featured on Findly.tools"
+          width={76}
+          height={24}
+          rel="noopener noreferrer"
+        />
         {/* Fazier 校验器要求链接不含 nofollow，故此处用 rel="noopener"（跟随链接）。 */}
         <BadgeLink
           href="https://fazier.com/launches/100mini.com"
