@@ -3,8 +3,8 @@
 slug: netlify-drop
 name: Netlify Drop
 domain: netlify.com
-as_of: "2026-10"
-positioning: "Drag-and-drop deploy from the Netlify platform; a doorway into the full Netlify product."
+as_of: "2026-10-18"
+positioning: "Drag-and-drop deploy from the Netlify platform; a doorway into the full Netlify product. Assumes the user is comfortable with deploys, repos, and settings."
 audience: "Developers deploying real projects (frameworks, functions, CI/CD)."
 signup: "Not required to run a Drop deploy; an account is needed to claim and manage the site."
 pricing:
@@ -21,10 +21,21 @@ weaknesses_for_our_use_case:
   - Heavier than needed for a single AI-generated HTML file
   - Usage-credit model
   - No built-in "anonymous, auto-expiring" privacy default
-  - No Claude-artifact-oriented paste flow
+  - No one-time burn-after-reading links or view limits
+  - No community gallery; you share the public URL yourself
+  - Claim/manage/domain steps assume a developer workflow
 best_for: "Production web apps and sites with a build step."
-not_ideal_for: "Someone who just wants to paste one AI-generated HTML file and share a link in seconds."
+not_ideal_for: "Non-technical creators who just want to paste one AI-generated HTML file and share a link in seconds."
 migration: "For a single static file, 100mini needs no repo, build, or account — copy-paste replaces zip-upload + claim."
+our_edge:
+  target_audience: "Non-technical creators (AI users, teachers, makers) sharing a demo."
+  positioning: "Paste HTML, publish, share — no Git, no build, no account."
+  features:
+    - "Expiry presets (1h/1d/7d/30d/custom ≤30d) and view limits (1/3/5/10/∞)"
+    - "One-time burn-after-reading links (crawlers/previews don't count as views)"
+    - "Custom link /p/your-name (points) and QR code on publish"
+    - "Optional one-click share to the Learning Square gallery"
+    - "Anonymous pages noindex + auto-destroy after 7 days; 5 permanent pages free with an account"
 sources:
   - https://www.netlify.com/pricing/
   - https://docs.netlify.com/deploy/create-deploys

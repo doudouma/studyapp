@@ -7,7 +7,7 @@ import i18n, { getBcp47 } from "~/lib/i18n";
 import { withLangPrefix, currentLang, BASE_URL, DEFAULT_OG_IMAGE } from "~/lib/seo";
 import { getCompetitor } from "~/features/alternatives/data";
 
-const TABLE_ROWS = ["r1", "r2", "r3", "r4", "r5", "r6", "r7"];
+const TABLE_ROWS = ["r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8"];
 const SECTIONS = ["s1", "s2", "s3"];
 const FAQS = ["faq1", "faq2", "faq3", "faq4"];
 
@@ -102,7 +102,7 @@ function AlternativePage() {
                 {TABLE_ROWS.map((r) => (
                   <tr key={r} className="border-t border-border align-top">
                     <th scope="row" className="px-4 py-3 text-left font-medium text-muted-foreground">
-                      {t(`${competitor.i18nKey}.${r}.label`)}
+                      {t(`alternatives.rows.${r}`)}
                     </th>
                     <td className="px-4 py-3 text-foreground">{t(`${competitor.i18nKey}.${r}.ours`)}</td>
                     <td className="px-4 py-3 text-muted-foreground">{t(`${competitor.i18nKey}.${r}.theirs`)}</td>
@@ -116,7 +116,7 @@ function AlternativePage() {
           {SECTIONS.map((s) => (
             <section key={s} className="mt-8">
               <h2 className="text-xl font-semibold tracking-tight text-foreground">
-                {t(`${competitor.i18nKey}.${s}.title`)}
+                {t(`alternatives.sections.${s}.title`)}
               </h2>
               <p className="mt-2 text-base leading-relaxed text-muted-foreground">
                 {t(`${competitor.i18nKey}.${s}.body`)}
@@ -129,7 +129,7 @@ function AlternativePage() {
             <div className="rounded-2xl border border-[#006c49]/20 bg-[#006c49]/5 p-5 dark:border-[#4edea3]/20 dark:bg-[#4edea3]/5">
               <h2 className="flex items-center gap-2 text-base font-semibold text-foreground">
                 <Check className="size-4 text-[#006c49] dark:text-[#4edea3]" />
-                {t(`${competitor.i18nKey}.ours.title`)}
+                {t("alternatives.ours.title")}
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                 {t(`${competitor.i18nKey}.ours.body`)}
@@ -138,7 +138,7 @@ function AlternativePage() {
             <div className="rounded-2xl border border-border bg-card p-5">
               <h2 className="flex items-center gap-2 text-base font-semibold text-foreground">
                 <X className="size-4 text-muted-foreground" />
-                {t(`${competitor.i18nKey}.theirs.title`)}
+                {t("alternatives.theirs.title", { name: competitor.name })}
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                 {t(`${competitor.i18nKey}.theirs.body`)}
@@ -149,7 +149,7 @@ function AlternativePage() {
           {/* Migration */}
           <section className="mt-8">
             <h2 className="text-xl font-semibold tracking-tight text-foreground">
-              {t(`${competitor.i18nKey}.migrate.title`)}
+              {t("alternatives.migrate.title")}
             </h2>
             <p className="mt-2 text-base leading-relaxed text-muted-foreground">
               {t(`${competitor.i18nKey}.migrate.body`)}

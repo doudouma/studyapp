@@ -24,7 +24,42 @@ export const COMPETITORS: Record<string, AlternativeCompetitor> = {
     name: "Netlify Drop",
     domain: "netlify.com",
     i18nKey: "altNetlifyDrop",
-    asOf: "2026-10",
+    asOf: "2026-10-18",
+  },
+  "tiiny-host": {
+    slug: "tiiny-host",
+    name: "Tiiny Host",
+    domain: "tiiny.host",
+    i18nKey: "altTiinyHost",
+    asOf: "2026-10-18",
+  },
+  codepen: {
+    slug: "codepen",
+    name: "CodePen",
+    domain: "codepen.io",
+    i18nKey: "altCodePen",
+    asOf: "2026-10-18",
+  },
+  vercel: {
+    slug: "vercel",
+    name: "Vercel",
+    domain: "vercel.com",
+    i18nKey: "altVercel",
+    asOf: "2026-10-18",
+  },
+  "github-pages": {
+    slug: "github-pages",
+    name: "GitHub Pages",
+    domain: "github.io",
+    i18nKey: "altGitHubPages",
+    asOf: "2026-10-18",
+  },
+  "ai-native-share": {
+    slug: "ai-native-share",
+    name: "Claude artifacts / ChatGPT Canvas",
+    domain: "claude.ai",
+    i18nKey: "altAiNativeShare",
+    asOf: "2026-10-18",
   },
 };
 

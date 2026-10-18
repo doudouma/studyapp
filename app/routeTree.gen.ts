@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WardrobeRouteImport } from './routes/wardrobe'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as TemporaryLinkRouteImport } from './routes/temporary-link'
 import { Route as SquareRouteImport } from './routes/square'
 import { Route as ShowcaseRouteImport } from './routes/showcase'
 import { Route as RhythmRouteImport } from './routes/rhythm'
@@ -23,6 +24,7 @@ import { Route as OutbreakRouteImport } from './routes/outbreak'
 import { Route as Md2htmlRouteImport } from './routes/md2html'
 import { Route as LinksRouteImport } from './routes/links'
 import { Route as IdphotoRouteImport } from './routes/idphoto'
+import { Route as HostSingleHtmlRouteImport } from './routes/host-single-html'
 import { Route as GamesRouteImport } from './routes/games'
 import { Route as FreetoolRouteImport } from './routes/freetool'
 import { Route as EnsoRouteImport } from './routes/enso'
@@ -47,6 +49,11 @@ const WardrobeRoute = WardrobeRouteImport.update({
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TemporaryLinkRoute = TemporaryLinkRouteImport.update({
+  id: '/temporary-link',
+  path: '/temporary-link',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SquareRoute = SquareRouteImport.update({
@@ -107,6 +114,11 @@ const LinksRoute = LinksRouteImport.update({
 const IdphotoRoute = IdphotoRouteImport.update({
   id: '/idphoto',
   path: '/idphoto',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HostSingleHtmlRoute = HostSingleHtmlRouteImport.update({
+  id: '/host-single-html',
+  path: '/host-single-html',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GamesRoute = GamesRouteImport.update({
@@ -198,6 +210,7 @@ export interface FileRoutesByFullPath {
   '/enso': typeof EnsoRoute
   '/freetool': typeof FreetoolRoute
   '/games': typeof GamesRoute
+  '/host-single-html': typeof HostSingleHtmlRoute
   '/idphoto': typeof IdphotoRoute
   '/links': typeof LinksRoute
   '/md2html': typeof Md2htmlRoute
@@ -210,6 +223,7 @@ export interface FileRoutesByFullPath {
   '/rhythm': typeof RhythmRoute
   '/showcase': typeof ShowcaseRoute
   '/square': typeof SquareRoute
+  '/temporary-link': typeof TemporaryLinkRoute
   '/terms': typeof TermsRoute
   '/wardrobe': typeof WardrobeRoute
   '/alternatives/$competitor': typeof AlternativesCompetitorRoute
@@ -229,6 +243,7 @@ export interface FileRoutesByTo {
   '/enso': typeof EnsoRoute
   '/freetool': typeof FreetoolRoute
   '/games': typeof GamesRoute
+  '/host-single-html': typeof HostSingleHtmlRoute
   '/idphoto': typeof IdphotoRoute
   '/links': typeof LinksRoute
   '/md2html': typeof Md2htmlRoute
@@ -241,6 +256,7 @@ export interface FileRoutesByTo {
   '/rhythm': typeof RhythmRoute
   '/showcase': typeof ShowcaseRoute
   '/square': typeof SquareRoute
+  '/temporary-link': typeof TemporaryLinkRoute
   '/terms': typeof TermsRoute
   '/wardrobe': typeof WardrobeRoute
   '/alternatives/$competitor': typeof AlternativesCompetitorRoute
@@ -261,6 +277,7 @@ export interface FileRoutesById {
   '/enso': typeof EnsoRoute
   '/freetool': typeof FreetoolRoute
   '/games': typeof GamesRoute
+  '/host-single-html': typeof HostSingleHtmlRoute
   '/idphoto': typeof IdphotoRoute
   '/links': typeof LinksRoute
   '/md2html': typeof Md2htmlRoute
@@ -273,6 +290,7 @@ export interface FileRoutesById {
   '/rhythm': typeof RhythmRoute
   '/showcase': typeof ShowcaseRoute
   '/square': typeof SquareRoute
+  '/temporary-link': typeof TemporaryLinkRoute
   '/terms': typeof TermsRoute
   '/wardrobe': typeof WardrobeRoute
   '/alternatives_/$competitor': typeof AlternativesCompetitorRoute
@@ -294,6 +312,7 @@ export interface FileRouteTypes {
     | '/enso'
     | '/freetool'
     | '/games'
+    | '/host-single-html'
     | '/idphoto'
     | '/links'
     | '/md2html'
@@ -306,6 +325,7 @@ export interface FileRouteTypes {
     | '/rhythm'
     | '/showcase'
     | '/square'
+    | '/temporary-link'
     | '/terms'
     | '/wardrobe'
     | '/alternatives/$competitor'
@@ -325,6 +345,7 @@ export interface FileRouteTypes {
     | '/enso'
     | '/freetool'
     | '/games'
+    | '/host-single-html'
     | '/idphoto'
     | '/links'
     | '/md2html'
@@ -337,6 +358,7 @@ export interface FileRouteTypes {
     | '/rhythm'
     | '/showcase'
     | '/square'
+    | '/temporary-link'
     | '/terms'
     | '/wardrobe'
     | '/alternatives/$competitor'
@@ -356,6 +378,7 @@ export interface FileRouteTypes {
     | '/enso'
     | '/freetool'
     | '/games'
+    | '/host-single-html'
     | '/idphoto'
     | '/links'
     | '/md2html'
@@ -368,6 +391,7 @@ export interface FileRouteTypes {
     | '/rhythm'
     | '/showcase'
     | '/square'
+    | '/temporary-link'
     | '/terms'
     | '/wardrobe'
     | '/alternatives_/$competitor'
@@ -388,6 +412,7 @@ export interface RootRouteChildren {
   EnsoRoute: typeof EnsoRoute
   FreetoolRoute: typeof FreetoolRoute
   GamesRoute: typeof GamesRoute
+  HostSingleHtmlRoute: typeof HostSingleHtmlRoute
   IdphotoRoute: typeof IdphotoRoute
   LinksRoute: typeof LinksRoute
   Md2htmlRoute: typeof Md2htmlRoute
@@ -400,6 +425,7 @@ export interface RootRouteChildren {
   RhythmRoute: typeof RhythmRoute
   ShowcaseRoute: typeof ShowcaseRoute
   SquareRoute: typeof SquareRoute
+  TemporaryLinkRoute: typeof TemporaryLinkRoute
   TermsRoute: typeof TermsRoute
   WardrobeRoute: typeof WardrobeRoute
   AlternativesCompetitorRoute: typeof AlternativesCompetitorRoute
@@ -421,6 +447,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/temporary-link': {
+      id: '/temporary-link'
+      path: '/temporary-link'
+      fullPath: '/temporary-link'
+      preLoaderRoute: typeof TemporaryLinkRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/square': {
@@ -505,6 +538,13 @@ declare module '@tanstack/react-router' {
       path: '/idphoto'
       fullPath: '/idphoto'
       preLoaderRoute: typeof IdphotoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/host-single-html': {
+      id: '/host-single-html'
+      path: '/host-single-html'
+      fullPath: '/host-single-html'
+      preLoaderRoute: typeof HostSingleHtmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/games': {
@@ -628,6 +668,7 @@ const rootRouteChildren: RootRouteChildren = {
   EnsoRoute: EnsoRoute,
   FreetoolRoute: FreetoolRoute,
   GamesRoute: GamesRoute,
+  HostSingleHtmlRoute: HostSingleHtmlRoute,
   IdphotoRoute: IdphotoRoute,
   LinksRoute: LinksRoute,
   Md2htmlRoute: Md2htmlRoute,
@@ -640,6 +681,7 @@ const rootRouteChildren: RootRouteChildren = {
   RhythmRoute: RhythmRoute,
   ShowcaseRoute: ShowcaseRoute,
   SquareRoute: SquareRoute,
+  TemporaryLinkRoute: TemporaryLinkRoute,
   TermsRoute: TermsRoute,
   WardrobeRoute: WardrobeRoute,
   AlternativesCompetitorRoute: AlternativesCompetitorRoute,

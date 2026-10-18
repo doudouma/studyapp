@@ -103,6 +103,10 @@ function pageKeys(basePath: string): { name: string; desc: string } {
       return { name: "any2md.heading", desc: "any2md.subtitle" };
     case "/claude-artifact-to-link":
       return { name: "claudeArtifact.h1", desc: "claudeArtifact.desc" };
+    case "/host-single-html":
+      return { name: "hostSingleHtml.h1", desc: "hostSingleHtml.desc" };
+    case "/temporary-link":
+      return { name: "temporaryLink.h1", desc: "temporaryLink.desc" };
     case "/freetool":
       return { name: "freetool.heading", desc: "freetool.desc" };
     case "/games":

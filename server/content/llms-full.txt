@@ -3,23 +3,36 @@
 Source: https://100mini.com
 Last updated: 2026-10
 
-100mini is instant HTML hosting with no signup. You paste AI-generated HTML
-(Claude artifacts, ChatGPT output, any LLM) or upload a .html/.zip file and get
-a live, shareable link in about 30 seconds. Anonymous uploads auto-destroy after
-7 days; a free account keeps 5 pages permanently, and logged-in users can also
-set an expiry, cap the number of views, or create a one-time burn-after-reading
-link. It is aimed at people who just produced HTML with an AI tool and need to
-preview, host, or share it.
+100mini is instant single-file HTML hosting with no signup. You paste AI-generated
+HTML (Claude artifacts, ChatGPT Canvas, v0, any LLM) or upload one .html/.zip file
+and get a live, shareable link in about 30 seconds — no repository, build, or
+server. Anonymous uploads auto-destroy after 7 days; a free account keeps 5 pages
+permanently, and logged-in users can also set an expiry, cap the number of views,
+or create a one-time burn-after-reading link. It is aimed at non-technical
+creators who just produced HTML with an AI tool and need to preview, host, or
+share it — without setting up Git, a build, or a hosting account.
 
 ## How to publish a page
 1. Prepare HTML with an AI tool or an editor (single-file HTML, or a .zip with index.html).
 2. Paste the code or upload the file; optionally add a title, category and tags.
 3. Publish and copy the shareable link (or the QR code). It opens full-screen on any device.
 
+## How to host a single HTML file
+1. Paste a self-contained .html file, or upload one .html or a .zip that contains index.html at its root.
+2. Click Publish — there is no repository, commit, build step, or server to configure.
+3. Copy the URL or QR code; the page opens full-screen on any device.
+This is the fastest path for sharing an interactive prototype, a client demo, or a one-page tool without GitHub or a hosting account. See https://100mini.com/host-single-html.
+
 ## How to publish a Claude artifact as a live link
 1. In Claude, click the copy button on any HTML artifact (top-right of the code block).
 2. Paste the HTML into https://100mini.com/claude-artifact-to-link and click Publish.
 3. You get a shareable, full-screen live link in seconds — no downloads or local server.
+
+## How to create a temporary (expiring) HTML link
+1. Paste a self-contained .html file, or upload one .html or a .zip that contains index.html.
+2. Log in and choose an expiry: 1 hour, 1 day, 7 days, 30 days, or a custom duration (1 minute–30 days); optionally cap the number of views.
+3. Publish and copy the URL or QR code. When the timer ends — or the view cap is reached — the page is deleted automatically.
+Anonymous pages expire after 7 days by default, so no-account users get a temporary link out of the box. See https://100mini.com/temporary-link.
 
 ## Expiring and one-time (burn-after-reading) links
 Logged-in users can control a page's lifetime in the publish panel. All of these
@@ -36,6 +49,8 @@ Expiring and one-time pages are excluded from the Learning Square.
 
 ## Free tools
 - Claude to Link (https://100mini.com/claude-artifact-to-link): paste a Claude artifact, get a live link.
+- Single-file HTML hosting (https://100mini.com/host-single-html): paste one .html, get a shareable link — no Git or build.
+- Temporary link (https://100mini.com/temporary-link): host a page that expires on a timer, optionally with a view cap.
 - Markdown to HTML (https://100mini.com/md2html): render Markdown with 9 brand templates.
 - Any to Markdown (https://100mini.com/any2md): convert Word/PPT/Excel/PDF to Markdown locally.
 - ID photo (https://100mini.com/idphoto): AI background removal for 24 compliant ID photo sizes.
@@ -45,8 +60,12 @@ Expiring and one-time pages are excluded from the Learning Square.
 ## Comparisons
 100mini is often evaluated against other ways to put HTML online. A comparison hub
 lives at https://100mini.com/alternatives.
-- 100mini vs Netlify Drop (https://100mini.com/alternatives/netlify-drop): Netlify Drop is a doorway to the full Netlify platform (builds, functions, custom domains, free tier with 300 credits/month). 100mini is narrower: one static HTML file, no account, live link in ~30s, anonymous pages auto-destroy after 7 days. Use Netlify for apps with a build step; use 100mini to share one AI-generated file fast.
-- Also compared: Tiiny Host, CodePen, Vercel, GitHub Pages, and Claude/ChatGPT native artifact sharing.
+- 100mini vs Netlify Drop (https://100mini.com/alternatives/netlify-drop): Netlify Drop is a doorway to the full Netlify platform (builds, functions, custom domains, free tier with 300 credits/month). 100mini is narrower and aimed at non-technical creators: one static HTML file, no account, live link in ~30s, expiry/view limits and one-time burn-after-reading links, optional share to the Learning Square gallery, and anonymous pages that auto-destroy after 7 days. Use Netlify for apps with a build step; use 100mini to share one AI-generated file fast without Git or a build.
+- 100mini vs Tiiny Host (https://100mini.com/alternatives/tiiny-host): Tiiny Host is simple static hosting, but the free plan needs an account, caps uploads at 3 MB, adds a banner, and links lapse without periodic logins. 100mini is no-account and no-banner, with expiry, view limits, and one-time burn links.
+- 100mini vs CodePen (https://100mini.com/alternatives/codepen): CodePen is an editor-first, public-by-default playground (privacy needs a paid plan). 100mini hosts a finished, full-page HTML file with no editor and no public feed unless you opt in to the Learning Square gallery.
+- 100mini vs Vercel (https://100mini.com/alternatives/vercel): Vercel is a frontend cloud for real apps (Git, builds, functions, previews) and its free Hobby plan is non-commercial only. 100mini is a no-account, no-deploy link for one finished HTML file.
+- 100mini vs GitHub Pages (https://100mini.com/alternatives/github-pages): GitHub Pages requires a repository and Git, and its terms restrict commercial use. 100mini needs no repository or Git and adds expiry, view limits, and one-time burn links.
+- 100mini vs Claude artifacts / ChatGPT Canvas (https://100mini.com/alternatives/ai-native-share): in-chat sharing is one click but runs in the AI platform's sandbox, shows an "unverified" label, and may not be public. 100mini turns the same HTML into a portable, full-page link that opens anywhere.
 - Note: 100mini offers a custom link path (/p/your-name, 10 in-app points) but not a custom domain.
 
 ## Limits and pricing
