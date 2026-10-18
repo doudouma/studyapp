@@ -211,6 +211,14 @@ export function AppFooter() {
           height={24}
           rel="noopener noreferrer"
         />
+        <BadgeLink
+          href="https://productwatch.io/products/100mini?utm_source=badge"
+          imgSrc="https://productwatch.io/backend/api/v1/badge/featured?productId=2fbe6162-b55b-41a9-97e7-808b630e264e&darkMode=false"
+          label="Featured on ProductWatch"
+          width={116}
+          height={24}
+          rel=""
+        />
         {/* Fazier 校验器要求链接不含 nofollow，故此处用 rel="noopener"（跟随链接）。 */}
         <BadgeLink
           href="https://fazier.com/launches/100mini.com"
