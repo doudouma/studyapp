@@ -77,6 +77,13 @@ export const Route = createRootRoute({
       // are rendered server-only in RootDocument's <head> instead.
       links: [
         { rel: "preload", href: interFontUrl, as: "font", type: "font/woff2", crossOrigin: "anonymous" },
+        // Favicons. icon.svg is the source of truth; favicon.ico is a
+        // multi-size fallback for browsers/legacy clients that request
+        // /favicon.ico directly. apple-touch-icon for iOS home-screen bookmarks.
+        { rel: "icon", type: "image/svg+xml", href: "/icon.svg" },
+        { rel: "icon", type: "image/x-icon", sizes: "any", href: "/favicon.ico" },
+        { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
+        { rel: "mask-icon", href: "/icon-maskable.svg", color: "#006c49" },
       ] as any[],
     };
   },
