@@ -23,6 +23,7 @@ function TextLink({ href, label }: { href: string; label: string }) {
 }
 
 const BADGE_HEIGHT = 24;
+const BADGE_WIDTH = 116;
 
 function BadgeLink({
   href,
@@ -51,9 +52,10 @@ function BadgeLink({
         <img
           src={imgSrc}
           alt={label}
+          width={BADGE_WIDTH}
           height={BADGE_HEIGHT}
-          style={{ height: BADGE_HEIGHT, width: "auto", maxWidth: "100%" }}
-          className="block w-auto shrink-0 object-contain"
+          style={{ height: BADGE_HEIGHT, width: BADGE_WIDTH, maxWidth: "100%" }}
+          className="block shrink-0 object-contain"
           loading={eager ? "eager" : "lazy"}
           decoding="async"
           onError={() => setFailed(true)}
