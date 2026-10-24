@@ -22,20 +22,18 @@ function TextLink({ href, label }: { href: string; label: string }) {
   );
 }
 
+const BADGE_HEIGHT = 24;
+
 function BadgeLink({
   href,
   imgSrc,
   label,
-  width,
-  height,
   rel = "sponsored nofollow noopener",
   eager = false,
 }: {
   href: string;
   imgSrc: string;
   label: string;
-  width?: number;
-  height?: number;
   rel?: string;
   eager?: boolean;
 }) {
@@ -45,22 +43,19 @@ function BadgeLink({
       href={href}
       target="_blank"
       {...(rel ? { rel } : {})}
-      className="inline-flex items-center text-xs text-muted-foreground transition-colors hover:text-[#006c49] dark:hover:text-[#4edea3]"
+      className="inline-flex h-6 items-center text-xs text-muted-foreground transition-colors hover:text-[#006c49] dark:hover:text-[#4edea3]"
     >
       {failed ? (
-        label
+        <span className="inline-flex h-6 items-center leading-6">{label}</span>
       ) : (
         <img
           src={imgSrc}
           alt={label}
-          width={width}
-          height={height}
-          style={
-            width || height
-              ? { width: width ?? "auto", height: height ?? "auto" }
-              : { height: 24, width: "auto" }
-          }
+          height={BADGE_HEIGHT}
+          style={{ height: BADGE_HEIGHT, width: "auto", maxWidth: "100%" }}
+          className="block w-auto shrink-0 object-contain"
           loading={eager ? "eager" : "lazy"}
+          decoding="async"
           onError={() => setFailed(true)}
         />
       )}
@@ -158,8 +153,6 @@ export function AppFooter() {
           href="https://startupfa.me/s/100mini?utm_source=100mini.com"
           imgSrc="https://startupfa.me/badges/featured/default.webp"
           label="100mini - Featured on Startup Fame"
-          width={76}
-          height={24}
           rel=""
           eager
         />
@@ -207,24 +200,18 @@ export function AppFooter() {
           href="https://findly.tools/100mini?utm_source=100mini"
           imgSrc="https://findly.tools/badges/findly-tools-badge-light.svg"
           label="Featured on Findly.tools"
-          width={76}
-          height={24}
           rel="noopener noreferrer"
         />
         <BadgeLink
           href="https://productwatch.io/products/100mini?utm_source=badge"
           imgSrc="https://productwatch.io/backend/api/v1/badge/featured?productId=2fbe6162-b55b-41a9-97e7-808b630e264e&darkMode=false"
           label="Featured on ProductWatch"
-          width={116}
-          height={24}
           rel=""
         />
         <BadgeLink
           href="https://tinylaunch.com"
           imgSrc="https://tinylaunch.com/tinylaunch_badge_featured_on.svg"
           label="Featured on TinyLaunch"
-          width={79}
-          height={24}
           rel="noopener"
         />
         {/* Fazier 校验器要求链接不含 nofollow，故此处用 rel="noopener"（跟随链接）。 */}
