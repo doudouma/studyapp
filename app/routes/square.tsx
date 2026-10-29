@@ -116,6 +116,14 @@ function SquarePage() {
     return () => observer.disconnect();
   }, []);
 
+  const handleDeleted = (id: string) => {
+    setAllItems((prev) => {
+      const next = prev.filter((item) => item.id !== id);
+      allItemsRef.current = next;
+      return next;
+    });
+  };
+
   const allTags = Array.from(
     new Set(
       allItems
@@ -215,7 +223,7 @@ function SquarePage() {
           )}
 
           {/* Grid */}
-          <SquareGrid items={filtered} />
+          <SquareGrid items={filtered} onDeleted={handleDeleted} />
 
           {/* Infinite scroll sentinel */}
           <div ref={sentinelRef} className="h-4" />

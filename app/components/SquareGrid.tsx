@@ -1,10 +1,23 @@
 import { useState } from "react";
-import { FileText, Eye } from "lucide-react";
+import { FileText, Eye, Loader2, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { SquareItem } from "@shared/types/square";
+import { useAuth } from "~/lib/auth-context";
+import { deleteAdminPage } from "~/features/admin/api";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
+import { Button } from "~/components/ui/button";
 
 interface SquareGridProps {
   items: SquareItem[];
+  onDeleted?: (id: string) => void;
 }
 
 function getCategoryColor(cat: string): string {
@@ -49,8 +62,31 @@ function PreviewCell({ item, index }: { item: SquareItem; index: number }) {
   );
 }
 
-export function SquareGrid({ items }: SquareGridProps) {
+export function SquareGrid({ items, onDeleted }: SquareGridProps) {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
+  const [deleteTarget, setDeleteTarget] = useState<SquareItem | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
+
+  const handleDelete = async (target: SquareItem) => {
+    setDeleting(true);
+    setDeleteError("");
+    try {
+      const result = await deleteAdminPage(target.id);
+      if (!result.ok) {
+        setDeleteError(result.error || t("admin.page.deleteFailed"));
+        return;
+      }
+      onDeleted?.(target.id);
+      setDeleteTarget(null);
+    } catch {
+      setDeleteError(t("admin.page.deleteFailed"));
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const getCategoryLabel = (cat: string) => {
     const labels: Record<string, string> = {
@@ -83,78 +119,133 @@ export function SquareGrid({ items }: SquareGridProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {items.map((item, index) => (
-        <article
-          key={item.id}
-          className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] overflow-hidden group hover:shadow-sm transition-all duration-300"
-        >
-          {/* HTML preview via iframe */}
-          <a
-            href={`/p/${item.slug ?? item.id}`}
-            target="_blank"
-            className="relative block overflow-hidden"
+    <>
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {items.map((item, index) => (
+          <article
+            key={item.id}
+            className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] overflow-hidden group hover:shadow-sm transition-all duration-300"
           >
-            <div className="relative overflow-hidden bg-muted" style={{ aspectRatio: "2/3" }}>
-              <PreviewCell item={item} index={index} />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4 z-10">
-                <span className="flex items-center gap-2 text-sm font-medium text-white">
-                  <Eye className="size-4" />
-                  {t("square.viewPage")}
-                </span>
+            {/* HTML preview via iframe */}
+            <a
+              href={`/p/${item.slug ?? item.id}`}
+              target="_blank"
+              className="relative block overflow-hidden"
+            >
+              <div className="relative overflow-hidden bg-muted" style={{ aspectRatio: "2/3" }}>
+                <PreviewCell item={item} index={index} />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4 z-10">
+                  <span className="flex items-center gap-2 text-sm font-medium text-white">
+                    <Eye className="size-4" />
+                    {t("square.viewPage")}
+                  </span>
+                </div>
               </div>
-            </div>
-          </a>
+            </a>
 
-          {/* Info */}
-          <div className="p-4">
-            <div className="flex flex-wrap items-center gap-1.5 mb-2">
-              <span
-                className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${getCategoryColor(item.category)}`}
-              >
-                {getCategoryLabel(item.category)}
-              </span>
-              {item.tags && item.tags.split(/[,，]+/).map((tag) => tag.trim()).filter(Boolean).map((tag) => (
+            {/* Info */}
+            <div className="p-4">
+              <div className="flex flex-wrap items-center gap-1.5 mb-2">
                 <span
-                  key={tag}
-                  className="inline-block px-2 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground"
+                  className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${getCategoryColor(item.category)}`}
                 >
-                  {tag.trim()}
+                  {getCategoryLabel(item.category)}
                 </span>
-              ))}
-            </div>
-            <h3 className="text-base font-semibold text-foreground truncate">
-              {item.title || t("square.unnamed")}
-            </h3>
-            <div className="mt-3 flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                {item.userName ? (
-                  <>
-                    {item.userImage ? (
-                      <img
-                        src={item.userImage}
-                        alt={item.userName}
-                        className="size-5 rounded-full"
-                      />
-                    ) : (
-                      <div className="size-5 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary">
-                        {item.userName.charAt(0)}
-                      </div>
-                    )}
-                    <span>{item.userName}</span>
-                  </>
-                ) : (
-                  <span>{t("square.anonymous")}</span>
-                )}
+                {item.tags && item.tags.split(/[,，]+/).map((tag) => tag.trim()).filter(Boolean).map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-block px-2 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground"
+                  >
+                    {tag.trim()}
+                  </span>
+                ))}
               </div>
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Eye className="size-3.5" />
-                {item.viewCount}
+              <h3 className="text-base font-semibold text-foreground truncate">
+                {item.title || t("square.unnamed")}
+              </h3>
+              <div className="mt-3 flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  {item.userName ? (
+                    <>
+                      {item.userImage ? (
+                        <img
+                          src={item.userImage}
+                          alt={item.userName}
+                          className="size-5 rounded-full"
+                        />
+                      ) : (
+                        <div className="size-5 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary">
+                          {item.userName.charAt(0)}
+                        </div>
+                      )}
+                      <span>{item.userName}</span>
+                    </>
+                  ) : (
+                    <span>{t("square.anonymous")}</span>
+                  )}
+                </div>
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1">
+                    <Eye className="size-3.5" />
+                    {item.viewCount}
+                  </span>
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDeleteError("");
+                        setDeleteTarget(item);
+                      }}
+                      className="flex items-center gap-1 text-destructive hover:text-destructive/80 transition-colors"
+                      title={t("common.delete")}
+                      aria-label={t("common.delete")}
+                    >
+                      <Trash2 className="size-3.5" />
+                      {t("common.delete")}
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        </article>
-      ))}
-    </div>
+          </article>
+        ))}
+      </div>
+
+      <Dialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => {
+          if (!open && !deleting) setDeleteTarget(null);
+        }}
+      >
+        <DialogContent className="sm:max-w-sm" showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle>{t("admin.page.deleteTitle")}</DialogTitle>
+            <DialogDescription>
+              {t("admin.page.deleteDesc", {
+                name: deleteTarget?.title || t("square.unnamed"),
+              })}
+            </DialogDescription>
+          </DialogHeader>
+          {deleteError && <p className="text-sm text-destructive">{deleteError}</p>}
+          <DialogFooter>
+            <DialogClose render={<Button variant="outline" disabled={deleting}>{t("common.cancel")}</Button>} />
+            <Button
+              variant="destructive"
+              disabled={deleting}
+              onClick={() => handleDelete(deleteTarget as SquareItem)}
+            >
+              {deleting ? (
+                <>
+                  <Loader2 className="size-4 animate-spin mr-1" />
+                  {t("common.deleting")}
+                </>
+              ) : (
+                t("common.confirmDelete")
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
