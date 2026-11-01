@@ -254,8 +254,6 @@ export function AppFooter() {
               imgSrc="https://dofollow.tools/badge/badge_light.svg"
               label="Featured on Dofollow.Tools"
               rel="noopener"
-              width={200}
-              height={54}
             />
           </div>
         </div>
