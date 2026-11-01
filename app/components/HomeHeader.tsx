@@ -303,6 +303,7 @@ export function AppNav() {
                 <NavLink href="/square">{t("nav.square")}</NavLink>
               </div>
               <NavLink href="/showcase">{t("nav.showcase")}</NavLink>
+              <NavLink href="/100-questions">{t("nav.questions")}</NavLink>
               <GamesDropdown />
               <ToolsDropdown />
             </div>
@@ -349,6 +350,7 @@ export function AppNav() {
                 <MobileNavLink href="/square" onClick={() => setMobileNavOpen(false)}>{t("nav.square")}</MobileNavLink>
               </div>
               <MobileNavLink href="/showcase" onClick={() => setMobileNavOpen(false)}>{t("nav.showcase")}</MobileNavLink>
+            <MobileNavLink href="/100-questions" onClick={() => setMobileNavOpen(false)}>{t("nav.questions")}</MobileNavLink>
               <MobileGroup label={t("nav.tools")}>
                 <MobileNavLink href="/freetool" onClick={() => setMobileNavOpen(false)}>{t("nav.toolsAll")}</MobileNavLink>
                 <MobileNavLink href="/claude-artifact-to-link" onClick={() => setMobileNavOpen(false)}>{t("nav.claudeArtifact")}</MobileNavLink>
@@ -395,6 +397,7 @@ export function AppNav() {
               <NavLink href="/square">{t("nav.square")}</NavLink>
             </div>
             <NavLink href="/showcase">{t("nav.showcase")}</NavLink>
+            <NavLink href="/100-questions">{t("nav.questions")}</NavLink>
             <GamesDropdown />
             <ToolsDropdown />
             <NavLink href="/links">{t("nav.profile")}</NavLink>
@@ -482,6 +485,7 @@ export function AppNav() {
               <MobileNavLink href="/square" onClick={() => setMobileNavOpen(false)}>{t("nav.square")}</MobileNavLink>
             </div>
             <MobileNavLink href="/showcase" onClick={() => setMobileNavOpen(false)}>{t("nav.showcase")}</MobileNavLink>
+            <MobileNavLink href="/100-questions" onClick={() => setMobileNavOpen(false)}>{t("nav.questions")}</MobileNavLink>
             <MobileGroup label={t("nav.tools")}>
               <MobileNavLink href="/freetool" onClick={() => setMobileNavOpen(false)}>{t("nav.toolsAll")}</MobileNavLink>
               <MobileNavLink href="/pomodoro" onClick={() => setMobileNavOpen(false)}>{t("nav.pomodoro")}</MobileNavLink>

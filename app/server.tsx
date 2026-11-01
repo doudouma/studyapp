@@ -81,6 +81,20 @@ app.use("*", async (c, next) => {
   c.header("Strict-Transport-Security", HSTS);
 });
 
+// Advertise the Markdown alternate for 100 Questions detail pages. Agents that
+// prefer plain text can follow this Link header instead of parsing the HTML.
+app.use("*", async (c, next) => {
+  await next();
+  const url = new URL(c.req.url);
+  if (!/^\/(?:(?:zh|es|pt|fr)\/)?100-questions\/[a-z0-9-]+$/.test(url.pathname)) return;
+  const type = c.res.headers.get("content-type") ?? "";
+  if (!type.includes("text/html")) return;
+  c.header(
+    "Link",
+    `<${url.origin}${url.pathname}.md>; rel="alternate"; type="text/markdown"`,
+  );
+});
+
 // Inject local Cloudflare bindings in dev mode
 app.use("*", async (c, next) => {
   if (!c.env?.D1) {

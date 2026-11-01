@@ -36,10 +36,12 @@ import { Route as BurnAfterReadingLinkRouteImport } from './routes/burn-after-re
 import { Route as Any2mdRouteImport } from './routes/any2md'
 import { Route as AlternativesRouteImport } from './routes/alternatives'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as R100QuestionsRouteImport } from './routes/100-questions'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShowcaseSlugRouteImport } from './routes/showcase_.$slug'
 import { Route as PapercutViewRouteImport } from './routes/papercut_.view'
 import { Route as AlternativesCompetitorRouteImport } from './routes/alternatives_.$competitor'
+import { Route as R100QuestionsSlugRouteImport } from './routes/100-questions_.$slug'
 
 const WardrobeRoute = WardrobeRouteImport.update({
   id: '/wardrobe',
@@ -176,6 +178,11 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const R100QuestionsRoute = R100QuestionsRouteImport.update({
+  id: '/100-questions',
+  path: '/100-questions',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -196,9 +203,15 @@ const AlternativesCompetitorRoute = AlternativesCompetitorRouteImport.update({
   path: '/alternatives/$competitor',
   getParentRoute: () => rootRouteImport,
 } as any)
+const R100QuestionsSlugRoute = R100QuestionsSlugRouteImport.update({
+  id: '/100-questions_/$slug',
+  path: '/100-questions/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/100-questions': typeof R100QuestionsRoute
   '/admin': typeof AdminRoute
   '/alternatives': typeof AlternativesRoute
   '/any2md': typeof Any2mdRoute
@@ -226,12 +239,14 @@ export interface FileRoutesByFullPath {
   '/temporary-link': typeof TemporaryLinkRoute
   '/terms': typeof TermsRoute
   '/wardrobe': typeof WardrobeRoute
+  '/100-questions/$slug': typeof R100QuestionsSlugRoute
   '/alternatives/$competitor': typeof AlternativesCompetitorRoute
   '/papercut/view': typeof PapercutViewRoute
   '/showcase/$slug': typeof ShowcaseSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/100-questions': typeof R100QuestionsRoute
   '/admin': typeof AdminRoute
   '/alternatives': typeof AlternativesRoute
   '/any2md': typeof Any2mdRoute
@@ -259,6 +274,7 @@ export interface FileRoutesByTo {
   '/temporary-link': typeof TemporaryLinkRoute
   '/terms': typeof TermsRoute
   '/wardrobe': typeof WardrobeRoute
+  '/100-questions/$slug': typeof R100QuestionsSlugRoute
   '/alternatives/$competitor': typeof AlternativesCompetitorRoute
   '/papercut/view': typeof PapercutViewRoute
   '/showcase/$slug': typeof ShowcaseSlugRoute
@@ -266,6 +282,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/100-questions': typeof R100QuestionsRoute
   '/admin': typeof AdminRoute
   '/alternatives': typeof AlternativesRoute
   '/any2md': typeof Any2mdRoute
@@ -293,6 +310,7 @@ export interface FileRoutesById {
   '/temporary-link': typeof TemporaryLinkRoute
   '/terms': typeof TermsRoute
   '/wardrobe': typeof WardrobeRoute
+  '/100-questions_/$slug': typeof R100QuestionsSlugRoute
   '/alternatives_/$competitor': typeof AlternativesCompetitorRoute
   '/papercut_/view': typeof PapercutViewRoute
   '/showcase_/$slug': typeof ShowcaseSlugRoute
@@ -301,6 +319,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/100-questions'
     | '/admin'
     | '/alternatives'
     | '/any2md'
@@ -328,12 +347,14 @@ export interface FileRouteTypes {
     | '/temporary-link'
     | '/terms'
     | '/wardrobe'
+    | '/100-questions/$slug'
     | '/alternatives/$competitor'
     | '/papercut/view'
     | '/showcase/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/100-questions'
     | '/admin'
     | '/alternatives'
     | '/any2md'
@@ -361,12 +382,14 @@ export interface FileRouteTypes {
     | '/temporary-link'
     | '/terms'
     | '/wardrobe'
+    | '/100-questions/$slug'
     | '/alternatives/$competitor'
     | '/papercut/view'
     | '/showcase/$slug'
   id:
     | '__root__'
     | '/'
+    | '/100-questions'
     | '/admin'
     | '/alternatives'
     | '/any2md'
@@ -394,6 +417,7 @@ export interface FileRouteTypes {
     | '/temporary-link'
     | '/terms'
     | '/wardrobe'
+    | '/100-questions_/$slug'
     | '/alternatives_/$competitor'
     | '/papercut_/view'
     | '/showcase_/$slug'
@@ -401,6 +425,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  R100QuestionsRoute: typeof R100QuestionsRoute
   AdminRoute: typeof AdminRoute
   AlternativesRoute: typeof AlternativesRoute
   Any2mdRoute: typeof Any2mdRoute
@@ -428,6 +453,7 @@ export interface RootRouteChildren {
   TemporaryLinkRoute: typeof TemporaryLinkRoute
   TermsRoute: typeof TermsRoute
   WardrobeRoute: typeof WardrobeRoute
+  R100QuestionsSlugRoute: typeof R100QuestionsSlugRoute
   AlternativesCompetitorRoute: typeof AlternativesCompetitorRoute
   PapercutViewRoute: typeof PapercutViewRoute
   ShowcaseSlugRoute: typeof ShowcaseSlugRoute
@@ -624,6 +650,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/100-questions': {
+      id: '/100-questions'
+      path: '/100-questions'
+      fullPath: '/100-questions'
+      preLoaderRoute: typeof R100QuestionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -652,11 +685,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AlternativesCompetitorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/100-questions_/$slug': {
+      id: '/100-questions_/$slug'
+      path: '/100-questions/$slug'
+      fullPath: '/100-questions/$slug'
+      preLoaderRoute: typeof R100QuestionsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  R100QuestionsRoute: R100QuestionsRoute,
   AdminRoute: AdminRoute,
   AlternativesRoute: AlternativesRoute,
   Any2mdRoute: Any2mdRoute,
@@ -684,6 +725,7 @@ const rootRouteChildren: RootRouteChildren = {
   TemporaryLinkRoute: TemporaryLinkRoute,
   TermsRoute: TermsRoute,
   WardrobeRoute: WardrobeRoute,
+  R100QuestionsSlugRoute: R100QuestionsSlugRoute,
   AlternativesCompetitorRoute: AlternativesCompetitorRoute,
   PapercutViewRoute: PapercutViewRoute,
   ShowcaseSlugRoute: ShowcaseSlugRoute,

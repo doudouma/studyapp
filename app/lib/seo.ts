@@ -2,6 +2,12 @@ import i18n from "./i18n";
 import { getCompetitor } from "~/features/alternatives/data";
 import { getCaseLocales } from "@shared/showcase";
 import type { ShowcaseLocale } from "@shared/types/showcase";
+import { getQuestionLocales, getQuestionSlugs } from "@shared/questions";
+import {
+  DEFAULT_QUESTION_LOCALE,
+  QUESTION_LOCALES,
+  type QuestionLocale,
+} from "@shared/types/questions";
 import {
   LANGS,
   DEFAULT_LANG,
@@ -43,6 +49,23 @@ export function currentLang(): Lang {
 }
 
 const CASE_PATH_RE = /^\/showcase\/([a-z0-9-]+)$/;
+const QUESTION_PATH_RE = /^\/100-questions(?:\/([a-z0-9-]+))?$/;
+
+/**
+ * 「100 个问题」页面的实际可用语言。
+ * 列表页取所有文章语言的并集；详情页取该文章已有翻译。
+ * 非该栏目路径返回 null。
+ */
+function questionLocalesForPath(basePath: string): QuestionLocale[] | null {
+  const m = QUESTION_PATH_RE.exec(basePath);
+  if (!m) return null;
+  if (m[1]) return getQuestionLocales(m[1]);
+  const used = new Set<QuestionLocale>();
+  for (const slug of getQuestionSlugs()) {
+    for (const locale of getQuestionLocales(slug)) used.add(locale);
+  }
+  return QUESTION_LOCALES.filter((l) => used.has(l));
+}
 
 /** 案例详情页路径 → slug；非案例页返回 null */
 export function caseSlugFromPath(basePath: string): string | null {
@@ -58,6 +81,13 @@ export function caseSlugFromPath(basePath: string): string | null {
  * 只依赖「该案例有哪些语言」（同步索引），不需要加载正文。
  */
 export function canonicalPathFor(basePath: string, lang: Lang): string {
+  const qLocales = questionLocalesForPath(basePath);
+  if (qLocales) {
+    const loc = qLocales.includes(lang as QuestionLocale)
+      ? lang
+      : (qLocales[0] ?? DEFAULT_QUESTION_LOCALE);
+    return withLangPrefix(loc as Lang, basePath);
+  }
   const slug = caseSlugFromPath(basePath);
   if (!slug) return withLangPrefix(lang, basePath);
   const hasTranslation = getCaseLocales(slug).includes(lang as ShowcaseLocale);
@@ -71,6 +101,21 @@ export function canonicalPathFor(basePath: string, lang: Lang): string {
  * 等于告诉搜索引擎那些页面是独立语言版本，而它们内容其实是英文。
  */
 export function hreflangLinksForPath(basePath: string): HeadLink[] {
+  const qLocales = questionLocalesForPath(basePath);
+  if (qLocales) {
+    if (qLocales.length === 0) return [];
+    const links: HeadLink[] = qLocales.map((locale) => ({
+      rel: "alternate",
+      hrefLang: getBcp47(locale),
+      href: BASE_URL + withLangPrefix(locale as Lang, basePath),
+    }));
+    links.push({
+      rel: "alternate",
+      hrefLang: "x-default",
+      href: BASE_URL + withLangPrefix((qLocales[0] ?? DEFAULT_QUESTION_LOCALE) as Lang, basePath),
+    });
+    return links;
+  }
   const slug = caseSlugFromPath(basePath);
   if (!slug) return buildHreflangLinksFor(basePath, LANGS);
   const langs = getCaseLocales(slug);
@@ -97,6 +142,8 @@ function pageKeys(basePath: string): { name: string; desc: string } {
       return { name: "square.heading", desc: "square.desc" };
     case "/showcase":
       return { name: "showcase.h1", desc: "showcase.desc" };
+    case "/100-questions":
+      return { name: "questions.h1", desc: "questions.desc" };
     case "/md2html":
       return { name: "md2html.seoTitle", desc: "md2html.seoDesc" };
     case "/any2md":

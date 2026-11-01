@@ -1,7 +1,7 @@
 # 100mini — full context
 
 Source: https://100mini.com
-Last updated: 2026-10
+Last updated: 2026-11
 
 100mini is instant single-file HTML hosting with no signup. You paste AI-generated
 HTML (Claude artifacts, ChatGPT Canvas, v0, any LLM) or upload one .html/.zip file
@@ -56,6 +56,17 @@ Expiring and one-time pages are excluded from the Learning Square.
 - ID photo (https://100mini.com/idphoto): AI background removal for 24 compliant ID photo sizes.
 - Pomodoro (https://100mini.com/pomodoro), Rhythm (https://100mini.com/rhythm): focus and music tools.
 - All tools: https://100mini.com/freetool
+
+## 100 Questions guides
+- Index: https://100mini.com/100-questions
+- What it is: topic guides built around 100 questions. Each guide keeps every question in a left-hand contents menu and gives a direct answer or a source link under each heading.
+- Guides:
+  - 100 Questions About Codex — https://100mini.com/100-questions/codex-100-questions
+  - 100 Common AI Questions (mined from Reddit and X) — https://100mini.com/100-questions/ai-100-questions-2026-11-01
+- Languages: English, Chinese, Spanish, Portuguese and French. Use /zh/, /es/, /pt/ or /fr/ before /100-questions; each language has a canonical URL and hreflang alternates.
+- Machine-readable: append .md to a guide URL for a Markdown version (for example https://100mini.com/100-questions/codex-100-questions.md). The HTML page remains canonical.
+- Topics covered: Codex fundamentals and workflows; a 100-question AI question bank mined from Reddit and X, grouped into agents, prompting, coding, learning, image, local models, audio, video, RAG and monetization.
+- Freshness: each guide carries publishedAt/updatedAt dates in its frontmatter and Article JSON-LD.
 
 ## Comparisons
 100mini is often evaluated against other ways to put HTML online. A comparison hub

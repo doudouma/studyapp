@@ -588,3 +588,28 @@ select.input-comic { cursor: pointer; }
 .dark .sc-md blockquote p:first-child strong {
   color: var(--sc-accent-dark, #4edea3);
 }
+
+/* ============================================
+   100 QUESTIONS (/100-questions/{slug})
+   复用 .sc-md 的终端风正文，额外处理章节/问题标题。
+   ============================================ */
+.qs-md h2,
+.qs-md h3 { scroll-margin-top: 5rem; }
+.qs-md h2::before { content: "# "; }
+.qs-md h3 {
+  margin-top: 1.8em;
+  padding-top: 0.7em;
+  border-top: 1px dashed #e0e0e0;
+}
+.qs-md > h3:first-of-type { border-top: 0; padding-top: 0; }
+.qs-md h3::before {
+  content: "Q";
+  display: inline-block;
+  margin-right: 0.35em;
+  color: var(--sc-accent, #006c49);
+  font-size: 0.85em;
+  letter-spacing: 0.04em;
+}
+.dark .qs-md h3 { border-top-color: #243244; }
+.dark .qs-md h3::before { color: var(--sc-accent-dark, #4edea3); }
+

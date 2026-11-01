@@ -13,6 +13,12 @@ import { page } from "./db/schema";
 import { createDb } from "./db";
 import { getCaseLocales, getCaseSlugs, loadCase } from "../shared/showcase";
 import { type ShowcaseLocale } from "../shared/types/showcase";
+import { getQuestionLocales, getQuestionSlugs, loadQuestion } from "../shared/questions";
+import {
+  DEFAULT_QUESTION_LOCALE,
+  QUESTION_LOCALES,
+  type QuestionLocale,
+} from "../shared/types/questions";
 import { squareRoutes } from "./features/square/square.routes";
 import { pagesRoutes } from "./features/pages/pages.routes";
 import { adminRoutes } from "./features/admin/admin.routes";
@@ -152,6 +158,40 @@ api.get("/llms.txt", (c) => c.text(llmsTxt, 200, MD_HEADERS));
 api.get("/llms-full.txt", (c) => c.text(llmsFullTxt, 200, MD_HEADERS));
 api.get("/pricing.md", (c) => c.text(pricingMd, 200, MD_HEADERS));
 
+// Markdown versions of the 100 Questions guides, for AI agents and
+// content-negotiation clients. The HTML page stays canonical; these files are
+// noindex to avoid duplicate search results.
+function serveArticleMarkdown(
+  c: any,
+  article: { slug: string; title: string; summary: string; body: string; locale: string },
+) {
+  const htmlUrl =
+    BASE_URL + withLangPrefix(article.locale as Lang, `/100-questions/${article.slug}`);
+  const md = `# ${article.title}\n\n> ${article.summary}\n\n${article.body}\n`;
+  return c.text(md, 200, {
+    ...MD_HEADERS,
+    "Content-Language": getBcp47(article.locale),
+    Link: `<${htmlUrl}>; rel=\"canonical\"`,
+    "X-Robots-Tag": "noindex",
+  });
+}
+
+api.get("/100-questions/:file{[a-z0-9-]+\\.md}", async (c) => {
+  const slug = (c.req.param("file") ?? "").replace(/\.md$/, "");
+  const article = await loadQuestion(slug, "en");
+  if (!article) return c.notFound();
+  return serveArticleMarkdown(c, article);
+});
+
+api.get("/:lang/100-questions/:file{[a-z0-9-]+\\.md}", async (c) => {
+  const lang = c.req.param("lang") ?? "";
+  if (!(LANGS as readonly string[]).includes(lang)) return c.notFound();
+  const slug = (c.req.param("file") ?? "").replace(/\.md$/, "");
+  const article = await loadQuestion(slug, lang as Lang);
+  if (!article) return c.notFound();
+  return serveArticleMarkdown(c, article);
+});
+
 // Sitemap index — lists each per-language sitemap.
 api.get("/sitemap.xml", (c) => {
   const entries = LANGS.map(
@@ -180,6 +220,17 @@ function alternateLinksXml(basePath: string): string {
 // have a translation (plus x-default → en). Case URLs are language-prefixed like
 // every other page; untranslated cases are absent from the non-en sitemaps so the
 // English fallback version isn't indexed under a misleading language URL.
+function questionAlternateLinksXml(basePath: string, locales: QuestionLocale[]): string {
+  const lines = locales.map(
+    (l) =>
+      `\n    <xhtml:link rel="alternate" hreflang="${getBcp47(l)}" href="${BASE_URL}${withLangPrefix(l, basePath)}"/>`
+  );
+  lines.push(
+    `\n    <xhtml:link rel="alternate" hreflang="x-default" href="${BASE_URL}${withLangPrefix(DEFAULT_QUESTION_LOCALE, basePath)}"/>`
+  );
+  return lines.join("");
+}
+
 function caseAlternateLinksXml(slug: string, locales: ShowcaseLocale[]): string {
   const lines = locales.map(
     (l) =>
@@ -201,6 +252,42 @@ async function buildLangSitemap(c: any, lang: Lang): Promise<string> {
     <priority>${p.priority}</priority>${alternateLinksXml(p.loc)}
   </url>`;
   });
+
+  // 「100 个问题」栏目：列表页只在实际有内容的语言里收录，详情页按翻译收录。
+  const questionListLocales = new Set<QuestionLocale>();
+  for (const slug of getQuestionSlugs()) {
+    for (const locale of getQuestionLocales(slug)) questionListLocales.add(locale);
+  }
+  const questionListLang = lang as QuestionLocale;
+  if (questionListLocales.has(questionListLang)) {
+    const available = QUESTION_LOCALES.filter((l) => questionListLocales.has(l));
+    let listLastmod = "";
+    for (const slug of getQuestionSlugs()) {
+      const item = await loadQuestion(slug, questionListLang);
+      if (!item) continue;
+      const date = item.updatedAt ?? item.publishedAt;
+      if (date > listLastmod) listLastmod = date;
+    }
+    urls.push(`
+  <url>
+    <loc>${escapeXml(`${BASE_URL}${withLangPrefix(lang, "/100-questions")}`)}</loc>${listLastmod ? `\n    <lastmod>${listLastmod}</lastmod>` : ""}
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>${questionAlternateLinksXml("/100-questions", available)}
+  </url>`);
+  }
+
+  for (const slug of getQuestionSlugs()) {
+    const locales = getQuestionLocales(slug);
+    if (!locales.includes(questionListLang)) continue;
+    const item = await loadQuestion(slug, questionListLang);
+    if (!item) continue;
+    const lastmod = item.updatedAt ?? item.publishedAt;
+    const basePath = `/100-questions/${slug}`;
+    urls.push(`
+  <url>
+    <loc>${escapeXml(`${BASE_URL}${withLangPrefix(lang, basePath)}`)}</loc>${lastmod ? `\n    <lastmod>${lastmod}</lastmod>` : ""}${questionAlternateLinksXml(basePath, locales)}
+  </url>`);
+  }
 
   // Case library detail pages: each language sitemap lists the cases that have
   // that translation; untranslated cases fall back to English and stay en-only.

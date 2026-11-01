@@ -21,10 +21,6 @@ export const Route = createRootRoute({
     const matches: Array<{ pathname: string }> = ctx?.matches ?? [];
     const leafPath = matches.length ? matches[matches.length - 1].pathname : "/";
     const lang = currentLang();
-    // Case detail pages supply their own Article + BreadcrumbList JSON-LD in
-    // their route head(); the generic WebPage/breadcrumb graph generated here
-    // cannot know the case, so it is skipped to avoid a wrong breadcrumb.
-    const jsonLd = leafPath.startsWith("/showcase/") ? [] : buildJsonLd(leafPath, lang);
     const pageUrl = BASE_URL + canonicalPathFor(leafPath, lang);
 
     return {
@@ -64,11 +60,6 @@ export const Route = createRootRoute({
           name: "twitter:description",
           content: i18n.t("app.desc"),
         },
-        // Localized JSON-LD structured data — one set per language version.
-        // TanStack's head runtime accepts { "script:ld+json": object } entries
-        // (rendered as <script type="application/ld+json">); cast because the
-        // head type is narrower than what the runtime supports.
-        ...jsonLd.map((block) => ({ "script:ld+json": block } as any)),
       ] as any[],
       // NOTE: canonical + hreflang alternate links are NOT declared here.
       // TanStack's HeadContent re-renders `links:` on the client, which
@@ -112,6 +103,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     select: (s) => s.matches[s.matches.length - 1]?.pathname ?? "/",
   });
   const lang = currentLang();
+  // JSON-LD 由 RootDocument 渲染到 body，而不是走 head 的 scripts：
+  // HeadContent 在客户端会再次渲染 head，导致 SSR 的脚本被重复插入。
+  const rootJsonLd =
+    leafPath.startsWith("/showcase/") || leafPath.startsWith("/100-questions/")
+      ? []
+      : buildJsonLd(leafPath, lang);
   // 案例详情页各语言内容不等价（没翻译时回退英文），所以 canonical 与
   // hreflang 都由 seo.ts 按「该案例实际有哪些语言」算，不能一律按当前语言。
   const canonicalHref = BASE_URL + canonicalPathFor(leafPath, lang);
@@ -165,7 +162,16 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           <script dangerouslySetInnerHTML={{ __html: "window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-TN108SHDRR');" }} />
         </head>
         <body>
-          <div id="root">{children}</div>
+          <div id="root">
+            {rootJsonLd.map((block, index) => (
+              <script
+                key={index}
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(block).replace(/</g, "\\u003c") }}
+              />
+            ))}
+            {children}
+          </div>
           <Scripts />
           {/* TRTC Knocket SDK — async 加载，不阻塞渲染 */}
           <script async src="https://trtc.io/knocket-sdk/sdk.js?identifier=3e226a1d769ff3442f&v=1791514668378"></script>
@@ -176,6 +182,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     <>
       <HeadContent />
+      {rootJsonLd.map((block, index) => (
+        <script
+          key={index}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(block).replace(/</g, "\\u003c") }}
+        />
+      ))}
       {children}
       <Scripts />
     </>
