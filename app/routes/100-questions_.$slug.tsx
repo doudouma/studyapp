@@ -15,6 +15,19 @@ import { accentVars, getArticleBySlug } from "~/features/questions/articles";
 import { buildQuestionToc } from "~/features/questions/toc";
 import { buildQuestionArticleJsonLd } from "~/features/questions/seo";
 
+/** Keep meta descriptions near the 150–160 character sweet spot. */
+function clampDescription(text: string, max = 158): string {
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max - 1);
+  const space = cut.lastIndexOf(" ");
+  return `${(space > 80 ? cut.slice(0, space) : cut).trimEnd()}…`;
+}
+
+/** Long titles already fill the SERP; drop the brand suffix to avoid truncation. */
+function serpTitle(title: string): string {
+  return title.length > 48 ? title : `${title} — 100mini`;
+}
+
 export const Route = createFileRoute("/100-questions_/$slug")({
   loader: async ({ params }) => {
     const article = await getArticleBySlug(params.slug, currentLang());
@@ -32,21 +45,23 @@ export const Route = createFileRoute("/100-questions_/$slug")({
       };
     }
     const url = BASE_URL + withLangPrefix(article.locale, `/100-questions/${article.slug}`);
+    const description = clampDescription(article.summary);
     return {
       meta: [
-        { title: `${article.title} — 100mini` },
-        { name: "description", content: article.summary },
+        { title: serpTitle(article.title) },
+        { name: "description", content: description },
         { name: "keywords", content: article.tags.join(", ") },
         { name: "robots", content: "index, follow" },
         { property: "og:type", content: "article" },
         { property: "og:title", content: article.title },
-        { property: "og:description", content: article.summary },
+        { property: "og:description", content: description },
         { property: "og:url", content: url },
         { property: "og:site_name", content: "100mini" },
         { property: "article:published_time", content: article.publishedAt },
+        { property: "article:modified_time", content: article.updatedAt ?? article.publishedAt },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: article.title },
-        { name: "twitter:description", content: article.summary },
+        { name: "twitter:description", content: description },
       ],
     };
   },

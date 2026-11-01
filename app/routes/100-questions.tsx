@@ -41,10 +41,12 @@ export const Route = createFileRoute("/100-questions")({
 
 function QuestionsPage() {
   const { t } = useTranslation();
-  const articles = useLoaderData({ from: Route.id });
+  const allArticles = useLoaderData({ from: Route.id });
+  const lang = currentLang();
+  const articles = allArticles.filter((article) => article.locale === lang);
   const jsonLd = buildQuestionCollectionJsonLd(
     articles,
-    articles[0]?.locale ?? currentLang(),
+    lang,
     t("questions.h1"),
     t("questions.desc"),
   );

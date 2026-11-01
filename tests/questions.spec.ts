@@ -22,8 +22,9 @@ const AI = "ai-100-questions-2026-11-01";
 const VIBE = "vibe-coding-100-questions";
 const WORKBUDDY = "workbuddy-100-questions";
 const OBSIDIAN = "obsidian-100-questions";
-const CHAPTERS: Record<string, number> = { [FIRST]: 6, [AI]: 12, [VIBE]: 7, [WORKBUDDY]: 6, [OBSIDIAN]: 7 };
-const FULLY_TRANSLATED = new Set([FIRST, AI, VIBE]);
+const GITHUB = "github-100-questions";
+const CHAPTERS: Record<string, number> = { [FIRST]: 6, [AI]: 12, [VIBE]: 7, [WORKBUDDY]: 6, [OBSIDIAN]: 7, [GITHUB]: 6 };
+const FULLY_TRANSLATED = new Set(SLUGS);
 
 describe("100 questions content", () => {
   it("keeps locales in sync with the site languages", () => {
@@ -44,13 +45,10 @@ describe("100 questions content", () => {
     expect(article!.questionCount).toBeGreaterThan(0);
   });
 
-  it("ships English for every article and all locales for the fully translated ones", () => {
+  it("ships every supported language for every article", () => {
     for (const slug of SLUGS) {
       const locales = getQuestionLocales(slug);
-      expect(locales, `${slug} 缺少英文`).toContain("en");
-      if (FULLY_TRANSLATED.has(slug)) {
-        expect([...locales].sort(), `${slug} 翻译语言不全`).toEqual([...QUESTION_LOCALES].sort());
-      }
+      expect([...locales].sort(), `${slug} 翻译语言不全`).toEqual([...QUESTION_LOCALES].sort());
     }
   });
 
