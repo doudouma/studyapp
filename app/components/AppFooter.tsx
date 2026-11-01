@@ -133,6 +133,7 @@ export function AppFooter() {
               href="https://gets.tools"
               imgSrc="https://gets.tools/badge/badge_light.svg"
               label="Gets.Tools"
+              rel="noopener"
             />
             <BadgeLink
               href="https://goodaitools.com/ai/100mini"
@@ -150,6 +151,7 @@ export function AppFooter() {
               href="https://deeplaunch.io"
               imgSrc="https://deeplaunch.io/badge/badge_light.svg"
               label="DeepLaunch.io"
+              rel="noopener"
             />
             <BadgeLink
               href="https://tooldirs.com"
@@ -180,6 +182,37 @@ export function AppFooter() {
               href="https://startuptrusted.com?ref=100mini.com"
               imgSrc="https://startuptrusted.com/api/badge?type=featured&style=light"
               label="100mini on StartupTrusted"
+              rel="noopener"
+            />
+            <BadgeLink
+              href="https://turbo0.com/item/100mini"
+              imgSrc="https://img.turbo0.com/badge-listed-light.svg"
+              label="Listed on Turbo0"
+              rel="noopener noreferrer"
+            />
+            <BadgeLink
+              href="https://uno.directory"
+              imgSrc="https://uno.directory/uno-directory.svg"
+              label="Listed on Uno Directory"
+              rel="noopener"
+            />
+            <BadgeLink
+              href="https://toolfame.com/item/100mini"
+              imgSrc="https://toolfame.com/badge-light.svg"
+              label="Listed on ToolFame"
+              rel="noopener noreferrer"
+            />
+            <BadgeLink
+              href="https://launchbuff.com/products/100mini-a5vq73"
+              imgSrc="https://launchbuff.com/badge-featured-dark.svg"
+              label="Featured on LaunchBuff"
+              rel="noopener noreferrer"
+            />
+            <BadgeLink
+              href="https://saasfame.com/item/100mini"
+              imgSrc="https://saasfame.com/badge-light.svg"
+              label="Featured on SaaSFame"
+              rel="noopener noreferrer"
             />
             <BadgeLink
               href="https://doforai.tools"
