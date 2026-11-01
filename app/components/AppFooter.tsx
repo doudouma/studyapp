@@ -45,12 +45,16 @@ function BadgeLink({
   label,
   rel = "sponsored nofollow noopener",
   eager = false,
+  width = BADGE_WIDTH,
+  height = BADGE_HEIGHT,
 }: {
   href: string;
   imgSrc: string;
   label: string;
   rel?: string;
   eager?: boolean;
+  width?: number;
+  height?: number;
 }) {
   const [failed, setFailed] = useState(false);
   return (
@@ -58,17 +62,18 @@ function BadgeLink({
       href={href}
       target="_blank"
       {...(rel ? { rel } : {})}
-      className="inline-flex h-6 items-center text-xs text-muted-foreground transition-colors hover:text-[#006c49] dark:hover:text-[#4edea3]"
+      style={{ height }}
+      className="inline-flex items-center text-xs text-muted-foreground transition-colors hover:text-[#006c49] dark:hover:text-[#4edea3]"
     >
       {failed ? (
-        <span className="inline-flex h-6 items-center leading-6">{label}</span>
+        <span className="inline-flex items-center leading-6" style={{ height }}>{label}</span>
       ) : (
         <img
           src={imgSrc}
           alt={label}
-          width={BADGE_WIDTH}
-          height={BADGE_HEIGHT}
-          style={{ height: BADGE_HEIGHT, width: BADGE_WIDTH, maxWidth: "100%" }}
+          width={width}
+          height={height}
+          style={{ height, width: "auto", maxWidth: "100%" }}
           className="block shrink-0 object-contain"
           loading={eager ? "eager" : "lazy"}
           decoding="async"
@@ -243,6 +248,14 @@ export function AppFooter() {
               imgSrc="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=featured&theme=light"
               label="Featured on Fazier"
               rel="noopener"
+            />
+            <BadgeLink
+              href="https://dofollow.tools"
+              imgSrc="https://dofollow.tools/badge/badge_light.svg"
+              label="Featured on Dofollow.Tools"
+              rel="noopener"
+              width={200}
+              height={54}
             />
           </div>
         </div>
