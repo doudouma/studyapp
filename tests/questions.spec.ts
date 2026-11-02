@@ -27,7 +27,8 @@ const VIBE = "vibe-coding-100-questions";
 const WORKBUDDY = "workbuddy-100-questions";
 const OBSIDIAN = "obsidian-100-questions";
 const GITHUB = "github-100-questions";
-const CHAPTERS: Record<string, number> = { [FIRST]: 6, [AI]: 12, [VIBE]: 7, [WORKBUDDY]: 6, [OBSIDIAN]: 7, [GITHUB]: 6 };
+const JEV = "jev-100-questions";
+const CHAPTERS: Record<string, number> = { [FIRST]: 6, [AI]: 12, [VIBE]: 7, [WORKBUDDY]: 6, [OBSIDIAN]: 7, [GITHUB]: 6, [JEV]: 6 };
 const FULLY_TRANSLATED = new Set(SLUGS);
 
 describe("100 questions content", () => {

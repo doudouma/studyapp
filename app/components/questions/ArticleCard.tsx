@@ -21,6 +21,7 @@ function coverTheme(slug: string) {
   if (slug.includes("ai-")) return COVER_THEMES[1];
   if (slug.includes("github")) return COVER_THEMES[6];
   if (slug.includes("obsidian")) return COVER_THEMES[5];
+  if (slug.includes("jev")) return COVER_THEMES[4];
   let h = 0;
   for (let i = 0; i < slug.length; i++) h = (h * 31 + slug.charCodeAt(i)) >>> 0;
   return COVER_THEMES[h % COVER_THEMES.length];
