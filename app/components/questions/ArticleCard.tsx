@@ -12,6 +12,7 @@ const COVER_THEMES = [
   { from: "#be123c", to: "#5b0d1f" }, // rose
   { from: "#0f766e", to: "#083b38" }, // teal
   { from: "#24292f", to: "#0d1117" }, // github dark
+  { from: "#0e7490", to: "#083344" }, // cyan
 ];
 
 /** 根据 slug 稳定选一个封面主题：同一篇文章永远同一颜色，不同文章尽量不同 */
@@ -22,6 +23,8 @@ function coverTheme(slug: string) {
   if (slug.includes("github")) return COVER_THEMES[6];
   if (slug.includes("obsidian")) return COVER_THEMES[5];
   if (slug.includes("jev")) return COVER_THEMES[4];
+  if (slug.includes("context")) return COVER_THEMES[7];
+  if (slug.includes("workbuddy")) return COVER_THEMES[3];
   let h = 0;
   for (let i = 0; i < slug.length; i++) h = (h * 31 + slug.charCodeAt(i)) >>> 0;
   return COVER_THEMES[h % COVER_THEMES.length];

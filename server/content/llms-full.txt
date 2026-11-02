@@ -68,9 +68,10 @@ Expiring and one-time pages are excluded from the Learning Square.
   - 100 Questions About Obsidian — https://100mini.com/100-questions/obsidian-100-questions
   - 100 Questions About GitHub — https://100mini.com/100-questions/github-100-questions
   - 100 Questions About Jev — https://100mini.com/100-questions/jev-100-questions
+  - 100 Questions About Context Engineering — https://100mini.com/100-questions/context-engineering-100-questions
 - Languages: English, Chinese, Spanish, Portuguese and French. Use /zh/, /es/, /pt/ or /fr/ before /100-questions; each language has a canonical URL and hreflang alternates.
 - Machine-readable: append .md to a guide URL for a Markdown version (for example https://100mini.com/100-questions/codex-100-questions.md). The HTML page remains canonical.
-- Topics covered: Codex fundamentals and workflows; a 100-question AI question bank mined from Reddit and X; a practical Vibe Coding guide from first prototype to secure deployment, quality control and career choices; a WorkBuddy office-workflow guide covering Ask/Plan/Craft, connectors, validation and boundaries; an Obsidian + AI knowledge-base guide covering notes, links, local models, plugins and privacy; a GitHub guide covering first steps, pitfalls, search, portfolios and open-source contribution; and a Jev guide covering System One judgement models, API access, calibration, limits and rollout.
+- Topics covered: Codex fundamentals and workflows; a 100-question AI question bank mined from Reddit and X; a practical Vibe Coding guide from first prototype to secure deployment, quality control and career choices; a WorkBuddy office-workflow guide covering Ask/Plan/Craft, connectors, validation and boundaries; an Obsidian + AI knowledge-base guide covering notes, links, local models, plugins and privacy; a GitHub guide covering first steps, pitfalls, search, portfolios and open-source contribution; a Jev guide covering System One judgement models, API access, calibration, limits and rollout; and a Context Engineering guide covering context rot, window assembly, compaction, caching, instruction design and quality evaluation.
 - Freshness: each guide carries publishedAt/updatedAt dates in its frontmatter and Article JSON-LD.
 
 ## Comparisons
