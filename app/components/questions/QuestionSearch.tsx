@@ -88,7 +88,7 @@ export function QuestionSearch({
 
   return (
     <div
-      className="relative mt-4"
+      className="relative"
       style={{ fontFamily: TERMINAL_FONT }}
       onFocus={() => {
         window.clearTimeout(blurTimer.current);

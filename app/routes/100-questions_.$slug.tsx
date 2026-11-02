@@ -106,6 +106,16 @@ function QuestionArticlePage() {
               onActiveQuestionChange={setActiveQuestionId}
             />
             <div className="min-w-0">
+              <div className="sticky top-20 z-30 mb-3">
+                <QuestionSearch
+                  toc={toc}
+                  markdown={article.body}
+                  onSelect={(id) => {
+                    markVisited(id);
+                    setActiveQuestionId(id);
+                  }}
+                />
+              </div>
               <TerminalWindow
                 title={`100mini ~ /100-questions/${article.slug} — zsh`}
                 bodyClassName="p-4 text-[11.5px] sm:p-6"
@@ -177,15 +187,6 @@ function QuestionArticlePage() {
                       setActiveQuestionId(id);
                     }}
                     onReset={reset}
-                  />
-
-                  <QuestionSearch
-                    toc={toc}
-                    markdown={article.body}
-                    onSelect={(id) => {
-                      markVisited(id);
-                      setActiveQuestionId(id);
-                    }}
                   />
 
                   <details className="mt-4 rounded-lg border lg:hidden border-[#cfcfcf] bg-white px-3.5 py-3 dark:border-[#243244] dark:bg-[#0f1720]">
