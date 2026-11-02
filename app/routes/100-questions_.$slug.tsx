@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { createFileRoute, Link, notFound, useLoaderData } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { BASE_URL, currentLang, withLangPrefix } from "~/lib/seo";
@@ -5,6 +6,8 @@ import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { QuestionBody } from "~/components/questions/QuestionBody";
 import { QuestionSidebar } from "~/components/questions/QuestionSidebar";
+import { QuestionMap } from "~/components/questions/QuestionMap";
+import { QuestionSearch } from "~/components/questions/QuestionSearch";
 import {
   TerminalCmd,
   TerminalCursor,
@@ -14,6 +17,7 @@ import {
 import { accentVars, getArticleBySlug } from "~/features/questions/articles";
 import { buildQuestionToc } from "~/features/questions/toc";
 import { buildQuestionArticleJsonLd } from "~/features/questions/seo";
+import { useQuestionProgress } from "~/features/questions/progress";
 
 /** Keep meta descriptions near the 150–160 character sweet spot. */
 function clampDescription(text: string, max = 158): string {
@@ -72,7 +76,13 @@ function QuestionArticlePage() {
   const { t } = useTranslation();
   const { article, toc } = useLoaderData({ from: Route.id });
   const totalQuestions = toc.reduce((n, chapter) => n + chapter.questions.length, 0);
+  const { visited, markVisited, reset } = useQuestionProgress(article.slug, toc);
+  const [activeQuestionId, setActiveQuestionId] = useState<string | null>(null);
   const jsonLd = buildQuestionArticleJsonLd(article, t("questions.h1"));
+
+  useEffect(() => {
+    if (activeQuestionId) markVisited(activeQuestionId);
+  }, [activeQuestionId, markVisited]);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -88,7 +98,13 @@ function QuestionArticlePage() {
       <main className="flex-1">
         <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-[200px_minmax(0,1fr)] xl:grid-cols-[220px_768px] xl:justify-center">
-            <QuestionSidebar slug={article.slug} toc={toc} totalQuestions={totalQuestions} />
+            <QuestionSidebar
+              toc={toc}
+              totalQuestions={totalQuestions}
+              visited={visited}
+              onVisited={markVisited}
+              onActiveQuestionChange={setActiveQuestionId}
+            />
             <div className="min-w-0">
               <TerminalWindow
                 title={`100mini ~ /100-questions/${article.slug} — zsh`}
@@ -151,6 +167,26 @@ function QuestionArticlePage() {
                       ))}
                     </dl>
                   ) : null}
+
+                  <QuestionMap
+                    toc={toc}
+                    visited={visited}
+                    activeQuestionId={activeQuestionId}
+                    onSelect={(id) => {
+                      markVisited(id);
+                      setActiveQuestionId(id);
+                    }}
+                    onReset={reset}
+                  />
+
+                  <QuestionSearch
+                    toc={toc}
+                    markdown={article.body}
+                    onSelect={(id) => {
+                      markVisited(id);
+                      setActiveQuestionId(id);
+                    }}
+                  />
 
                   <details className="mt-4 rounded-lg border lg:hidden border-[#cfcfcf] bg-white px-3.5 py-3 dark:border-[#243244] dark:bg-[#0f1720]">
                     <summary className="cursor-pointer select-none text-[11px] font-bold text-[#000000] dark:text-[#e6edf6]">

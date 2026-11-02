@@ -29,7 +29,6 @@ Ceci est un guide « 100 questions » : une façon de découper un grand sujet e
 
 Codex est l'agent IA d'OpenAI, et il fonctionne très différemment d'un assistant conversationnel. Ce guide part de ce qu'il est, passe par l'installation, les pièges, les flux avancés et les cas concrets, puis se termine sur ses limites et ce qu'il faut en retenir.
 
-> D'après le volume Codex de la *série 100 questions* de Lei Shu, édité, traduit et légèrement complété pour ce site. [Voir la série](https://my.feishu.cn/wiki/FC6ZwnwWWi0dWpke56act61gnUd).
 
 > **Comment lire**
 >
@@ -45,7 +44,6 @@ Codex est l'agent IA d'OpenAI, et il fonctionne très différemment d'un assista
 - Committez avant les changements et arrêtez tôt les tâches en boucle. Ces deux habitudes évitent l'essentiel du retravail et du gaspillage de quota.
 - Définissez le critère d'acceptation avant de commencer : c'est la vraie ligne de partage entre un usage fluide et un usage pénible.
 
-> **Mention** : ceci est une compilation éditoriale indépendante fondée sur la *série 100 questions* de Lei Shu et sur la documentation publique de Codex disponible au moment de l'édition. Ce n'est pas de la documentation officielle d'OpenAI.
 
 
 ## 1. Fondamentaux et positionnement

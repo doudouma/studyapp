@@ -37,8 +37,6 @@ Vibe coding makes "build an app by talking" possible, but there is a long road b
 - Change one thing at a time, review after each change, and manually check anything touching money, privacy or user data.
 - "It runs" is not "it is correct". Acceptance criteria, backups and security basics are the real line between a demo and something you can ship.
 
-> Based on the Vibe Coding volume of Lei Shu's *100 Questions Series*, edited, condensed and lightly completed for this site.
-
 > This is a condensed translation: some passages are still being checked against the original OCR.
 
 ## 1. Can you really build an app by talking to AI?

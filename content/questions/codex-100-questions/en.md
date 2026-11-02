@@ -29,7 +29,6 @@ This is a "100 questions" guide: a way to break a large subject into questions, 
 
 Codex is OpenAI's AI agent, and it works very differently from a chat assistant. This guide starts with what it is, moves through setup, pitfalls, advanced workflows and real-world scenarios, then ends with its limits and what to make of it.
 
-> Based on the Codex volume of Lei Shu's *100 Questions Series*, edited, translated and lightly completed for this site. [Browse the series](https://my.feishu.cn/wiki/FC6ZwnwWWi0dWpke56act61gnUd).
 
 > **How to read**
 >
@@ -45,7 +44,6 @@ Codex is OpenAI's AI agent, and it works very differently from a chat assistant.
 - Commit before changes and stop looping tasks early. Those two habits prevent most lost work and wasted quota.
 - Define the acceptance test before you start. That is the real dividing line between smooth and painful Codex use.
 
-> **Disclosure**: this is an independent editorial compilation based on Lei Shu's *100 Questions Series* and public Codex documentation available at the time of editing. It is not official OpenAI documentation.
 
 
 ## 1. Fundamentals and positioning

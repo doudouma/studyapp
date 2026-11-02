@@ -11,6 +11,10 @@ import { buildQuestionToc } from "../app/features/questions/toc";
 import { renderQuestionBody } from "../app/features/questions/markdown";
 import { buildQuestionFaq } from "../app/features/questions/faq";
 import {
+  buildQuestionSearchIndex,
+  searchQuestions,
+} from "../app/features/questions/search";
+import {
   buildQuestionArticleJsonLd,
   buildQuestionCollectionJsonLd,
 } from "../app/features/questions/seo";
@@ -133,6 +137,24 @@ describe("100 questions content", () => {
     ) as any;
     expect(block.name).toBe("100 preguntas");
     expect(block.description).toBe("Un tema, 100 preguntas.");
+  });
+
+  it("adds copy-link anchors to question headings", async () => {
+    const article = (await loadQuestion(FIRST, "en"))!;
+    const html = renderQuestionBody(article.body);
+    expect(html).toContain('class="qs-anchor"');
+    expect(html).toContain('href="#q-1"');
+  });
+
+  it("builds a searchable index of all 100 questions", async () => {
+    const article = (await loadQuestion(FIRST, "en"))!;
+    const toc = buildQuestionToc(article.body);
+    const items = buildQuestionSearchIndex(toc, article.body);
+    expect(items).toHaveLength(100);
+    expect(items[0].chapter).not.toBe("");
+    expect(items[0].text.length).toBeGreaterThan(20);
+    expect(searchQuestions(items, "Codex").length).toBeGreaterThan(0);
+    expect(searchQuestions(items, "zzzz-not-found")).toHaveLength(0);
   });
 
   it("builds a chapter/question TOC with stable anchors", async () => {

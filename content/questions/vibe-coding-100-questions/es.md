@@ -37,7 +37,6 @@ El vibe coding hace posible «crear una app hablando», pero hay un largo camino
 - Cambia una cosa a la vez, revisa después de cada cambio y comprueba a mano todo lo que toque dinero, privacidad o datos de usuarios.
 - «Funciona» no es «está bien hecho». Los criterios de aceptación, las copias de seguridad y lo básico de seguridad son la verdadera línea entre una demo y algo que puedes publicar.
 
-> Basado en el volumen de Vibe Coding de la *serie 100 preguntas* de Lei Shu, editado, condensado y levemente completado para este sitio.
 
 > Esta es una traducción condensada: algunos pasajes todavía se están revisando respecto al OCR original.
 

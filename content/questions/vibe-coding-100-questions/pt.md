@@ -37,8 +37,6 @@ O vibe coding torna possível «criar um app falando», mas há um longo caminho
 - Mude uma coisa por vez, revise após cada mudança e confira manualmente tudo que envolve dinheiro, privacidade ou dados de usuários.
 - «Funciona» não é «está correto». Critérios de aceitação, backups e o básico de segurança são a verdadeira linha entre uma demo e algo que você pode publicar.
 
-> Baseado no volume de Vibe Coding da *série 100 perguntas* de Lei Shu, editado, condensado e levemente completado para este site.
-
 > Esta é uma tradução condensada: alguns trechos ainda estão sendo conferidos com o OCR original.
 
 ## 1. Dá para criar um app conversando com a IA?

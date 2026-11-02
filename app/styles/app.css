@@ -613,3 +613,35 @@ select.input-comic { cursor: pointer; }
 .dark .qs-md h3 { border-top-color: #243244; }
 .dark .qs-md h3::before { color: var(--sc-accent-dark, #4edea3); }
 
+
+/* 100 问地图：移动端 10×10，桌面 20×5 */
+.qs-map-grid {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 4px;
+}
+@media (min-width: 640px) {
+  .qs-map-grid {
+    grid-template-columns: repeat(20, minmax(0, 1fr));
+  }
+}
+
+/* 题目级深链：标题右侧 #，点击复制永久链接 */
+.qs-md h3 .qs-anchor {
+  margin-left: 0.45em;
+  color: var(--sc-accent, #006c49);
+  text-decoration: none;
+  font-weight: 400;
+  font-size: 0.9em;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.qs-md h3:hover .qs-anchor,
+.qs-md h3 .qs-anchor:focus-visible,
+.qs-md h3 .qs-anchor[data-copied] {
+  opacity: 1;
+}
+@media (hover: none) {
+  .qs-md h3 .qs-anchor { opacity: 0.45; }
+}
+.dark .qs-md h3 .qs-anchor { color: var(--sc-accent-dark, #4edea3); }

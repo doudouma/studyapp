@@ -24,11 +24,11 @@ export function renderQuestionBody(markdown: string): string {
       let id: string;
       if (level === "2") {
         id = isQuestionPreface(text) ? "preface" : `chapter-${++chapter}`;
-      } else {
-        const m = /^(\d+)\./.exec(text);
-        id = m ? `q-${m[1]}` : `q-x-${++fallback}`;
+        return `<h2 id="${id}"${attrs}>${inner}</h2>`;
       }
-      return `<h${level} id="${id}"${attrs}>${inner}</h${level}>`;
+      const m = /^(\d+)\./.exec(text);
+      id = m ? `q-${m[1]}` : `q-x-${++fallback}`;
+      return `<h3 id="${id}"${attrs}>${inner}<a class="qs-anchor" href="#${id}" aria-label="Copy link">#</a></h3>`;
     },
   );
 

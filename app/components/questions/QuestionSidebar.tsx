@@ -12,13 +12,17 @@ import type { QuestionTocChapter } from "~/features/questions/toc";
  * - 移动端隐藏，改用正文上方的可折叠目录
  */
 export function QuestionSidebar({
-  slug,
   toc,
   totalQuestions,
+  visited,
+  onVisited,
+  onActiveQuestionChange,
 }: {
-  slug: string;
   toc: QuestionTocChapter[];
   totalQuestions: number;
+  visited: Set<string>;
+  onVisited: (id: string) => void;
+  onActiveQuestionChange?: (id: string | null) => void;
 }) {
   const { t } = useTranslation();
   const navRef = useRef<HTMLElement>(null);
@@ -27,8 +31,6 @@ export function QuestionSidebar({
   );
   const [activeChapterId, setActiveChapterId] = useState<string | null>(toc[0]?.id ?? null);
   const [activeQuestionId, setActiveQuestionId] = useState<string | null>(null);
-  const [visited, setVisited] = useState<Set<string>>(() => new Set());
-  const [visitedReady, setVisitedReady] = useState(false);
 
   /** 展开/收起单章，不影响其它章 */
   const toggle = (id: string) => {
@@ -41,7 +43,7 @@ export function QuestionSidebar({
   };
 
   const markVisited = (id: string) => {
-    setVisited((prev) => (prev.has(id) ? prev : new Set(prev).add(id)));
+    onVisited(id);
   };
 
   // 切文章时重置展开/高亮
@@ -50,29 +52,6 @@ export function QuestionSidebar({
     setActiveQuestionId(null);
     setExpanded(new Set(toc[0] ? [toc[0].id] : []));
   }, [toc]);
-
-  // 阅读进度按文章存放在 sessionStorage：刷新/来回切换时仍能看到看过哪里
-  const storageKey = `questions-visited:${slug}`;
-  useEffect(() => {
-    setVisitedReady(false);
-    try {
-      const raw = sessionStorage.getItem(storageKey);
-      const ids = raw ? JSON.parse(raw) : [];
-      setVisited(new Set(Array.isArray(ids) ? ids.map(String) : []));
-    } catch {
-      // sessionStorage 不可用（隐私模式等）时静默降级
-      setVisited(new Set());
-    }
-    setVisitedReady(true);
-  }, [storageKey]);
-  useEffect(() => {
-    if (!visitedReady) return;
-    try {
-      sessionStorage.setItem(storageKey, JSON.stringify([...visited]));
-    } catch {
-      // ignore
-    }
-  }, [storageKey, visited, visitedReady]);
 
   /** 扁平化标题列表，按 DOM 顺序用于滚动定位 */
   const headings = useMemo(
@@ -88,16 +67,21 @@ export function QuestionSidebar({
     [toc],
   );
 
-  // 跟随正文：找到最后一个越过顶部的标题，高亮对应章节/问题
   useEffect(() => {
-    const items = headings
-      .map((h) => ({ ...h, el: document.getElementById(h.id) }))
-      .filter((h): h is typeof h & { el: HTMLElement } => Boolean(h.el));
-    if (items.length === 0) return;
+    onActiveQuestionChange?.(activeQuestionId);
+  }, [activeQuestionId, onActiveQuestionChange]);
 
+  // 跟随正文：找到最后一个越过顶部的标题，高亮对应章节/问题。
+  // 每次 update 重新查询 DOM，避免正文 HTML 被替换后持有失效节点。
+  useEffect(() => {
     let raf = 0;
     const update = () => {
       raf = 0;
+      const items = headings
+        .map((h) => ({ ...h, el: document.getElementById(h.id) }))
+        .filter((h): h is typeof h & { el: HTMLElement } => Boolean(h.el));
+      if (items.length === 0) return;
+
       const line = 112; // 顶部 sticky 导航以下
       let current = items[0];
       for (const item of items) {
@@ -143,6 +127,10 @@ export function QuestionSidebar({
     }
   }, [activeItemId]);
 
+  const readCount = toc
+    .flatMap((chapter) => chapter.questions)
+    .filter((question) => visited.has(question.id)).length;
+
   return (
     <aside className="hidden lg:block lg:self-stretch">
       <div
@@ -158,8 +146,14 @@ export function QuestionSidebar({
               questions: totalQuestions,
             })}
           >
-            {toc.length} · {totalQuestions}
+            {readCount}/{totalQuestions}
           </span>
+        </div>
+        <div className="h-0.5 bg-[#e0e0e0] dark:bg-[#243244]">
+          <div
+            className="h-full bg-[#006c49] transition-[width] dark:bg-[#4edea3]"
+            style={{ width: `${totalQuestions ? (readCount / totalQuestions) * 100 : 0}%` }}
+          />
         </div>
 
         <nav
@@ -170,7 +164,9 @@ export function QuestionSidebar({
           {toc.map((chapter) => {
             const open = expanded.has(chapter.id);
             const activeChapter = activeChapterId === chapter.id;
-            const chapterVisited = visited.has(chapter.id);
+            const chapterVisited =
+              visited.has(chapter.id) ||
+              chapter.questions.some((question) => visited.has(question.id));
             return (
               <div key={chapter.id} className="mb-0.5" data-chapter-id={chapter.id}>
                 <div
