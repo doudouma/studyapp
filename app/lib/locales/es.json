@@ -2323,5 +2323,13 @@
   "freeLib.path.details": "Ruta completa de un vistazo",
   "nav.aiLearningPath": "Ruta de IA",
   "freetool.item.aiLearningPath.title": "Calculadora de ruta de IA",
-  "freetool.item.aiLearningPath.desc": "Cuatro preguntas estiman cuánto falta para estar listo, con cursos gratis y dos libros por etapa."
+  "freetool.item.aiLearningPath.desc": "Cuatro preguntas estiman cuánto falta para estar listo, con cursos gratis y dos libros por etapa.",
+  "aiAssessment.title": "Autoevaluación de preparación en IA (2026) | 100mini",
+  "aiAssessment.desc": "Diez afirmaciones, dos minutos. Obtén una puntuación de 0 a 100 y las tres guías 100 Questions que leer después.",
+  "aiAssessment.keywords": "autoevaluación IA, test de habilidades IA, test de conocimientos IA, evaluación de competencias IA",
+  "aiAssessment.crumb": "Autoevaluación de IA",
+  "nav.aiAssessment": "Test de preparación IA",
+  "freetool.item.aiAssessment.title": "Autoevaluación de preparación en IA",
+  "freetool.item.aiAssessment.desc": "Diez afirmaciones dan una puntuación de 0 a 100, tus áreas más débiles y las próximas guías.",
+  "questions.assessmentCta": "Comprueba tu preparación en IA →"
 }

@@ -76,6 +76,7 @@ const STATIC_PAGES: { loc: string; changefreq: string; priority: string; lastmod
   { loc: "/alternatives/github-pages", changefreq: "monthly", priority: "0.7" },
   { loc: "/alternatives/ai-native-share", changefreq: "monthly", priority: "0.7" },
   { loc: "/freetool", changefreq: "weekly", priority: "0.7", lastmod: "2026-11-03" },
+  { loc: "/ai-skills-assessment", changefreq: "monthly", priority: "0.7", lastmod: "2026-11-03" },
   { loc: "/games", changefreq: "weekly", priority: "0.8" },
   { loc: "/idphoto", changefreq: "weekly", priority: "0.7" },
   // /links (My Pages) is a login-gated dashboard — intentionally excluded from

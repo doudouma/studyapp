@@ -2281,5 +2281,13 @@
   "freeLib.path.details": "Trilha completa em resumo",
   "nav.aiLearningPath": "Trilha de IA",
   "freetool.item.aiLearningPath.title": "Calculadora de trilha de IA",
-  "freetool.item.aiLearningPath.desc": "Quatro perguntas estimam quanto falta para estar pronto, com cursos grátis e dois livros por etapa."
+  "freetool.item.aiLearningPath.desc": "Quatro perguntas estimam quanto falta para estar pronto, com cursos grátis e dois livros por etapa.",
+  "aiAssessment.title": "Autoavaliação de preparação para IA (2026) | 100mini",
+  "aiAssessment.desc": "Dez afirmações, dois minutos. Receba uma pontuação de 0 a 100 e os três guias 100 Questions para ler em seguida.",
+  "aiAssessment.keywords": "autoavaliação IA, teste de habilidades IA, teste de conhecimento IA, avaliação de competências IA",
+  "aiAssessment.crumb": "Autoavaliação de IA",
+  "nav.aiAssessment": "Teste de preparação IA",
+  "freetool.item.aiAssessment.title": "Autoavaliação de preparação para IA",
+  "freetool.item.aiAssessment.desc": "Dez afirmações dão uma pontuação de 0 a 100, suas áreas mais fracas e os próximos guias.",
+  "questions.assessmentCta": "Teste sua preparação para IA →"
 }

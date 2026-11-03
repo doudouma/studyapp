@@ -2274,5 +2274,13 @@
   "freeLib.path.details": "Parcours complet en un coup d'œil",
   "nav.aiLearningPath": "Parcours IA",
   "freetool.item.aiLearningPath.title": "Calculateur de parcours IA",
-  "freetool.item.aiLearningPath.desc": "Quatre questions estiment le temps nécessaire pour être prêt, avec des cours gratuits et deux livres par étape."
+  "freetool.item.aiLearningPath.desc": "Quatre questions estiment le temps nécessaire pour être prêt, avec des cours gratuits et deux livres par étape.",
+  "aiAssessment.title": "Auto-évaluation de préparation à l'IA (2026) | 100mini",
+  "aiAssessment.desc": "Dix affirmations, deux minutes. Obtenez un score de préparation à l'IA sur 100 et les trois guides 100 Questions à lire ensuite.",
+  "aiAssessment.keywords": "auto-évaluation IA, test de compétences IA, test connaissances IA, évaluation compétences IA",
+  "aiAssessment.crumb": "Auto-évaluation IA",
+  "nav.aiAssessment": "Test de préparation IA",
+  "freetool.item.aiAssessment.title": "Auto-évaluation de préparation à l'IA",
+  "freetool.item.aiAssessment.desc": "Dix affirmations donnent un score sur 100, vos points faibles et les prochains guides à lire.",
+  "questions.assessmentCta": "Testez votre préparation à l'IA →"
 }

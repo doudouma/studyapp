@@ -24,6 +24,7 @@
 - AI Books lists: https://100mini.com/ai-books/best-ai-business-books, https://100mini.com/ai-books/best-ai-tools-books, https://100mini.com/ai-books/best-ai-design-books, https://100mini.com/ai-books/best-ai-writing-books, https://100mini.com/ai-books/best-ai-productivity-books, https://100mini.com/ai-books/best-ai-money-books, https://100mini.com/ai-books/best-ai-technical-books, https://100mini.com/ai-books/best-ai-books-for-beginners, https://100mini.com/ai-books/best-ai-books-for-engineers, https://100mini.com/ai-books/best-ai-books-for-managers, https://100mini.com/ai-books/best-ai-books-for-designers, https://100mini.com/ai-books/best-ai-books-for-writers
 - [Case library](https://100mini.com/showcase)
 - [100 Questions](https://100mini.com/100-questions): long-form topic guides built around 100 questions; append .md to any guide URL for a Markdown version
+- [AI Readiness Self-Assessment](https://100mini.com/ai-skills-assessment): 10 statements → 0–100 readiness score, weakest areas and the next 100 Questions guides to read
 - [Learning Square](https://100mini.com/square)
 - [Alternatives & comparisons](https://100mini.com/alternatives): 100mini vs Netlify Drop, Tiiny Host, CodePen, Vercel, GitHub Pages, and AI-native artifact sharing
 

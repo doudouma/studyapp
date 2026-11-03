@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, useLoaderData } from "@tanstack/react-router";
+import { createFileRoute, Link, useLoaderData } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import i18n from "~/lib/i18n";
 import { currentLang } from "~/lib/seo";
@@ -85,6 +85,12 @@ function QuestionsPage() {
               </h1>
             </div>
             <p className="mt-1 text-muted-foreground">{t("questions.subtitle")}</p>
+            <Link
+              to="/ai-skills-assessment"
+              className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline"
+            >
+              {t("questions.assessmentCta")}
+            </Link>
 
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-b border-dashed border-[#e0e0e0] pb-3 dark:border-[#243244]">
               <div className="text-[11px]">

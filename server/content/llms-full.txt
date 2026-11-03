@@ -68,6 +68,12 @@ Expiring and one-time pages are excluded from the Learning Square.
 - Learning path calculator: https://100mini.com/ai-books/learning-path — four questions estimate a realistic timeline and return free courses plus two books per stage.
 - Last updated: 2026-11-01.
 
+## AI Readiness Self-Assessment
+- URL: https://100mini.com/ai-skills-assessment
+- What it is: 10 statements scored 0–3 (Never / Sometimes / Often / Always). The total is normalized to a 100-point AI readiness score, with a level (Explorer / Practitioner / Builder), a domain breakdown, and the three lowest-scoring areas mapped to the most relevant 100 Questions guides.
+- No signup, no email. Results are shareable via URL hash.
+- Languages: English, Chinese, Spanish, Portuguese and French.
+
 ## 100 Questions guides
 - Index: https://100mini.com/100-questions
 - What it is: topic guides built around 100 questions. Each guide keeps every question in a left-hand contents menu and gives a direct answer or a source link under each heading.

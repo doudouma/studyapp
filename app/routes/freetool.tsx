@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Timer, Music, FileText, FileCode2, Camera, ArrowRight, Sparkles, PawPrint, ShieldAlert, Link2, CalendarClock } from "lucide-react";
+import { Timer, Music, FileText, FileCode2, Camera, ArrowRight, Sparkles, PawPrint, ShieldAlert, Link2, CalendarClock, ClipboardCheck } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { useTranslation } from "react-i18next";
@@ -88,6 +88,12 @@ export const Route = createFileRoute("/freetool")({
                 name: i18n.t("freetool.item.aiLearningPath.title"),
                 url: "https://100mini.com/ai-books/learning-path",
               },
+              {
+                "@type": "ListItem",
+                position: 10,
+                name: i18n.t("freetool.item.aiAssessment.title"),
+                url: "https://100mini.com/ai-skills-assessment",
+              },
             ],
           }),
         },
@@ -154,6 +160,12 @@ function FreeToolPage() {
       icon: CalendarClock,
       title: t("freetool.item.aiLearningPath.title"),
       desc: t("freetool.item.aiLearningPath.desc"),
+    },
+    {
+      href: "/ai-skills-assessment" as const,
+      icon: ClipboardCheck,
+      title: t("freetool.item.aiAssessment.title"),
+      desc: t("freetool.item.aiAssessment.desc"),
     },
   ];
 

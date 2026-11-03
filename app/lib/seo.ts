@@ -162,6 +162,8 @@ function pageKeys(basePath: string): {
       return { name: "freeLib.h1", desc: "freeLib.desc" };
     case "/ai-books/learning-path":
       return { name: "aiLearningPath.crumb", desc: "aiLearningPath.desc" };
+    case "/ai-skills-assessment":
+      return { name: "aiAssessment.crumb", desc: "aiAssessment.desc" };
     case "/100-questions":
       return { name: "questions.h1", desc: "questions.desc" };
     case "/md2html":

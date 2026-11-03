@@ -2369,5 +2369,13 @@
   "freeLib.path.details": "完整学习路径一览",
   "nav.aiLearningPath": "AI 学习路径",
   "freetool.item.aiLearningPath.title": "AI 学习路径计算器",
-  "freetool.item.aiLearningPath.desc": "回答四个问题，估算多久能准备好 AI 岗位，并给出免费课程与每个阶段两本书。"
+  "freetool.item.aiLearningPath.desc": "回答四个问题，估算多久能准备好 AI 岗位，并给出免费课程与每个阶段两本书。",
+  "aiAssessment.title": "AI 准备度自测（2026）：测试你的 AI 技能 | 100mini",
+  "aiAssessment.desc": "10 条陈述，约 2 分钟。得到 0–100 的 AI 准备度分数，以及接下来该读的 3 个 100 Questions 指南。",
+  "aiAssessment.keywords": "AI准备度自测,AI技能测试,AI能力评估,AI知识测试,AI自测",
+  "aiAssessment.crumb": "AI 准备度自测",
+  "nav.aiAssessment": "AI 准备度测试",
+  "freetool.item.aiAssessment.title": "AI 准备度自测",
+  "freetool.item.aiAssessment.desc": "10 条陈述，得到 0–100 的 AI 准备度分数、最薄弱领域和接下来该读的指南。",
+  "questions.assessmentCta": "测试你的 AI 准备度 →"
 }

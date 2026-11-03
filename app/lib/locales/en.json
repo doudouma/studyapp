@@ -2381,5 +2381,13 @@
   "freeLib.path.details": "Full path at a glance",
   "nav.aiLearningPath": "AI Learning Path",
   "freetool.item.aiLearningPath.title": "AI Learning Path Calculator",
-  "freetool.item.aiLearningPath.desc": "Four questions estimate how long until you're job-ready, with free courses and two books per stage."
+  "freetool.item.aiLearningPath.desc": "Four questions estimate how long until you're job-ready, with free courses and two books per stage.",
+  "aiAssessment.title": "AI Readiness Self-Assessment (2026): Test Your AI Skills | 100mini",
+  "aiAssessment.desc": "Ten statements, two minutes. Get a 0–100 AI readiness score and the three 100 Questions guides to read next.",
+  "aiAssessment.keywords": "AI readiness assessment, AI skills test, test your AI knowledge, AI competency assessment, AI self-assessment",
+  "aiAssessment.crumb": "AI readiness assessment",
+  "nav.aiAssessment": "AI Readiness Test",
+  "freetool.item.aiAssessment.title": "AI Readiness Self-Assessment",
+  "freetool.item.aiAssessment.desc": "Ten statements give you a 0–100 AI readiness score, your weakest areas and the next guides to read.",
+  "questions.assessmentCta": "Test your AI readiness →"
 }
