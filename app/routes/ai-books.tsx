@@ -1,0 +1,519 @@
+import { useEffect, useMemo, useRef, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
+import {
+  Heart,
+  Library,
+  Search,
+  Sparkles,
+  Star,
+  Sun,
+  TrendingUp,
+  type LucideIcon,
+} from "lucide-react";
+import i18n from "~/lib/i18n";
+import { BASE_URL, currentLang, withLangPrefix } from "~/lib/seo";
+import { AppNav } from "~/components/HomeHeader";
+import { AppFooter } from "~/components/AppFooter";
+import {
+  BOOKS,
+  BOOK_COUNT,
+  CATEGORIES,
+  TOTAL_RATINGS,
+  type Book,
+  type BookCategory,
+} from "~/features/books/data";
+
+const VIEW_KEYS = ["today", "alltime", "recommended", "rising", "foryou"] as const;
+type ViewKey = (typeof VIEW_KEYS)[number];
+type CategoryFilter = "all" | BookCategory;
+
+const RATING_OPTIONS = [0, 4.5, 4.3, 4.0] as const;
+const COUNT_OPTIONS = [0, 1000, 500, 100] as const;
+
+const CATEGORY_KEYS = Object.keys(CATEGORIES) as BookCategory[];
+const CATEGORY_COUNTS = CATEGORY_KEYS.reduce<Record<string, number>>(
+  (acc, key) => {
+    acc[key] = BOOKS.filter((b) => b.category === key).length;
+    return acc;
+  },
+  {},
+);
+
+const numberFormat = new Intl.NumberFormat("en-US");
+
+function fmt(n: number): string {
+  return numberFormat.format(n || 0);
+}
+
+function short(n: number): string {
+  const value = Number(n) || 0;
+  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`;
+  if (value >= 1_000) return `${(value / 1_000).toFixed(1).replace(/\.0$/, "")}K`;
+  return String(value);
+}
+
+function bayes(b: Book, m = 50, C = 4.3): number {
+  return ((b.rating || 0) * (b.reviews || 0) + C * m) / ((b.reviews || 0) + m);
+}
+
+function demand(b: Book): number {
+  return Math.log10((b.reviews || 0) + 10) / Math.log10(5010);
+}
+
+function quality(b: Book): number {
+  return Math.max(0, Math.min(1, (bayes(b) - 3.8) / 1.2));
+}
+
+function titleQuality(b: Book): number {
+  const title = b.title || "";
+  let q = 1;
+  if (title.length > 70) q -= Math.min(0.35, (title.length - 70) / 300);
+  if (/\b(complete|guide|master|essential|proven|step)\b/i.test(title)) q += 0.08;
+  if (/[A-Z]{4,}/.test(title)) q -= 0.1;
+  return Math.max(0, Math.min(1, q));
+}
+
+function score(b: Book): number {
+  return 0.5 * demand(b) + 0.3 * quality(b) + 0.2 * titleQuality(b);
+}
+
+function risingScore(b: Book): number {
+  return (
+    (quality(b) * 0.7 + (1 - Math.min(1, (b.reviews || 0) / 800)) * 0.3) *
+    (b.reviews > 15 ? 1 : 0.6)
+  );
+}
+
+function seeded(day: number): () => number {
+  let seed = day % 2147483647;
+  return () => {
+    seed = (seed * 48271) % 2147483647;
+    return (seed - 1) / 2147483646;
+  };
+}
+
+function shuffle<T>(items: readonly T[], day: number): T[] {
+  const result = items.slice();
+  const random = seeded(day);
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+export const Route = createFileRoute("/ai-books")({
+  head: () => {
+    const lang = currentLang();
+    const pageUrl = BASE_URL + withLangPrefix(lang, "/ai-books");
+    return {
+      meta: [
+        { title: i18n.t("aiBooks.title") },
+        { name: "description", content: i18n.t("aiBooks.desc") },
+        { name: "keywords", content: i18n.t("aiBooks.keywords") },
+        { name: "robots", content: "index, follow" },
+        { property: "og:type", content: "website" },
+        { property: "og:title", content: i18n.t("aiBooks.title") },
+        { property: "og:description", content: i18n.t("aiBooks.desc") },
+        { property: "og:url", content: pageUrl },
+        { property: "og:site_name", content: "100mini" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: i18n.t("aiBooks.title") },
+        { name: "twitter:description", content: i18n.t("aiBooks.desc") },
+      ],
+      links: [
+        { rel: "preconnect", href: "https://m.media-amazon.com" },
+        { rel: "dns-prefetch", href: "https://m.media-amazon.com" },
+      ],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            name: i18n.t("aiBooks.h1"),
+            description: i18n.t("aiBooks.desc"),
+            url: pageUrl,
+            inLanguage: lang,
+            isPartOf: { "@type": "WebSite", name: "100mini", url: BASE_URL },
+            about: { "@type": "Thing", name: "Artificial Intelligence books" },
+            mainEntity: {
+              "@type": "ItemList",
+              numberOfItems: BOOK_COUNT,
+              itemListElement: BOOKS.slice(0, 10).map((book, index) => ({
+                "@type": "ListItem",
+                position: index + 1,
+                name: book.displayTitle || book.title,
+                url: book.url,
+              })),
+            },
+          }),
+        },
+      ],
+    };
+  },
+  component: AiBooksPage,
+});
+
+interface ViewMeta {
+  key: ViewKey;
+  icon: LucideIcon;
+  label: string;
+  title: string;
+  desc: string;
+}
+
+function Chip({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={
+        active
+          ? "h-[30px] whitespace-nowrap rounded-full border border-primary bg-primary px-3.5 text-xs font-medium text-primary-foreground"
+          : "h-[30px] whitespace-nowrap rounded-full border border-border bg-card px-3.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+      }
+    >
+      {children}
+    </button>
+  );
+}
+
+function FilterRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="min-w-14 text-xs text-muted-foreground">{label}</span>
+      {children}
+    </div>
+  );
+}
+
+function AiBooksPage() {
+  const { t } = useTranslation();
+  const [view, setView] = useState<ViewKey>("recommended");
+  const [category, setCategory] = useState<CategoryFilter>("all");
+  const [rating, setRating] = useState<number>(0);
+  const [count, setCount] = useState<number>(0);
+  const [query, setQuery] = useState("");
+  const searchRef = useRef<HTMLInputElement>(null);
+  const day = useMemo(() => Math.floor(Date.now() / 86_400_000), []);
+
+  const views: ViewMeta[] = [
+    {
+      key: "today",
+      icon: Sun,
+      label: t("aiBooks.view.today.label"),
+      title: t("aiBooks.view.today.title"),
+      desc: t("aiBooks.view.today.desc"),
+    },
+    {
+      key: "alltime",
+      icon: Star,
+      label: t("aiBooks.view.alltime.label"),
+      title: t("aiBooks.view.alltime.title"),
+      desc: t("aiBooks.view.alltime.desc"),
+    },
+    {
+      key: "recommended",
+      icon: Sparkles,
+      label: t("aiBooks.view.recommended.label"),
+      title: t("aiBooks.view.recommended.title"),
+      desc: t("aiBooks.view.recommended.desc"),
+    },
+    {
+      key: "rising",
+      icon: TrendingUp,
+      label: t("aiBooks.view.rising.label"),
+      title: t("aiBooks.view.rising.title"),
+      desc: t("aiBooks.view.rising.desc"),
+    },
+    {
+      key: "foryou",
+      icon: Heart,
+      label: t("aiBooks.view.foryou.label"),
+      title: t("aiBooks.view.foryou.title"),
+      desc: t("aiBooks.view.foryou.desc"),
+    },
+  ];
+
+  const activeView = views.find((v) => v.key === view) ?? views[2];
+
+  useEffect(() => {
+    const applyHash = () => {
+      const key = window.location.hash.replace("#", "");
+      if ((VIEW_KEYS as readonly string[]).includes(key)) setView(key as ViewKey);
+    };
+    applyHash();
+    window.addEventListener("hashchange", applyHash);
+    return () => window.removeEventListener("hashchange", applyHash);
+  }, []);
+
+  useEffect(() => {
+    const handleKey = (event: KeyboardEvent) => {
+      const tag = (event.target as HTMLElement | null)?.tagName;
+      const typing =
+        tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+      if (event.key === "/" && !typing) {
+        event.preventDefault();
+        searchRef.current?.focus();
+      }
+      if (event.key === "Escape") searchRef.current?.blur();
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, []);
+
+  const books = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    let list = BOOKS.filter((book) => {
+      if (category !== "all" && book.category !== category) return false;
+      if (rating && !(book.rating >= rating)) return false;
+      if (count && !(book.reviews >= count)) return false;
+      if (!q) return true;
+      const haystack = [
+        book.title,
+        book.author,
+        book.displayAuthor,
+        book.displayTitle,
+        book.category,
+        t(`aiBooks.cat.${book.category}`),
+      ]
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(q);
+    });
+
+    if (view === "alltime") {
+      list.sort(
+        (a, b) => (b.reviews || 0) - (a.reviews || 0) || (b.rating || 0) - (a.rating || 0),
+      );
+    } else if (view === "rising") {
+      list.sort((a, b) => risingScore(b) - risingScore(a));
+    } else if (view === "foryou") {
+      return shuffle(list, day).slice(0, 24);
+    } else if (view === "today") {
+      list.sort((a, b) => score(b) - score(a));
+      return shuffle(list.slice(0, 30), day).slice(0, 12);
+    } else {
+      list.sort((a, b) => score(b) - score(a));
+    }
+
+    return list;
+  }, [view, category, rating, count, query, day, t]);
+
+  const chooseView = (key: ViewKey) => {
+    setView(key);
+    if (typeof window !== "undefined") {
+      window.history.replaceState(null, "", `#${key}`);
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen flex-col bg-background">
+      <AppNav />
+      <main className="flex-1">
+        <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:py-10">
+          <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
+            <aside className="min-w-0 lg:sticky lg:top-24 lg:self-start">
+              <nav className="flex gap-1 overflow-x-auto pb-2 lg:flex-col lg:gap-0.5 lg:overflow-visible lg:pb-0">
+                {views.map((item) => {
+                  const Icon = item.icon;
+                  const active = item.key === view;
+                  return (
+                    <button
+                      key={item.key}
+                      type="button"
+                      onClick={() => chooseView(item.key)}
+                      className={
+                        active
+                          ? "flex w-auto shrink-0 items-center gap-2.5 rounded-lg bg-primary/10 px-3 py-2 text-sm font-semibold text-primary lg:w-full"
+                          : "flex w-auto shrink-0 items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:w-full"
+                      }
+                    >
+                      <Icon className="size-4 shrink-0" />
+                      <span className="whitespace-nowrap">{item.label}</span>
+                    </button>
+                  );
+                })}
+              </nav>
+
+              <Link
+                to="/ai-books/free"
+                className="mt-2 flex w-auto shrink-0 items-center gap-2.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/10 lg:w-full"
+              >
+                <Library className="size-4 shrink-0" />
+                <span className="whitespace-nowrap">{t("aiBooks.freeLink")}</span>
+                <span className="ml-auto hidden rounded-full bg-primary px-1.5 py-0.5 text-[9px] font-bold uppercase text-primary-foreground lg:inline">
+                  Free
+                </span>
+              </Link>
+
+              <p className="mt-6 hidden px-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground lg:block">
+                {t("aiBooks.topics")}
+              </p>
+              <div className="mt-1 flex gap-1.5 overflow-x-auto pb-3 lg:mt-1.5 lg:flex-col lg:gap-px lg:overflow-visible lg:pb-0">
+                <button
+                  type="button"
+                  onClick={() => setCategory("all")}
+                  className={
+                    category === "all"
+                      ? "flex shrink-0 items-center justify-between gap-3 rounded-lg bg-muted px-3 py-2 text-sm font-semibold text-foreground lg:w-full"
+                      : "flex shrink-0 items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:w-full"
+                  }
+                >
+                  <span className="whitespace-nowrap">{t("aiBooks.cat.all")}</span>
+                  <span className="text-xs tabular-nums text-muted-foreground">
+                    {fmt(BOOK_COUNT)}
+                  </span>
+                </button>
+                {CATEGORY_KEYS.map((key) => {
+                  const active = category === key;
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => setCategory(key)}
+                      className={
+                        active
+                          ? "flex shrink-0 items-center justify-between gap-3 rounded-lg bg-muted px-3 py-2 text-sm font-semibold text-foreground lg:w-full"
+                          : "flex shrink-0 items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:w-full"
+                      }
+                    >
+                      <span className="whitespace-nowrap">{t(`aiBooks.cat.${key}`)}</span>
+                      <span className="text-xs tabular-nums text-muted-foreground">
+                        {fmt(CATEGORY_COUNTS[key] ?? 0)}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="mt-7 hidden px-3 text-xs leading-relaxed text-muted-foreground lg:block">
+                <div>{t("aiBooks.stats", { books: BOOK_COUNT, ratings: fmt(TOTAL_RATINGS) })}</div>
+              </div>
+            </aside>
+
+            <section className="min-w-0">
+              <div className="relative w-full sm:max-w-md">
+                <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  ref={searchRef}
+                  type="search"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder={t("aiBooks.searchPlaceholder")}
+                  autoComplete="off"
+                  className="h-10 w-full rounded-lg border border-border bg-card pl-9 pr-10 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-primary focus:ring-2 focus:ring-primary/15"
+                />
+                <kbd className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground sm:block">
+                  /
+                </kbd>
+              </div>
+
+              <div className="mt-6">
+                <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                  {activeView.title}
+                </h1>
+                <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+                  {activeView.desc}
+                </p>
+              </div>
+
+              <div className="mt-5 flex flex-col gap-2.5">
+                <FilterRow label={t("aiBooks.ratingLabel")}>
+                  {RATING_OPTIONS.map((value) => (
+                    <Chip
+                      key={value}
+                      active={rating === value}
+                      onClick={() => setRating(value)}
+                    >
+                      {value === 0 ? t("aiBooks.filterAll") : `${value.toFixed(1)}+`}
+                    </Chip>
+                  ))}
+                </FilterRow>
+                <FilterRow label={t("aiBooks.ratingsLabel")}>
+                  {COUNT_OPTIONS.map((value) => (
+                    <Chip
+                      key={value}
+                      active={count === value}
+                      onClick={() => setCount(value)}
+                    >
+                      {value === 0 ? t("aiBooks.filterAll") : `${fmt(value)}+`}
+                    </Chip>
+                  ))}
+                </FilterRow>
+              </div>
+
+              <div className="mt-2 lg:hidden">
+                <p className="text-xs text-muted-foreground">
+                  {t("aiBooks.stats", { books: BOOK_COUNT, ratings: fmt(TOTAL_RATINGS) })}
+                </p>
+              </div>
+
+              {books.length === 0 ? (
+                <div className="py-20 text-center text-sm text-muted-foreground">
+                  {t("aiBooks.empty")}
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-x-3 gap-y-6 py-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+                  {books.map((book, index) => (
+                    <a
+                      key={book.asin}
+                      href={`${book.url}&ascsubtag=shelf-${book.asin}-${index + 1}`}
+                      target="_blank"
+                      rel="nofollow sponsored noopener"
+                      className="group flex min-w-0 flex-col"
+                    >
+                      <div className="relative aspect-[3/4] overflow-hidden rounded-md bg-muted shadow-sm transition duration-200 group-hover:-translate-y-1 group-hover:shadow-lg">
+                        <img
+                          src={book.image}
+                          alt={book.displayTitle || book.title}
+                          loading={index < 8 ? undefined : "lazy"}
+                          fetchPriority={index === 0 ? "high" : undefined}
+                          decoding="async"
+                          className="size-full object-cover"
+                        />
+                        {book.rating ? (
+                          <span className="absolute bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-black/80 px-1.5 py-0.5 text-[10.5px] tabular-nums text-white">
+                            ★ {book.rating.toFixed(1)}
+                          </span>
+                        ) : null}
+                      </div>
+                      <h2
+                        className="mt-3 line-clamp-2 text-sm font-semibold leading-snug text-foreground"
+                        title={book.title}
+                      >
+                        {book.displayTitle || book.title}
+                      </h2>
+                      <p className="mt-1 truncate text-xs text-muted-foreground">
+                        {book.displayAuthor || "—"}
+                      </p>
+                      <p className="mt-1.5 flex items-center justify-between gap-2 whitespace-nowrap text-[11px] text-muted-foreground/80">
+                        <span>{t("aiBooks.ratingsCount", { count: short(book.reviews) })}</span>
+                        <span className="font-semibold text-primary group-hover:underline">
+                          {t("aiBooks.checkPrice")}
+                        </span>
+                      </p>
+                    </a>
+                  ))}
+                </div>
+              )}
+
+            </section>
+          </div>
+        </div>
+      </main>
+      <AppFooter />
+    </div>
+  );
+}

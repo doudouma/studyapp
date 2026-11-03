@@ -142,6 +142,10 @@ function pageKeys(basePath: string): { name: string; desc: string } {
       return { name: "square.heading", desc: "square.desc" };
     case "/showcase":
       return { name: "showcase.h1", desc: "showcase.desc" };
+    case "/ai-books":
+      return { name: "aiBooks.h1", desc: "aiBooks.desc" };
+    case "/ai-books/free":
+      return { name: "freeLib.h1", desc: "freeLib.desc" };
     case "/100-questions":
       return { name: "questions.h1", desc: "questions.desc" };
     case "/md2html":

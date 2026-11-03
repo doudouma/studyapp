@@ -105,6 +105,8 @@ export function AppFooter() {
             <li><Link to="/games" className={FOOTER_LINK}>{t("footer.games")}</Link></li>
             <li><Link to="/showcase" className={FOOTER_LINK}>{t("footer.showcase")}</Link></li>
             <li><Link to="/100-questions" className={FOOTER_LINK}>{t("footer.questions")}</Link></li>
+            <li><Link to="/ai-books" className={FOOTER_LINK}>{t("footer.aiBooks")}</Link></li>
+            <li><Link to="/ai-books/free" className={FOOTER_LINK}>{t("footer.freeLibrary")}</Link></li>
           </FooterGroup>
 
           <FooterGroup title={t("footer.group.company")}>

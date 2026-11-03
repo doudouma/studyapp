@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { Code2, Settings, LogOut, Menu, X, Bookmark, ChevronDown } from "lucide-react";
+import { Code2, Settings, LogOut, Menu, X, Bookmark, ChevronDown, User } from "lucide-react";
 import { authClient } from "~/lib/auth-client";
 import { useAuth } from "~/lib/auth-context";
 import { Button } from "~/components/ui/button";
@@ -303,7 +303,8 @@ export function AppNav() {
                 <NavLink href="/square">{t("nav.square")}</NavLink>
               </div>
               <NavLink href="/showcase">{t("nav.showcase")}</NavLink>
-              <NavLink href="/100-questions">{t("nav.questions")}</NavLink>
+  <NavLink href="/100-questions">{t("nav.questions")}</NavLink>
+            <NavLink href="/ai-books">{t("nav.aiBooks")}</NavLink>
               <GamesDropdown />
               <ToolsDropdown />
             </div>
@@ -351,6 +352,7 @@ export function AppNav() {
               </div>
               <MobileNavLink href="/showcase" onClick={() => setMobileNavOpen(false)}>{t("nav.showcase")}</MobileNavLink>
             <MobileNavLink href="/100-questions" onClick={() => setMobileNavOpen(false)}>{t("nav.questions")}</MobileNavLink>
+            <MobileNavLink href="/ai-books" onClick={() => setMobileNavOpen(false)}>{t("nav.aiBooks")}</MobileNavLink>
               <MobileGroup label={t("nav.tools")}>
                 <MobileNavLink href="/freetool" onClick={() => setMobileNavOpen(false)}>{t("nav.toolsAll")}</MobileNavLink>
                 <MobileNavLink href="/claude-artifact-to-link" onClick={() => setMobileNavOpen(false)}>{t("nav.claudeArtifact")}</MobileNavLink>
@@ -398,9 +400,9 @@ export function AppNav() {
             </div>
             <NavLink href="/showcase">{t("nav.showcase")}</NavLink>
             <NavLink href="/100-questions">{t("nav.questions")}</NavLink>
+            <NavLink href="/ai-books">{t("nav.aiBooks")}</NavLink>
             <GamesDropdown />
             <ToolsDropdown />
-            <NavLink href="/links">{t("nav.profile")}</NavLink>
           </div>
         </div>
 
@@ -447,9 +449,13 @@ export function AppNav() {
             </button>
             {menuOpen && (
               <div className="absolute right-0 top-10 z-50 w-52 rounded-lg border border-border bg-popover shadow-lg">
-                <div className="border-b px-3 py-2 text-sm text-muted-foreground">
-                  {user.name}
-                </div>
+                <button
+                  className="flex w-full items-center gap-2 border-b px-3 py-2 text-left text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                  onClick={() => { setMenuOpen(false); navigate({ to: "/links" }); }}
+                >
+                  <User className="size-4 text-muted-foreground" />
+                  <span className="truncate">{user.name}</span>
+                </button>
                 <div className="border-b px-3 py-2">
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-muted-foreground">{t("nav.points")}</span>
@@ -486,6 +492,7 @@ export function AppNav() {
             </div>
             <MobileNavLink href="/showcase" onClick={() => setMobileNavOpen(false)}>{t("nav.showcase")}</MobileNavLink>
             <MobileNavLink href="/100-questions" onClick={() => setMobileNavOpen(false)}>{t("nav.questions")}</MobileNavLink>
+            <MobileNavLink href="/ai-books" onClick={() => setMobileNavOpen(false)}>{t("nav.aiBooks")}</MobileNavLink>
             <MobileGroup label={t("nav.tools")}>
               <MobileNavLink href="/freetool" onClick={() => setMobileNavOpen(false)}>{t("nav.toolsAll")}</MobileNavLink>
               <MobileNavLink href="/pomodoro" onClick={() => setMobileNavOpen(false)}>{t("nav.pomodoro")}</MobileNavLink>
@@ -503,7 +510,6 @@ export function AppNav() {
               <MobileNavLink href="/enso" onClick={() => setMobileNavOpen(false)}>{t("nav.enso")}</MobileNavLink>
               <MobileNavLink href="/outbreak" onClick={() => setMobileNavOpen(false)}>{t("nav.outbreak")}</MobileNavLink>
             </MobileGroup>
-            <MobileNavLink href="/links" onClick={() => setMobileNavOpen(false)}>{t("nav.profile")}</MobileNavLink>
             {user.role === "admin" && (
               <MobileNavLink href="/admin" onClick={() => setMobileNavOpen(false)}>{t("nav.admin")}</MobileNavLink>
             )}

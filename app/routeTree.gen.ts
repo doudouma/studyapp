@@ -35,12 +35,14 @@ import { Route as ClaudeArtifactToLinkRouteImport } from './routes/claude-artifa
 import { Route as BurnAfterReadingLinkRouteImport } from './routes/burn-after-reading-link'
 import { Route as Any2mdRouteImport } from './routes/any2md'
 import { Route as AlternativesRouteImport } from './routes/alternatives'
+import { Route as AiBooksRouteImport } from './routes/ai-books'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as R100QuestionsRouteImport } from './routes/100-questions'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShowcaseSlugRouteImport } from './routes/showcase_.$slug'
 import { Route as PapercutViewRouteImport } from './routes/papercut_.view'
 import { Route as AlternativesCompetitorRouteImport } from './routes/alternatives_.$competitor'
+import { Route as AiBooksFreeRouteImport } from './routes/ai-books_.free'
 import { Route as R100QuestionsSlugRouteImport } from './routes/100-questions_.$slug'
 
 const WardrobeRoute = WardrobeRouteImport.update({
@@ -173,6 +175,11 @@ const AlternativesRoute = AlternativesRouteImport.update({
   path: '/alternatives',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AiBooksRoute = AiBooksRouteImport.update({
+  id: '/ai-books',
+  path: '/ai-books',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -203,6 +210,11 @@ const AlternativesCompetitorRoute = AlternativesCompetitorRouteImport.update({
   path: '/alternatives/$competitor',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AiBooksFreeRoute = AiBooksFreeRouteImport.update({
+  id: '/ai-books_/free',
+  path: '/ai-books/free',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const R100QuestionsSlugRoute = R100QuestionsSlugRouteImport.update({
   id: '/100-questions_/$slug',
   path: '/100-questions/$slug',
@@ -213,6 +225,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/100-questions': typeof R100QuestionsRoute
   '/admin': typeof AdminRoute
+  '/ai-books': typeof AiBooksRoute
   '/alternatives': typeof AlternativesRoute
   '/any2md': typeof Any2mdRoute
   '/burn-after-reading-link': typeof BurnAfterReadingLinkRoute
@@ -240,6 +253,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/wardrobe': typeof WardrobeRoute
   '/100-questions/$slug': typeof R100QuestionsSlugRoute
+  '/ai-books/free': typeof AiBooksFreeRoute
   '/alternatives/$competitor': typeof AlternativesCompetitorRoute
   '/papercut/view': typeof PapercutViewRoute
   '/showcase/$slug': typeof ShowcaseSlugRoute
@@ -248,6 +262,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/100-questions': typeof R100QuestionsRoute
   '/admin': typeof AdminRoute
+  '/ai-books': typeof AiBooksRoute
   '/alternatives': typeof AlternativesRoute
   '/any2md': typeof Any2mdRoute
   '/burn-after-reading-link': typeof BurnAfterReadingLinkRoute
@@ -275,6 +290,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/wardrobe': typeof WardrobeRoute
   '/100-questions/$slug': typeof R100QuestionsSlugRoute
+  '/ai-books/free': typeof AiBooksFreeRoute
   '/alternatives/$competitor': typeof AlternativesCompetitorRoute
   '/papercut/view': typeof PapercutViewRoute
   '/showcase/$slug': typeof ShowcaseSlugRoute
@@ -284,6 +300,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/100-questions': typeof R100QuestionsRoute
   '/admin': typeof AdminRoute
+  '/ai-books': typeof AiBooksRoute
   '/alternatives': typeof AlternativesRoute
   '/any2md': typeof Any2mdRoute
   '/burn-after-reading-link': typeof BurnAfterReadingLinkRoute
@@ -311,6 +328,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/wardrobe': typeof WardrobeRoute
   '/100-questions_/$slug': typeof R100QuestionsSlugRoute
+  '/ai-books_/free': typeof AiBooksFreeRoute
   '/alternatives_/$competitor': typeof AlternativesCompetitorRoute
   '/papercut_/view': typeof PapercutViewRoute
   '/showcase_/$slug': typeof ShowcaseSlugRoute
@@ -321,6 +339,7 @@ export interface FileRouteTypes {
     | '/'
     | '/100-questions'
     | '/admin'
+    | '/ai-books'
     | '/alternatives'
     | '/any2md'
     | '/burn-after-reading-link'
@@ -348,6 +367,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/wardrobe'
     | '/100-questions/$slug'
+    | '/ai-books/free'
     | '/alternatives/$competitor'
     | '/papercut/view'
     | '/showcase/$slug'
@@ -356,6 +376,7 @@ export interface FileRouteTypes {
     | '/'
     | '/100-questions'
     | '/admin'
+    | '/ai-books'
     | '/alternatives'
     | '/any2md'
     | '/burn-after-reading-link'
@@ -383,6 +404,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/wardrobe'
     | '/100-questions/$slug'
+    | '/ai-books/free'
     | '/alternatives/$competitor'
     | '/papercut/view'
     | '/showcase/$slug'
@@ -391,6 +413,7 @@ export interface FileRouteTypes {
     | '/'
     | '/100-questions'
     | '/admin'
+    | '/ai-books'
     | '/alternatives'
     | '/any2md'
     | '/burn-after-reading-link'
@@ -418,6 +441,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/wardrobe'
     | '/100-questions_/$slug'
+    | '/ai-books_/free'
     | '/alternatives_/$competitor'
     | '/papercut_/view'
     | '/showcase_/$slug'
@@ -427,6 +451,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   R100QuestionsRoute: typeof R100QuestionsRoute
   AdminRoute: typeof AdminRoute
+  AiBooksRoute: typeof AiBooksRoute
   AlternativesRoute: typeof AlternativesRoute
   Any2mdRoute: typeof Any2mdRoute
   BurnAfterReadingLinkRoute: typeof BurnAfterReadingLinkRoute
@@ -454,6 +479,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   WardrobeRoute: typeof WardrobeRoute
   R100QuestionsSlugRoute: typeof R100QuestionsSlugRoute
+  AiBooksFreeRoute: typeof AiBooksFreeRoute
   AlternativesCompetitorRoute: typeof AlternativesCompetitorRoute
   PapercutViewRoute: typeof PapercutViewRoute
   ShowcaseSlugRoute: typeof ShowcaseSlugRoute
@@ -643,6 +669,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AlternativesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ai-books': {
+      id: '/ai-books'
+      path: '/ai-books'
+      fullPath: '/ai-books'
+      preLoaderRoute: typeof AiBooksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -685,6 +718,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AlternativesCompetitorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ai-books_/free': {
+      id: '/ai-books_/free'
+      path: '/ai-books/free'
+      fullPath: '/ai-books/free'
+      preLoaderRoute: typeof AiBooksFreeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/100-questions_/$slug': {
       id: '/100-questions_/$slug'
       path: '/100-questions/$slug'
@@ -699,6 +739,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   R100QuestionsRoute: R100QuestionsRoute,
   AdminRoute: AdminRoute,
+  AiBooksRoute: AiBooksRoute,
   AlternativesRoute: AlternativesRoute,
   Any2mdRoute: Any2mdRoute,
   BurnAfterReadingLinkRoute: BurnAfterReadingLinkRoute,
@@ -726,6 +767,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   WardrobeRoute: WardrobeRoute,
   R100QuestionsSlugRoute: R100QuestionsSlugRoute,
+  AiBooksFreeRoute: AiBooksFreeRoute,
   AlternativesCompetitorRoute: AlternativesCompetitorRoute,
   PapercutViewRoute: PapercutViewRoute,
   ShowcaseSlugRoute: ShowcaseSlugRoute,
