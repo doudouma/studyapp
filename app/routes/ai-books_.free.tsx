@@ -271,9 +271,8 @@ function TopicButton({
 }
 
 function FreeLibraryPage() {
-  const { t, i18n: i18nInstance } = useTranslation();
-  const resourceLocale = ((i18nInstance.language || "en").split("-")[0] ??
-    "en") as ResourceLocale;
+  const { t } = useTranslation();
+  const resourceLocale = currentLang();
   const [type, setType] = useState<TypeFilter>("all");
   const [topic, setTopic] = useState<TopicFilter>("all");
   const [sort, setSort] = useState<SortKey>("reviews");

@@ -1,4 +1,5 @@
 // AI 书单的编辑内容：快速回答、按目标选书表、评分方法与 FAQ。
+// 注意：文案里的 84 本 / 26,414 条评分 / 2026-11-01 是数据快照，更新 data.ts 时需同步修改。
 // 文案按语言本地化；书名/作者保留英文原名。
 
 import type { ResourceLocale } from "~/features/books/free-resources";

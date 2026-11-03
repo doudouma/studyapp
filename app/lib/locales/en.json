@@ -2344,5 +2344,6 @@
   "aiBooks.method.volume": "Review volume",
   "aiBooks.method.quality": "Rating quality",
   "aiBooks.method.clarity": "Title clarity",
-  "aiBooks.faq.title": "AI books FAQ"
+  "aiBooks.faq.title": "AI books FAQ",
+  "aiBooks.table.summary": "{{count}} picks"
 }

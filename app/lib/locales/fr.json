@@ -2237,5 +2237,6 @@
   "aiBooks.method.volume": "Volume d'avis",
   "aiBooks.method.quality": "Qualité des notes",
   "aiBooks.method.clarity": "Clarté du titre",
-  "aiBooks.faq.title": "FAQ livres IA"
+  "aiBooks.faq.title": "FAQ livres IA",
+  "aiBooks.table.summary": "{{count}} choix"
 }

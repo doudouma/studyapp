@@ -2286,5 +2286,6 @@
   "aiBooks.method.volume": "Volumen de reseñas",
   "aiBooks.method.quality": "Calidad de la valoración",
   "aiBooks.method.clarity": "Claridad del título",
-  "aiBooks.faq.title": "Preguntas frecuentes sobre libros de IA"
+  "aiBooks.faq.title": "Preguntas frecuentes sobre libros de IA",
+  "aiBooks.table.summary": "{{count}} opciones"
 }

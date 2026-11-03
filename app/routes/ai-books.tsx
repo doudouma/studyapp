@@ -34,7 +34,6 @@ import {
   QUICK_ANSWER,
   TOP_PICKS,
 } from "~/features/books/ai-books-content";
-import type { ResourceLocale } from "~/features/books/free-resources";
 
 const VIEW_KEYS = ["today", "alltime", "recommended", "rising", "foryou"] as const;
 type ViewKey = (typeof VIEW_KEYS)[number];
@@ -186,9 +185,8 @@ function FilterRow({ label, children }: { label: string; children: React.ReactNo
 }
 
 function AiBooksPage() {
-  const { t, i18n: i18nInstance } = useTranslation();
-  const contentLocale = ((i18nInstance.language || "en").split("-")[0] ??
-    "en") as ResourceLocale;
+  const { t } = useTranslation();
+  const contentLocale = currentLang();
   const [view, setView] = useState<ViewKey>("recommended");
   const [category, setCategory] = useState<CategoryFilter>("all");
   const [rating, setRating] = useState<number>(0);
@@ -461,19 +459,17 @@ function AiBooksPage() {
                 </kbd>
               </div>
 
-              <div className="mt-6">
+              <div className="mt-5">
                 <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
                   {t("aiBooks.h1")}
                 </h1>
-                <div className="mt-3 max-w-3xl rounded-xl border border-primary/20 bg-primary/5 px-4 py-3">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-primary">
-                    {t("aiBooks.quickLabel")}
-                  </p>
-                  <p className="mt-1 text-sm leading-relaxed text-foreground/90">
-                    {QUICK_ANSWER[contentLocale]}
-                  </p>
-                </div>
-                <p className="mt-3 text-[11px] text-muted-foreground">
+                <p className="mt-2 max-w-3xl text-[13px] leading-relaxed text-muted-foreground">
+                  <span className="font-semibold text-primary">
+                    {t("aiBooks.quickLabel")}:
+                  </span>{" "}
+                  {QUICK_ANSWER[contentLocale]}
+                </p>
+                <p className="mt-2 text-[11px] text-muted-foreground">
                   {t("aiBooks.factLine", {
                     books: BOOK_COUNT,
                     ratings: fmt(TOTAL_RATINGS),
@@ -483,9 +479,20 @@ function AiBooksPage() {
                 </p>
               </div>
 
-              <section id="top-picks" className="mt-8 scroll-mt-24">
-                <h2 className="text-lg font-bold text-foreground">{t("aiBooks.table.title")}</h2>
-                <div className="mt-3 overflow-x-auto rounded-xl border border-border">
+              <details
+                id="top-picks"
+                className="group mt-4 scroll-mt-24 rounded-xl border border-border bg-card"
+              >
+                <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-2.5 [&::-webkit-details-marker]:hidden">
+                  <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" />
+                  <h2 className="text-sm font-semibold text-foreground">
+                    {t("aiBooks.table.title")}
+                  </h2>
+                  <span className="ml-auto text-[11px] font-normal text-muted-foreground">
+                    {t("aiBooks.table.summary", { count: TOP_PICKS.length })}
+                  </span>
+                </summary>
+                <div className="overflow-x-auto border-t border-border">
                   <table className="w-full min-w-[680px] text-left text-sm">
                     <thead className="bg-muted/60 text-[11px] uppercase tracking-wide text-muted-foreground">
                       <tr>
@@ -498,6 +505,8 @@ function AiBooksPage() {
                     <tbody>
                       {TOP_PICKS.map((pick) => {
                         const book = BOOKS.find((item) => item.asin === pick.asin);
+                        if (!book) return null;
+                        const separator = book.url.includes("?") ? "&" : "?";
                         return (
                           <tr key={pick.asin} className="border-t border-border align-top">
                             <td className="whitespace-nowrap px-3 py-2.5 text-xs font-medium text-foreground">
@@ -505,18 +514,16 @@ function AiBooksPage() {
                             </td>
                             <td className="px-3 py-2.5">
                               <a
-                                href={`${book?.url ?? "#"}&ascsubtag=shelf-${pick.asin}-pick`}
+                                href={`${book.url}${separator}ascsubtag=shelf-${pick.asin}-pick`}
                                 target="_blank"
                                 rel="nofollow sponsored noopener"
                                 className="font-medium text-primary hover:underline"
                               >
                                 {pick.book}
                               </a>
-                              {book ? (
-                                <span className="mt-0.5 block text-[11px] text-muted-foreground">
-                                  ★ {book.rating.toFixed(1)} · {short(book.reviews)}
-                                </span>
-                              ) : null}
+                              <span className="mt-0.5 block text-[11px] text-muted-foreground">
+                                ★ {book.rating.toFixed(1)} · {short(book.reviews)}
+                              </span>
                             </td>
                             <td className="px-3 py-2.5 text-xs text-muted-foreground">{pick.author}</td>
                             <td className="px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
@@ -528,10 +535,12 @@ function AiBooksPage() {
                     </tbody>
                   </table>
                 </div>
-                <p className="mt-2 text-[11px] text-muted-foreground">{t("aiBooks.table.note")}</p>
-              </section>
+                <p className="border-t border-border px-3 py-2 text-[11px] text-muted-foreground">
+                  {t("aiBooks.table.note")}
+                </p>
+              </details>
 
-              <div className="mt-8">
+              <div className="mt-6">
                 <h2 className="text-lg font-bold tracking-tight text-foreground">
                   {activeView.title}
                 </h2>

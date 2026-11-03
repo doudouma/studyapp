@@ -1,4 +1,5 @@
 # Best AI Books (2026)
+<!-- Keep counts in sync with app/features/books/data.ts: 84 books, 26,414 ratings, snapshot 2026-11-01. -->
 
 Source: https://100mini.com/ai-books
 Last updated: 2026-11-01

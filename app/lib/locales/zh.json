@@ -2332,5 +2332,6 @@
   "aiBooks.method.volume": "评论数量",
   "aiBooks.method.quality": "评分质量",
   "aiBooks.method.clarity": "书名清晰度",
-  "aiBooks.faq.title": "AI 书单常见问题"
+  "aiBooks.faq.title": "AI 书单常见问题",
+  "aiBooks.table.summary": "{{count}} 个选择"
 }
