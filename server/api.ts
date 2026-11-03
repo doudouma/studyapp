@@ -57,13 +57,13 @@ api.onError((err, c) => {
 // Every URL advertises its hreflang alternates via <xhtml:link> so search
 // engines know the language-region correspondence.
 
-const STATIC_PAGES: { loc: string; changefreq: string; priority: string }[] = [
+const STATIC_PAGES: { loc: string; changefreq: string; priority: string; lastmod?: string }[] = [
   { loc: "/", changefreq: "daily", priority: "1.0" },
   { loc: "/square", changefreq: "hourly", priority: "0.9" },
   { loc: "/showcase", changefreq: "weekly", priority: "0.8" },
-  { loc: "/ai-books", changefreq: "weekly", priority: "0.8" },
-  { loc: "/ai-books/free", changefreq: "weekly", priority: "0.8" },
-  { loc: "/ai-books/learning-path", changefreq: "monthly", priority: "0.7" },
+  { loc: "/ai-books", changefreq: "weekly", priority: "0.8", lastmod: "2026-11-03" },
+  { loc: "/ai-books/free", changefreq: "weekly", priority: "0.8", lastmod: "2026-11-03" },
+  { loc: "/ai-books/learning-path", changefreq: "monthly", priority: "0.7", lastmod: "2026-11-03" },
   { loc: "/md2html", changefreq: "weekly", priority: "0.8" },
   { loc: "/any2md", changefreq: "weekly", priority: "0.8" },
   { loc: "/claude-artifact-to-link", changefreq: "weekly", priority: "0.8" },
@@ -75,7 +75,7 @@ const STATIC_PAGES: { loc: string; changefreq: string; priority: string }[] = [
   { loc: "/alternatives/vercel", changefreq: "monthly", priority: "0.7" },
   { loc: "/alternatives/github-pages", changefreq: "monthly", priority: "0.7" },
   { loc: "/alternatives/ai-native-share", changefreq: "monthly", priority: "0.7" },
-  { loc: "/freetool", changefreq: "weekly", priority: "0.7" },
+  { loc: "/freetool", changefreq: "weekly", priority: "0.7", lastmod: "2026-11-03" },
   { loc: "/games", changefreq: "weekly", priority: "0.8" },
   { loc: "/idphoto", changefreq: "weekly", priority: "0.7" },
   // /links (My Pages) is a login-gated dashboard — intentionally excluded from
@@ -257,9 +257,10 @@ function caseAlternateLinksXml(slug: string, locales: ShowcaseLocale[]): string 
 async function buildLangSitemap(c: any, lang: Lang): Promise<string> {
   const urls: string[] = STATIC_PAGES.map((p) => {
     const loc = `${BASE_URL}${withLangPrefix(lang, p.loc)}`;
+    const lastmod = p.lastmod ? `\n    <lastmod>${p.lastmod}</lastmod>` : "";
     return `
   <url>
-    <loc>${loc}</loc>
+    <loc>${loc}</loc>${lastmod}
     <changefreq>${p.changefreq}</changefreq>
     <priority>${p.priority}</priority>${alternateLinksXml(p.loc)}
   </url>`;
@@ -271,6 +272,7 @@ async function buildLangSitemap(c: any, lang: Lang): Promise<string> {
     urls.push(`
   <url>
     <loc>${escapeXml(`${BASE_URL}${withLangPrefix(lang, basePath)}`)}</loc>
+    <lastmod>2026-11-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>${alternateLinksXml(basePath)}
   </url>`);
