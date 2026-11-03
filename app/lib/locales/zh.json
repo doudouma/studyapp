@@ -2365,5 +2365,6 @@
   "aiLearningPath.keywords": "AI学习路径,AI学习路线,学AI要多久,机器学习学习计划,免费AI课程",
   "aiLearningPath.crumb": "AI 学习路径计算器",
   "freeLib.path.calculator": "计算你的学习时间表 →",
-  "aiBooks.pathCta": "不知道从哪开始？计算你的 AI 学习路径 →"
+  "aiBooks.pathCta": "不知道从哪开始？计算你的 AI 学习路径 →",
+  "freeLib.path.details": "完整学习路径一览"
 }
