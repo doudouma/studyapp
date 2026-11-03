@@ -18,6 +18,8 @@
 ## Product
 - [Free tools](https://100mini.com/freetool): Claude-to-Link, Markdown to HTML, any document to Markdown, ID photo, and more
 - [Games](https://100mini.com/games)
+- [AI Books](https://100mini.com/ai-books): 84 AI books ranked by Amazon reader signal, with a free AI courses and ebooks library at /ai-books/free
+- [AI Books — Markdown](https://100mini.com/ai-books.md): machine-readable version of the AI book list, ranking method and FAQ
 - [Case library](https://100mini.com/showcase)
 - [100 Questions](https://100mini.com/100-questions): long-form topic guides built around 100 questions; append .md to any guide URL for a Markdown version
 - [Learning Square](https://100mini.com/square)

@@ -57,6 +57,14 @@ Expiring and one-time pages are excluded from the Learning Square.
 - Pomodoro (https://100mini.com/pomodoro), Rhythm (https://100mini.com/rhythm): focus and music tools.
 - All tools: https://100mini.com/freetool
 
+## AI Books
+- Shelf: https://100mini.com/ai-books — 84 AI books ranked by Amazon reader signal (review volume 50%, Bayesian-adjusted rating 30%, title clarity 20%), with sponsored placements removed before ranking. Snapshot uses 26,414 Amazon ratings captured 2026-11-01.
+- Quick picks: beginners → Co-Intelligence (Ethan Mollick); builders → AI Engineering (Chip Huyen); managers → The AI-Driven Leader (Geoff Woods); designers → UX for AI (Greg Nudelman, Daria Kempka); writers → More Than Words (John Warner).
+- Free library: https://100mini.com/ai-books/free — 30 free Udemy courses, 30 permanently free Kindle ebooks, plus 21 hand-picked free books (PDF/online), GitHub repos and video channels.
+- Languages: English, Chinese, Spanish, Portuguese and French. Prefix /zh/, /es/, /pt/ or /fr/ for localized versions; each has a canonical URL and hreflang alternates.
+- Machine-readable: https://100mini.com/ai-books.md (Markdown for AI agents; the HTML page stays canonical).
+- Last updated: 2026-11-01.
+
 ## 100 Questions guides
 - Index: https://100mini.com/100-questions
 - What it is: topic guides built around 100 questions. Each guide keeps every question in a left-hand contents menu and gives a direct answer or a source link under each heading.

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import {
+  ChevronDown,
   Heart,
   Library,
   Search,
@@ -23,6 +24,17 @@ import {
   type Book,
   type BookCategory,
 } from "~/features/books/data";
+import {
+  AI_BOOKS_UPDATED,
+  FAQ,
+  METHOD_AUTHOR,
+  METHOD_INTRO,
+  METHOD_ROWS,
+  METHOD_SOURCE,
+  QUICK_ANSWER,
+  TOP_PICKS,
+} from "~/features/books/ai-books-content";
+import type { ResourceLocale } from "~/features/books/free-resources";
 
 const VIEW_KEYS = ["today", "alltime", "recommended", "rising", "foryou"] as const;
 type ViewKey = (typeof VIEW_KEYS)[number];
@@ -126,31 +138,6 @@ export const Route = createFileRoute("/ai-books")({
         { rel: "preconnect", href: "https://m.media-amazon.com" },
         { rel: "dns-prefetch", href: "https://m.media-amazon.com" },
       ],
-      scripts: [
-        {
-          type: "application/ld+json",
-          children: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "CollectionPage",
-            name: i18n.t("aiBooks.h1"),
-            description: i18n.t("aiBooks.desc"),
-            url: pageUrl,
-            inLanguage: lang,
-            isPartOf: { "@type": "WebSite", name: "100mini", url: BASE_URL },
-            about: { "@type": "Thing", name: "Artificial Intelligence books" },
-            mainEntity: {
-              "@type": "ItemList",
-              numberOfItems: BOOK_COUNT,
-              itemListElement: BOOKS.slice(0, 10).map((book, index) => ({
-                "@type": "ListItem",
-                position: index + 1,
-                name: book.displayTitle || book.title,
-                url: book.url,
-              })),
-            },
-          }),
-        },
-      ],
     };
   },
   component: AiBooksPage,
@@ -199,7 +186,9 @@ function FilterRow({ label, children }: { label: string; children: React.ReactNo
 }
 
 function AiBooksPage() {
-  const { t } = useTranslation();
+  const { t, i18n: i18nInstance } = useTranslation();
+  const contentLocale = ((i18nInstance.language || "en").split("-")[0] ??
+    "en") as ResourceLocale;
   const [view, setView] = useState<ViewKey>("recommended");
   const [category, setCategory] = useState<CategoryFilter>("all");
   const [rating, setRating] = useState<number>(0);
@@ -318,8 +307,60 @@ function AiBooksPage() {
     }
   };
 
+  const jsonLd = useMemo(() => {
+    const topTen = BOOKS.slice()
+      .sort((a, b) => score(b) - score(a))
+      .slice(0, 10);
+    return {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "CollectionPage",
+          name: t("aiBooks.h1"),
+          description: t("aiBooks.desc"),
+          url: BASE_URL + withLangPrefix(currentLang(), "/ai-books"),
+          inLanguage: contentLocale,
+          dateModified: AI_BOOKS_UPDATED,
+          author: { "@type": "Organization", name: "100mini Editorial" },
+          publisher: { "@type": "Organization", name: "100mini", url: BASE_URL },
+          isPartOf: { "@type": "WebSite", name: "100mini", url: BASE_URL },
+          about: { "@type": "Thing", name: "Artificial Intelligence books" },
+          citation: METHOD_SOURCE[contentLocale],
+          mainEntity: {
+            "@type": "ItemList",
+            numberOfItems: BOOK_COUNT,
+            itemListElement: topTen.map((book, index) => ({
+              "@type": "ListItem",
+              position: index + 1,
+              item: {
+                "@type": "Book",
+                name: book.displayTitle || book.title,
+                author: { "@type": "Person", name: book.displayAuthor || book.author },
+                url: book.url,
+              },
+            })),
+          },
+        },
+        {
+          "@type": "FAQPage",
+          mainEntity: FAQ.map((item) => ({
+            "@type": "Question",
+            name: item.q[contentLocale],
+            acceptedAnswer: { "@type": "Answer", text: item.a[contentLocale] },
+          })),
+        },
+      ],
+    };
+  }, [contentLocale, t]);
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
       <AppNav />
       <main className="flex-1">
         <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:py-10">
@@ -422,14 +463,84 @@ function AiBooksPage() {
 
               <div className="mt-6">
                 <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                  {activeView.title}
+                  {t("aiBooks.h1")}
                 </h1>
-                <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+                <div className="mt-3 max-w-3xl rounded-xl border border-primary/20 bg-primary/5 px-4 py-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-primary">
+                    {t("aiBooks.quickLabel")}
+                  </p>
+                  <p className="mt-1 text-sm leading-relaxed text-foreground/90">
+                    {QUICK_ANSWER[contentLocale]}
+                  </p>
+                </div>
+                <p className="mt-3 text-[11px] text-muted-foreground">
+                  {t("aiBooks.factLine", {
+                    books: BOOK_COUNT,
+                    ratings: fmt(TOTAL_RATINGS),
+                    topics: CATEGORY_KEYS.length,
+                    date: AI_BOOKS_UPDATED,
+                  })}
+                </p>
+              </div>
+
+              <section id="top-picks" className="mt-8 scroll-mt-24">
+                <h2 className="text-lg font-bold text-foreground">{t("aiBooks.table.title")}</h2>
+                <div className="mt-3 overflow-x-auto rounded-xl border border-border">
+                  <table className="w-full min-w-[680px] text-left text-sm">
+                    <thead className="bg-muted/60 text-[11px] uppercase tracking-wide text-muted-foreground">
+                      <tr>
+                        <th className="px-3 py-2 font-semibold">{t("aiBooks.table.goal")}</th>
+                        <th className="px-3 py-2 font-semibold">{t("aiBooks.table.book")}</th>
+                        <th className="px-3 py-2 font-semibold">{t("aiBooks.table.author")}</th>
+                        <th className="px-3 py-2 font-semibold">{t("aiBooks.table.why")}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {TOP_PICKS.map((pick) => {
+                        const book = BOOKS.find((item) => item.asin === pick.asin);
+                        return (
+                          <tr key={pick.asin} className="border-t border-border align-top">
+                            <td className="whitespace-nowrap px-3 py-2.5 text-xs font-medium text-foreground">
+                              {pick.goal[contentLocale]}
+                            </td>
+                            <td className="px-3 py-2.5">
+                              <a
+                                href={`${book?.url ?? "#"}&ascsubtag=shelf-${pick.asin}-pick`}
+                                target="_blank"
+                                rel="nofollow sponsored noopener"
+                                className="font-medium text-primary hover:underline"
+                              >
+                                {pick.book}
+                              </a>
+                              {book ? (
+                                <span className="mt-0.5 block text-[11px] text-muted-foreground">
+                                  ★ {book.rating.toFixed(1)} · {short(book.reviews)}
+                                </span>
+                              ) : null}
+                            </td>
+                            <td className="px-3 py-2.5 text-xs text-muted-foreground">{pick.author}</td>
+                            <td className="px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
+                              {pick.why[contentLocale]}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="mt-2 text-[11px] text-muted-foreground">{t("aiBooks.table.note")}</p>
+              </section>
+
+              <div className="mt-8">
+                <h2 className="text-lg font-bold tracking-tight text-foreground">
+                  {activeView.title}
+                </h2>
+                <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted-foreground">
                   {activeView.desc}
                 </p>
               </div>
 
-              <div className="mt-5 flex flex-col gap-2.5">
+              <div className="mt-4 flex flex-col gap-2.5">
                 <FilterRow label={t("aiBooks.ratingLabel")}>
                   {RATING_OPTIONS.map((value) => (
                     <Chip
@@ -489,12 +600,12 @@ function AiBooksPage() {
                           </span>
                         ) : null}
                       </div>
-                      <h2
+                      <h3
                         className="mt-3 line-clamp-2 text-sm font-semibold leading-snug text-foreground"
                         title={book.title}
                       >
                         {book.displayTitle || book.title}
-                      </h2>
+                      </h3>
                       <p className="mt-1 truncate text-xs text-muted-foreground">
                         {book.displayAuthor || "—"}
                       </p>
@@ -509,6 +620,50 @@ function AiBooksPage() {
                 </div>
               )}
 
+              <section id="methodology" className="mt-10 scroll-mt-24 border-t border-border pt-6">
+                <h2 className="text-lg font-bold text-foreground">{t("aiBooks.method.title")}</h2>
+                <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+                  {METHOD_INTRO[contentLocale]}
+                </p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                  {METHOD_ROWS.map((row) => (
+                    <div key={row.id} className="rounded-xl border border-border bg-card p-4">
+                      <div className="flex items-baseline justify-between gap-2">
+                        <h3 className="text-sm font-semibold text-foreground">
+                          {t(`aiBooks.method.${row.id}`)}
+                        </h3>
+                        <span className="text-xs font-bold text-primary">{row.weight}</span>
+                      </div>
+                      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                        {row.text[contentLocale]}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+                  {METHOD_SOURCE[contentLocale]}
+                </p>
+                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                  {METHOD_AUTHOR[contentLocale]}
+                </p>
+              </section>
+
+              <section id="faq" className="mt-10 scroll-mt-24 border-t border-border pt-6">
+                <h2 className="text-lg font-bold text-foreground">{t("aiBooks.faq.title")}</h2>
+                <div className="mt-3 divide-y divide-border rounded-xl border border-border bg-card">
+                  {FAQ.map((item) => (
+                    <details key={item.id} className="group px-4 py-3">
+                      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium text-foreground [&::-webkit-details-marker]:hidden">
+                        {item.q[contentLocale]}
+                        <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" />
+                      </summary>
+                      <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                        {item.a[contentLocale]}
+                      </p>
+                    </details>
+                  ))}
+                </div>
+              </section>
             </section>
           </div>
         </div>

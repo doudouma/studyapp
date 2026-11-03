@@ -111,35 +111,6 @@ export const Route = createFileRoute("/ai-books_/free")({
         { rel: "preconnect", href: "https://img-c.udemycdn.com" },
         { rel: "preconnect", href: "https://m.media-amazon.com" },
       ],
-      scripts: [
-        {
-          type: "application/ld+json",
-          children: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "CollectionPage",
-            name: i18n.t("freeLib.h1"),
-            description: i18n.t("freeLib.desc"),
-            url: pageUrl,
-            inLanguage: lang,
-            dateModified: FREE_GENERATED_AT,
-            isPartOf: { "@type": "WebSite", name: "100mini", url: BASE_URL },
-            about: { "@type": "Thing", name: "Free AI courses and ebooks" },
-            mainEntity: {
-              "@type": "ItemList",
-              numberOfItems: FREE_TOTAL,
-              itemListElement: FREE_ITEMS.slice()
-                .sort((a, b) => (b.reviews || 0) - (a.reviews || 0))
-                .slice(0, 10)
-                .map((item, index) => ({
-                  "@type": "ListItem",
-                  position: index + 1,
-                  name: item.displayTitle || item.title,
-                  url: item.url,
-                })),
-            },
-          }),
-        },
-      ],
     };
   },
   component: FreeLibraryPage,
@@ -354,8 +325,39 @@ function FreeLibraryPage() {
   const showCourses = type !== "ebook";
   const showEbooks = type !== "course";
 
+  const freeJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: t("freeLib.h1"),
+    description: t("freeLib.desc"),
+    url: BASE_URL + withLangPrefix(currentLang(), "/ai-books/free"),
+    inLanguage: resourceLocale,
+    dateModified: FREE_GENERATED_AT,
+    isPartOf: { "@type": "WebSite", name: "100mini", url: BASE_URL },
+    about: { "@type": "Thing", name: "Free AI courses and ebooks" },
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: FREE_TOTAL,
+      itemListElement: FREE_ITEMS.slice()
+        .sort((a, b) => (b.reviews || 0) - (a.reviews || 0))
+        .slice(0, 10)
+        .map((item, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: item.displayTitle || item.title,
+          url: item.url,
+        })),
+    },
+  };
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(freeJsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
       <AppNav />
       <main className="flex-1">
         <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:py-10">

@@ -30,6 +30,7 @@ import { outbreakRoutes } from "./features/outbreak/outbreak.routes";
 import { log } from "./lib/log";
 import llmsTxt from "./content/llms.txt?raw";
 import llmsFullTxt from "./content/llms-full.txt?raw";
+import aiBooksMd from "./content/ai-books.md?raw";
 import pricingMd from "./content/pricing.md?raw";
 
 type Variables = {
@@ -159,6 +160,13 @@ const MD_HEADERS = { "Content-Type": "text/markdown; charset=utf-8" };
 api.get("/llms.txt", (c) => c.text(llmsTxt, 200, MD_HEADERS));
 api.get("/llms-full.txt", (c) => c.text(llmsFullTxt, 200, MD_HEADERS));
 api.get("/pricing.md", (c) => c.text(pricingMd, 200, MD_HEADERS));
+api.get("/ai-books.md", (c) =>
+  c.text(aiBooksMd, 200, {
+    ...MD_HEADERS,
+    Link: `<${BASE_URL}/ai-books>; rel="canonical"`,
+    "X-Robots-Tag": "noindex",
+  }),
+);
 
 // Markdown versions of the 100 Questions guides, for AI agents and
 // content-negotiation clients. The HTML page stays canonical; these files are
