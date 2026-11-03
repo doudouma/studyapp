@@ -2359,5 +2359,11 @@
   "aiBookPage.tipsTitle": "怎么选",
   "aiBookPage.tip1": "先读一本概览，再加一本动手实践。连读五本入门书只是拖延。",
   "aiBookPage.tip2": "评论数少于 50 的评分参考价值有限，小样本波动很大。",
-  "aiBookPage.tip3": "留意出版年份。2024 年以前的书更适合当背景，而不是当前指南。"
+  "aiBookPage.tip3": "留意出版年份。2024 年以前的书更适合当背景，而不是当前指南。",
+  "aiLearningPath.title": "AI 学习路径计算器（2026）：多久能准备好 AI 岗位？| 100mini",
+  "aiLearningPath.desc": "回答四个问题，得到现实的 AI 学习时间表、按顺序学习的免费课程，以及每个阶段两本值得买的书。无需注册。",
+  "aiLearningPath.keywords": "AI学习路径,AI学习路线,学AI要多久,机器学习学习计划,免费AI课程",
+  "aiLearningPath.crumb": "AI 学习路径计算器",
+  "freeLib.path.calculator": "计算你的学习时间表 →",
+  "aiBooks.pathCta": "不知道从哪开始？计算你的 AI 学习路径 →"
 }

@@ -83,6 +83,10 @@ https://100mini.com/ai-books/free
 free books (PDF/online), GitHub repos and video channels. Every link is free to
 access; no trial, no paywall.
 
+## Learning path calculator
+
+https://100mini.com/ai-books/learning-path — four questions estimate a realistic timeline, then return free courses and two books per stage.
+
 ## Browse by topic and goal
 
 Category lists:

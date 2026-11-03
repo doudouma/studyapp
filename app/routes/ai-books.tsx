@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import {
+  CalendarClock,
   ChevronDown,
   Heart,
   Library,
@@ -568,6 +569,13 @@ function AiBooksPage() {
                     );
                   })}
                 </div>
+                <Link
+                  to="/ai-books/learning-path"
+                  className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+                >
+                  <CalendarClock className="size-3.5" />
+                  {t("aiBooks.pathCta")}
+                </Link>
               </section>
 
               <section id="methodology" className="mt-10 scroll-mt-24 border-t border-border pt-6">

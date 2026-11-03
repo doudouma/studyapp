@@ -2264,5 +2264,11 @@
   "aiBookPage.tipsTitle": "Comment choisir",
   "aiBookPage.tip1": "Commencez par un livre d'ensemble, puis ajoutez un titre pratique. Lire cinq introductions est une forme de procrastination.",
   "aiBookPage.tip2": "Ignorez les notes fondées sur moins de 50 avis. Les petits échantillons varient fortement.",
-  "aiBookPage.tip3": "Vérifiez l'année de publication. Un livre antérieur à 2024 est un contexte, pas un guide actuel."
+  "aiBookPage.tip3": "Vérifiez l'année de publication. Un livre antérieur à 2024 est un contexte, pas un guide actuel.",
+  "aiLearningPath.title": "Calculateur de parcours IA (2026) : combien de temps pour être prêt ? | 100mini",
+  "aiLearningPath.desc": "Quatre questions donnent un calendrier d'apprentissage IA réaliste, les cours gratuits dans l'ordre et deux livres par étape. Sans inscription.",
+  "aiLearningPath.keywords": "parcours IA, feuille de route IA, combien de temps pour apprendre l'IA, plan d'étude IA, cours IA gratuits",
+  "aiLearningPath.crumb": "Calculateur de parcours IA",
+  "freeLib.path.calculator": "Calculer votre calendrier →",
+  "aiBooks.pathCta": "Vous ne savez pas où commencer ? Calculez votre parcours IA →"
 }

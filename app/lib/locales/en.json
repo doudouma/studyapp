@@ -2371,5 +2371,11 @@
   "aiBookPage.tipsTitle": "How to choose",
   "aiBookPage.tip1": "Start with one overview book, then add a hands-on title. Reading five introductions is procrastination.",
   "aiBookPage.tip2": "Ignore ratings built on fewer than 50 reviews. Small samples swing wildly.",
-  "aiBookPage.tip3": "Check the publication year. Anything older than 2024 is background, not a current guide."
+  "aiBookPage.tip3": "Check the publication year. Anything older than 2024 is background, not a current guide.",
+  "aiLearningPath.title": "AI Learning Path Calculator (2026): How Long Until Job-Ready? | 100mini",
+  "aiLearningPath.desc": "Four questions give you a realistic AI learning timeline, free courses in order, and two books per stage. No signup.",
+  "aiLearningPath.keywords": "AI learning path, AI learning roadmap, how long to learn AI, AI study plan, machine learning roadmap, free AI courses",
+  "aiLearningPath.crumb": "AI learning path calculator",
+  "freeLib.path.calculator": "Calculate your timeline →",
+  "aiBooks.pathCta": "Not sure where to start? Calculate your AI learning path →"
 }

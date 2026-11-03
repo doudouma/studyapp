@@ -65,6 +65,7 @@ Expiring and one-time pages are excluded from the Learning Square.
 - Machine-readable: https://100mini.com/ai-books.md (Markdown for AI agents; the HTML page stays canonical).
 - Category lists: https://100mini.com/ai-books/best-ai-business-books, https://100mini.com/ai-books/best-ai-tools-books, https://100mini.com/ai-books/best-ai-design-books, https://100mini.com/ai-books/best-ai-writing-books, https://100mini.com/ai-books/best-ai-productivity-books, https://100mini.com/ai-books/best-ai-money-books, https://100mini.com/ai-books/best-ai-technical-books.
 - Audience lists: https://100mini.com/ai-books/best-ai-books-for-beginners, https://100mini.com/ai-books/best-ai-books-for-engineers, https://100mini.com/ai-books/best-ai-books-for-managers, https://100mini.com/ai-books/best-ai-books-for-designers, https://100mini.com/ai-books/best-ai-books-for-writers.
+- Learning path calculator: https://100mini.com/ai-books/learning-path — four questions estimate a realistic timeline and return free courses plus two books per stage.
 - Last updated: 2026-11-01.
 
 ## 100 Questions guides

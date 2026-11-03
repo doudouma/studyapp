@@ -42,6 +42,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShowcaseSlugRouteImport } from './routes/showcase_.$slug'
 import { Route as PapercutViewRouteImport } from './routes/papercut_.view'
 import { Route as AlternativesCompetitorRouteImport } from './routes/alternatives_.$competitor'
+import { Route as AiBooksLearningPathRouteImport } from './routes/ai-books_.learning-path'
 import { Route as AiBooksFreeRouteImport } from './routes/ai-books_.free'
 import { Route as AiBooksSlugRouteImport } from './routes/ai-books_.$slug'
 import { Route as R100QuestionsSlugRouteImport } from './routes/100-questions_.$slug'
@@ -211,6 +212,11 @@ const AlternativesCompetitorRoute = AlternativesCompetitorRouteImport.update({
   path: '/alternatives/$competitor',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AiBooksLearningPathRoute = AiBooksLearningPathRouteImport.update({
+  id: '/ai-books_/learning-path',
+  path: '/ai-books/learning-path',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AiBooksFreeRoute = AiBooksFreeRouteImport.update({
   id: '/ai-books_/free',
   path: '/ai-books/free',
@@ -261,6 +267,7 @@ export interface FileRoutesByFullPath {
   '/100-questions/$slug': typeof R100QuestionsSlugRoute
   '/ai-books/$slug': typeof AiBooksSlugRoute
   '/ai-books/free': typeof AiBooksFreeRoute
+  '/ai-books/learning-path': typeof AiBooksLearningPathRoute
   '/alternatives/$competitor': typeof AlternativesCompetitorRoute
   '/papercut/view': typeof PapercutViewRoute
   '/showcase/$slug': typeof ShowcaseSlugRoute
@@ -299,6 +306,7 @@ export interface FileRoutesByTo {
   '/100-questions/$slug': typeof R100QuestionsSlugRoute
   '/ai-books/$slug': typeof AiBooksSlugRoute
   '/ai-books/free': typeof AiBooksFreeRoute
+  '/ai-books/learning-path': typeof AiBooksLearningPathRoute
   '/alternatives/$competitor': typeof AlternativesCompetitorRoute
   '/papercut/view': typeof PapercutViewRoute
   '/showcase/$slug': typeof ShowcaseSlugRoute
@@ -338,6 +346,7 @@ export interface FileRoutesById {
   '/100-questions_/$slug': typeof R100QuestionsSlugRoute
   '/ai-books_/$slug': typeof AiBooksSlugRoute
   '/ai-books_/free': typeof AiBooksFreeRoute
+  '/ai-books_/learning-path': typeof AiBooksLearningPathRoute
   '/alternatives_/$competitor': typeof AlternativesCompetitorRoute
   '/papercut_/view': typeof PapercutViewRoute
   '/showcase_/$slug': typeof ShowcaseSlugRoute
@@ -378,6 +387,7 @@ export interface FileRouteTypes {
     | '/100-questions/$slug'
     | '/ai-books/$slug'
     | '/ai-books/free'
+    | '/ai-books/learning-path'
     | '/alternatives/$competitor'
     | '/papercut/view'
     | '/showcase/$slug'
@@ -416,6 +426,7 @@ export interface FileRouteTypes {
     | '/100-questions/$slug'
     | '/ai-books/$slug'
     | '/ai-books/free'
+    | '/ai-books/learning-path'
     | '/alternatives/$competitor'
     | '/papercut/view'
     | '/showcase/$slug'
@@ -454,6 +465,7 @@ export interface FileRouteTypes {
     | '/100-questions_/$slug'
     | '/ai-books_/$slug'
     | '/ai-books_/free'
+    | '/ai-books_/learning-path'
     | '/alternatives_/$competitor'
     | '/papercut_/view'
     | '/showcase_/$slug'
@@ -493,6 +505,7 @@ export interface RootRouteChildren {
   R100QuestionsSlugRoute: typeof R100QuestionsSlugRoute
   AiBooksSlugRoute: typeof AiBooksSlugRoute
   AiBooksFreeRoute: typeof AiBooksFreeRoute
+  AiBooksLearningPathRoute: typeof AiBooksLearningPathRoute
   AlternativesCompetitorRoute: typeof AlternativesCompetitorRoute
   PapercutViewRoute: typeof PapercutViewRoute
   ShowcaseSlugRoute: typeof ShowcaseSlugRoute
@@ -731,6 +744,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AlternativesCompetitorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ai-books_/learning-path': {
+      id: '/ai-books_/learning-path'
+      path: '/ai-books/learning-path'
+      fullPath: '/ai-books/learning-path'
+      preLoaderRoute: typeof AiBooksLearningPathRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ai-books_/free': {
       id: '/ai-books_/free'
       path: '/ai-books/free'
@@ -789,6 +809,7 @@ const rootRouteChildren: RootRouteChildren = {
   R100QuestionsSlugRoute: R100QuestionsSlugRoute,
   AiBooksSlugRoute: AiBooksSlugRoute,
   AiBooksFreeRoute: AiBooksFreeRoute,
+  AiBooksLearningPathRoute: AiBooksLearningPathRoute,
   AlternativesCompetitorRoute: AlternativesCompetitorRoute,
   PapercutViewRoute: PapercutViewRoute,
   ShowcaseSlugRoute: ShowcaseSlugRoute,

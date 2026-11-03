@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import {
   BookMarked,
   BookOpen,
+  CalendarClock,
   Code2,
   Compass,
   GraduationCap,
@@ -530,6 +531,13 @@ function FreeLibraryPage() {
                 <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
                   {t("freeLib.pathFoot")}
                 </p>
+                <Link
+                  to="/ai-books/learning-path"
+                  className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+                >
+                  <CalendarClock className="size-3.5" />
+                  {t("freeLib.path.calculator")}
+                </Link>
               </section>
 
               <div className="mt-8 flex flex-col gap-2.5">

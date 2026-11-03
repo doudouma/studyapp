@@ -160,6 +160,8 @@ function pageKeys(basePath: string): {
       return { name: "aiBooks.h1", desc: "aiBooks.desc" };
     case "/ai-books/free":
       return { name: "freeLib.h1", desc: "freeLib.desc" };
+    case "/ai-books/learning-path":
+      return { name: "aiLearningPath.crumb", desc: "aiLearningPath.desc" };
     case "/100-questions":
       return { name: "questions.h1", desc: "questions.desc" };
     case "/md2html":
@@ -217,7 +219,7 @@ function breadcrumbs(basePath: string): { name: string; path: string }[] {
   const keys = pageKeys(basePath);
   if (basePath === "/") return [home];
   const pageName = keys.nameText ?? i18n.t(keys.name);
-  if (basePath.startsWith("/ai-books/") && getAiBookPage(basePath.slice("/ai-books/".length))) {
+  if (basePath.startsWith("/ai-books/")) {
     return [home, { name: i18n.t("aiBooks.h1"), path: "/ai-books" }, { name: pageName, path: basePath }];
   }
   return [home, { name: pageName, path: basePath }];

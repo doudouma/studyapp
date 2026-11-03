@@ -20,6 +20,7 @@
 - [Games](https://100mini.com/games)
 - [AI Books](https://100mini.com/ai-books): 84 AI books ranked by Amazon reader signal, with a free AI courses and ebooks library at /ai-books/free
 - [AI Books — Markdown](https://100mini.com/ai-books.md): machine-readable version of the AI book list, ranking method and FAQ
+- [AI Learning Path Calculator](https://100mini.com/ai-books/learning-path): four questions estimate how long until job-ready, with free courses and books per stage
 - AI Books lists: https://100mini.com/ai-books/best-ai-business-books, https://100mini.com/ai-books/best-ai-tools-books, https://100mini.com/ai-books/best-ai-design-books, https://100mini.com/ai-books/best-ai-writing-books, https://100mini.com/ai-books/best-ai-productivity-books, https://100mini.com/ai-books/best-ai-money-books, https://100mini.com/ai-books/best-ai-technical-books, https://100mini.com/ai-books/best-ai-books-for-beginners, https://100mini.com/ai-books/best-ai-books-for-engineers, https://100mini.com/ai-books/best-ai-books-for-managers, https://100mini.com/ai-books/best-ai-books-for-designers, https://100mini.com/ai-books/best-ai-books-for-writers
 - [Case library](https://100mini.com/showcase)
 - [100 Questions](https://100mini.com/100-questions): long-form topic guides built around 100 questions; append .md to any guide URL for a Markdown version

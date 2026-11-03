@@ -63,6 +63,7 @@ const STATIC_PAGES: { loc: string; changefreq: string; priority: string }[] = [
   { loc: "/showcase", changefreq: "weekly", priority: "0.8" },
   { loc: "/ai-books", changefreq: "weekly", priority: "0.8" },
   { loc: "/ai-books/free", changefreq: "weekly", priority: "0.8" },
+  { loc: "/ai-books/learning-path", changefreq: "monthly", priority: "0.7" },
   { loc: "/md2html", changefreq: "weekly", priority: "0.8" },
   { loc: "/any2md", changefreq: "weekly", priority: "0.8" },
   { loc: "/claude-artifact-to-link", changefreq: "weekly", priority: "0.8" },
