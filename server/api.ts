@@ -12,6 +12,7 @@ import {
 import { page } from "./db/schema";
 import { createDb } from "./db";
 import { getCaseLocales, getCaseSlugs, loadCase } from "../shared/showcase";
+import { AI_BOOK_PAGES } from "../shared/books/programmatic";
 import { type ShowcaseLocale } from "../shared/types/showcase";
 import { getQuestionLocales, getQuestionSlugs, loadQuestion } from "../shared/questions";
 import {
@@ -262,6 +263,17 @@ async function buildLangSitemap(c: any, lang: Lang): Promise<string> {
     <priority>${p.priority}</priority>${alternateLinksXml(p.loc)}
   </url>`;
   });
+
+  // AI Books programmatic pages: category and audience lists.
+  for (const page of AI_BOOK_PAGES) {
+    const basePath = `/ai-books/${page.slug}`;
+    urls.push(`
+  <url>
+    <loc>${escapeXml(`${BASE_URL}${withLangPrefix(lang, basePath)}`)}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>${alternateLinksXml(basePath)}
+  </url>`);
+  }
 
   // 「100 个问题」栏目：列表页只在实际有内容的语言里收录，详情页按翻译收录。
   const questionListLocales = new Set<QuestionLocale>();

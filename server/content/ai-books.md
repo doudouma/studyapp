@@ -83,6 +83,24 @@ https://100mini.com/ai-books/free
 free books (PDF/online), GitHub repos and video channels. Every link is free to
 access; no trial, no paywall.
 
+## Browse by topic and goal
+
+Category lists:
+- AI business books: https://100mini.com/ai-books/best-ai-business-books
+- AI tools books: https://100mini.com/ai-books/best-ai-tools-books
+- AI design books: https://100mini.com/ai-books/best-ai-design-books
+- AI writing books: https://100mini.com/ai-books/best-ai-writing-books
+- AI productivity books: https://100mini.com/ai-books/best-ai-productivity-books
+- AI money books: https://100mini.com/ai-books/best-ai-money-books
+- AI technical books: https://100mini.com/ai-books/best-ai-technical-books
+
+Audience lists:
+- For beginners: https://100mini.com/ai-books/best-ai-books-for-beginners
+- For engineers: https://100mini.com/ai-books/best-ai-books-for-engineers
+- For managers: https://100mini.com/ai-books/best-ai-books-for-managers
+- For designers: https://100mini.com/ai-books/best-ai-books-for-designers
+- For writers: https://100mini.com/ai-books/best-ai-books-for-writers
+
 ## Languages
 
 English (this file), Chinese (/zh/ai-books), Spanish (/es/ai-books), Portuguese

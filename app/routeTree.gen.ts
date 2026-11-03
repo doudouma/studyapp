@@ -43,6 +43,7 @@ import { Route as ShowcaseSlugRouteImport } from './routes/showcase_.$slug'
 import { Route as PapercutViewRouteImport } from './routes/papercut_.view'
 import { Route as AlternativesCompetitorRouteImport } from './routes/alternatives_.$competitor'
 import { Route as AiBooksFreeRouteImport } from './routes/ai-books_.free'
+import { Route as AiBooksSlugRouteImport } from './routes/ai-books_.$slug'
 import { Route as R100QuestionsSlugRouteImport } from './routes/100-questions_.$slug'
 
 const WardrobeRoute = WardrobeRouteImport.update({
@@ -215,6 +216,11 @@ const AiBooksFreeRoute = AiBooksFreeRouteImport.update({
   path: '/ai-books/free',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AiBooksSlugRoute = AiBooksSlugRouteImport.update({
+  id: '/ai-books_/$slug',
+  path: '/ai-books/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const R100QuestionsSlugRoute = R100QuestionsSlugRouteImport.update({
   id: '/100-questions_/$slug',
   path: '/100-questions/$slug',
@@ -253,6 +259,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/wardrobe': typeof WardrobeRoute
   '/100-questions/$slug': typeof R100QuestionsSlugRoute
+  '/ai-books/$slug': typeof AiBooksSlugRoute
   '/ai-books/free': typeof AiBooksFreeRoute
   '/alternatives/$competitor': typeof AlternativesCompetitorRoute
   '/papercut/view': typeof PapercutViewRoute
@@ -290,6 +297,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/wardrobe': typeof WardrobeRoute
   '/100-questions/$slug': typeof R100QuestionsSlugRoute
+  '/ai-books/$slug': typeof AiBooksSlugRoute
   '/ai-books/free': typeof AiBooksFreeRoute
   '/alternatives/$competitor': typeof AlternativesCompetitorRoute
   '/papercut/view': typeof PapercutViewRoute
@@ -328,6 +336,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/wardrobe': typeof WardrobeRoute
   '/100-questions_/$slug': typeof R100QuestionsSlugRoute
+  '/ai-books_/$slug': typeof AiBooksSlugRoute
   '/ai-books_/free': typeof AiBooksFreeRoute
   '/alternatives_/$competitor': typeof AlternativesCompetitorRoute
   '/papercut_/view': typeof PapercutViewRoute
@@ -367,6 +376,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/wardrobe'
     | '/100-questions/$slug'
+    | '/ai-books/$slug'
     | '/ai-books/free'
     | '/alternatives/$competitor'
     | '/papercut/view'
@@ -404,6 +414,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/wardrobe'
     | '/100-questions/$slug'
+    | '/ai-books/$slug'
     | '/ai-books/free'
     | '/alternatives/$competitor'
     | '/papercut/view'
@@ -441,6 +452,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/wardrobe'
     | '/100-questions_/$slug'
+    | '/ai-books_/$slug'
     | '/ai-books_/free'
     | '/alternatives_/$competitor'
     | '/papercut_/view'
@@ -479,6 +491,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   WardrobeRoute: typeof WardrobeRoute
   R100QuestionsSlugRoute: typeof R100QuestionsSlugRoute
+  AiBooksSlugRoute: typeof AiBooksSlugRoute
   AiBooksFreeRoute: typeof AiBooksFreeRoute
   AlternativesCompetitorRoute: typeof AlternativesCompetitorRoute
   PapercutViewRoute: typeof PapercutViewRoute
@@ -725,6 +738,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AiBooksFreeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ai-books_/$slug': {
+      id: '/ai-books_/$slug'
+      path: '/ai-books/$slug'
+      fullPath: '/ai-books/$slug'
+      preLoaderRoute: typeof AiBooksSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/100-questions_/$slug': {
       id: '/100-questions_/$slug'
       path: '/100-questions/$slug'
@@ -767,6 +787,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   WardrobeRoute: WardrobeRoute,
   R100QuestionsSlugRoute: R100QuestionsSlugRoute,
+  AiBooksSlugRoute: AiBooksSlugRoute,
   AiBooksFreeRoute: AiBooksFreeRoute,
   AlternativesCompetitorRoute: AlternativesCompetitorRoute,
   PapercutViewRoute: PapercutViewRoute,

@@ -63,6 +63,8 @@ Expiring and one-time pages are excluded from the Learning Square.
 - Free library: https://100mini.com/ai-books/free — 30 free Udemy courses, 30 permanently free Kindle ebooks, plus 21 hand-picked free books (PDF/online), GitHub repos and video channels.
 - Languages: English, Chinese, Spanish, Portuguese and French. Prefix /zh/, /es/, /pt/ or /fr/ for localized versions; each has a canonical URL and hreflang alternates.
 - Machine-readable: https://100mini.com/ai-books.md (Markdown for AI agents; the HTML page stays canonical).
+- Category lists: https://100mini.com/ai-books/best-ai-business-books, https://100mini.com/ai-books/best-ai-tools-books, https://100mini.com/ai-books/best-ai-design-books, https://100mini.com/ai-books/best-ai-writing-books, https://100mini.com/ai-books/best-ai-productivity-books, https://100mini.com/ai-books/best-ai-money-books, https://100mini.com/ai-books/best-ai-technical-books.
+- Audience lists: https://100mini.com/ai-books/best-ai-books-for-beginners, https://100mini.com/ai-books/best-ai-books-for-engineers, https://100mini.com/ai-books/best-ai-books-for-managers, https://100mini.com/ai-books/best-ai-books-for-designers, https://100mini.com/ai-books/best-ai-books-for-writers.
 - Last updated: 2026-11-01.
 
 ## 100 Questions guides

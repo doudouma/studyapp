@@ -16,14 +16,16 @@ import i18n from "~/lib/i18n";
 import { BASE_URL, currentLang, withLangPrefix } from "~/lib/seo";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
+import { BookCard } from "~/features/books/BookCard";
 import {
   BOOKS,
   BOOK_COUNT,
   CATEGORIES,
   TOTAL_RATINGS,
-  type Book,
   type BookCategory,
 } from "~/features/books/data";
+import { risingScore, score, shuffle } from "~/features/books/scoring";
+import { AI_BOOK_PAGES } from "@shared/books/programmatic";
 import {
   AI_BOOKS_UPDATED,
   FAQ,
@@ -62,56 +64,6 @@ function short(n: number): string {
   if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`;
   if (value >= 1_000) return `${(value / 1_000).toFixed(1).replace(/\.0$/, "")}K`;
   return String(value);
-}
-
-function bayes(b: Book, m = 50, C = 4.3): number {
-  return ((b.rating || 0) * (b.reviews || 0) + C * m) / ((b.reviews || 0) + m);
-}
-
-function demand(b: Book): number {
-  return Math.log10((b.reviews || 0) + 10) / Math.log10(5010);
-}
-
-function quality(b: Book): number {
-  return Math.max(0, Math.min(1, (bayes(b) - 3.8) / 1.2));
-}
-
-function titleQuality(b: Book): number {
-  const title = b.title || "";
-  let q = 1;
-  if (title.length > 70) q -= Math.min(0.35, (title.length - 70) / 300);
-  if (/\b(complete|guide|master|essential|proven|step)\b/i.test(title)) q += 0.08;
-  if (/[A-Z]{4,}/.test(title)) q -= 0.1;
-  return Math.max(0, Math.min(1, q));
-}
-
-function score(b: Book): number {
-  return 0.5 * demand(b) + 0.3 * quality(b) + 0.2 * titleQuality(b);
-}
-
-function risingScore(b: Book): number {
-  return (
-    (quality(b) * 0.7 + (1 - Math.min(1, (b.reviews || 0) / 800)) * 0.3) *
-    (b.reviews > 15 ? 1 : 0.6)
-  );
-}
-
-function seeded(day: number): () => number {
-  let seed = day % 2147483647;
-  return () => {
-    seed = (seed * 48271) % 2147483647;
-    return (seed - 1) / 2147483646;
-  };
-}
-
-function shuffle<T>(items: readonly T[], day: number): T[] {
-  const result = items.slice();
-  const random = seeded(day);
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
-  }
-  return result;
 }
 
 export const Route = createFileRoute("/ai-books")({
@@ -587,47 +539,36 @@ function AiBooksPage() {
               ) : (
                 <div className="grid grid-cols-2 gap-x-3 gap-y-6 py-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
                   {books.map((book, index) => (
-                    <a
-                      key={book.asin}
-                      href={`${book.url}&ascsubtag=shelf-${book.asin}-${index + 1}`}
-                      target="_blank"
-                      rel="nofollow sponsored noopener"
-                      className="group flex min-w-0 flex-col"
-                    >
-                      <div className="relative aspect-[3/4] overflow-hidden rounded-md bg-muted shadow-sm transition duration-200 group-hover:-translate-y-1 group-hover:shadow-lg">
-                        <img
-                          src={book.image}
-                          alt={book.displayTitle || book.title}
-                          loading={index < 8 ? undefined : "lazy"}
-                          fetchPriority={index === 0 ? "high" : undefined}
-                          decoding="async"
-                          className="size-full object-cover"
-                        />
-                        {book.rating ? (
-                          <span className="absolute bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-black/80 px-1.5 py-0.5 text-[10.5px] tabular-nums text-white">
-                            ★ {book.rating.toFixed(1)}
-                          </span>
-                        ) : null}
-                      </div>
-                      <h3
-                        className="mt-3 line-clamp-2 text-sm font-semibold leading-snug text-foreground"
-                        title={book.title}
-                      >
-                        {book.displayTitle || book.title}
-                      </h3>
-                      <p className="mt-1 truncate text-xs text-muted-foreground">
-                        {book.displayAuthor || "—"}
-                      </p>
-                      <p className="mt-1.5 flex items-center justify-between gap-2 whitespace-nowrap text-[11px] text-muted-foreground/80">
-                        <span>{t("aiBooks.ratingsCount", { count: short(book.reviews) })}</span>
-                        <span className="font-semibold text-primary group-hover:underline">
-                          {t("aiBooks.checkPrice")}
-                        </span>
-                      </p>
-                    </a>
+                    <BookCard key={book.asin} book={book} index={index} />
                   ))}
                 </div>
               )}
+
+              <section className="mt-10 border-t border-border pt-5">
+                <h2 className="text-lg font-bold text-foreground">{t("aiBooks.browseTitle")}</h2>
+                <p className="mt-1 text-xs text-muted-foreground">{t("aiBooks.browseDesc")}</p>
+                <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                  {AI_BOOK_PAGES.map((page) => {
+                    const count =
+                      page.kind === "category"
+                        ? BOOKS.filter((book) => book.category === page.category).length
+                        : BOOKS.filter((book) => page.asins?.includes(book.asin)).length;
+                    return (
+                      <Link
+                        key={page.slug}
+                        to="/ai-books/$slug"
+                        params={{ slug: page.slug }}
+                        className="group flex items-center justify-between gap-3 rounded-lg border border-border px-3 py-2 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+                      >
+                        <span>{page.copy[contentLocale].topic}</span>
+                        <span className="shrink-0 text-[11px] tabular-nums text-muted-foreground">
+                          {t("aiBooks.pageCount", { count })}
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </section>
 
               <section id="methodology" className="mt-10 scroll-mt-24 border-t border-border pt-6">
                 <h2 className="text-lg font-bold text-foreground">{t("aiBooks.method.title")}</h2>

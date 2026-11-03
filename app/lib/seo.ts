@@ -1,4 +1,5 @@
 import i18n from "./i18n";
+import { getAiBookPage } from "@shared/books/programmatic";
 import { getCompetitor } from "~/features/alternatives/data";
 import { getCaseLocales } from "@shared/showcase";
 import type { ShowcaseLocale } from "@shared/types/showcase";
@@ -134,7 +135,20 @@ export const DEFAULT_OG_IMAGE = `${BASE_URL}/og-default.jpg`;
  * Map a base path to the i18n keys for that page's name/description.
  * Used to produce localized JSON-LD per language.
  */
-function pageKeys(basePath: string): { name: string; desc: string } {
+function pageKeys(basePath: string): {
+  name: string;
+  desc: string;
+  nameText?: string;
+  descText?: string;
+} {
+  const aiBookPage = basePath.startsWith("/ai-books/")
+    ? getAiBookPage(basePath.slice("/ai-books/".length))
+    : undefined;
+  if (aiBookPage) {
+    const copy = aiBookPage.copy[currentLang()];
+    return { name: "aiBooks.h1", desc: "aiBooks.desc", nameText: copy.h1, descText: copy.intro };
+  }
+
   switch (basePath) {
     case "/":
       return { name: "app.title", desc: "app.desc" };
@@ -202,7 +216,11 @@ function breadcrumbs(basePath: string): { name: string; path: string }[] {
   const home = { name: i18n.t("nav.home"), path: "/" };
   const keys = pageKeys(basePath);
   if (basePath === "/") return [home];
-  return [home, { name: i18n.t(keys.name), path: basePath }];
+  const pageName = keys.nameText ?? i18n.t(keys.name);
+  if (basePath.startsWith("/ai-books/") && getAiBookPage(basePath.slice("/ai-books/".length))) {
+    return [home, { name: i18n.t("aiBooks.h1"), path: "/ai-books" }, { name: pageName, path: basePath }];
+  }
+  return [home, { name: pageName, path: basePath }];
 }
 
 /**
@@ -218,8 +236,8 @@ export function buildJsonLd(basePath: string, lang: Lang): object[] {
   const keys = pageKeys(basePath);
   const siteName = i18n.t("app.title");
   const siteDesc = i18n.t("app.desc");
-  const pageName = i18n.t(keys.name);
-  const pageDesc = i18n.t(keys.desc);
+  const pageName = keys.nameText ?? i18n.t(keys.name);
+  const pageDesc = keys.descText ?? i18n.t(keys.desc);
 
   const organization = {
     "@type": "Organization",
