@@ -2320,5 +2320,8 @@
   "aiLearningPath.crumb": "Calculadora de ruta de IA",
   "freeLib.path.calculator": "Calcular tu calendario →",
   "aiBooks.pathCta": "¿No sabes por dónde empezar? Calcula tu ruta de IA →",
-  "freeLib.path.details": "Ruta completa de un vistazo"
+  "freeLib.path.details": "Ruta completa de un vistazo",
+  "nav.aiLearningPath": "Ruta de IA",
+  "freetool.item.aiLearningPath.title": "Calculadora de ruta de IA",
+  "freetool.item.aiLearningPath.desc": "Cuatro preguntas estiman cuánto falta para estar listo, con cursos gratis y dos libros por etapa."
 }

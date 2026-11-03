@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { CalendarClock, Check, Copy, Printer, RotateCcw } from "lucide-react";
+import { CalendarClock, Check, Copy, Printer, RotateCcw, Sparkles } from "lucide-react";
 import { getBcp47 } from "~/lib/i18n";
 import { currentLang } from "~/lib/seo";
 import { BOOKS, type Book } from "~/features/books/data";
@@ -451,6 +451,14 @@ export function LearningPathCalculator({
               <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground">
                 {copy.disclosure}
               </p>
+
+              <Link
+                to="/host-single-html"
+                className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-xs font-semibold text-primary transition-colors hover:bg-primary/10"
+              >
+                <Sparkles className="size-3.5" />
+                {copy.publishCta}
+              </Link>
 
               {!compact && (
                 <div className="mt-3 flex flex-wrap gap-3 text-xs font-medium text-primary">

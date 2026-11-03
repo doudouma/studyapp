@@ -2278,5 +2278,8 @@
   "aiLearningPath.crumb": "Calculadora de trilha de IA",
   "freeLib.path.calculator": "Calcular seu cronograma →",
   "aiBooks.pathCta": "Não sabe por onde começar? Calcule sua trilha de IA →",
-  "freeLib.path.details": "Trilha completa em resumo"
+  "freeLib.path.details": "Trilha completa em resumo",
+  "nav.aiLearningPath": "Trilha de IA",
+  "freetool.item.aiLearningPath.title": "Calculadora de trilha de IA",
+  "freetool.item.aiLearningPath.desc": "Quatro perguntas estimam quanto falta para estar pronto, com cursos grátis e dois livros por etapa."
 }

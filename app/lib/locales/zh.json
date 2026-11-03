@@ -2366,5 +2366,8 @@
   "aiLearningPath.crumb": "AI 学习路径计算器",
   "freeLib.path.calculator": "计算你的学习时间表 →",
   "aiBooks.pathCta": "不知道从哪开始？计算你的 AI 学习路径 →",
-  "freeLib.path.details": "完整学习路径一览"
+  "freeLib.path.details": "完整学习路径一览",
+  "nav.aiLearningPath": "AI 学习路径",
+  "freetool.item.aiLearningPath.title": "AI 学习路径计算器",
+  "freetool.item.aiLearningPath.desc": "回答四个问题，估算多久能准备好 AI 岗位，并给出免费课程与每个阶段两本书。"
 }

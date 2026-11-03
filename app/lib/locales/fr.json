@@ -2271,5 +2271,8 @@
   "aiLearningPath.crumb": "Calculateur de parcours IA",
   "freeLib.path.calculator": "Calculer votre calendrier →",
   "aiBooks.pathCta": "Vous ne savez pas où commencer ? Calculez votre parcours IA →",
-  "freeLib.path.details": "Parcours complet en un coup d'œil"
+  "freeLib.path.details": "Parcours complet en un coup d'œil",
+  "nav.aiLearningPath": "Parcours IA",
+  "freetool.item.aiLearningPath.title": "Calculateur de parcours IA",
+  "freetool.item.aiLearningPath.desc": "Quatre questions estiment le temps nécessaire pour être prêt, avec des cours gratuits et deux livres par étape."
 }

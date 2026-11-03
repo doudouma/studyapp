@@ -85,7 +85,8 @@ function ToolsDropdown() {
     location.pathname.startsWith("/freetool") ||
     location.pathname.startsWith("/idphoto") ||
     location.pathname.startsWith("/petbadge") ||
-    location.pathname.startsWith("/petsafe");
+    location.pathname.startsWith("/petsafe") ||
+    location.pathname.startsWith("/ai-books/learning-path");
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -140,6 +141,9 @@ function ToolsDropdown() {
           </DropdownLink>
           <DropdownLink href="/petsafe" onClick={() => setOpen(false)}>
             {t("nav.petsafe")}
+          </DropdownLink>
+          <DropdownLink href="/ai-books/learning-path" onClick={() => setOpen(false)}>
+            {t("nav.aiLearningPath")}
           </DropdownLink>
         </div>
       )}
@@ -363,6 +367,7 @@ export function AppNav() {
                 <MobileNavLink href="/idphoto" onClick={() => setMobileNavOpen(false)}>{t("nav.idphoto")}</MobileNavLink>
                 <MobileNavLink href="/petbadge" onClick={() => setMobileNavOpen(false)}>{t("nav.petbadge")}</MobileNavLink>
                 <MobileNavLink href="/petsafe" onClick={() => setMobileNavOpen(false)}>{t("nav.petsafe")}</MobileNavLink>
+                <MobileNavLink href="/ai-books/learning-path" onClick={() => setMobileNavOpen(false)}>{t("nav.aiLearningPath")}</MobileNavLink>
               </MobileGroup>
               <MobileGroup label={t("nav.game")}>
                 <MobileNavLink href="/games" onClick={() => setMobileNavOpen(false)}>{t("nav.gamesAll")}</MobileNavLink>
@@ -502,6 +507,7 @@ export function AppNav() {
               <MobileNavLink href="/idphoto" onClick={() => setMobileNavOpen(false)}>{t("nav.idphoto")}</MobileNavLink>
               <MobileNavLink href="/petbadge" onClick={() => setMobileNavOpen(false)}>{t("nav.petbadge")}</MobileNavLink>
               <MobileNavLink href="/petsafe" onClick={() => setMobileNavOpen(false)}>{t("nav.petsafe")}</MobileNavLink>
+                <MobileNavLink href="/ai-books/learning-path" onClick={() => setMobileNavOpen(false)}>{t("nav.aiLearningPath")}</MobileNavLink>
             </MobileGroup>
             <MobileGroup label={t("nav.game")}>
               <MobileNavLink href="/games" onClick={() => setMobileNavOpen(false)}>{t("nav.gamesAll")}</MobileNavLink>

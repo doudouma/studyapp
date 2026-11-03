@@ -95,6 +95,7 @@ export interface LpCopy {
   print: string;
   restart: string;
   disclosure: string;
+  publishCta: string;
   freeLibrary: string;
   allBooks: string;
 }
@@ -137,6 +138,7 @@ export const LP_COPY: Record<LpLocale, LpCopy> = {
     restart: "Start over",
     disclosure:
       "How this is calculated. Timelines are estimates from total study hours (goal × starting level + specialisation), divided by your weekly hours, then shown as a range. They assume consistent weekly work and real projects, not video watching. Book links are Amazon affiliate links; free courses earn us nothing.",
+    publishCta: "Built something? Publish it with 100mini →",
     freeLibrary: "Free library",
     allBooks: "All books",
   },
@@ -177,6 +179,7 @@ export const LP_COPY: Record<LpLocale, LpCopy> = {
     restart: "重新开始",
     disclosure:
       "计算方式：总学习时长由目标 × 起始水平 + 专精方向估算，再除以每周投入小时数，最后以区间展示。前提是持续投入并做真实项目，而不是只看视频。书籍链接为 Amazon 联盟链接；免费课程不带来收益。",
+    publishCta: "做出了东西？用 100mini 发布上线 →",
     freeLibrary: "免费资源库",
     allBooks: "全部书单",
   },
@@ -217,6 +220,7 @@ export const LP_COPY: Record<LpLocale, LpCopy> = {
     restart: "Recommencer",
     disclosure:
       "Méthode de calcul : les durées sont estimées à partir du total d'heures d'étude (objectif × niveau de départ + spécialisation), divisé par vos heures hebdomadaires, puis affiché sous forme de fourchette. Elles supposent un travail régulier et de vrais projets, pas seulement des vidéos. Les liens livres sont des liens d'affiliation Amazon ; les cours gratuits ne nous rapportent rien.",
+    publishCta: "Vous avez construit quelque chose ? Publiez-le avec 100mini →",
     freeLibrary: "Bibliothèque gratuite",
     allBooks: "Tous les livres",
   },
@@ -257,6 +261,7 @@ export const LP_COPY: Record<LpLocale, LpCopy> = {
     restart: "Empezar de nuevo",
     disclosure:
       "Cómo se calcula: los plazos se estiman a partir del total de horas de estudio (objetivo × nivel inicial + especialización), dividido por tus horas semanales y mostrado como un rango. Asumen trabajo constante y proyectos reales, no solo vídeos. Los enlaces de libros son de afiliado de Amazon; los cursos gratis no nos reportan nada.",
+    publishCta: "¿Has construido algo? Publícalo con 100mini →",
     freeLibrary: "Biblioteca gratis",
     allBooks: "Todos los libros",
   },
@@ -297,6 +302,7 @@ export const LP_COPY: Record<LpLocale, LpCopy> = {
     restart: "Começar de novo",
     disclosure:
       "Como é calculado: os prazos são estimativas a partir do total de horas de estudo (objetivo × nível inicial + especialização), dividido pelas suas horas semanais e exibido como intervalo. Assumem trabalho consistente e projetos reais, não apenas vídeos. Os links de livros são de afiliado da Amazon; cursos grátis não nos rendem nada.",
+    publishCta: "Construiu algo? Publique com a 100mini →",
     freeLibrary: "Biblioteca grátis",
     allBooks: "Todos os livros",
   },
