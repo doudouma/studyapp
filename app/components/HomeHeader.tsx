@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { Code2, Settings, LogOut, Menu, X, Bookmark, ChevronDown, User } from "lucide-react";
+import { Code2, Settings, LogOut, Menu, X, Bookmark, ChevronDown, ChevronRight, User } from "lucide-react";
 import { authClient } from "~/lib/auth-client";
 import { useAuth } from "~/lib/auth-context";
 import { Button } from "~/components/ui/button";
@@ -455,11 +455,12 @@ export function AppNav() {
             {menuOpen && (
               <div className="absolute right-0 top-10 z-50 w-52 rounded-lg border border-border bg-popover shadow-lg">
                 <button
-                  className="flex w-full items-center gap-2 border-b px-3 py-2 text-left text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                  className="group flex w-full cursor-pointer items-center gap-2 border-b px-3 py-2 text-left text-sm font-medium text-foreground transition-colors hover:bg-muted hover:text-primary"
                   onClick={() => { setMenuOpen(false); navigate({ to: "/links" }); }}
                 >
-                  <User className="size-4 text-muted-foreground" />
+                  <User className="size-4 text-muted-foreground group-hover:text-primary" />
                   <span className="truncate">{user.name}</span>
+                  <ChevronRight className="ml-auto size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
                 </button>
                 <div className="border-b px-3 py-2">
                   <div className="flex items-center justify-between">
@@ -477,7 +478,7 @@ export function AppNav() {
                   </button>
                 )}
                 <button
-                  className="flex w-full items-center gap-2 rounded-b-lg px-3 py-2 text-sm transition-colors hover:bg-muted"
+                  className="flex w-full cursor-pointer items-center gap-2 rounded-b-lg px-3 py-2 text-sm transition-colors hover:bg-muted"
                   onClick={handleLogout}
                 >
                   <LogOut className="size-4" />
