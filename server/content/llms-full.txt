@@ -76,7 +76,7 @@ Expiring and one-time pages are excluded from the Learning Square.
 
 ## 100 Questions guides
 - Index: https://100mini.com/100-questions
-- What it is: topic guides built around 100 questions. Each guide keeps every question in a left-hand contents menu and gives a direct answer or a source link under each heading.
+- What it is: topic guides built around 100 questions, plus one 30-method AI cost-saving playbook. Each guide keeps every question in a left-hand contents menu and gives a direct answer or a source link under each heading.
 - Guides:
   - 100 Questions About Codex — https://100mini.com/100-questions/codex-100-questions
   - 100 Common AI Questions (mined from Reddit and X) — https://100mini.com/100-questions/ai-100-questions-2026-11-01
@@ -87,9 +87,10 @@ Expiring and one-time pages are excluded from the Learning Square.
   - 100 Questions About Jev — https://100mini.com/100-questions/jev-100-questions
   - 100 Questions About Context Engineering — https://100mini.com/100-questions/context-engineering-100-questions
   - 100 Questions About RAG — https://100mini.com/100-questions/rag-100-questions
+  - AI Cost-Saving Playbook (30 methods, Reddit + X) — https://100mini.com/100-questions/ai-cost-saving-reddit-x
 - Languages: English, Chinese, Spanish, Portuguese and French. Use /zh/, /es/, /pt/ or /fr/ before /100-questions; each language has a canonical URL and hreflang alternates.
 - Machine-readable: append .md to a guide URL for a Markdown version (for example https://100mini.com/100-questions/codex-100-questions.md). The HTML page remains canonical.
-- Topics covered: Codex fundamentals and workflows; a 100-question AI question bank mined from Reddit and X; a practical Vibe Coding guide from first prototype to secure deployment, quality control and career choices; a WorkBuddy office-workflow guide covering Ask/Plan/Craft, connectors, validation and boundaries; an Obsidian + AI knowledge-base guide covering notes, links, local models, plugins and privacy; a GitHub guide covering first steps, pitfalls, search, portfolios and open-source contribution; a Jev guide covering System One judgement models, API access, calibration, limits and rollout; a Context Engineering guide covering context rot, window assembly, compaction, caching, instruction design and quality evaluation; and a RAG guide covering architecture, parsing, chunking, embeddings, retrieval, reranking, hallucination diagnosis, evaluation, cost, multimodality and GraphRAG.
+- Topics covered: Codex fundamentals and workflows; a 100-question AI question bank mined from Reddit and X; a practical Vibe Coding guide from first prototype to secure deployment, quality control and career choices; a WorkBuddy office-workflow guide covering Ask/Plan/Craft, connectors, validation and boundaries; an Obsidian + AI knowledge-base guide covering notes, links, local models, plugins and privacy; a GitHub guide covering first steps, pitfalls, search, portfolios and open-source contribution; a Jev guide covering System One judgement models, API access, calibration, limits and rollout; a Context Engineering guide covering context rot, window assembly, compaction, caching, instruction design and quality evaluation; a RAG guide covering architecture, parsing, chunking, embeddings, retrieval, reranking, hallucination diagnosis, evaluation, cost, multimodality and GraphRAG; and a 30-method AI cost-saving playbook covering bill negotiation, contract audits, local models, routing, caching, observability and enterprise automation.
 - Freshness: each guide carries publishedAt/updatedAt dates in its frontmatter and Article JSON-LD.
 
 ## Comparisons
