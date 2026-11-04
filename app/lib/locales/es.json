@@ -2281,6 +2281,8 @@
   "aiBooks.table.book": "Libro",
   "aiBooks.table.author": "Autor",
   "aiBooks.table.why": "Por qué este",
+  "aiBooks.table.fitFor": "Ideal para",
+  "aiBooks.table.notFor": "No si",
   "aiBooks.table.note": "Las valoraciones son de lectores de Amazon, capturadas en noviembre de 2026.",
   "aiBooks.method.title": "Cómo ordenamos los libros de IA",
   "aiBooks.method.volume": "Volumen de reseñas",

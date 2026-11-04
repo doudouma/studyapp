@@ -2327,6 +2327,8 @@
   "aiBooks.table.book": "书名",
   "aiBooks.table.author": "作者",
   "aiBooks.table.why": "为什么选它",
+  "aiBooks.table.fitFor": "适合",
+  "aiBooks.table.notFor": "不适合",
   "aiBooks.table.note": "评分为 Amazon 读者评分，抓取于 2026 年 11 月。",
   "aiBooks.method.title": "我们如何给 AI 书排序",
   "aiBooks.method.volume": "评论数量",

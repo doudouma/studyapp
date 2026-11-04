@@ -446,13 +446,15 @@ function AiBooksPage() {
                   </span>
                 </summary>
                 <div className="overflow-x-auto border-t border-border">
-                  <table className="w-full min-w-[680px] text-left text-sm">
+                  <table className="w-full min-w-[920px] text-left text-sm">
                     <thead className="bg-muted/60 text-[11px] uppercase tracking-wide text-muted-foreground">
                       <tr>
                         <th className="px-3 py-2 font-semibold">{t("aiBooks.table.goal")}</th>
                         <th className="px-3 py-2 font-semibold">{t("aiBooks.table.book")}</th>
                         <th className="px-3 py-2 font-semibold">{t("aiBooks.table.author")}</th>
                         <th className="px-3 py-2 font-semibold">{t("aiBooks.table.why")}</th>
+                        <th className="px-3 py-2 font-semibold">{t("aiBooks.table.fitFor")}</th>
+                        <th className="px-3 py-2 font-semibold">{t("aiBooks.table.notFor")}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -481,6 +483,18 @@ function AiBooksPage() {
                             <td className="px-3 py-2.5 text-xs text-muted-foreground">{pick.author}</td>
                             <td className="px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
                               {pick.why[contentLocale]}
+                            </td>
+                            <td className="px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
+                              <span className="mr-1 font-bold text-emerald-600 dark:text-emerald-400">
+                                ✓
+                              </span>
+                              {pick.fitFor[contentLocale]}
+                            </td>
+                            <td className="px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
+                              <span className="mr-1 font-bold text-rose-600 dark:text-rose-400">
+                                ✗
+                              </span>
+                              {pick.notFor[contentLocale]}
                             </td>
                           </tr>
                         );

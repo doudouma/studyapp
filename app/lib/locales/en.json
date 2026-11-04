@@ -2339,6 +2339,8 @@
   "aiBooks.table.book": "Book",
   "aiBooks.table.author": "Author",
   "aiBooks.table.why": "Why this one",
+  "aiBooks.table.fitFor": "Best for",
+  "aiBooks.table.notFor": "Skip if",
   "aiBooks.table.note": "Ratings are Amazon reader ratings captured in November 2026.",
   "aiBooks.method.title": "How we rank AI books",
   "aiBooks.method.volume": "Review volume",

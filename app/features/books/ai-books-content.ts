@@ -22,6 +22,8 @@ export interface TopPick {
   book: string;
   author: string;
   why: Localized;
+  fitFor: Localized;
+  notFor: Localized;
 }
 
 export const TOP_PICKS: TopPick[] = [
@@ -37,6 +39,20 @@ export const TOP_PICKS: TopPick[] = [
       es: "Una introducción breve y práctica a la IA, escrita para no especialistas.",
       pt: "Uma introdução curta e prática à IA, escrita para não especialistas.",
     },
+    fitFor: {
+      en: "Non-technical readers who want a practical, low-jargon starting point and habits for using AI at work.",
+      zh: "想要实用、少术语的入门起点，并希望建立日常 AI 使用习惯的非技术读者。",
+      fr: "Les lecteurs non techniques qui veulent un point de départ pratique et sans jargon, et des habitudes d'usage de l'IA au travail.",
+      es: "Lectores no técnicos que buscan un punto de partida práctico y sin jerga, y hábitos para usar IA en el trabajo.",
+      pt: "Leitores não técnicos que querem um ponto de partida prático e sem jargão, e hábitos para usar IA no trabalho.",
+    },
+    notFor: {
+      en: "Readers looking for implementation details, deep prompt engineering or how to build AI products.",
+      zh: "想深入了解实现细节、提示词工程，或想动手构建 AI 产品的读者。",
+      fr: "Les lecteurs qui cherchent des détails d'implémentation, du prompt engineering avancé ou comment construire des produits IA.",
+      es: "Lectores que buscan detalles de implementación, prompt engineering avanzado o cómo construir productos de IA.",
+      pt: "Leitores que buscam detalhes de implementação, prompt engineering avançado ou como construir produtos de IA.",
+    },
   },
   {
     asin: "1098166302",
@@ -49,6 +65,20 @@ export const TOP_PICKS: TopPick[] = [
       fr: "Le guide le plus clair pour construire des produits avec des modèles de fondation, de l'évaluation au déploiement.",
       es: "La guía más clara para construir productos con modelos fundacionales, de la evaluación al despliegue.",
       pt: "O guia mais claro para construir produtos com modelos de fundação, da avaliação ao deploy.",
+    },
+    fitFor: {
+      en: "Engineers and technical PMs building LLM products who need evaluation, RAG, deployment and cost trade-offs.",
+      zh: "正在构建 LLM 产品的工程师和技术型产品经理，需要评估、RAG、部署与成本权衡的实操指导。",
+      fr: "Les ingénieurs et PM techniques qui construisent des produits LLM et ont besoin d'évaluation, de RAG, de déploiement et d'arbitrages de coûts.",
+      es: "Ingenieros y PM técnicos que construyen productos LLM y necesitan evaluación, RAG, despliegue y decisiones de coste.",
+      pt: "Engenheiros e PMs técnicos que constroem produtos LLM e precisam de avaliação, RAG, deploy e decisões de custo.",
+    },
+    notFor: {
+      en: "Complete beginners or non-technical managers who want strategy without code.",
+      zh: "完全新手，或只想要战略、不想碰代码的非技术管理者。",
+      fr: "Les grands débutants ou les managers non techniques qui veulent de la stratégie sans code.",
+      es: "Principiantes absolutos o directivos no técnicos que buscan estrategia sin código.",
+      pt: "Iniciantes absolutos ou gestores não técnicos que querem estratégia sem código.",
     },
   },
   {
@@ -63,6 +93,20 @@ export const TOP_PICKS: TopPick[] = [
       es: "Marcos para decidir dónde encaja la IA, sin convertir el libro en un manual de programación.",
       pt: "Frameworks para decidir onde a IA se encaixa, sem transformar o livro em um manual de programação.",
     },
+    fitFor: {
+      en: "Managers and executives deciding where AI fits in workflows, teams and decisions.",
+      zh: "想判断 AI 该用在哪些流程、团队和决策上的管理者与高管。",
+      fr: "Les managers et dirigeants qui décident où l'IA a sa place dans les processus, les équipes et les décisions.",
+      es: "Directivos y ejecutivos que deciden dónde encaja la IA en procesos, equipos y decisiones.",
+      pt: "Gestores e executivos que decidem onde a IA se encaixa em processos, equipes e decisões.",
+    },
+    notFor: {
+      en: "Readers who want hands-on model building or deep technical implementation.",
+      zh: "想亲手搭建模型或深入技术实现的读者。",
+      fr: "Les lecteurs qui veulent construire des modèles ou approfondir l'implémentation technique.",
+      es: "Lectores que quieren construir modelos o profundizar en la implementación técnica.",
+      pt: "Leitores que querem construir modelos ou aprofundar a implementação técnica.",
+    },
   },
   {
     asin: "1394345925",
@@ -76,6 +120,20 @@ export const TOP_PICKS: TopPick[] = [
       es: "Un marco de diseño para productos de IA, incluidos confianza, feedback y estados de fallo.",
       pt: "Um framework de design para produtos de IA, incluindo confiança, feedback e estados de falha.",
     },
+    fitFor: {
+      en: "Product designers and UX leads shaping AI features, including trust, feedback and failure states.",
+      zh: "负责 AI 功能的产品设计师和 UX 负责人，尤其是要处理信任、反馈与失败状态的人。",
+      fr: "Les designers produit et UX leads qui conçoivent des fonctionnalités IA, notamment confiance, feedback et états d'échec.",
+      es: "Diseñadores de producto y responsables de UX que dan forma a funciones de IA, incluidos confianza, feedback y estados de fallo.",
+      pt: "Designers de produto e líderes de UX que moldam recursos de IA, incluindo confiança, feedback e estados de falha.",
+    },
+    notFor: {
+      en: "Engineers looking for model or backend architecture guidance.",
+      zh: "想找模型或后端架构指导的工程师。",
+      fr: "Les ingénieurs qui cherchent des conseils sur l'architecture des modèles ou du backend.",
+      es: "Ingenieros que buscan guía sobre arquitectura de modelos o backend.",
+      pt: "Engenheiros que buscam orientação sobre arquitetura de modelos ou backend.",
+    },
   },
   {
     asin: "1541605527",
@@ -88,6 +146,20 @@ export const TOP_PICKS: TopPick[] = [
       fr: "Un regard réfléchi sur l'écriture avec l'IA sans perdre sa voix, son jugement ou son métier.",
       es: "Una mirada reflexiva a escribir con IA sin perder voz, criterio ni oficio.",
       pt: "Um olhar ponderado sobre escrever com IA sem perder voz, julgamento ou ofício.",
+    },
+    fitFor: {
+      en: "Writers and editors who want to keep their voice and judgment while using AI in the writing process.",
+      zh: "希望在写作流程中使用 AI，同时保住自己声音与判断力的写作者和编辑。",
+      fr: "Les auteurs et éditeurs qui veulent garder leur voix et leur jugement en utilisant l'IA dans leur processus d'écriture.",
+      es: "Escritores y editores que quieren mantener su voz y criterio al usar IA en el proceso de escritura.",
+      pt: "Escritores e editores que querem manter voz e julgamento ao usar IA no processo de escrita.",
+    },
+    notFor: {
+      en: "Readers seeking prompt templates or a tactical AI writing toolkit.",
+      zh: "想找提示词模板或可落地 AI 写作工具箱的读者。",
+      fr: "Les lecteurs qui cherchent des modèles de prompts ou une boîte à outils tactique d'écriture IA.",
+      es: "Lectores que buscan plantillas de prompts o un kit táctico de escritura con IA.",
+      pt: "Leitores que buscam modelos de prompts ou um kit tático de escrita com IA.",
     },
   },
 ];
