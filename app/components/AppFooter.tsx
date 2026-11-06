@@ -257,6 +257,12 @@ export function AppFooter() {
               label="Featured on Dofollow.Tools"
               rel="noopener"
             />
+            <BadgeLink
+              href="https://inventlist.com/sites/instant-html-hosting"
+              imgSrc="https://inventlist.com/sites/instant-html-hosting/badge/listed"
+              label="Listed on InventList"
+              rel="noopener"
+            />
           </div>
         </div>
       </div>
