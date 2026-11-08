@@ -31,7 +31,8 @@ const JEV = "jev-100-questions";
 const CONTEXT = "context-engineering-100-questions";
 const RAG = "rag-100-questions";
 const COST = "ai-cost-saving-reddit-x";
-const CHAPTERS: Record<string, number> = { [FIRST]: 6, [AI]: 12, [VIBE]: 7, [WORKBUDDY]: 6, [OBSIDIAN]: 7, [GITHUB]: 6, [JEV]: 6, [CONTEXT]: 6, [RAG]: 10, [COST]: 6 };
+const GEO = "geo-whitepaper-overseas";
+const CHAPTERS: Record<string, number> = { [FIRST]: 6, [AI]: 12, [VIBE]: 7, [WORKBUDDY]: 6, [OBSIDIAN]: 7, [GITHUB]: 6, [JEV]: 6, [CONTEXT]: 6, [RAG]: 10, [COST]: 6, [GEO]: 8 };
 // 例外：省钱方法清单只有 30 条，不是 100 问（见内容说明）
 const QUESTION_COUNTS: Record<string, number> = { [COST]: 30 };
 const FULLY_TRANSLATED = new Set(SLUGS);

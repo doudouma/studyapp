@@ -25,6 +25,7 @@
 - [Case library](https://100mini.com/showcase)
 - [100 Questions](https://100mini.com/100-questions): long-form topic guides built around 100 questions; append .md to any guide URL for a Markdown version
 - [AI Cost-Saving Playbook](https://100mini.com/100-questions/ai-cost-saving-reddit-x): 30 cost-cutting methods mined from Reddit and X, with evidence links; Markdown at https://100mini.com/100-questions/ai-cost-saving-reddit-x.md
+- [Overseas GEO Whitepaper in 100 Questions](https://100mini.com/100-questions/geo-whitepaper-overseas): five AI platforms' source preferences, citation drift, the five-can framework, measurement and a 90-day rollout; Markdown at https://100mini.com/100-questions/geo-whitepaper-overseas.md
 - [AI Readiness Self-Assessment](https://100mini.com/ai-skills-assessment): 10 statements → 0–100 readiness score, weakest areas and the next 100 Questions guides to read
 - [Learning Square](https://100mini.com/square)
 - [Alternatives & comparisons](https://100mini.com/alternatives): 100mini vs Netlify Drop, Tiiny Host, CodePen, Vercel, GitHub Pages, and AI-native artifact sharing
