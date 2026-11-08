@@ -13,6 +13,7 @@ export default defineConfig({
     include: ["tests/**/*.spec.{ts,tsx}"],
     exclude: [
       "tests/any2md.spec.ts",
+      "tests/ai-tierlist.spec.ts",
       "tests/idphoto.spec.ts",
       "tests/md2html-publish.spec.ts",
       "tests/pomodoro.spec.ts",

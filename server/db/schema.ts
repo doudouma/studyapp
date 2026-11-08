@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, index, uniqueIndex } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 
 // --- Better Auth tables (D1/SQLite compatible) ---
@@ -264,4 +264,23 @@ export const outbreakRank = sqliteTable("outbreak_rank", {
 }, (t) => [
   index("idx_outbreak_rank_score").on(t.score),
   index("idx_outbreak_rank_player").on(t.playerKey),
+]);
+
+// --- AI Tier List 社区投票 ---
+// 一人一榜一工具一票：重复投票即改票（唯一约束是防刷的唯一硬保证，
+// 应用层走 upsert，不用先查后写）。board/tool 取值由 service 层白名单校验。
+
+export const tierlistVote = sqliteTable("tierlist_vote", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  board: text("board").notNull(), // image/code/chat/video/free/research
+  tool: text("tool").notNull(), // 固定榜里的工具名（榜单稳定标识）
+  tier: integer("tier").notNull().default(0), // 0=S 1=A 2=B 3=C 4=D
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
+}, (t) => [
+  uniqueIndex("uq_tierlist_vote_user_tool").on(t.userId, t.board, t.tool),
+  index("idx_tierlist_vote_board").on(t.board, t.tool),
 ]);

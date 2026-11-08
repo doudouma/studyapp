@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Timer, Music, FileText, FileCode2, Camera, ArrowRight, Sparkles, PawPrint, ShieldAlert, Link2, CalendarClock, ClipboardCheck } from "lucide-react";
+import { Timer, Music, FileText, FileCode2, Camera, ArrowRight, Sparkles, PawPrint, ShieldAlert, Link2, CalendarClock, ClipboardCheck, Layers } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { useTranslation } from "react-i18next";
@@ -94,6 +94,12 @@ export const Route = createFileRoute("/freetool")({
                 name: i18n.t("freetool.item.aiAssessment.title"),
                 url: "https://100mini.com/ai-skills-assessment",
               },
+              {
+                "@type": "ListItem",
+                position: 11,
+                name: i18n.t("aiTierlist.heading"),
+                url: "https://100mini.com/ai-tierlist",
+              },
             ],
           }),
         },
@@ -166,6 +172,12 @@ function FreeToolPage() {
       icon: ClipboardCheck,
       title: t("freetool.item.aiAssessment.title"),
       desc: t("freetool.item.aiAssessment.desc"),
+    },
+    {
+      href: "/ai-tierlist" as const,
+      icon: Layers,
+      title: t("aiTierlist.heading"),
+      desc: t("aiTierlist.subheading"),
     },
   ];
 
