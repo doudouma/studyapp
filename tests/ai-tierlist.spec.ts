@@ -121,6 +121,47 @@ test("切换工具池与重置都走站内确认框（不依赖原生 confirm）
   await expect(page.locator(".tl-tools .tl-chip")).toHaveCount(35);
 });
 
+test("工具池计数与可见卡片一致，且已移除搜索筛选", async ({ page }) => {
+  await page.goto("/ai-tierlist");
+  const chips = page.locator(".tl-tools .tl-chip");
+  const count = page.locator(".tl-pool h3 .count");
+  await expect(chips).toHaveCount(35);
+  await expect(count).toContainText("35");
+  await expect(page.locator(".tl-search")).toHaveCount(0);
+
+  // 移走一个工具后，计数与卡片数同步减少（计数不再和主体对不上）
+  await selectPoolChip(page);
+  await page.locator(".tl-movebar .tl-mbtn").first().click();
+  await expect(chips).toHaveCount(34);
+  await expect(count).toContainText("34");
+});
+
+test("浏览器翻译包裹文本节点时，点击卡片不会 insertBefore 崩溃", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+
+  await page.goto("/ai-tierlist");
+  await page.waitForSelector(".tl-chip", { state: "visible", timeout: 30000 });
+  await page.waitForTimeout(2000); // 等 hydration 完成
+
+  await expect(page.locator(".tlw")).toHaveAttribute("translate", "no");
+  await expect(page.locator(".tlw")).toHaveClass(/notranslate/);
+
+  // 模拟 Chrome/扩展翻译：把 movebar 的静态文本包进 <font>
+  await page.evaluate(() => {
+    const ml = document.querySelector(".tl-movebar .ml");
+    if (!ml || !ml.lastChild) return;
+    const font = document.createElement("font");
+    font.textContent = ml.lastChild.textContent ?? "";
+    ml.lastChild.textContent = "";
+    ml.appendChild(font);
+  });
+
+  await selectPoolChip(page);
+  await expect(page.locator(".tl-movebar.show")).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
 test("freetool 列表挂上了 AI Tier List 入口", async ({ page }) => {
   await page.goto("/freetool");
   await expect(page.getByRole("link", { name: /AI Tools Tier List Maker/ })).toBeVisible();

@@ -235,7 +235,6 @@ const CSS = `
   font-size:13px; min-width:0;
 }
 .tl-addrow .tl-field.grow{flex:1; min-width:170px}
-.tl-search{margin-left:auto; min-width:150px}
 .tl-movebar{
   position:fixed; left:50%; bottom:18px; transform:translateX(-50%) translateY(140%);
   background:#111827; color:#fff; border-radius:14px; padding:10px 12px; display:flex; gap:8px;
@@ -290,7 +289,6 @@ const CSS = `
   .tl-tier-label{width:100%; flex-direction:row; align-items:center; gap:10px; padding:10px 14px}
   .tl-tier-label .ten{margin-top:0}
   .tl-doc-title{min-width:120px; max-width:40vw}
-  .tl-search{margin-left:0; width:100%}
   .tl-chip{min-width:104px}
 }
 `;
@@ -350,7 +348,6 @@ export function TierListMaker() {
   const [state, setState] = useState<TierBoard>(() => createBoard(tr));
   const [hydrated, setHydrated] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [search, setSearch] = useState("");
   const [newName, setNewName] = useState("");
   const [newCat, setNewCat] = useState<TierCat>("chat");
   const [modalId, setModalId] = useState<string | null>(null);
@@ -678,17 +675,16 @@ export function TierListMaker() {
     }
   };
 
-  const filteredPool = state.pool.filter((id) => {
-    const tool = state.tools[id];
-    if (!tool) return false;
-    const q = search.trim().toLowerCase();
-    return !q || tool.name.toLowerCase().includes(q) || catLabel(tool.cat).toLowerCase().includes(q);
-  });
+  // 计数与卡片用同一份列表：池里若有失效引用会被剔除，保证「数字 = 可见卡片数」
+  const poolItems = state.pool.filter((id) => !!state.tools[id]);
 
   const themeValue = isTierlistTheme(state.theme) ? state.theme : "generic";
 
   return (
-    <div className="tlw">
+    // translate="no" + notranslate：浏览器翻译扩展会把文本节点包进 <font>，
+    // 破坏 React 的 DOM 锚点（表现为点击卡片时 insertBefore 崩溃）。
+    // 工具本身已做 5 语言 i18n，不需要再被机器翻译。
+    <div className="tlw notranslate" translate="no">
       <style>{CSS}</style>
 
       <div className="tl-header">
@@ -781,14 +777,7 @@ export function TierListMaker() {
         <div className="tl-pool">
           <h3>
             🗂 {t("aiTierlist.ui.pool")}
-            <span className="count">{t("aiTierlist.ui.unsorted", { n: state.pool.length })}</span>
-            <input
-              className="tl-field tl-search"
-              value={search}
-              placeholder={t("aiTierlist.ui.searchPlaceholder")}
-              aria-label={t("aiTierlist.ui.searchPlaceholder")}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+            <span className="count">{t("aiTierlist.ui.unsorted", { n: poolItems.length })}</span>
           </h3>
           <div className="tl-addrow">
             <input
@@ -815,14 +804,10 @@ export function TierListMaker() {
             </button>
           </div>
           <div className="tl-tools">
-            {filteredPool.length === 0 ? (
-              <div className="tl-empty">
-                {state.pool.length === 0
-                  ? t("aiTierlist.ui.emptyPool")
-                  : t("aiTierlist.ui.noMatch")}
-              </div>
+            {poolItems.length === 0 ? (
+              <div className="tl-empty">{t("aiTierlist.ui.emptyPool")}</div>
             ) : (
-              filteredPool.map((id) => {
+              poolItems.map((id) => {
                 const tool = state.tools[id];
                 return (
                   <Chip
@@ -846,7 +831,7 @@ export function TierListMaker() {
 
       <div className={`tl-movebar${selected ? " show" : ""}`}>
         <span className="ml">
-          {selected ? `「${state.tools[selected].name}」 ` : ""}
+          <span className="selname">{selected ? `「${state.tools[selected].name}」 ` : ""}</span>
           {t("aiTierlist.ui.moveTo")}
         </span>
         {state.tiers.map((tier) => (
