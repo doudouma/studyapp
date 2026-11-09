@@ -2414,6 +2414,8 @@
   "freeLib.desc": "A hand-picked library of free AI courses and permanently free Kindle ebooks. Every link is free to access — no trial, no paywall. Sorted by how many people actually used them.",
   "freeLib.keywords": "free AI courses, free AI ebooks, free machine learning course, free ChatGPT course, free deep learning course, free Kindle AI books",
   "freeLib.h1": "Free AI library",
+  "freeLib.extrasLabel": "Hand-picked extras",
+  "freeLib.zeroPaywall": "Paywalls. No trial, no card.",
   "freeLib.intro": "Every course and ebook on this page is free to access — no trial, no paywall. Courses are top-rated free Udemy classes; ebooks are permanently free Kindle editions on Amazon. Sorted by how many people actually used them.",
   "freeLib.searchPlaceholder": "Search free courses, ebooks, topics",
   "freeLib.allBooks": "All books",

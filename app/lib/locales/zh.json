@@ -2402,6 +2402,8 @@
   "freeLib.desc": "精选免费 AI 课程与 Amazon 永久免费 Kindle 电子书。所有链接均可免费访问，没有试用期，没有付费墙，按真实使用人数排序。",
   "freeLib.keywords": "免费AI课程,免费AI电子书,免费机器学习课程,免费ChatGPT课程,免费深度学习课程,免费Kindle AI书",
   "freeLib.h1": "免费 AI 资源库",
+  "freeLib.extrasLabel": "精选资源",
+  "freeLib.zeroPaywall": "付费墙。无试用、无绑卡。",
   "freeLib.intro": "本页所有课程与电子书均可免费访问，没有试用期，也没有付费墙。课程是 Udemy 上评分最高的免费课，电子书是 Amazon 上永久免费的 Kindle 版本，按真实使用人数排序。",
   "freeLib.searchPlaceholder": "搜索免费课程、电子书或主题",
   "freeLib.allBooks": "全部书单",

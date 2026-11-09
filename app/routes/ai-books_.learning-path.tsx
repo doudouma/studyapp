@@ -1,8 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowUpRight } from "lucide-react";
 import i18n from "~/lib/i18n";
 import { BASE_URL, currentLang, withLangPrefix } from "~/lib/seo";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
+import { AIX_CSS } from "~/components/aix/aix-styles";
+import { BOOKS_CSS } from "~/components/aix/books-styles";
 import { LearningPathCalculator } from "~/features/books/LearningPathCalculator";
 import { LP_COPY, type LpLocale } from "~/features/books/learning-path-calculator";
 
@@ -51,15 +54,30 @@ function LearningPathPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-[#ededed] dark:bg-[#0c0d0f]">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
       <AppNav />
       <main className="flex-1">
-        <div className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
-          <LearningPathCalculator />
+        <div className="aix">
+          <style>{AIX_CSS}{BOOKS_CSS}</style>
+          <section className="aix-frame">
+            <div className="aix-mininav">
+              <span className="brand">
+                <span className="dot" />
+                AI BOOKS / LEARNING PATH
+              </span>
+              <Link to="/ai-books">
+                {i18n.t("aiBookPage.back")}
+                <ArrowUpRight className="size-3.5" />
+              </Link>
+            </div>
+            <div className="aix-calc">
+              <LearningPathCalculator />
+            </div>
+          </section>
         </div>
       </main>
       <AppFooter />

@@ -7,9 +7,7 @@ import { AppFooter } from "~/components/AppFooter";
 import { TierListMaker } from "~/components/tierlist/TierListMaker";
 import i18n, { getBcp47 } from "~/lib/i18n";
 import { withLangPrefix, currentLang, BASE_URL, DEFAULT_OG_IMAGE } from "~/lib/seo";
-import { TIERLIST_THEMES, TIERLIST_TOOLS } from "@shared/types/tierlist";
 import { AIX_CSS } from "~/components/aix/aix-styles";
-import { AixBurst } from "~/components/aix/AixBurst";
 
 /**
  * AI Tier List 页面
@@ -111,18 +109,6 @@ function AiTierListPage() {
     desc: t(`aiTierlist.feature${i + 1}.desc`),
   }));
 
-  const stats = [
-    { n: String(TIERLIST_TOOLS.generic.length), label: t("aiTierlist.statTools"), cls: "grey" },
-    { n: String(TIERLIST_THEMES.length), label: t("aiTierlist.statPools"), cls: "lime" },
-    { n: "5", label: t("aiTierlist.statTiers"), cls: "ink" },
-    { n: "0", label: t("aiTierlist.statSignup"), cls: "ghost" },
-  ];
-
-  const ladder = [2, 3, 4, 5].map((i) => ({
-    letter: t(`aiTierlist.tier${i}.label`).slice(0, 1),
-    label: t(`aiTierlist.tier${i}.en`),
-  }));
-
   return (
     <div className="flex min-h-screen flex-col bg-[#ededed] dark:bg-[#0c0d0f]">
       <AppNav />
@@ -130,64 +116,27 @@ function AiTierListPage() {
         <div className="aix">
           <style>{AIX_CSS}</style>
 
-          {/* HERO */}
-          <section className="aix-frame aix-hero">
-            <div className="aix-mininav">
-              <span className="brand">
-                <span className="dot" />
-                AI TIER LIST
-              </span>
-              <span>{t("aiTierlist.kicker")}</span>
-              <a href={statsHref}>
-                {t("aiTierlist.viewStats")}
-                <ArrowUpRight className="size-3.5" />
-              </a>
-            </div>
-
-            <div className="aix-hero-grid">
-              <div className="aix-hero-copy">
-                <div>
-                  <div className="aix-topline">
-                    <span className="aix-pill lime">
-                      <span className="dot" />
-                      {t("aiTierlist.badge")}
-                    </span>
-                    <span className="aix-kicker">{t("aiTierlist.kicker")}</span>
-                  </div>
-                  <h1 className="aix-h1">{t("aiTierlist.heading")}</h1>
-                  <p className="aix-lede">{t("aiTierlist.subheading")}</p>
-                </div>
-
-                <div className="aix-stats">
-                  {stats.map((s) => (
-                    <div key={s.label} className={`aix-stat ${s.cls}`}>
-                      <div className="n">{s.n}</div>
-                      <div className="l">{s.label}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="aix-art" aria-hidden="true">
-                <span className="aix-art-grid" />
-                <AixBurst className="aix-art-burst" />
-                <div className="aix-art-s">
-                  S<span>{t("aiTierlist.tier1.en")}</span>
-                </div>
-                <div className="aix-art-rows">
-                  {ladder.map((row) => (
-                    <div key={row.letter} className="aix-art-row">
-                      <b>{row.letter}</b>
-                      <span>{row.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </section>
-
           {/* MAKER */}
           <section className="aix-frame" id="aix-maker">
+            <div className="aix-lead">
+              <div>
+                <div className="aix-topline">
+                  <span className="aix-pill lime">
+                    <span className="dot" />
+                    {t("aiTierlist.badge")}
+                  </span>
+                  <span className="aix-kicker">{t("aiTierlist.kicker")}</span>
+                </div>
+                <h1>{t("aiTierlist.heading")}</h1>
+                <p>{t("aiTierlist.subheading")}</p>
+              </div>
+              <div className="aix-lead-meta">
+                <a href={statsHref}>
+                  {t("aiTierlist.viewStats")}
+                  <ArrowUpRight className="size-3.5" />
+                </a>
+              </div>
+            </div>
             <div className="aix-sec-head">
               <div>
                 <div className="aix-section-num">01</div>

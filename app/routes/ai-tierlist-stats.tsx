@@ -11,7 +11,6 @@ import {
   type RedditToolStat,
 } from "@shared/data/reddit-ai-tools";
 import { AIX_CSS } from "~/components/aix/aix-styles";
-import { AixBurst } from "~/components/aix/AixBurst";
 import type { TierCat } from "@shared/types/tierlist";
 
 /**
@@ -22,7 +21,6 @@ import type { TierCat } from "@shared/types/tierlist";
  */
 
 const SORTED: RedditToolStat[] = [...REDDIT_TOOL_STATS].sort((a, b) => b.daily - a.daily);
-const TOTAL_SAMPLED = REDDIT_TOOL_STATS.reduce((sum, item) => sum + item.mentions, 0);
 
 const CATEGORY_ORDER: TierCat[] = ["chat", "code", "image", "audio", "search", "video", "productivity"];
 const CATEGORY_STATS = CATEGORY_ORDER.map((cat) => ({
@@ -31,7 +29,6 @@ const CATEGORY_STATS = CATEGORY_ORDER.map((cat) => ({
   tools: REDDIT_TOOL_STATS.filter((item) => item.cat === cat).length,
 })).sort((a, b) => b.daily - a.daily);
 const MAX_CATEGORY_DAILY = Math.max(...CATEGORY_STATS.map((item) => item.daily));
-const TOP_CATEGORY = CATEGORY_STATS[0];
 
 const TOP_POSTS = SORTED.filter((item) => item.topPost)
   .sort((a, b) => (b.topPost?.score ?? 0) - (a.topPost?.score ?? 0))
@@ -163,13 +160,6 @@ function AiTierListStatsPage() {
   const lang = currentLang();
   const tierListHref = withLangPrefix(lang, "/ai-tierlist");
 
-  const stats = [
-    { n: String(REDDIT_TOOL_STATS.length), label: t("aiTierlistStats.statTools"), cls: "grey" },
-    { n: String(REDDIT_STATS.subs.length), label: t("aiTierlistStats.statSubs"), cls: "lime" },
-    { n: `${REDDIT_STATS.windowDays}D`, label: t("aiTierlistStats.statWindow"), cls: "ink" },
-    { n: `${TOTAL_SAMPLED.toLocaleString("en-US")}+`, label: t("aiTierlistStats.statSampled"), cls: "ghost" },
-  ];
-
   return (
     <div className="flex min-h-screen flex-col bg-[#ededed] dark:bg-[#0c0d0f]">
       <AppNav />
@@ -177,71 +167,30 @@ function AiTierListStatsPage() {
         <div className="aix">
           <style>{AIX_CSS}{STATS_CSS}</style>
 
-          {/* HERO */}
-          <section className="aix-frame aix-hero">
-            <div className="aix-mininav">
-              <span className="brand">
-                <span className="dot" />
-                AI TIER LIST / STATS
-              </span>
-              <span>{t("aiTierlistStats.badge")}</span>
-              <a href={tierListHref}>
-                {t("aiTierlist.sectionMaker")}
-                <ArrowUpRight className="size-3.5" />
-              </a>
-            </div>
-
-            <div className="aix-hero-grid">
-              <div className="aix-hero-copy">
-                <div>
-                  <div className="aix-topline">
-                    <span className="aix-pill lime">
-                      <span className="dot" />
-                      {t("aiTierlistStats.badge")}
-                    </span>
-                    <span className="aix-kicker">
-                      {t("aiTierlistStats.updated", { date: REDDIT_STATS.asOf })}
-                    </span>
-                  </div>
-                  <h1 className="aix-h1">{t("aiTierlistStats.heading")}</h1>
-                  <p className="aix-lede">{t("aiTierlistStats.subheading")}</p>
-                </div>
-
-                <div className="aix-stats">
-                  {stats.map((s) => (
-                    <div key={s.label} className={`aix-stat ${s.cls}`}>
-                      <div className="n">{s.n}</div>
-                      <div className="l">{s.label}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="aix-art" aria-hidden="true">
-                <span className="aix-art-grid" />
-                <AixBurst className="aix-art-burst" />
-                <div className="aix-art-s">
-                  {REDDIT_STATS.windowDays}
-                  <span>
-                    {t("aiTierlistStats.statWindow")} · {t(`aiTierlist.cat.${TOP_CATEGORY.cat}`)} #1
-                  </span>
-                </div>
-                <div className="aix-art-rows">
-                  {CATEGORY_STATS.slice(0, 5).map((row) => (
-                    <div className="aix-art-row" key={row.cat}>
-                      <b>{t(`aiTierlist.cat.${row.cat}`)}</b>
-                      <span>
-                        {row.daily.toFixed(1)} {t("aiTierlistStats.perDay")}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </section>
-
           {/* 01 CATEGORY */}
           <section className="aix-frame">
+            <div className="aix-lead">
+              <div>
+                <div className="aix-topline">
+                  <span className="aix-pill lime">
+                    <span className="dot" />
+                    {t("aiTierlistStats.badge")}
+                  </span>
+                  <span className="aix-kicker">
+                    {t("aiTierlistStats.updated", { date: REDDIT_STATS.asOf })}
+                  </span>
+                </div>
+                <h1>{t("aiTierlistStats.heading")}</h1>
+                <p>{t("aiTierlistStats.subheading")}</p>
+              </div>
+              <div className="aix-lead-meta">
+                <span>{REDDIT_STATS.windowDays}D · {REDDIT_STATS.subs.length} {t("aiTierlistStats.statSubs")}</span>
+                <a href={tierListHref}>
+                  {t("aiTierlist.sectionMaker")}
+                  <ArrowUpRight className="size-3.5" />
+                </a>
+              </div>
+            </div>
             <div className="aix-sec-head">
               <div>
                 <div className="aix-section-num">01</div>

@@ -2356,6 +2356,8 @@
   "freeLib.desc": "Una biblioteca seleccionada de cursos de IA gratis y ebooks de Kindle gratis para siempre. Todos los enlaces son de acceso gratuito, sin prueba ni paywall. Ordenados por cuántas personas los usaron realmente.",
   "freeLib.keywords": "cursos de IA gratis, ebooks de IA gratis, curso machine learning gratis, curso ChatGPT gratis, curso deep learning gratis, libros IA Kindle gratis",
   "freeLib.h1": "Biblioteca IA gratis",
+  "freeLib.extrasLabel": "Extras seleccionados",
+  "freeLib.zeroPaywall": "Muros de pago. Sin prueba, sin tarjeta.",
   "freeLib.intro": "Todos los cursos y ebooks de esta página son de acceso gratuito: sin prueba, sin paywall. Los cursos son clases gratuitas de Udemy entre las mejor valoradas; los ebooks son ediciones Kindle gratuitas de forma permanente en Amazon. Ordenados por cuántas personas los usaron realmente.",
   "freeLib.searchPlaceholder": "Buscar cursos gratis, ebooks, temas",
   "freeLib.allBooks": "Todos los libros",

@@ -19,7 +19,7 @@ import { BASE_URL, currentLang, withLangPrefix } from "~/lib/seo";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { AIX_CSS } from "~/components/aix/aix-styles";
-import { AixBurst } from "~/components/aix/AixBurst";
+import { BOOKS_CSS } from "~/components/aix/books-styles";
 import { BookCard } from "~/features/books/BookCard";
 import {
   BOOKS,
@@ -120,7 +120,7 @@ function Chip({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`ab-chip${active ? " active" : ""}`}
+      className={`ab-chip${active ? " is-active" : ""}`}
     >
       {children}
     </button>
@@ -136,123 +136,7 @@ function FilterRow({ label, children }: { label: string; children: React.ReactNo
   );
 }
 
-const BOOKS_CSS = `
-.ab-layout{display:grid;gap:24px}
-@media(min-width:1024px){.ab-layout{grid-template-columns:214px minmax(0,1fr);gap:36px}}
-.ab-side{min-width:0;display:flex;flex-direction:column;gap:2px}
-@media(min-width:1024px){.ab-side{position:sticky;top:96px;align-self:start}}
-.ab-nav{display:flex;gap:2px;overflow-x:auto;padding-bottom:6px}
-@media(min-width:1024px){.ab-nav{flex-direction:column;overflow:visible;padding-bottom:0}}
-.ab-nav-item{
-  display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:2px;border:1px solid transparent;
-  background:transparent;color:var(--aix-mute);font-size:12px;font-weight:700;line-height:1.3;
-  white-space:nowrap;cursor:pointer;text-align:left;transition:.15s;flex:none;
-}
-@media(min-width:1024px){.ab-nav-item{width:100%}}
-.ab-nav-item:hover{background:var(--aix-grey);color:var(--aix-ink)}
-.ab-nav-item.active{background:#111214;color:var(--aix-lime);border-color:#111214}
-.ab-nav-item .ic{width:14px;height:14px;flex:none}
-.ab-nav-item .badge{margin-left:auto;background:#111214;color:var(--aix-lime);font-size:8px;letter-spacing:.12em;padding:2px 5px;border-radius:2px;font-weight:800}
-.ab-nav-item.ab-free{background:var(--aix-lime);color:#111214;border-color:transparent;margin-top:6px}
-.ab-nav-item.ab-free:hover{background:#c9ef00;color:#111214}
-.ab-label{font-size:9px;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:var(--aix-mute);padding:0 10px;margin:16px 0 5px}
-.ab-topic{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 10px;border-radius:2px;
-  border:0;background:transparent;color:var(--aix-mute);font-size:12px;text-align:left;cursor:pointer;white-space:nowrap;flex:none;
-}
-@media(min-width:1024px){.ab-topic{width:100%}}
-.ab-topic:hover{background:var(--aix-grey);color:var(--aix-ink)}
-.ab-topic.active{background:var(--aix-grey);color:var(--aix-ink);font-weight:800}
-.ab-topic .n{font-size:10px;font-variant-numeric:tabular-nums;opacity:.6}
-.ab-side-note{padding:10px;font-size:10.5px;line-height:1.5;color:var(--aix-mute)}
 
-.ab-search{position:relative;width:100%;max-width:420px}
-.ab-search input{
-  width:100%;height:38px;border:1px solid var(--aix-line);background:var(--aix-paper);border-radius:2px;
-  padding:0 36px 0 32px;font-size:12px;color:var(--aix-ink);outline:none;
-}
-.ab-search input:focus{border-color:var(--aix-ink)}
-.ab-search .ic{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--aix-mute);pointer-events:none}
-.ab-search kbd{
-  position:absolute;right:8px;top:50%;transform:translateY(-50%);border:1px solid var(--aix-line);border-radius:2px;
-  padding:1px 5px;font-size:9px;color:var(--aix-mute);background:var(--aix-grey);
-}
-
-.ab-viewhead{margin:22px 0 12px;border-bottom:1px solid var(--aix-line);padding-bottom:12px}
-.ab-viewhead h2{margin:3px 0 0;font-size:clamp(20px,2.2vw,28px);font-weight:800;letter-spacing:-.03em;text-transform:uppercase;line-height:1.05}
-.ab-viewhead p{margin:6px 0 0;max-width:72ch;font-size:12.5px;line-height:1.6;color:var(--aix-mute)}
-
-.ab-filters{display:flex;flex-direction:column;gap:8px;margin:14px 0}
-.ab-filterrow{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
-.ab-filterrow > span{min-width:74px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--aix-mute)}
-.ab-chip{
-  height:28px;padding:0 11px;border:1px solid var(--aix-line);background:var(--aix-paper);color:var(--aix-mute);
-  font-size:10.5px;font-weight:700;border-radius:2px;cursor:pointer;white-space:nowrap;transition:.15s;
-}
-.ab-chip:hover{border-color:var(--aix-ink);color:var(--aix-ink)}
-.ab-chip.active{background:#111214;border-color:#111214;color:var(--aix-lime)}
-
-.ab-details{border:1px solid var(--aix-line);background:var(--aix-paper);border-radius:2px;margin-top:16px}
-.ab-details summary{display:flex;align-items:center;gap:8px;padding:11px 14px;cursor:pointer;list-style:none;font-size:12px;font-weight:800}
-.ab-details summary::-webkit-details-marker{display:none}
-.ab-details summary .chev{width:14px;height:14px;color:var(--aix-mute);transition:transform .2s;flex:none}
-.ab-details[open] summary .chev{transform:rotate(180deg)}
-.ab-details .hint{margin-left:auto;font-size:10px;color:var(--aix-mute);font-weight:600}
-.ab-details .note{border-top:1px solid var(--aix-line);padding:8px 14px;font-size:10.5px;line-height:1.5;color:var(--aix-mute)}
-.ab-tablewrap{overflow-x:auto;border-top:1px solid var(--aix-line)}
-.ab-table{width:100%;min-width:920px;border-collapse:collapse;text-align:left}
-.ab-table th{
-  background:var(--aix-grey);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--aix-mute);
-  font-weight:800;padding:8px 10px;border-bottom:1px solid var(--aix-line);
-}
-.ab-table td{padding:10px;border-bottom:1px solid var(--aix-line);vertical-align:top;font-size:11.5px;line-height:1.5;color:var(--aix-mute)}
-.ab-table tr:last-child td{border-bottom:0}
-.ab-table a{color:var(--aix-ink);font-weight:700;text-decoration:none}
-.ab-table a:hover{text-decoration:underline}
-.ab-meta{display:block;margin-top:2px;font-size:10px;color:var(--aix-mute);font-weight:600}
-.ab-mark{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:2px;font-size:10px;font-weight:800;margin-right:4px;vertical-align:1px}
-.ab-mark.yes{background:var(--aix-lime);color:#111214}
-.ab-mark.no{background:var(--aix-grey);color:var(--aix-mute)}
-
-.ab-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 12px;padding:18px 0}
-@media(min-width:640px){.ab-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(min-width:768px){.ab-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media(min-width:1024px){.ab-grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
-@media(min-width:1280px){.ab-grid{grid-template-columns:repeat(6,minmax(0,1fr))}}
-.ab-empty{padding:64px 0;text-align:center;font-size:12px;color:var(--aix-mute)}
-
-.ab-browse{margin-top:30px;border-top:1px solid var(--aix-line);padding-top:18px}
-.ab-subhead{margin:0;font-size:15px;font-weight:800;letter-spacing:-.02em;text-transform:uppercase}
-.ab-subdesc{margin:4px 0 0;font-size:11px;color:var(--aix-mute)}
-.ab-links{display:grid;gap:6px;margin-top:12px}
-@media(min-width:640px){.ab-links{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(min-width:1024px){.ab-links{grid-template-columns:repeat(3,minmax(0,1fr))}}
-.ab-link{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--aix-line);
-  border-radius:2px;padding:9px 11px;font-size:12px;color:var(--aix-mute);text-decoration:none;background:var(--aix-paper);transition:.15s;
-}
-.ab-link:hover{border-color:var(--aix-ink);color:var(--aix-ink)}
-.ab-link .n{font-size:10px;font-variant-numeric:tabular-nums;opacity:.6}
-.ab-path{
-  display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-size:11px;font-weight:800;
-  color:var(--aix-ink);text-decoration:none;border-bottom:1px solid var(--aix-line);
-}
-.ab-path:hover{border-color:var(--aix-ink)}
-
-.ab-notes{display:grid;gap:8px;margin-top:16px}
-@media(min-width:640px){.ab-notes{grid-template-columns:repeat(3,minmax(0,1fr))}}
-.ab-note{
-  display:flex;flex-direction:column;gap:7px;border:1px solid var(--aix-line);border-radius:2px;
-  background:var(--aix-grey);padding:14px;min-height:150px;
-}
-.ab-note.ink{background:#111214;color:#fff;border-color:#111214}
-.ab-note.ink p{color:#cfcfcf;opacity:1}
-.ab-note.lime{background:var(--aix-lime);color:#111214;border-color:transparent}
-.ab-note .top{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
-.ab-note h3{margin:0;font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:800}
-.ab-note .w{font-size:13px;font-weight:800}
-.ab-note p{margin:0;font-size:11px;line-height:1.55;opacity:.75}
-`;
 
 function AiBooksPage() {
   const { t } = useTranslation();
@@ -434,80 +318,35 @@ function AiBooksPage() {
         <div className="aix">
           <style>{AIX_CSS}{BOOKS_CSS}</style>
 
-          {/* HERO */}
-          <section className="aix-frame aix-hero">
-            <div className="aix-mininav">
-              <span className="brand">
-                <span className="dot" />
-                AI BOOKS
-              </span>
-              <span>{t("aiBooks.stats", { books: BOOK_COUNT, ratings: fmt(TOTAL_RATINGS) })}</span>
-              <Link to="/ai-books/free">
-                {t("aiBooks.freeLink")}
-                <ArrowUpRight className="size-3.5" />
-              </Link>
-            </div>
-
-            <div className="aix-hero-grid">
-              <div className="aix-hero-copy">
-                <div>
-                  <div className="aix-topline">
-                    <span className="aix-pill lime">
-                      <span className="dot" />
-                      {t("aiBooks.quickLabel")}
-                    </span>
-                    <span className="aix-kicker">
-                      {t("aiBooks.factLine", {
-                        books: BOOK_COUNT,
-                        ratings: fmt(TOTAL_RATINGS),
-                        topics: CATEGORY_KEYS.length,
-                        date: AI_BOOKS_UPDATED,
-                      })}
-                    </span>
-                  </div>
-                  <h1 className="aix-h1">{t("aiBooks.h1")}</h1>
-                  <p className="aix-lede">{QUICK_ANSWER[contentLocale]}</p>
-                </div>
-
-                <div className="aix-stats">
-                  {[
-                    { n: fmt(BOOK_COUNT), label: t("aiBooks.statBooks"), cls: "grey" },
-                    { n: fmt(TOTAL_RATINGS), label: t("aiBooks.statRatings"), cls: "lime" },
-                    { n: String(CATEGORY_KEYS.length), label: t("aiBooks.statTopics"), cls: "ink" },
-                    { n: String(AI_BOOK_PAGES.length), label: t("aiBooks.statLists"), cls: "ghost" },
-                  ].map((stat) => (
-                    <div key={stat.label} className={`aix-stat ${stat.cls}`}>
-                      <div className="n">{stat.n}</div>
-                      <div className="l">{stat.label}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="aix-art" aria-hidden="true">
-                <span className="aix-art-grid" />
-                <AixBurst className="aix-art-burst" />
-                <div className="aix-art-s">
-                  {BOOK_COUNT}
-                  <span>{t("aiBooks.stats", { books: BOOK_COUNT, ratings: fmt(TOTAL_RATINGS) })}</span>
-                </div>
-                <div className="aix-art-rows">
-                  {[...CATEGORY_KEYS]
-                    .sort((a, b) => (CATEGORY_COUNTS[b] ?? 0) - (CATEGORY_COUNTS[a] ?? 0))
-                    .slice(0, 5)
-                    .map((key) => (
-                      <div className="aix-art-row" key={key}>
-                        <b>{t(`aiBooks.cat.${key}`)}</b>
-                        <span>{fmt(CATEGORY_COUNTS[key] ?? 0)}</span>
-                      </div>
-                    ))}
-                </div>
-              </div>
-            </div>
-          </section>
-
           {/* CATALOG */}
           <section className="aix-frame">
+            <div className="aix-lead">
+              <div>
+                <div className="aix-topline">
+                  <span className="aix-pill lime">
+                    <span className="dot" />
+                    {t("aiBooks.quickLabel")}
+                  </span>
+                  <span className="aix-kicker">
+                    {t("aiBooks.factLine", {
+                      books: BOOK_COUNT,
+                      ratings: fmt(TOTAL_RATINGS),
+                      topics: CATEGORY_KEYS.length,
+                      date: AI_BOOKS_UPDATED,
+                    })}
+                  </span>
+                </div>
+                <h1>{t("aiBooks.h1")}</h1>
+                <p>{QUICK_ANSWER[contentLocale]}</p>
+              </div>
+              <div className="aix-lead-meta">
+                <span>{t("aiBooks.stats", { books: BOOK_COUNT, ratings: fmt(TOTAL_RATINGS) })}</span>
+                <Link to="/ai-books/free">
+                  {t("aiBooks.freeLink")}
+                  <ArrowUpRight className="size-3.5" />
+                </Link>
+              </div>
+            </div>
             <div className="ab-layout">
               <aside className="ab-side">
                 <nav className="ab-nav">
@@ -519,7 +358,7 @@ function AiBooksPage() {
                         key={item.key}
                         type="button"
                         onClick={() => chooseView(item.key)}
-                        className={`ab-nav-item${active ? " active" : ""}`}
+                        className={`ab-nav-item${active ? " is-active" : ""}`}
                       >
                         <Icon className="ic" />
                         <span>{item.label}</span>
@@ -539,7 +378,7 @@ function AiBooksPage() {
                   <button
                     type="button"
                     onClick={() => setCategory("all")}
-                    className={`ab-topic${category === "all" ? " active" : ""}`}
+                    className={`ab-topic${category === "all" ? " is-active" : ""}`}
                   >
                     <span>{t("aiBooks.cat.all")}</span>
                     <span className="n">{fmt(BOOK_COUNT)}</span>
@@ -549,7 +388,7 @@ function AiBooksPage() {
                       key={key}
                       type="button"
                       onClick={() => setCategory(key)}
-                      className={`ab-topic${category === key ? " active" : ""}`}
+                      className={`ab-topic${category === key ? " is-active" : ""}`}
                     >
                       <span>{t(`aiBooks.cat.${key}`)}</span>
                       <span className="n">{fmt(CATEGORY_COUNTS[key] ?? 0)}</span>
