@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { TierListMaker } from "~/components/tierlist/TierListMaker";
-import { VoteBoard } from "~/components/tierlist/VoteBoard";
 import { ToolSeoBlock } from "~/components/ToolSeoBlock";
 import i18n, { getBcp47 } from "~/lib/i18n";
 import { withLangPrefix, currentLang, BASE_URL, DEFAULT_OG_IMAGE } from "~/lib/seo";
@@ -136,9 +135,6 @@ function AiTierListPage() {
 
         {/* 工具主体 */}
         <TierListMaker />
-
-        {/* 社区投票榜 */}
-        <VoteBoard />
 
         {/* 产品说明 */}
         <section className="mx-auto max-w-5xl px-6 pt-6">

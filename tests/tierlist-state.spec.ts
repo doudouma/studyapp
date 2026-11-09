@@ -3,7 +3,7 @@ import {
   isBoard,
   sanitizeBoard,
   type TierBoard,
-} from "~/components/tierlist/TierListMaker";
+} from "~/lib/tierlist/board";
 
 /**
  * 存档清洗契约：外部输入（localStorage / 分享链接 / 损坏数据）在渲染前必须

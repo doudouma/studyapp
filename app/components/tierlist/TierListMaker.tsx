@@ -6,7 +6,14 @@ import {
   TIERLIST_TOOLS,
   isTierlistTheme,
   type TierCat,
+  type TierlistTheme,
 } from "@shared/types/tierlist";
+import {
+  isBoard,
+  sanitizeBoard,
+  type TierBoard,
+  type TierTool,
+} from "~/lib/tierlist/board";
 
 /**
  * AI 工具 Tier List 制作器
@@ -22,22 +29,6 @@ import {
  */
 
 type Translate = (key: string, opts?: Record<string, unknown>) => string;
-
-export type TierTool = { name: string; cat: string; comment: string };
-export type TierRow = {
-  id: string;
-  label: string;
-  en: string;
-  color: string;
-  items: string[];
-};
-export type TierBoard = {
-  title: string;
-  theme: string;
-  tiers: TierRow[];
-  pool: string[];
-  tools: Record<string, TierTool>;
-};
 
 const LOCAL_KEY = "ai-tierlist_state";
 
@@ -78,80 +69,6 @@ function createBoard(tr: Translate): TierBoard {
       color: m.color,
       items: [],
     })),
-    pool,
-    tools,
-  };
-}
-
-export function isBoard(v: unknown): v is TierBoard {
-  if (!v || typeof v !== "object") return false;
-  const b = v as TierBoard;
-  return (
-    typeof b.title === "string" &&
-    typeof b.theme === "string" &&
-    Array.isArray(b.pool) &&
-    // 没有任何等级的榜单渲染不出分级表 → 判为无效，由调用方回退默认榜单
-    Array.isArray(b.tiers) &&
-    b.tiers.length > 0 &&
-    !!b.tools &&
-    typeof b.tools === "object"
-  );
-}
-
-/**
- * 清洗外部存档（localStorage / 分享链接）到可安全渲染的形态。
- *
- * **不变量**——破坏任何一条 React 都会出错，尤其是「key 重复」：
- * 重复 key 会让 React 复用/丢弃子节点，此后 commitPlacement 持有的兄弟节点
- * 锚点已被移走，直接抛 `insertBefore ... is not a child`。
- *  1. tier id 全局唯一且非空（重复/缺失时重排）；
- *  2. 每个工具只出现一次（pool 或唯一一个 tier）；
- *  3. pool/tiers 只保留真实存在的工具，落单的补回 pool；
- *  4. 颜色只接受 #rrggbb，分类只接受白名单。
- */
-export function sanitizeBoard(b: TierBoard): TierBoard {
-  const tools: Record<string, TierTool> = {};
-  for (const [id, raw] of Object.entries(b.tools)) {
-    if (!raw || typeof raw !== "object" || typeof raw.name !== "string" || !raw.name.trim()) continue;
-    const cat = typeof raw.cat === "string" && (TIER_CATS as readonly string[]).includes(raw.cat) ? raw.cat : "other";
-    tools[id] = { name: raw.name, cat, comment: typeof raw.comment === "string" ? raw.comment : "" };
-  }
-  const known = new Set(Object.keys(tools));
-  const seen = new Set<string>();
-  const take = (ids: unknown): string[] =>
-    (Array.isArray(ids) ? ids : []).filter((id): id is string => {
-      if (typeof id !== "string" || !known.has(id) || seen.has(id)) return false;
-      seen.add(id);
-      return true;
-    });
-
-  // 先取等级里的引用：用户主动排过的优先，池只是「未分类」兜底桶
-  const usedTierIds = new Set<string>();
-  const tiers = (Array.isArray(b.tiers) ? b.tiers : []).map((tier, i) => {
-    let id = typeof tier?.id === "string" && tier.id ? tier.id : "";
-    if (!id || usedTierIds.has(id)) {
-      let n = i + 1;
-      while (usedTierIds.has(`t${n}`)) n += 1;
-      id = `t${n}`;
-    }
-    usedTierIds.add(id);
-    return {
-      id,
-      label: typeof tier?.label === "string" && tier.label ? tier.label : `T${i + 1}`,
-      en: typeof tier?.en === "string" ? tier.en : "",
-      color: /^#[0-9a-fA-F]{6}$/.test(String(tier?.color)) ? String(tier.color) : "#64748b",
-      items: take(tier?.items),
-    };
-  });
-  const pool = take(b.pool);
-
-  // 没被放到任何等级、也不在池里的工具，补回池子（否则会"消失"）
-  for (const id of Object.keys(tools)) if (!seen.has(id)) pool.push(id);
-
-  return {
-    title: b.title || "AI Tools Tier List",
-    theme: b.theme || "generic",
-    tiers,
     pool,
     tools,
   };
@@ -248,8 +165,6 @@ const CSS = `
   max-width:1100px; margin:18px auto 0; padding:12px 14px;
   background:var(--panel); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow);
 }
-.tl-brand{font-weight:800; font-size:16px; letter-spacing:.3px; display:flex; align-items:center; gap:8px; white-space:nowrap}
-.tl-brand .dot{width:10px; height:10px; border-radius:50%; background:linear-gradient(135deg,#6366f1,#ec4899)}
 .tl-doc-title{
   font-size:14px; font-weight:700; border:1px solid var(--line); background:var(--accent-soft);
   color:var(--ink); padding:7px 10px; border-radius:8px; min-width:160px; max-width:44vw;
@@ -299,8 +214,8 @@ const CSS = `
 .dark .tlw .tl-chip .ccat{background:#22314a}
 .tl-chip .ccom{font-size:11px; color:var(--muted); margin-top:2px; word-break:break-word}
 .tl-chip .ccom.empty{font-style:italic; opacity:.55}
-.tl-chip .cact{position:absolute; top:5px; right:5px; display:flex; gap:4px; opacity:0; transition:.15s}
-.tl-chip:hover .cact,.tl-chip:focus-within .cact{opacity:1}
+.tl-chip .cact{position:absolute; top:5px; right:5px; display:flex; gap:4px; opacity:0; pointer-events:none; transition:.15s}
+.tl-chip:hover .cact,.tl-chip:focus-within .cact{opacity:1; pointer-events:auto}
 .tl-icobtn{
   width:22px; height:22px; border-radius:6px; border:1px solid var(--line); background:var(--panel);
   font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--muted);
@@ -346,18 +261,35 @@ const CSS = `
   border-radius:10px; padding:10px; font-size:13px; resize:vertical;
 }
 .tl-card .row{display:flex; gap:8px; justify-content:flex-end; margin-top:14px}
+.tl-card .field{display:flex; flex-direction:column; gap:6px; margin-bottom:12px}
+.tl-card .field > span{font-size:12px; font-weight:600; color:var(--muted)}
+.tl-card .confirmtext{font-size:13px; color:var(--muted); margin:0; line-height:1.55}
+.tl-card .field input[type="text"]{
+  width:100%; border:1px solid var(--line); background:var(--field); color:var(--ink);
+  border-radius:10px; padding:9px 10px; font-size:13px;
+}
+.tl-card .field input[type="text"]:focus{outline:2px solid var(--accent); outline-offset:1px}
+.tl-card .colorrow{display:flex; align-items:center; gap:10px}
+.tl-card .colorrow .hex{font-size:12px; color:var(--muted); font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.tl-card input[type="color"]{
+  width:46px; height:34px; padding:2px; border:1px solid var(--line); border-radius:8px;
+  background:var(--field); cursor:pointer;
+}
 .tl-toast{
   position:fixed; top:76px; left:50%; transform:translateX(-50%) translateY(-200%);
   background:#111827; color:#fff; padding:10px 16px; border-radius:10px; font-size:13px; z-index:70;
   transition:.3s; box-shadow:0 10px 30px rgba(0,0,0,.25); pointer-events:none; max-width:90vw;
 }
 .tl-toast.show{transform:translateX(-50%) translateY(0)}
+@media(hover:none){
+  /* 触屏没有 hover：动作按钮直接常显，避免「看不见但能点到」 */
+  .tl-chip .cact{opacity:1; pointer-events:auto}
+}
 @media(max-width:640px){
   .tl-tier{flex-direction:column}
   .tl-tier-label{width:100%; flex-direction:row; align-items:center; gap:10px; padding:10px 14px}
   .tl-tier-label .ten{margin-top:0}
   .tl-doc-title{min-width:120px; max-width:40vw}
-  .tl-brand{font-size:14px}
   .tl-search{margin-left:0; width:100%}
   .tl-chip{min-width:104px}
 }
@@ -381,7 +313,7 @@ function Chip({
   name, catLabel, comment, selected, inTier,
   onSelect, onComment, onRemove, onDragStart,
 }: ChipProps) {
-  const hasComment = comment.trim().length > 0;
+  const hasComment = (comment ?? "").trim().length > 0;
   return (
     <div
       className={`tl-chip${selected ? " selected" : ""}`}
@@ -423,6 +355,10 @@ export function TierListMaker() {
   const [newCat, setNewCat] = useState<TierCat>("chat");
   const [modalId, setModalId] = useState<string | null>(null);
   const [modalText, setModalText] = useState("");
+  const [tierModalId, setTierModalId] = useState<string | null>(null);
+  const [tierDraft, setTierDraft] = useState({ label: "", en: "", color: "#64748b" });
+  const [pendingTheme, setPendingTheme] = useState<TierlistTheme | null>(null);
+  const [resetOpen, setResetOpen] = useState(false);
   const [toast, setToast] = useState("");
   const [dragOver, setDragOver] = useState<string | null>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
@@ -447,6 +383,9 @@ export function TierListMaker() {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setModalId(null);
+        setTierModalId(null);
+        setPendingTheme(null);
+        setResetOpen(false);
         setSelectedId(null);
       }
     };
@@ -467,8 +406,26 @@ export function TierListMaker() {
   const catLabel = (cat: string) =>
     (TIER_CATS as readonly string[]).includes(cat) ? t(`aiTierlist.cat.${cat}`) : t("aiTierlist.cat.other");
 
+  const clearUrlHash = () => {
+    try {
+      history.replaceState(null, "", location.pathname + location.search);
+    } catch {
+      /* 沙箱 iframe 等场景禁止 replaceState：忽略，不影响本地编辑 */
+    }
+  };
+
+  /**
+   * 用户一旦改动榜单，URL 里的 `#s=…` 分享快照就过期了。
+   * 若不摘掉，刷新时挂载逻辑会优先读取旧快照，把刚做的修改覆盖掉
+   * （表现为「等级名改完，一刷新又变回去」）。改动后本地存档才是事实来源。
+   */
+  const dropStaleShareHash = () => {
+    if (location.hash.startsWith("#s=")) clearUrlHash();
+  };
+
   /** 结构性更新：深一层拷贝后再改，避免直接改 state */
   const mutate = (fn: (draft: TierBoard) => void) => {
+    dropStaleShareHash();
     setState((prev) => {
       const draft: TierBoard = {
         ...prev,
@@ -502,11 +459,8 @@ export function TierListMaker() {
     setSelectedId(null);
   };
 
-  const loadTheme = (key: string) => {
-    if (!isTierlistTheme(key)) return;
+  const applyTheme = (key: TierlistTheme) => {
     const theme = TIERLIST_TOOLS[key];
-    const hasWork = Object.keys(state.tools).length > 0 || state.tiers.some((tier) => tier.items.length > 0);
-    if (hasWork && !confirm(t("aiTierlist.ui.confirmTheme"))) return;
     const tools: Record<string, TierTool> = {};
     const pool: string[] = [];
     theme.forEach(([name, cat]) => {
@@ -522,25 +476,50 @@ export function TierListMaker() {
       b.theme = key;
     });
     setSelectedId(null);
+    setPendingTheme(null);
     showToast(t("aiTierlist.ui.toastTheme", { name: t(`aiTierlist.theme.${key}.label`) }));
   };
 
+  /**
+   * 切换主题会替换整份工具池，先确认。
+   * 不用原生 `confirm()`：跨域 / 沙箱 iframe 里它会被浏览器忽略并在控制台报错，
+   * 用户看到的就是「点了工具池没反应 + 报错」。
+   */
+  const loadTheme = (key: string) => {
+    if (!isTierlistTheme(key)) return;
+    const hasWork = Object.keys(state.tools).length > 0 || state.tiers.some((tier) => tier.items.length > 0);
+    if (hasWork) { setPendingTheme(key); return; }
+    applyTheme(key);
+  };
+
+  /**
+   * 打开等级编辑弹窗。
+   * 不再用连续三个 `prompt()`：原生弹窗在跨域 iframe / 屏蔽弹窗的浏览器里拿不到值，
+   * 而且中途取消会连带丢弃已填内容（改名看起来「改了又没改」）。
+   */
   const editTier = (tierId: string) => {
     const tier = state.tiers.find((x) => x.id === tierId);
     if (!tier) return;
-    const label = prompt(t("aiTierlist.ui.tierNamePrompt"), tier.label);
-    if (label === null) return;
-    const en = prompt(t("aiTierlist.ui.tierEnPrompt"), tier.en);
-    if (en === null) return;
-    const color = prompt(t("aiTierlist.ui.colorPrompt"), tier.color);
-    if (color === null) return;
+    setTierDraft({ label: tier.label, en: tier.en, color: tier.color });
+    setTierModalId(tierId);
+  };
+
+  const saveTier = () => {
+    const tierId = tierModalId;
+    if (!tierId) return;
+    const label = tierDraft.label.trim();
+    const en = tierDraft.en.trim();
+    const color = /^#[0-9a-fA-F]{6}$/.test(tierDraft.color.trim())
+      ? tierDraft.color.trim()
+      : null;
     mutate((b) => {
       const row = b.tiers.find((x) => x.id === tierId);
       if (!row) return;
-      row.label = label.trim() || row.label;
-      row.en = en.trim() || row.en;
-      if (/^#[0-9a-fA-F]{6}$/.test(color.trim())) row.color = color.trim();
+      if (label) row.label = label;
+      if (en) row.en = en;
+      if (color) row.color = color;
     });
+    setTierModalId(null);
   };
 
   const addTool = () => {
@@ -570,7 +549,11 @@ export function TierListMaker() {
     const b64 = encodeState(state);
     if (!b64) { showToast(t("aiTierlist.ui.toastShareFail")); return; }
     const url = `${location.origin}${location.pathname}#s=${b64}`;
-    history.replaceState(null, "", `#s=${b64}`);
+    try {
+      history.replaceState(null, "", `#s=${b64}`);
+    } catch {
+      /* 沙箱 iframe 禁止改地址栏：链接仍写进剪贴板 */
+    }
     if (navigator.clipboard?.writeText) {
       navigator.clipboard.writeText(url).then(
         () => showToast(t("aiTierlist.ui.toastShareCopied")),
@@ -581,11 +564,14 @@ export function TierListMaker() {
     }
   };
 
-  const resetAll = () => {
-    if (!confirm(t("aiTierlist.ui.confirmReset"))) return;
+  /** 原生 confirm 在沙箱 iframe 里会被忽略并报错，重置也改用站内弹窗 */
+  const resetAll = () => setResetOpen(true);
+
+  const doReset = () => {
     setState(createBoard(tr));
     setSelectedId(null);
-    history.replaceState(null, "", location.pathname + location.search);
+    clearUrlHash();
+    setResetOpen(false);
     showToast(t("aiTierlist.ui.toastReset"));
   };
 
@@ -706,10 +692,6 @@ export function TierListMaker() {
       <style>{CSS}</style>
 
       <div className="tl-header">
-        <div className="tl-brand">
-          <span className="dot" />
-          {t("aiTierlist.ui.brand")}
-        </div>
         <select
           className="tl-theme"
           value={themeValue}
@@ -753,6 +735,14 @@ export function TierListMaker() {
               className="tl-tier-label"
               style={{ background: tier.color }}
               onClick={() => editTier(tier.id)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  editTier(tier.id);
+                }
+              }}
+              role="button"
+              tabIndex={0}
               title={t("aiTierlist.ui.editTier")}
             >
               <div className="tname">{tier.label}</div>
@@ -896,6 +886,99 @@ export function TierListMaker() {
                 {t("common.cancel")}
               </button>
               <button className="tl-btn primary" onClick={saveModal}>
+                {t("common.save")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {pendingTheme && (
+        <div
+          className="tl-modal show"
+          onClick={(e) => { if (e.target === e.currentTarget) setPendingTheme(null); }}
+        >
+          <div className="tl-card">
+            <h4>{t(`aiTierlist.theme.${pendingTheme}.label`)}</h4>
+            <p className="confirmtext">{t("aiTierlist.ui.confirmTheme")}</p>
+            <div className="row">
+              <button className="tl-btn" onClick={() => setPendingTheme(null)}>
+                {t("common.cancel")}
+              </button>
+              <button className="tl-btn primary" onClick={() => applyTheme(pendingTheme)}>
+                {t("common.confirm")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {resetOpen && (
+        <div
+          className="tl-modal show"
+          onClick={(e) => { if (e.target === e.currentTarget) setResetOpen(false); }}
+        >
+          <div className="tl-card">
+            <h4>{t("common.reset")}</h4>
+            <p className="confirmtext">{t("aiTierlist.ui.confirmReset")}</p>
+            <div className="row">
+              <button className="tl-btn" onClick={() => setResetOpen(false)}>
+                {t("common.cancel")}
+              </button>
+              <button className="tl-btn primary" onClick={doReset}>
+                {t("common.confirm")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {tierModalId && (
+        <div
+          className="tl-modal show"
+          onClick={(e) => { if (e.target === e.currentTarget) setTierModalId(null); }}
+        >
+          <div className="tl-card">
+            <h4>{t("aiTierlist.ui.editTier")}</h4>
+            <label className="field">
+              <span>{t("aiTierlist.ui.tierNamePrompt")}</span>
+              <input
+                type="text"
+                name="tier-name"
+                value={tierDraft.label}
+                autoFocus
+                onChange={(e) => setTierDraft((d) => ({ ...d, label: e.target.value }))}
+                onKeyDown={(e) => { if (e.key === "Enter") saveTier(); }}
+              />
+            </label>
+            <label className="field">
+              <span>{t("aiTierlist.ui.tierEnPrompt")}</span>
+              <input
+                type="text"
+                name="tier-en"
+                value={tierDraft.en}
+                onChange={(e) => setTierDraft((d) => ({ ...d, en: e.target.value }))}
+                onKeyDown={(e) => { if (e.key === "Enter") saveTier(); }}
+              />
+            </label>
+            <div className="field">
+              <span>{t("aiTierlist.ui.colorPrompt")}</span>
+              <div className="colorrow">
+                <input
+                  type="color"
+                  name="tier-color"
+                  value={/^#[0-9a-fA-F]{6}$/.test(tierDraft.color) ? tierDraft.color : "#64748b"}
+                  aria-label={t("aiTierlist.ui.colorPrompt")}
+                  onChange={(e) => setTierDraft((d) => ({ ...d, color: e.target.value }))}
+                />
+                <span className="hex">{tierDraft.color}</span>
+              </div>
+            </div>
+            <div className="row">
+              <button className="tl-btn" onClick={() => setTierModalId(null)}>
+                {t("common.cancel")}
+              </button>
+              <button className="tl-btn primary" onClick={saveTier}>
                 {t("common.save")}
               </button>
             </div>
