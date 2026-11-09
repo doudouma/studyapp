@@ -22,6 +22,7 @@ import {
 } from "../shared/types/questions";
 import { squareRoutes } from "./features/square/square.routes";
 import { pagesRoutes } from "./features/pages/pages.routes";
+import { selectIndexableSharedPages } from "./features/pages/pages.quality";
 import { adminRoutes } from "./features/admin/admin.routes";
 import { pomodoroRoutes } from "./features/pomodoro/pomodoro.routes";
 import { wardrobeRoutes } from "./features/wardrobe/wardrobe.routes";
@@ -332,18 +333,31 @@ async function buildLangSitemap(c: any, lang: Lang): Promise<string> {
 
   // User-generated shared pages live at root only (single canonical URL, no
   // language variants — /{lang}/p/:id 301-redirects to /p/:id). Include them
-  // only in the default-language (en) sitemap.
+  // only in the default-language (en) sitemap, and only when they pass the
+  // quality gate (owned + permanent + titled + past the review cooldown).
+  // Low-quality UGC stays reachable but is noindexed at serve time.
   if (lang === DEFAULT_LANG && c.env?.D1) {
     const db = createDb(c.env.D1);
     const dynamicPages = await db
-      .select({ id: page.id, sharedAt: page.sharedAt })
+      .select({
+        id: page.id,
+        sharedAt: page.sharedAt,
+        title: page.title,
+        state: page.state,
+        isSharedToSquare: page.isSharedToSquare,
+        userId: page.userId,
+        maxViews: page.maxViews,
+        expiresAt: page.expiresAt,
+        createdAt: page.createdAt,
+        contentHash: page.contentHash,
+      })
       .from(page)
       .where(eq(page.isSharedToSquare, true))
       .orderBy(desc(page.sharedAt))
-      .limit(1000);
-    for (const p of dynamicPages) {
-      if (!p.sharedAt) continue;
-      const lastmod = new Date(p.sharedAt).toISOString().split("T")[0];
+      .limit(2000);
+
+    for (const p of selectIndexableSharedPages(dynamicPages, Date.now(), 1000)) {
+      const lastmod = new Date(p.sharedAt as Date).toISOString().split("T")[0];
       urls.push(`
   <url>
     <loc>${BASE_URL}/p/${escapeXml(p.id)}</loc>

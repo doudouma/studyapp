@@ -48,6 +48,48 @@ export function injectBanner(
 }
 
 /**
+ * 给用户页面里的所有绝对外链补上 `rel="nofollow ugc noopener"`。
+ *
+ * /p/* 是任意用户上传的 HTML，外链权重不应外流，也不该让 100mini 被当成
+ * 链接农场（站内检测器常把「大量可传递权重的外链」记为垃圾信号）。
+ * 只处理 `<a>` 标签，相对链接 / 锚点 / mailto / tel 保持原样。
+ *
+ * 说明：这里是字符串级替换而非完整 HTML 解析。用户 HTML 是任意内容，
+ * 极端情况下 `<script>` 字符串里的 `<a>` 也会被改写——但仍会生成合法的
+ * 锚标签，不会破坏页面结构。
+ */
+const ANCHOR_TAG_RE = /<a\b[^>]*>/gi;
+const HREF_ATTR_RE = /\bhref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'>]+))/i;
+const REL_ATTR_RE = /\brel\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'>]+))/i;
+
+/** 绝对 http(s) 链接或协议相对链接视为外链 */
+function isExternalHref(href: string): boolean {
+  return /^https?:\/\//i.test(href) || /^\/\//.test(href);
+}
+
+const UGC_REL_TOKENS = ["nofollow", "ugc", "noopener"];
+
+export function hardenOutboundLinks(html: string): string {
+  return html.replace(ANCHOR_TAG_RE, (tag: string) => {
+    const hrefMatch = tag.match(HREF_ATTR_RE);
+    if (!hrefMatch) return tag;
+    const href = (hrefMatch[1] ?? hrefMatch[2] ?? hrefMatch[3] ?? "").trim();
+    if (!isExternalHref(href)) return tag;
+
+    const relMatch = tag.match(REL_ATTR_RE);
+    const existing = (relMatch?.[1] ?? relMatch?.[2] ?? relMatch?.[3] ?? "")
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(Boolean);
+    const tokens = [...new Set([...existing, ...UGC_REL_TOKENS])];
+    const relAttr = `rel="${tokens.join(" ")}"`;
+
+    if (relMatch) return tag.replace(relMatch[0], relAttr);
+    return tag.replace(/>$/, ` ${relAttr}>`);
+  });
+}
+
+/**
  * Pick the best language from an Accept-Language header, falling back to the
  * default lang. /p/* pages are served at root (no URL prefix), so the header
  * is the only signal for localizing the 404 page.

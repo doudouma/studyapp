@@ -38,6 +38,7 @@ vi.mock("../server/features/pages/pages.storage", async (importOriginal) => {
 
 vi.mock("../server/features/pages/pages.render", () => ({
   injectBanner: vi.fn(),
+  hardenOutboundLinks: vi.fn((html: string) => html),
   notFoundHtml: vi.fn(() => "<404>"),
   blockedHtml: vi.fn(() => "<410>"),
   burnedHtml: vi.fn(() => "<burned>"),

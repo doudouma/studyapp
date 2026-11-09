@@ -32,7 +32,8 @@ import {
   deleteTmpByBucketId,
   isExpiredByUploaded,
 } from "./pages.storage";
-import { injectBanner, notFoundHtml, blockedHtml, burnedHtml, isLikelyCrawler, detectLangFromHeader } from "./pages.render";
+import { injectBanner, hardenOutboundLinks, notFoundHtml, blockedHtml, burnedHtml, isLikelyCrawler, detectLangFromHeader } from "./pages.render";
+import { isIndexablePage } from "./pages.quality";
 import type { Lang } from "../../../app/lib/lang";
 import { log } from "../../lib/log";
 import { insertUploadLog, insertScanLog, getLatestBlockedScan } from "../admin/upload-log.repo";
@@ -937,22 +938,26 @@ async function servePageById(
 
   const rawHtml = await obj.text();
   const baseHref = isZip ? `/p/${urlSegment}/` : undefined;
-  // Anonymous uploads live under the `tmp/` R2 prefix; keep them out of search.
+  // 匿名 tmp 页一律 noindex；分享到广场的页面还要过质量门槛（pages.quality.ts）。
   const isAnonymousTmp = obj.key?.startsWith("tmp/") ?? false;
-  const injected = injectBanner(rawHtml, pageMeta, baseHref, isAnonymousTmp);
+  const sharedLowQuality = record?.isSharedToSquare === true && !isIndexablePage(record);
+  const noindex = isAnonymousTmp || sharedLowQuality;
+  // UGC 外链统一 nofollow/ugc，避免用户页面向外传递权重
+  const injected = injectBanner(hardenOutboundLinks(rawHtml), pageMeta, baseHref, noindex);
 
   // 内容已读取：本次达上限后焚毁（一次性链接打开即焚）
   if (burnAfterServe) {
     await burnPageContent(env, id, "views");
   }
 
-  return new Response(injected, {
-    status: 200,
-    headers: {
-      "Content-Type": "text/html; charset=utf-8",
-      "Content-Security-Policy": "form-action 'none';",
-    },
-  });
+  const headers: Record<string, string> = {
+    "Content-Type": "text/html; charset=utf-8",
+    "Content-Security-Policy": "form-action 'none';",
+  };
+  // meta 标签依赖页面里有 </head>；用响应头兜底，碎片 HTML 也不会被误收录
+  if (noindex) headers["X-Robots-Tag"] = "noindex, nofollow";
+
+  return new Response(injected, { status: 200, headers });
 }
 
 /**

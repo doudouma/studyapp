@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { escapeHtml, injectBanner, detectLangFromHeader, burnedHtml, isLikelyCrawler } from "../server/features/pages/pages.render";
+import { escapeHtml, injectBanner, detectLangFromHeader, burnedHtml, isLikelyCrawler, hardenOutboundLinks } from "../server/features/pages/pages.render";
 
 describe("escapeHtml", () => {
   it("转义 & 字符", () => {
@@ -189,5 +189,68 @@ describe("burnedHtml", () => {
     const generic = burnedHtml("en");
     expect(generic).toContain("digital ashes");
     expect(generic).toContain('lang="en');
+  });
+});
+
+describe("hardenOutboundLinks", () => {
+  it("给绝对外链补 rel=nofollow ugc noopener", () => {
+    const html = '<p><a href="https://example.com/x">x</a></p>';
+    const out = hardenOutboundLinks(html);
+    expect(out).toContain('rel="nofollow ugc noopener"');
+    expect(out).toContain('href="https://example.com/x"');
+  });
+
+  it("http 与协议相对链接同样处理", () => {
+    const html = '<a href="http://example.com">a</a><a href="//cdn.example.com/x">b</a>';
+    const out = hardenOutboundLinks(html);
+    expect(out.match(/rel="nofollow ugc noopener"/g)).toHaveLength(2);
+  });
+
+  it("已有 rel 时合并并去重，不覆盖原有 token", () => {
+    const html = '<a href="https://example.com" rel="noopener sponsored">x</a>';
+    const out = hardenOutboundLinks(html);
+    expect(out).toContain('rel="noopener sponsored nofollow ugc"');
+    expect(out.match(/\bnoopener\b/g)).toHaveLength(1);
+  });
+
+  it("相对链接 / 锚点 / mailto / tel 保持原样", () => {
+    const html = [
+      '<a href="/p/abc1234">internal</a>',
+      '<a href="#section">anchor</a>',
+      '<a href="mailto:hi@example.com">mail</a>',
+      '<a href="tel:+123">tel</a>',
+      '<a href="./a.html">relative</a>',
+    ].join("");
+    expect(hardenOutboundLinks(html)).toBe(html);
+  });
+
+  it("大小写标签与属性也能识别", () => {
+    const out = hardenOutboundLinks('<A HREF="HTTPS://EXAMPLE.COM">x</A>');
+    expect(out).toContain('rel="nofollow ugc noopener"');
+  });
+
+  it("没有 href 的 <a> 不处理", () => {
+    const html = "<a name=\"anchor\">x</a>";
+    expect(hardenOutboundLinks(html)).toBe(html);
+  });
+
+  it("保留其它属性与内部文本", () => {
+    const out = hardenOutboundLinks('<a class="btn" href="https://x.com" target="_blank">Go</a>');
+    expect(out).toContain('class="btn"');
+    expect(out).toContain('target="_blank"');
+    expect(out).toContain(">Go</a>");
+    expect(out).toContain('rel="nofollow ugc noopener"');
+  });
+
+  it("紧跟在文本后的锚点（无空格）也会处理", () => {
+    const out = hardenOutboundLinks('hello<a href="https://x.com">world</a>');
+    expect(out).toContain('rel="nofollow ugc noopener"');
+  });
+
+  it("多个外链逐个处理，内链不受影响", () => {
+    const html = '<a href="https://a.com">a</a><a href="/">home</a><a href="https://b.com">b</a>';
+    const out = hardenOutboundLinks(html);
+    expect(out.match(/rel="nofollow ugc noopener"/g)).toHaveLength(2);
+    expect(out).toContain('<a href="/">home</a>');
   });
 });
