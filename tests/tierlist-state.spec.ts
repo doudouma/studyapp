@@ -77,7 +77,7 @@ describe("存档清洗 sanitizeBoard", () => {
     expect(out.tiers[0].id).toBe("t1");
     expect(out.tiers[0].label).toBe("T1");
     expect(out.tiers[0].en).toBe("");
-    expect(out.tiers[0].color).toBe("#64748b"); // 非 #rrggbb 一律回退
+    expect(out.tiers[0].color).toBe("#8d8d8d"); // 非 #rrggbb 一律回退
     expect(out.tiers[0].items).toEqual([]);
   });
 
@@ -149,6 +149,41 @@ describe("存档清洗 sanitizeBoard", () => {
     );
     expect(out.tools.p0.cat).toBe("other");
     expect(out.tools.p0.comment).toBe("");
+  });
+
+  it("旧版默认调色板整组迁移到新配色，自定义颜色不动", () => {
+    const legacy = sanitizeBoard(
+      asBoard({
+        title: "t",
+        theme: "generic",
+        pool: [],
+        tools: {},
+        tiers: [
+          { id: "t1", label: "S", en: "", color: "#ef4444", items: [] },
+          { id: "t2", label: "A", en: "", color: "#f59e0b", items: [] },
+          { id: "t3", label: "B", en: "", color: "#10b981", items: [] },
+          { id: "t4", label: "C", en: "", color: "#3b82f6", items: [] },
+          { id: "t5", label: "D", en: "", color: "#64748b", items: [] },
+        ],
+      }),
+    );
+    expect(legacy.tiers.map((t) => t.color)).toEqual([
+      "#d8ff00", "#ffffff", "#cfcfcf", "#8d8d8d", "#3f3f3f",
+    ]);
+
+    const custom = sanitizeBoard(
+      asBoard({
+        title: "t",
+        theme: "generic",
+        pool: [],
+        tools: {},
+        tiers: [
+          { id: "t1", label: "S", en: "", color: "#ff00aa", items: [] },
+          { id: "t2", label: "A", en: "", color: "#f59e0b", items: [] },
+        ],
+      }),
+    );
+    expect(custom.tiers.map((t) => t.color)).toEqual(["#ff00aa", "#f59e0b"]);
   });
 
   it("清洗是幂等的（再次清洗结果不变）", () => {

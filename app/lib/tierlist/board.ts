@@ -13,6 +13,10 @@ import { TIER_CATS } from "@shared/types/tierlist";
 
 export type TierTool = { name: string; cat: string; comment: string };
 
+/** 旧版默认 tier 配色 → 新版酸橙/单色调色板（仅整组默认色时迁移，自定义颜色不动） */
+const LEGACY_DEFAULT_COLORS = ["#ef4444", "#f59e0b", "#10b981", "#3b82f6", "#64748b"];
+const CURRENT_DEFAULT_COLORS = ["#d8ff00", "#ffffff", "#cfcfcf", "#8d8d8d", "#3f3f3f"];
+
 export type TierRow = {
   id: string;
   label: string;
@@ -85,10 +89,17 @@ export function sanitizeBoard(b: TierBoard): TierBoard {
       id,
       label: typeof tier?.label === "string" && tier.label ? tier.label : `T${i + 1}`,
       en: typeof tier?.en === "string" ? tier.en : "",
-      color: /^#[0-9a-fA-F]{6}$/.test(String(tier?.color)) ? String(tier.color) : "#64748b",
+      color: /^#[0-9a-fA-F]{6}$/.test(String(tier?.color)) ? String(tier.color) : "#8d8d8d",
       items: take(tier?.items),
     };
   });
+  if (
+    tiers.length === LEGACY_DEFAULT_COLORS.length &&
+    tiers.every((tier, i) => tier.color.toLowerCase() === LEGACY_DEFAULT_COLORS[i])
+  ) {
+    tiers.forEach((tier, i) => { tier.color = CURRENT_DEFAULT_COLORS[i]; });
+  }
+
   const pool = take(b.pool);
 
   // 没被放到任何等级、也不在池里的工具，补回池子（否则会"消失"）

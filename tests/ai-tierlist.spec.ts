@@ -205,9 +205,10 @@ test("Reddit 统计页渲染 20 款工具、评价与口径说明", async ({ pag
 
 test("ai-tierlist 页面挂上了 Reddit 统计入口", async ({ page }) => {
   await page.goto("/ai-tierlist");
-  const link = page.locator('a[href="/ai-tierlist-stats"]');
-  await expect(link).toBeVisible();
-  await expect(link).toContainText("Reddit stats");
+  const links = page.locator('a[href="/ai-tierlist-stats"]');
+  await expect(links).toHaveCount(2);
+  await expect(links.first()).toBeVisible();
+  await expect(page.locator(".aix-strip")).toContainText("Reddit stats");
 });
 
 test("空 toast 完全透明，导航顶部不会出现黑点", async ({ page }) => {

@@ -1,13 +1,25 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowUpRight, ChevronDown, Layers, Sparkles, Share2, ImageDown, GripHorizontal } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { TierListMaker } from "~/components/tierlist/TierListMaker";
-import { ToolSeoBlock } from "~/components/ToolSeoBlock";
 import i18n, { getBcp47 } from "~/lib/i18n";
 import { withLangPrefix, currentLang, BASE_URL, DEFAULT_OG_IMAGE } from "~/lib/seo";
+import { TIERLIST_THEMES, TIERLIST_TOOLS } from "@shared/types/tierlist";
+import { AIX_CSS } from "~/components/aix/aix-styles";
+import { AixBurst } from "~/components/aix/AixBurst";
+
+/**
+ * AI Tier List 页面
+ *
+ * 视觉参考 template/ai-rank/lime-corporate-presentation.html：
+ * 浅灰底 + 白色细框、酸橙/墨黑、超大全大写标题、微型编号导航、数字统计卡。
+ * 工具本体（TierListMaker）使用同一套变量换肤。
+ */
+
+
 
 export const Route = createFileRoute("/ai-tierlist")({
   head: () => {
@@ -72,11 +84,7 @@ export const Route = createFileRoute("/ai-tierlist")({
             description: i18n.t("aiTierlist.desc"),
             inLanguage: getBcp47(i18n.language),
             totalTime: "PT3M",
-            step: steps.map((text, i) => ({
-              "@type": "HowToStep",
-              position: i + 1,
-              text,
-            })),
+            step: steps.map((text, i) => ({ "@type": "HowToStep", position: i + 1, text })),
           }),
         },
       ],
@@ -85,117 +93,213 @@ export const Route = createFileRoute("/ai-tierlist")({
   component: AiTierListPage,
 });
 
-const FEATURE_ICONS = [GripHorizontal, Share2, ImageDown, Layers];
 
 function AiTierListPage() {
   const { t } = useTranslation();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  const lang = currentLang();
+  const statsHref = withLangPrefix(lang, "/ai-tierlist-stats");
 
   const faqs = Array.from({ length: 7 }, (_, i) => ({
     q: t(`aiTierlist.faq${i + 1}.q`),
     a: t(`aiTierlist.faq${i + 1}.a`),
   }));
 
-  const features = FEATURE_ICONS.map((Icon, i) => ({
-    Icon,
+  const features = Array.from({ length: 4 }, (_, i) => ({
     title: t(`aiTierlist.feature${i + 1}.title`),
     desc: t(`aiTierlist.feature${i + 1}.desc`),
   }));
 
+  const stats = [
+    { n: String(TIERLIST_TOOLS.generic.length), label: t("aiTierlist.statTools"), cls: "grey" },
+    { n: String(TIERLIST_THEMES.length), label: t("aiTierlist.statPools"), cls: "lime" },
+    { n: "5", label: t("aiTierlist.statTiers"), cls: "ink" },
+    { n: "0", label: t("aiTierlist.statSignup"), cls: "ghost" },
+  ];
+
+  const ladder = [2, 3, 4, 5].map((i) => ({
+    letter: t(`aiTierlist.tier${i}.label`).slice(0, 1),
+    label: t(`aiTierlist.tier${i}.en`),
+  }));
+
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-[#ededed] dark:bg-[#0c0d0f]">
       <AppNav />
       <main className="flex-1">
-        {/* Hero */}
-    
+        <div className="aix">
+          <style>{AIX_CSS}</style>
 
-        {/* 工具主体 */}
-        <TierListMaker />
-
-        {/* Reddit 统计与社区评价 */}
-        <section className="mx-auto max-w-5xl px-6 pt-8">
-          <a
-            href={withLangPrefix(currentLang(), "/ai-tierlist-stats")}
-            className="group flex flex-col gap-3 rounded-2xl border border-border/70 bg-card p-5 shadow-sm transition-colors hover:border-[#006c49]/40 dark:hover:border-[#4edea3]/40 sm:flex-row sm:items-center sm:justify-between"
-          >
-            <div>
-              <h2 className="text-base font-bold text-foreground">{t("aiTierlist.statsLink")}</h2>
-              <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">
-                {t("aiTierlist.statsLinkDesc")}
-              </p>
+          {/* HERO */}
+          <section className="aix-frame aix-hero">
+            <div className="aix-mininav">
+              <span className="brand">
+                <span className="dot" />
+                AI TIER LIST
+              </span>
+              <span>{t("aiTierlist.kicker")}</span>
+              <a href={statsHref}>
+                {t("aiTierlist.viewStats")}
+                <ArrowUpRight className="size-3.5" />
+              </a>
             </div>
-            <span className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-[#006c49] dark:text-[#4edea3]">
-              {t("common.view")}
+
+            <div className="aix-hero-grid">
+              <div className="aix-hero-copy">
+                <div>
+                  <div className="aix-topline">
+                    <span className="aix-pill lime">
+                      <span className="dot" />
+                      {t("aiTierlist.badge")}
+                    </span>
+                    <span className="aix-kicker">{t("aiTierlist.kicker")}</span>
+                  </div>
+                  <h1 className="aix-h1">{t("aiTierlist.heading")}</h1>
+                  <p className="aix-lede">{t("aiTierlist.subheading")}</p>
+                </div>
+
+                <div className="aix-stats">
+                  {stats.map((s) => (
+                    <div key={s.label} className={`aix-stat ${s.cls}`}>
+                      <div className="n">{s.n}</div>
+                      <div className="l">{s.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="aix-art" aria-hidden="true">
+                <span className="aix-art-grid" />
+                <AixBurst className="aix-art-burst" />
+                <div className="aix-art-s">
+                  S<span>{t("aiTierlist.tier1.en")}</span>
+                </div>
+                <div className="aix-art-rows">
+                  {ladder.map((row) => (
+                    <div key={row.letter} className="aix-art-row">
+                      <b>{row.letter}</b>
+                      <span>{row.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* MAKER */}
+          <section className="aix-frame" id="aix-maker">
+            <div className="aix-sec-head">
+              <div>
+                <div className="aix-section-num">01</div>
+                <h2 className="aix-sec-title">{t("aiTierlist.sectionMaker")}</h2>
+              </div>
+              <span className="aix-dot-sm" />
+            </div>
+            <TierListMaker />
+          </section>
+
+          {/* STATS STRIP */}
+          <a className="aix-strip" href={statsHref}>
+            <span className="k">REDDIT / 30D</span>
+            <span>
+              <strong>{t("aiTierlist.statsLink")}</strong>
+              <small>{t("aiTierlist.statsLinkDesc")}</small>
+            </span>
+            <span className="go">
               <ArrowUpRight className="size-4" />
             </span>
           </a>
-        </section>
 
-        {/* 产品说明 */}
-        <section className="mx-auto max-w-5xl px-6 pt-6">
-          <h2 className="text-2xl font-bold tracking-tight text-foreground">
-            {t("aiTierlist.intro.title")}
-          </h2>
-          <div className="mt-4 space-y-3">
-            <p className="text-[15px] leading-relaxed text-foreground">
-              {t("aiTierlist.intro.text")}
-            </p>
-          </div>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {features.map((f, i) => {
-              const Icon = f.Icon;
-              return (
-                <div key={i} className="rounded-2xl border border-border/70 bg-card p-5">
-                  <div className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary dark:text-[#4edea3]">
-                    <Icon className="size-4" />
-                  </div>
-                  <h3 className="mt-3 text-sm font-semibold text-foreground">{f.title}</h3>
-                  <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">{f.desc}</p>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* How to */}
-        <ToolSeoBlock
-          className="mx-auto max-w-5xl px-6 pt-14"
-          title={t("aiTierlist.howto.title")}
-          answer={t("aiTierlist.desc")}
-          steps={[
-            t("aiTierlist.howto.step1"),
-            t("aiTierlist.howto.step2"),
-            t("aiTierlist.howto.step3"),
-            t("aiTierlist.howto.step4"),
-          ]}
-        />
-
-        {/* FAQ */}
-        <section className="mx-auto max-w-5xl px-6 pt-14 pb-16">
-          <h2 className="text-2xl font-bold tracking-tight text-foreground">
-            {t("aiTierlist.faqHeading")}
-          </h2>
-          <div className="mt-4 rounded-2xl border border-border/70 bg-card px-6 shadow-sm">
-            {faqs.map((faq, i) => (
-              <div key={faq.q} className="border-b border-border/60 last:border-b-0">
-                <button
-                  className="flex w-full cursor-pointer items-center justify-between gap-4 py-4 text-left text-sm font-medium transition-colors hover:text-foreground/80"
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                >
-                  <span>{faq.q}</span>
-                  <ChevronDown
-                    className={`size-4 shrink-0 text-muted-foreground transition-transform duration-200 ${
-                      openFaq === i ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-                {openFaq === i && (
-                  <div className="pb-4 text-sm leading-relaxed text-muted-foreground">{faq.a}</div>
-                )}
+          {/* WHY */}
+          <section className="aix-frame">
+            <div className="aix-sec-head">
+              <div>
+                <div className="aix-section-num">02</div>
+                <h2 className="aix-sec-title">{t("aiTierlist.intro.title")}</h2>
               </div>
-            ))}
-          </div>
-        </section>
+              <span className="aix-dot-sm" />
+            </div>
+            <p className="aix-body">{t("aiTierlist.intro.text")}</p>
+            <div className="aix-notes">
+              {features.map((f, i) => (
+                <div
+                  key={f.title}
+                  className={`aix-note ${i === 0 ? "ink" : i === 1 ? "lime" : i === 2 ? "" : "ghost"}`}
+                >
+                  <span className="num">{String(i + 1).padStart(2, "0")}</span>
+                  <h3>{f.title}</h3>
+                  <p>{f.desc}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* HOW */}
+          <section className="aix-frame">
+            <div className="aix-sec-head">
+              <div>
+                <div className="aix-section-num">03</div>
+                <h2 className="aix-sec-title">{t("aiTierlist.howto.title")}</h2>
+              </div>
+              <span className="aix-dot-sm" />
+            </div>
+            <div className="aix-how">
+              <p className="aix-body">{t("aiTierlist.desc")}</p>
+              <ol className="aix-steps">
+                {[1, 2, 3, 4].map((i) => (
+                  <li key={i} className="aix-step">
+                    <span className="num">{String(i).padStart(2, "0")}</span>
+                    <span>{t(`aiTierlist.howto.step${i}`)}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </section>
+
+          {/* FAQ */}
+          <section className="aix-frame">
+            <div className="aix-sec-head">
+              <div>
+                <div className="aix-section-num">04</div>
+                <h2 className="aix-sec-title">{t("aiTierlist.faqHeading")}</h2>
+              </div>
+              <span className="aix-dot-sm" />
+            </div>
+            <div className="aix-faq">
+              {faqs.map((faq, i) => {
+                const open = openFaq === i;
+                return (
+                  <details
+                    key={faq.q}
+                    open={open}
+                    onToggle={(e) => {
+                      const isOpen = (e.currentTarget as HTMLDetailsElement).open;
+                      setOpenFaq(isOpen ? i : openFaq === i ? null : openFaq);
+                    }}
+                  >
+                    <summary>
+                      <span>{faq.q}</span>
+                      <span className="plus">＋</span>
+                    </summary>
+                    <p className="answer">{faq.a}</p>
+                  </details>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* CTA */}
+          <section className="aix-cta">
+            <div>
+              <h2>{t("aiTierlist.ctaHeading")}</h2>
+              <p>{t("aiTierlist.ctaText")}</p>
+            </div>
+            <a href="#aix-maker">
+              {t("aiTierlist.ctaButton")}
+              <ArrowUpRight className="size-4" />
+            </a>
+          </section>
+        </div>
       </main>
       <AppFooter />
     </div>
