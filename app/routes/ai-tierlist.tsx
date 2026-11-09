@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { ChevronDown, Layers, Sparkles, Share2, ImageDown, GripHorizontal } from "lucide-react";
+import { ArrowUpRight, ChevronDown, Layers, Sparkles, Share2, ImageDown, GripHorizontal } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
@@ -107,34 +107,29 @@ function AiTierListPage() {
       <AppNav />
       <main className="flex-1">
         {/* Hero */}
-        <section className="relative overflow-hidden bg-[#006c49] dark:bg-[#0b1c30]">
-          <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-            <div className="absolute -left-24 -top-24 size-72 rounded-full bg-[#4edea3]/20 blur-3xl" />
-            <div className="absolute -bottom-32 -right-24 size-80 rounded-full bg-white/10 blur-3xl" />
-            <div
-              className="absolute inset-0 opacity-[0.15]"
-              style={{
-                backgroundImage: "radial-gradient(circle, #fff 1px, transparent 1px)",
-                backgroundSize: "24px 24px",
-              }}
-            />
-          </div>
-          <div className="relative mx-auto max-w-5xl px-6 py-14 text-center sm:py-18">
-            <div className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-sm">
-              <Sparkles className="size-4 text-[#4edea3]" />
-              {t("aiTierlist.badge")}
-            </div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-              {t("aiTierlist.heading")}
-            </h1>
-            <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-[#cfe8dd] sm:text-lg">
-              {t("aiTierlist.subheading")}
-            </p>
-          </div>
-        </section>
+    
 
         {/* 工具主体 */}
         <TierListMaker />
+
+        {/* Reddit 统计与社区评价 */}
+        <section className="mx-auto max-w-5xl px-6 pt-8">
+          <a
+            href={withLangPrefix(currentLang(), "/ai-tierlist-stats")}
+            className="group flex flex-col gap-3 rounded-2xl border border-border/70 bg-card p-5 shadow-sm transition-colors hover:border-[#006c49]/40 dark:hover:border-[#4edea3]/40 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <div>
+              <h2 className="text-base font-bold text-foreground">{t("aiTierlist.statsLink")}</h2>
+              <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">
+                {t("aiTierlist.statsLinkDesc")}
+              </p>
+            </div>
+            <span className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-[#006c49] dark:text-[#4edea3]">
+              {t("common.view")}
+              <ArrowUpRight className="size-4" />
+            </span>
+          </a>
+        </section>
 
         {/* 产品说明 */}
         <section className="mx-auto max-w-5xl px-6 pt-6">

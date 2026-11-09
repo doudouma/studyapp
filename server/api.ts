@@ -81,6 +81,7 @@ const STATIC_PAGES: { loc: string; changefreq: string; priority: string; lastmod
   { loc: "/games", changefreq: "weekly", priority: "0.8" },
   { loc: "/idphoto", changefreq: "weekly", priority: "0.7" },
   { loc: "/ai-tierlist", changefreq: "weekly", priority: "0.7" },
+  { loc: "/ai-tierlist-stats", changefreq: "weekly", priority: "0.7" },
   // /links (My Pages) is a login-gated dashboard — intentionally excluded from
   // the sitemap and marked noindex (see app/routes/links.tsx).
   { loc: "/burn-after-reading-link", changefreq: "weekly", priority: "0.8" },

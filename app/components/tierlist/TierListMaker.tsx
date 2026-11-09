@@ -1,11 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  TIER_CATS,
   TIERLIST_THEMES,
   TIERLIST_TOOLS,
   isTierlistTheme,
-  type TierCat,
   type TierlistTheme,
 } from "@shared/types/tierlist";
 import {
@@ -210,8 +208,6 @@ const CSS = `
 .tl-chip:active{cursor:grabbing}
 .tl-chip.selected{outline:2px solid var(--accent); outline-offset:1px}
 .tl-chip .cname{font-size:13px; font-weight:700; display:flex; align-items:center; gap:6px}
-.tl-chip .ccat{font-size:10px; color:var(--muted); background:#f1f5f9; padding:1px 6px; border-radius:6px; font-weight:600; white-space:nowrap}
-.dark .tlw .tl-chip .ccat{background:#22314a}
 .tl-chip .ccom{font-size:11px; color:var(--muted); margin-top:2px; word-break:break-word}
 .tl-chip .ccom.empty{font-style:italic; opacity:.55}
 .tl-chip .cact{position:absolute; top:5px; right:5px; display:flex; gap:4px; opacity:0; pointer-events:none; transition:.15s}
@@ -221,6 +217,7 @@ const CSS = `
   font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--muted);
 }
 .tl-icobtn:hover{color:var(--accent); border-color:var(--accent)}
+.tl-icobtn.danger:hover{color:#dc2626; border-color:#dc2626}
 .tl-pool{
   background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px;
   box-shadow:var(--shadow); margin-top:6px;
@@ -229,6 +226,7 @@ const CSS = `
 .tl-pool h3 .count{color:var(--muted); font-weight:600; font-size:12px}
 .tl-tools{display:flex; flex-wrap:wrap; gap:10px}
 .tl-empty{color:var(--muted); font-size:13px; padding:8px 0}
+.tl-search{margin-left:auto; min-width:150px}
 .tl-addrow{display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap}
 .tl-field{
   border:1px solid var(--line); background:var(--field); border-radius:9px; padding:8px 10px;
@@ -281,14 +279,15 @@ const CSS = `
 }
 .tl-toast.show{transform:translateX(-50%) translateY(0)}
 @media(hover:none){
-  /* 触屏没有 hover：动作按钮直接常显，避免「看不见但能点到」 */
-  .tl-chip .cact{opacity:1; pointer-events:auto}
+  /* 触屏没有 hover：动作按钮常显，并改成卡片底部一行，避免遮住工具名 */
+  .tl-chip .cact{position:static; opacity:1; pointer-events:auto; margin-top:6px; justify-content:flex-end}
 }
 @media(max-width:640px){
   .tl-tier{flex-direction:column}
   .tl-tier-label{width:100%; flex-direction:row; align-items:center; gap:10px; padding:10px 14px}
   .tl-tier-label .ten{margin-top:0}
   .tl-doc-title{min-width:120px; max-width:40vw}
+  .tl-search{margin-left:0; width:100%}
   .tl-chip{min-width:104px}
 }
 `;
@@ -297,19 +296,20 @@ const CSS = `
 
 type ChipProps = {
   name: string;
-  catLabel: string;
   comment: string;
   selected: boolean;
   inTier: boolean;
+  deleteLabel: string;
   onSelect: () => void;
   onComment: () => void;
   onRemove: () => void;
+  onDelete: () => void;
   onDragStart: (e: React.DragEvent) => void;
 };
 
 function Chip({
-  name, catLabel, comment, selected, inTier,
-  onSelect, onComment, onRemove, onDragStart,
+  name, comment, selected, inTier, deleteLabel,
+  onSelect, onComment, onRemove, onDelete, onDragStart,
 }: ChipProps) {
   const hasComment = (comment ?? "").trim().length > 0;
   return (
@@ -322,12 +322,11 @@ function Chip({
         const act = (e.target as HTMLElement).getAttribute("data-act");
         if (act === "comment") { onComment(); return; }
         if (act === "remove") { onRemove(); return; }
+        if (act === "delete") { onDelete(); return; }
         onSelect();
       }}
     >
-      <div className="cname">
-        {name} <span className="ccat">{catLabel}</span>
-      </div>
+      <div className="cname">{name}</div>
       <div className={`ccom${hasComment ? "" : " empty"}`}>
         {hasComment ? comment : "＋ ★"}
       </div>
@@ -336,6 +335,7 @@ function Chip({
         {inTier && (
           <button className="tl-icobtn" data-act="remove" title="↩" aria-label="back">↩</button>
         )}
+        <button className="tl-icobtn danger" data-act="delete" title={deleteLabel} aria-label={deleteLabel}>×</button>
       </div>
     </div>
   );
@@ -349,7 +349,7 @@ export function TierListMaker() {
   const [hydrated, setHydrated] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [newName, setNewName] = useState("");
-  const [newCat, setNewCat] = useState<TierCat>("chat");
+  const [search, setSearch] = useState("");
   const [modalId, setModalId] = useState<string | null>(null);
   const [modalText, setModalText] = useState("");
   const [tierModalId, setTierModalId] = useState<string | null>(null);
@@ -399,9 +399,6 @@ export function TierListMaker() {
     if (toastTimer.current) clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setToast(""), 1900);
   };
-
-  const catLabel = (cat: string) =>
-    (TIER_CATS as readonly string[]).includes(cat) ? t(`aiTierlist.cat.${cat}`) : t("aiTierlist.cat.other");
 
   const clearUrlHash = () => {
     try {
@@ -524,11 +521,24 @@ export function TierListMaker() {
     if (!name) { showToast(t("aiTierlist.ui.toastNeedName")); return; }
     const id = uid();
     mutate((b) => {
-      b.tools[id] = { name, cat: newCat, comment: "" };
+      b.tools[id] = { name, cat: "other", comment: "" };
       b.pool.push(id);
     });
     setNewName("");
     showToast(t("aiTierlist.ui.toastAdded"));
+  };
+
+  /** 从整个榜单移除工具（池子 + 所有等级），不只是放回池子 */
+  const deleteTool = (id: string) => {
+    const name = state.tools[id]?.name ?? "";
+    mutate((b) => {
+      delete b.tools[id];
+      b.pool = b.pool.filter((x) => x !== id);
+      b.tiers.forEach((tier) => { tier.items = tier.items.filter((x) => x !== id); });
+    });
+    if (selectedId === id) setSelectedId(null);
+    if (modalId === id) setModalId(null);
+    showToast(t("aiTierlist.ui.toastDeleted", { name }));
   };
 
   const saveModal = () => {
@@ -640,7 +650,7 @@ export function TierListMaker() {
         ctx.fillStyle = "#6b7280";
         const comment = tool.comment
           ? truncate(ctx, tool.comment, cellW - 16, 11)
-          : `（${catLabel(tool.cat)}）`;
+          : "＋ ★";
         ctx.font = "400 11px sans-serif";
         ctx.fillText(comment, fx + 10, fy + 36);
         col += 1;
@@ -676,7 +686,12 @@ export function TierListMaker() {
   };
 
   // 计数与卡片用同一份列表：池里若有失效引用会被剔除，保证「数字 = 可见卡片数」
-  const poolItems = state.pool.filter((id) => !!state.tools[id]);
+  const poolQuery = search.trim().toLowerCase();
+  const poolItems = state.pool.filter((id) => {
+    const tool = state.tools[id];
+    if (!tool) return false;
+    return !poolQuery || tool.name.toLowerCase().includes(poolQuery);
+  });
 
   const themeValue = isTierlistTheme(state.theme) ? state.theme : "generic";
 
@@ -759,13 +774,14 @@ export function TierListMaker() {
                   <Chip
                     key={id}
                     name={tool.name}
-                    catLabel={catLabel(tool.cat)}
                     comment={tool.comment}
                     selected={selected === id}
                     inTier
+                    deleteLabel={t("aiTierlist.ui.deleteTool")}
                     onSelect={() => setSelectedId((v) => (v === id ? null : id))}
                     onComment={() => { setModalId(id); setModalText(tool.comment); }}
                     onRemove={() => moveToPool(id)}
+                    onDelete={() => deleteTool(id)}
                     onDragStart={(e) => onDragStart(e, id)}
                   />
                 );
@@ -777,7 +793,19 @@ export function TierListMaker() {
         <div className="tl-pool">
           <h3>
             🗂 {t("aiTierlist.ui.pool")}
-            <span className="count">{t("aiTierlist.ui.unsorted", { n: poolItems.length })}</span>
+            <span className="count">
+              {poolQuery
+                ? t("aiTierlist.ui.poolFiltered", { shown: poolItems.length, total: state.pool.length })
+                : t("aiTierlist.ui.unsorted", { n: poolItems.length })}
+            </span>
+            <input
+              type="search"
+              className="tl-field tl-search"
+              value={search}
+              placeholder={t("aiTierlist.ui.searchPlaceholder")}
+              aria-label={t("aiTierlist.ui.searchPlaceholder")}
+              onChange={(e) => setSearch(e.target.value)}
+            />
           </h3>
           <div className="tl-addrow">
             <input
@@ -789,23 +817,17 @@ export function TierListMaker() {
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") addTool(); }}
             />
-            <select
-              className="tl-field"
-              value={newCat}
-              aria-label={t("aiTierlist.ui.category")}
-              onChange={(e) => setNewCat(e.target.value as TierCat)}
-            >
-              {TIER_CATS.map((cat) => (
-                <option key={cat} value={cat}>{t(`aiTierlist.cat.${cat}`)}</option>
-              ))}
-            </select>
             <button className="tl-btn primary" onClick={addTool}>
               {t("aiTierlist.ui.addBtn")}
             </button>
           </div>
           <div className="tl-tools">
             {poolItems.length === 0 ? (
-              <div className="tl-empty">{t("aiTierlist.ui.emptyPool")}</div>
+              <div className="tl-empty">
+                {state.pool.length === 0
+                  ? t("aiTierlist.ui.emptyPool")
+                  : t("aiTierlist.ui.noMatch")}
+              </div>
             ) : (
               poolItems.map((id) => {
                 const tool = state.tools[id];
@@ -813,13 +835,14 @@ export function TierListMaker() {
                   <Chip
                     key={id}
                     name={tool.name}
-                    catLabel={catLabel(tool.cat)}
                     comment={tool.comment}
                     selected={selected === id}
                     inTier={false}
+                    deleteLabel={t("aiTierlist.ui.deleteTool")}
                     onSelect={() => setSelectedId((v) => (v === id ? null : id))}
                     onComment={() => { setModalId(id); setModalText(tool.comment); }}
                     onRemove={() => undefined}
+                    onDelete={() => deleteTool(id)}
                     onDragStart={(e) => onDragStart(e, id)}
                   />
                 );

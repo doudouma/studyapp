@@ -121,19 +121,49 @@ test("切换工具池与重置都走站内确认框（不依赖原生 confirm）
   await expect(page.locator(".tl-tools .tl-chip")).toHaveCount(35);
 });
 
-test("工具池计数与可见卡片一致，且已移除搜索筛选", async ({ page }) => {
+test("工具池可搜索、计数与卡片同步，且没有分类选择", async ({ page }) => {
   await page.goto("/ai-tierlist");
   const chips = page.locator(".tl-tools .tl-chip");
   const count = page.locator(".tl-pool h3 .count");
   await expect(chips).toHaveCount(35);
   await expect(count).toContainText("35");
-  await expect(page.locator(".tl-search")).toHaveCount(0);
+  await expect(page.locator(".tl-addrow select")).toHaveCount(0);
 
-  // 移走一个工具后，计数与卡片数同步减少（计数不再和主体对不上）
+  // 搜索：数字与可见卡片同步
+  await expect(async () => {
+    await page.locator(".tl-search").fill("Claude");
+    await expect(chips).toHaveCount(2, { timeout: 1500 });
+  }).toPass({ timeout: 30000 });
+  await expect(count).toContainText("2 / 35");
+
+  await page.locator(".tl-search").fill("no-such-tool");
+  await expect(chips).toHaveCount(0);
+  await expect(page.locator(".tl-empty")).toContainText("No matching tools");
+
+  await page.locator(".tl-search").fill("");
+  await expect(chips).toHaveCount(35);
+
+  // 移走一个工具后，计数与卡片数同步减少
   await selectPoolChip(page);
   await page.locator(".tl-movebar .tl-mbtn").first().click();
   await expect(chips).toHaveCount(34);
   await expect(count).toContainText("34");
+});
+
+test("新增工具可以从工具池删除", async ({ page }) => {
+  await page.goto("/ai-tierlist");
+  await expect(async () => {
+    await page.locator(".tl-addrow .tl-field.grow").fill("TestTool");
+    await page.locator(".tl-addrow .tl-btn.primary").click();
+    await expect(
+      page.locator(".tl-tools .tl-chip", { hasText: "TestTool" }),
+    ).toHaveCount(1, { timeout: 1500 });
+  }).toPass({ timeout: 30000 });
+
+  const chip = page.locator(".tl-tools .tl-chip", { hasText: "TestTool" });
+  await chip.hover();
+  await chip.locator('[data-act="delete"]').click();
+  await expect(page.locator(".tl-tools .tl-chip", { hasText: "TestTool" })).toHaveCount(0);
 });
 
 test("浏览器翻译包裹文本节点时，点击卡片不会 insertBefore 崩溃", async ({ page }) => {
@@ -160,6 +190,24 @@ test("浏览器翻译包裹文本节点时，点击卡片不会 insertBefore 崩
   await selectPoolChip(page);
   await expect(page.locator(".tl-movebar.show")).toBeVisible();
   expect(errors).toEqual([]);
+});
+
+test("Reddit 统计页渲染 20 款工具、评价与口径说明", async ({ page }) => {
+  await page.goto("/ai-tierlist-stats");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(/AI tools on Reddit/);
+  await expect(page.locator("article")).toHaveCount(20);
+  const first = page.locator("article").first();
+  await expect(first).toContainText("ChatGPT");
+  await expect(first).toContainText("Leader");
+  await expect(first).toContainText("The default for chat and writing");
+  await expect(page.getByRole("heading", { name: "Methodology" })).toBeVisible();
+});
+
+test("ai-tierlist 页面挂上了 Reddit 统计入口", async ({ page }) => {
+  await page.goto("/ai-tierlist");
+  const link = page.locator('a[href="/ai-tierlist-stats"]');
+  await expect(link).toBeVisible();
+  await expect(link).toContainText("Reddit stats");
 });
 
 test("freetool 列表挂上了 AI Tier List 入口", async ({ page }) => {
