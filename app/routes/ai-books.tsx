@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import {
+  ArrowUpRight,
   CalendarClock,
   ChevronDown,
   Heart,
@@ -17,6 +18,8 @@ import i18n from "~/lib/i18n";
 import { BASE_URL, currentLang, withLangPrefix } from "~/lib/seo";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
+import { AIX_CSS } from "~/components/aix/aix-styles";
+import { AixBurst } from "~/components/aix/AixBurst";
 import { BookCard } from "~/features/books/BookCard";
 import {
   BOOKS,
@@ -117,11 +120,7 @@ function Chip({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={
-        active
-          ? "h-[30px] whitespace-nowrap rounded-full border border-primary bg-primary px-3.5 text-xs font-medium text-primary-foreground"
-          : "h-[30px] whitespace-nowrap rounded-full border border-border bg-card px-3.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
-      }
+      className={`ab-chip${active ? " active" : ""}`}
     >
       {children}
     </button>
@@ -130,12 +129,130 @@ function Chip({
 
 function FilterRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <span className="min-w-14 text-xs text-muted-foreground">{label}</span>
+    <div className="ab-filterrow">
+      <span>{label}</span>
       {children}
     </div>
   );
 }
+
+const BOOKS_CSS = `
+.ab-layout{display:grid;gap:24px}
+@media(min-width:1024px){.ab-layout{grid-template-columns:214px minmax(0,1fr);gap:36px}}
+.ab-side{min-width:0;display:flex;flex-direction:column;gap:2px}
+@media(min-width:1024px){.ab-side{position:sticky;top:96px;align-self:start}}
+.ab-nav{display:flex;gap:2px;overflow-x:auto;padding-bottom:6px}
+@media(min-width:1024px){.ab-nav{flex-direction:column;overflow:visible;padding-bottom:0}}
+.ab-nav-item{
+  display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:2px;border:1px solid transparent;
+  background:transparent;color:var(--aix-mute);font-size:12px;font-weight:700;line-height:1.3;
+  white-space:nowrap;cursor:pointer;text-align:left;transition:.15s;flex:none;
+}
+@media(min-width:1024px){.ab-nav-item{width:100%}}
+.ab-nav-item:hover{background:var(--aix-grey);color:var(--aix-ink)}
+.ab-nav-item.active{background:#111214;color:var(--aix-lime);border-color:#111214}
+.ab-nav-item .ic{width:14px;height:14px;flex:none}
+.ab-nav-item .badge{margin-left:auto;background:#111214;color:var(--aix-lime);font-size:8px;letter-spacing:.12em;padding:2px 5px;border-radius:2px;font-weight:800}
+.ab-nav-item.ab-free{background:var(--aix-lime);color:#111214;border-color:transparent;margin-top:6px}
+.ab-nav-item.ab-free:hover{background:#c9ef00;color:#111214}
+.ab-label{font-size:9px;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:var(--aix-mute);padding:0 10px;margin:16px 0 5px}
+.ab-topic{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 10px;border-radius:2px;
+  border:0;background:transparent;color:var(--aix-mute);font-size:12px;text-align:left;cursor:pointer;white-space:nowrap;flex:none;
+}
+@media(min-width:1024px){.ab-topic{width:100%}}
+.ab-topic:hover{background:var(--aix-grey);color:var(--aix-ink)}
+.ab-topic.active{background:var(--aix-grey);color:var(--aix-ink);font-weight:800}
+.ab-topic .n{font-size:10px;font-variant-numeric:tabular-nums;opacity:.6}
+.ab-side-note{padding:10px;font-size:10.5px;line-height:1.5;color:var(--aix-mute)}
+
+.ab-search{position:relative;width:100%;max-width:420px}
+.ab-search input{
+  width:100%;height:38px;border:1px solid var(--aix-line);background:var(--aix-paper);border-radius:2px;
+  padding:0 36px 0 32px;font-size:12px;color:var(--aix-ink);outline:none;
+}
+.ab-search input:focus{border-color:var(--aix-ink)}
+.ab-search .ic{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--aix-mute);pointer-events:none}
+.ab-search kbd{
+  position:absolute;right:8px;top:50%;transform:translateY(-50%);border:1px solid var(--aix-line);border-radius:2px;
+  padding:1px 5px;font-size:9px;color:var(--aix-mute);background:var(--aix-grey);
+}
+
+.ab-viewhead{margin:22px 0 12px;border-bottom:1px solid var(--aix-line);padding-bottom:12px}
+.ab-viewhead h2{margin:3px 0 0;font-size:clamp(20px,2.2vw,28px);font-weight:800;letter-spacing:-.03em;text-transform:uppercase;line-height:1.05}
+.ab-viewhead p{margin:6px 0 0;max-width:72ch;font-size:12.5px;line-height:1.6;color:var(--aix-mute)}
+
+.ab-filters{display:flex;flex-direction:column;gap:8px;margin:14px 0}
+.ab-filterrow{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.ab-filterrow > span{min-width:74px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--aix-mute)}
+.ab-chip{
+  height:28px;padding:0 11px;border:1px solid var(--aix-line);background:var(--aix-paper);color:var(--aix-mute);
+  font-size:10.5px;font-weight:700;border-radius:2px;cursor:pointer;white-space:nowrap;transition:.15s;
+}
+.ab-chip:hover{border-color:var(--aix-ink);color:var(--aix-ink)}
+.ab-chip.active{background:#111214;border-color:#111214;color:var(--aix-lime)}
+
+.ab-details{border:1px solid var(--aix-line);background:var(--aix-paper);border-radius:2px;margin-top:16px}
+.ab-details summary{display:flex;align-items:center;gap:8px;padding:11px 14px;cursor:pointer;list-style:none;font-size:12px;font-weight:800}
+.ab-details summary::-webkit-details-marker{display:none}
+.ab-details summary .chev{width:14px;height:14px;color:var(--aix-mute);transition:transform .2s;flex:none}
+.ab-details[open] summary .chev{transform:rotate(180deg)}
+.ab-details .hint{margin-left:auto;font-size:10px;color:var(--aix-mute);font-weight:600}
+.ab-details .note{border-top:1px solid var(--aix-line);padding:8px 14px;font-size:10.5px;line-height:1.5;color:var(--aix-mute)}
+.ab-tablewrap{overflow-x:auto;border-top:1px solid var(--aix-line)}
+.ab-table{width:100%;min-width:920px;border-collapse:collapse;text-align:left}
+.ab-table th{
+  background:var(--aix-grey);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--aix-mute);
+  font-weight:800;padding:8px 10px;border-bottom:1px solid var(--aix-line);
+}
+.ab-table td{padding:10px;border-bottom:1px solid var(--aix-line);vertical-align:top;font-size:11.5px;line-height:1.5;color:var(--aix-mute)}
+.ab-table tr:last-child td{border-bottom:0}
+.ab-table a{color:var(--aix-ink);font-weight:700;text-decoration:none}
+.ab-table a:hover{text-decoration:underline}
+.ab-meta{display:block;margin-top:2px;font-size:10px;color:var(--aix-mute);font-weight:600}
+.ab-mark{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:2px;font-size:10px;font-weight:800;margin-right:4px;vertical-align:1px}
+.ab-mark.yes{background:var(--aix-lime);color:#111214}
+.ab-mark.no{background:var(--aix-grey);color:var(--aix-mute)}
+
+.ab-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 12px;padding:18px 0}
+@media(min-width:640px){.ab-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(min-width:768px){.ab-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(min-width:1024px){.ab-grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media(min-width:1280px){.ab-grid{grid-template-columns:repeat(6,minmax(0,1fr))}}
+.ab-empty{padding:64px 0;text-align:center;font-size:12px;color:var(--aix-mute)}
+
+.ab-browse{margin-top:30px;border-top:1px solid var(--aix-line);padding-top:18px}
+.ab-subhead{margin:0;font-size:15px;font-weight:800;letter-spacing:-.02em;text-transform:uppercase}
+.ab-subdesc{margin:4px 0 0;font-size:11px;color:var(--aix-mute)}
+.ab-links{display:grid;gap:6px;margin-top:12px}
+@media(min-width:640px){.ab-links{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:1024px){.ab-links{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.ab-link{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--aix-line);
+  border-radius:2px;padding:9px 11px;font-size:12px;color:var(--aix-mute);text-decoration:none;background:var(--aix-paper);transition:.15s;
+}
+.ab-link:hover{border-color:var(--aix-ink);color:var(--aix-ink)}
+.ab-link .n{font-size:10px;font-variant-numeric:tabular-nums;opacity:.6}
+.ab-path{
+  display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-size:11px;font-weight:800;
+  color:var(--aix-ink);text-decoration:none;border-bottom:1px solid var(--aix-line);
+}
+.ab-path:hover{border-color:var(--aix-ink)}
+
+.ab-notes{display:grid;gap:8px;margin-top:16px}
+@media(min-width:640px){.ab-notes{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.ab-note{
+  display:flex;flex-direction:column;gap:7px;border:1px solid var(--aix-line);border-radius:2px;
+  background:var(--aix-grey);padding:14px;min-height:150px;
+}
+.ab-note.ink{background:#111214;color:#fff;border-color:#111214}
+.ab-note.ink p{color:#cfcfcf;opacity:1}
+.ab-note.lime{background:var(--aix-lime);color:#111214;border-color:transparent}
+.ab-note .top{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.ab-note h3{margin:0;font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:800}
+.ab-note .w{font-size:13px;font-weight:800}
+.ab-note p{margin:0;font-size:11px;line-height:1.55;opacity:.75}
+`;
 
 function AiBooksPage() {
   const { t } = useTranslation();
@@ -305,7 +422,7 @@ function AiBooksPage() {
   }, [contentLocale, t]);
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-[#ededed] dark:bg-[#0c0d0f]">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -314,330 +431,323 @@ function AiBooksPage() {
       />
       <AppNav />
       <main className="flex-1">
-        <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:py-10">
-          <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
-            <aside className="min-w-0 lg:sticky lg:top-24 lg:self-start">
-              <nav className="flex gap-1 overflow-x-auto pb-2 lg:flex-col lg:gap-0.5 lg:overflow-visible lg:pb-0">
-                {views.map((item) => {
-                  const Icon = item.icon;
-                  const active = item.key === view;
-                  return (
-                    <button
-                      key={item.key}
-                      type="button"
-                      onClick={() => chooseView(item.key)}
-                      className={
-                        active
-                          ? "flex w-auto shrink-0 items-center gap-2.5 rounded-lg bg-primary/10 px-3 py-2 text-sm font-semibold text-primary lg:w-full"
-                          : "flex w-auto shrink-0 items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:w-full"
-                      }
-                    >
-                      <Icon className="size-4 shrink-0" />
-                      <span className="whitespace-nowrap">{item.label}</span>
-                    </button>
-                  );
-                })}
-              </nav>
+        <div className="aix">
+          <style>{AIX_CSS}{BOOKS_CSS}</style>
 
-              <Link
-                to="/ai-books/free"
-                className="mt-2 flex w-auto shrink-0 items-center gap-2.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/10 lg:w-full"
-              >
-                <Library className="size-4 shrink-0" />
-                <span className="whitespace-nowrap">{t("aiBooks.freeLink")}</span>
-                <span className="ml-auto hidden rounded-full bg-primary px-1.5 py-0.5 text-[9px] font-bold uppercase text-primary-foreground lg:inline">
-                  Free
-                </span>
+          {/* HERO */}
+          <section className="aix-frame aix-hero">
+            <div className="aix-mininav">
+              <span className="brand">
+                <span className="dot" />
+                AI BOOKS
+              </span>
+              <span>{t("aiBooks.stats", { books: BOOK_COUNT, ratings: fmt(TOTAL_RATINGS) })}</span>
+              <Link to="/ai-books/free">
+                {t("aiBooks.freeLink")}
+                <ArrowUpRight className="size-3.5" />
               </Link>
+            </div>
 
-              <p className="mt-6 hidden px-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground lg:block">
-                {t("aiBooks.topics")}
-              </p>
-              <div className="mt-1 flex gap-1.5 overflow-x-auto pb-3 lg:mt-1.5 lg:flex-col lg:gap-px lg:overflow-visible lg:pb-0">
-                <button
-                  type="button"
-                  onClick={() => setCategory("all")}
-                  className={
-                    category === "all"
-                      ? "flex shrink-0 items-center justify-between gap-3 rounded-lg bg-muted px-3 py-2 text-sm font-semibold text-foreground lg:w-full"
-                      : "flex shrink-0 items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:w-full"
-                  }
-                >
-                  <span className="whitespace-nowrap">{t("aiBooks.cat.all")}</span>
-                  <span className="text-xs tabular-nums text-muted-foreground">
-                    {fmt(BOOK_COUNT)}
-                  </span>
-                </button>
-                {CATEGORY_KEYS.map((key) => {
-                  const active = category === key;
-                  return (
+            <div className="aix-hero-grid">
+              <div className="aix-hero-copy">
+                <div>
+                  <div className="aix-topline">
+                    <span className="aix-pill lime">
+                      <span className="dot" />
+                      {t("aiBooks.quickLabel")}
+                    </span>
+                    <span className="aix-kicker">
+                      {t("aiBooks.factLine", {
+                        books: BOOK_COUNT,
+                        ratings: fmt(TOTAL_RATINGS),
+                        topics: CATEGORY_KEYS.length,
+                        date: AI_BOOKS_UPDATED,
+                      })}
+                    </span>
+                  </div>
+                  <h1 className="aix-h1">{t("aiBooks.h1")}</h1>
+                  <p className="aix-lede">{QUICK_ANSWER[contentLocale]}</p>
+                </div>
+
+                <div className="aix-stats">
+                  {[
+                    { n: fmt(BOOK_COUNT), label: t("aiBooks.statBooks"), cls: "grey" },
+                    { n: fmt(TOTAL_RATINGS), label: t("aiBooks.statRatings"), cls: "lime" },
+                    { n: String(CATEGORY_KEYS.length), label: t("aiBooks.statTopics"), cls: "ink" },
+                    { n: String(AI_BOOK_PAGES.length), label: t("aiBooks.statLists"), cls: "ghost" },
+                  ].map((stat) => (
+                    <div key={stat.label} className={`aix-stat ${stat.cls}`}>
+                      <div className="n">{stat.n}</div>
+                      <div className="l">{stat.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="aix-art" aria-hidden="true">
+                <span className="aix-art-grid" />
+                <AixBurst className="aix-art-burst" />
+                <div className="aix-art-s">
+                  {BOOK_COUNT}
+                  <span>{t("aiBooks.stats", { books: BOOK_COUNT, ratings: fmt(TOTAL_RATINGS) })}</span>
+                </div>
+                <div className="aix-art-rows">
+                  {[...CATEGORY_KEYS]
+                    .sort((a, b) => (CATEGORY_COUNTS[b] ?? 0) - (CATEGORY_COUNTS[a] ?? 0))
+                    .slice(0, 5)
+                    .map((key) => (
+                      <div className="aix-art-row" key={key}>
+                        <b>{t(`aiBooks.cat.${key}`)}</b>
+                        <span>{fmt(CATEGORY_COUNTS[key] ?? 0)}</span>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* CATALOG */}
+          <section className="aix-frame">
+            <div className="ab-layout">
+              <aside className="ab-side">
+                <nav className="ab-nav">
+                  {views.map((item) => {
+                    const Icon = item.icon;
+                    const active = item.key === view;
+                    return (
+                      <button
+                        key={item.key}
+                        type="button"
+                        onClick={() => chooseView(item.key)}
+                        className={`ab-nav-item${active ? " active" : ""}`}
+                      >
+                        <Icon className="ic" />
+                        <span>{item.label}</span>
+                      </button>
+                    );
+                  })}
+                </nav>
+
+                <Link to="/ai-books/free" className="ab-nav-item ab-free">
+                  <Library className="ic" />
+                  <span>{t("aiBooks.freeLink")}</span>
+                  <span className="badge">FREE</span>
+                </Link>
+
+                <div className="ab-label">{t("aiBooks.topics")}</div>
+                <div className="ab-nav">
+                  <button
+                    type="button"
+                    onClick={() => setCategory("all")}
+                    className={`ab-topic${category === "all" ? " active" : ""}`}
+                  >
+                    <span>{t("aiBooks.cat.all")}</span>
+                    <span className="n">{fmt(BOOK_COUNT)}</span>
+                  </button>
+                  {CATEGORY_KEYS.map((key) => (
                     <button
                       key={key}
                       type="button"
                       onClick={() => setCategory(key)}
-                      className={
-                        active
-                          ? "flex shrink-0 items-center justify-between gap-3 rounded-lg bg-muted px-3 py-2 text-sm font-semibold text-foreground lg:w-full"
-                          : "flex shrink-0 items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:w-full"
-                      }
+                      className={`ab-topic${category === key ? " active" : ""}`}
                     >
-                      <span className="whitespace-nowrap">{t(`aiBooks.cat.${key}`)}</span>
-                      <span className="text-xs tabular-nums text-muted-foreground">
-                        {fmt(CATEGORY_COUNTS[key] ?? 0)}
-                      </span>
+                      <span>{t(`aiBooks.cat.${key}`)}</span>
+                      <span className="n">{fmt(CATEGORY_COUNTS[key] ?? 0)}</span>
                     </button>
-                  );
-                })}
-              </div>
-
-              <div className="mt-7 hidden px-3 text-xs leading-relaxed text-muted-foreground lg:block">
-                <div>{t("aiBooks.stats", { books: BOOK_COUNT, ratings: fmt(TOTAL_RATINGS) })}</div>
-              </div>
-            </aside>
-
-            <section className="min-w-0">
-              <div className="relative w-full sm:max-w-md">
-                <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                <input
-                  ref={searchRef}
-                  type="search"
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder={t("aiBooks.searchPlaceholder")}
-                  autoComplete="off"
-                  className="h-10 w-full rounded-lg border border-border bg-card pl-9 pr-10 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-primary focus:ring-2 focus:ring-primary/15"
-                />
-                <kbd className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground sm:block">
-                  /
-                </kbd>
-              </div>
-
-              <div className="mt-5">
-                <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                  {t("aiBooks.h1")}
-                </h1>
-                <p className="mt-2 max-w-3xl text-[13px] leading-relaxed text-muted-foreground">
-                  <span className="font-semibold text-primary">
-                    {t("aiBooks.quickLabel")}:
-                  </span>{" "}
-                  {QUICK_ANSWER[contentLocale]}
-                </p>
-                <p className="mt-2 text-[11px] text-muted-foreground">
-                  {t("aiBooks.factLine", {
-                    books: BOOK_COUNT,
-                    ratings: fmt(TOTAL_RATINGS),
-                    topics: CATEGORY_KEYS.length,
-                    date: AI_BOOKS_UPDATED,
-                  })}
-                </p>
-              </div>
-
-              <details
-                id="top-picks"
-                className="group mt-4 scroll-mt-24 rounded-xl border border-border bg-card"
-              >
-                <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-2.5 [&::-webkit-details-marker]:hidden">
-                  <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" />
-                  <h2 className="text-sm font-semibold text-foreground">
-                    {t("aiBooks.table.title")}
-                  </h2>
-                  <span className="ml-auto text-[11px] font-normal text-muted-foreground">
-                    {t("aiBooks.table.summary", { count: TOP_PICKS.length })}
-                  </span>
-                </summary>
-                <div className="overflow-x-auto border-t border-border">
-                  <table className="w-full min-w-[920px] text-left text-sm">
-                    <thead className="bg-muted/60 text-[11px] uppercase tracking-wide text-muted-foreground">
-                      <tr>
-                        <th className="px-3 py-2 font-semibold">{t("aiBooks.table.goal")}</th>
-                        <th className="px-3 py-2 font-semibold">{t("aiBooks.table.book")}</th>
-                        <th className="px-3 py-2 font-semibold">{t("aiBooks.table.author")}</th>
-                        <th className="px-3 py-2 font-semibold">{t("aiBooks.table.why")}</th>
-                        <th className="px-3 py-2 font-semibold">{t("aiBooks.table.fitFor")}</th>
-                        <th className="px-3 py-2 font-semibold">{t("aiBooks.table.notFor")}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {TOP_PICKS.map((pick) => {
-                        const book = BOOKS.find((item) => item.asin === pick.asin);
-                        if (!book) return null;
-                        const separator = book.url.includes("?") ? "&" : "?";
-                        return (
-                          <tr key={pick.asin} className="border-t border-border align-top">
-                            <td className="whitespace-nowrap px-3 py-2.5 text-xs font-medium text-foreground">
-                              {pick.goal[contentLocale]}
-                            </td>
-                            <td className="px-3 py-2.5">
-                              <a
-                                href={`${book.url}${separator}ascsubtag=shelf-${pick.asin}-pick`}
-                                target="_blank"
-                                rel="nofollow sponsored noopener"
-                                className="font-medium text-primary hover:underline"
-                              >
-                                {pick.book}
-                              </a>
-                              <span className="mt-0.5 block text-[11px] text-muted-foreground">
-                                ★ {book.rating.toFixed(1)} · {short(book.reviews)}
-                              </span>
-                            </td>
-                            <td className="px-3 py-2.5 text-xs text-muted-foreground">{pick.author}</td>
-                            <td className="px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
-                              {pick.why[contentLocale]}
-                            </td>
-                            <td className="px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
-                              <span className="mr-1 font-bold text-emerald-600 dark:text-emerald-400">
-                                ✓
-                              </span>
-                              {pick.fitFor[contentLocale]}
-                            </td>
-                            <td className="px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
-                              <span className="mr-1 font-bold text-rose-600 dark:text-rose-400">
-                                ✗
-                              </span>
-                              {pick.notFor[contentLocale]}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                  ))}
                 </div>
-                <p className="border-t border-border px-3 py-2 text-[11px] text-muted-foreground">
-                  {t("aiBooks.table.note")}
-                </p>
-              </details>
 
-              <div className="mt-6">
-                <h2 className="text-lg font-bold tracking-tight text-foreground">
-                  {activeView.title}
-                </h2>
-                <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-                  {activeView.desc}
-                </p>
-              </div>
-
-              <div className="mt-4 flex flex-col gap-2.5">
-                <FilterRow label={t("aiBooks.ratingLabel")}>
-                  {RATING_OPTIONS.map((value) => (
-                    <Chip
-                      key={value}
-                      active={rating === value}
-                      onClick={() => setRating(value)}
-                    >
-                      {value === 0 ? t("aiBooks.filterAll") : `${value.toFixed(1)}+`}
-                    </Chip>
-                  ))}
-                </FilterRow>
-                <FilterRow label={t("aiBooks.ratingsLabel")}>
-                  {COUNT_OPTIONS.map((value) => (
-                    <Chip
-                      key={value}
-                      active={count === value}
-                      onClick={() => setCount(value)}
-                    >
-                      {value === 0 ? t("aiBooks.filterAll") : `${fmt(value)}+`}
-                    </Chip>
-                  ))}
-                </FilterRow>
-              </div>
-
-              <div className="mt-2 lg:hidden">
-                <p className="text-xs text-muted-foreground">
+                <p className="ab-side-note hidden lg:block">
                   {t("aiBooks.stats", { books: BOOK_COUNT, ratings: fmt(TOTAL_RATINGS) })}
                 </p>
+              </aside>
+
+              <div className="min-w-0">
+                <div className="ab-search">
+                  <Search className="ic" />
+                  <input
+                    ref={searchRef}
+                    type="search"
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder={t("aiBooks.searchPlaceholder")}
+                    autoComplete="off"
+                  />
+                  <kbd>/</kbd>
+                </div>
+
+                <div className="ab-viewhead">
+                  <h2>{activeView.title}</h2>
+                  <p>{activeView.desc}</p>
+                </div>
+
+                <details id="top-picks" className="ab-details group">
+                  <summary>
+                    <ChevronDown className="chev" />
+                    <span>{t("aiBooks.table.title")}</span>
+                    <span className="hint">{t("aiBooks.table.summary", { count: TOP_PICKS.length })}</span>
+                  </summary>
+                  <div className="ab-tablewrap">
+                    <table className="ab-table">
+                      <thead>
+                        <tr>
+                          <th>{t("aiBooks.table.goal")}</th>
+                          <th>{t("aiBooks.table.book")}</th>
+                          <th>{t("aiBooks.table.author")}</th>
+                          <th>{t("aiBooks.table.why")}</th>
+                          <th>{t("aiBooks.table.fitFor")}</th>
+                          <th>{t("aiBooks.table.notFor")}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {TOP_PICKS.map((pick) => {
+                          const book = BOOKS.find((item) => item.asin === pick.asin);
+                          if (!book) return null;
+                          const separator = book.url.includes("?") ? "&" : "?";
+                          return (
+                            <tr key={pick.asin}>
+                              <td>{pick.goal[contentLocale]}</td>
+                              <td>
+                                <a
+                                  href={`${book.url}${separator}ascsubtag=shelf-${pick.asin}-pick`}
+                                  target="_blank"
+                                  rel="nofollow sponsored noopener"
+                                >
+                                  {pick.book}
+                                </a>
+                                <span className="ab-meta">
+                                  ★ {book.rating.toFixed(1)} · {short(book.reviews)}
+                                </span>
+                              </td>
+                              <td>{pick.author}</td>
+                              <td>{pick.why[contentLocale]}</td>
+                              <td>
+                                <span className="ab-mark yes">✓</span>
+                                {pick.fitFor[contentLocale]}
+                              </td>
+                              <td>
+                                <span className="ab-mark no">✗</span>
+                                {pick.notFor[contentLocale]}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="note">{t("aiBooks.table.note")}</p>
+                </details>
+
+                <div className="ab-filters">
+                  <FilterRow label={t("aiBooks.ratingLabel")}>
+                    {RATING_OPTIONS.map((value) => (
+                      <Chip key={value} active={rating === value} onClick={() => setRating(value)}>
+                        {value === 0 ? t("aiBooks.filterAll") : `${value.toFixed(1)}+`}
+                      </Chip>
+                    ))}
+                  </FilterRow>
+                  <FilterRow label={t("aiBooks.ratingsLabel")}>
+                    {COUNT_OPTIONS.map((value) => (
+                      <Chip key={value} active={count === value} onClick={() => setCount(value)}>
+                        {value === 0 ? t("aiBooks.filterAll") : `${fmt(value)}+`}
+                      </Chip>
+                    ))}
+                  </FilterRow>
+                </div>
+
+                <p className="ab-side-note lg:hidden">
+                  {t("aiBooks.stats", { books: BOOK_COUNT, ratings: fmt(TOTAL_RATINGS) })}
+                </p>
+
+                {books.length === 0 ? (
+                  <div className="ab-empty">{t("aiBooks.empty")}</div>
+                ) : (
+                  <div className="ab-grid">
+                    {books.map((book, index) => (
+                      <BookCard key={book.asin} book={book} index={index} />
+                    ))}
+                  </div>
+                )}
+
+                <section className="ab-browse">
+                  <h2 className="ab-subhead">{t("aiBooks.browseTitle")}</h2>
+                  <p className="ab-subdesc">{t("aiBooks.browseDesc")}</p>
+                  <div className="ab-links">
+                    {AI_BOOK_PAGES.map((page) => {
+                      const pageCount =
+                        page.kind === "category"
+                          ? BOOKS.filter((book) => book.category === page.category).length
+                          : BOOKS.filter((book) => page.asins?.includes(book.asin)).length;
+                      return (
+                        <Link
+                          key={page.slug}
+                          to="/ai-books/$slug"
+                          params={{ slug: page.slug }}
+                          className="ab-link"
+                        >
+                          <span>{page.copy[contentLocale].topic}</span>
+                          <span className="n">
+                            {t("aiBooks.pageCount", { count: pageCount })}
+                          </span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                  <Link to="/ai-books/learning-path" className="ab-path">
+                    <CalendarClock className="size-3.5" />
+                    {t("aiBooks.pathCta")}
+                  </Link>
+                </section>
               </div>
+            </div>
+          </section>
 
-              {books.length === 0 ? (
-                <div className="py-20 text-center text-sm text-muted-foreground">
-                  {t("aiBooks.empty")}
+          {/* METHODOLOGY */}
+          <section className="aix-frame" id="methodology">
+            <div className="aix-sec-head">
+              <div>
+                <div className="aix-section-num">01</div>
+                <h2 className="aix-sec-title">{t("aiBooks.method.title")}</h2>
+              </div>
+              <span className="aix-dot-sm" />
+            </div>
+            <p className="aix-body">{METHOD_INTRO[contentLocale]}</p>
+            <div className="ab-notes">
+              {METHOD_ROWS.map((row, index) => (
+                <div key={row.id} className={`ab-note${index === 0 ? " ink" : index === 1 ? " lime" : ""}`}>
+                  <div className="top">
+                    <h3>{t(`aiBooks.method.${row.id}`)}</h3>
+                    <span className="w">{row.weight}</span>
+                  </div>
+                  <p>{row.text[contentLocale]}</p>
                 </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-x-3 gap-y-6 py-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-                  {books.map((book, index) => (
-                    <BookCard key={book.asin} book={book} index={index} />
-                  ))}
-                </div>
-              )}
+              ))}
+            </div>
+            <p className="aix-kicker" style={{ marginTop: 14 }}>{METHOD_SOURCE[contentLocale]}</p>
+            <p className="aix-kicker">{METHOD_AUTHOR[contentLocale]}</p>
+          </section>
 
-              <section className="mt-10 border-t border-border pt-5">
-                <h2 className="text-lg font-bold text-foreground">{t("aiBooks.browseTitle")}</h2>
-                <p className="mt-1 text-xs text-muted-foreground">{t("aiBooks.browseDesc")}</p>
-                <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                  {AI_BOOK_PAGES.map((page) => {
-                    const count =
-                      page.kind === "category"
-                        ? BOOKS.filter((book) => book.category === page.category).length
-                        : BOOKS.filter((book) => page.asins?.includes(book.asin)).length;
-                    return (
-                      <Link
-                        key={page.slug}
-                        to="/ai-books/$slug"
-                        params={{ slug: page.slug }}
-                        className="group flex items-center justify-between gap-3 rounded-lg border border-border px-3 py-2 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
-                      >
-                        <span>{page.copy[contentLocale].topic}</span>
-                        <span className="shrink-0 text-[11px] tabular-nums text-muted-foreground">
-                          {t("aiBooks.pageCount", { count })}
-                        </span>
-                      </Link>
-                    );
-                  })}
-                </div>
-                <Link
-                  to="/ai-books/learning-path"
-                  className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
-                >
-                  <CalendarClock className="size-3.5" />
-                  {t("aiBooks.pathCta")}
-                </Link>
-              </section>
-
-              <section id="methodology" className="mt-10 scroll-mt-24 border-t border-border pt-6">
-                <h2 className="text-lg font-bold text-foreground">{t("aiBooks.method.title")}</h2>
-                <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-                  {METHOD_INTRO[contentLocale]}
-                </p>
-                <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                  {METHOD_ROWS.map((row) => (
-                    <div key={row.id} className="rounded-xl border border-border bg-card p-4">
-                      <div className="flex items-baseline justify-between gap-2">
-                        <h3 className="text-sm font-semibold text-foreground">
-                          {t(`aiBooks.method.${row.id}`)}
-                        </h3>
-                        <span className="text-xs font-bold text-primary">{row.weight}</span>
-                      </div>
-                      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                        {row.text[contentLocale]}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-                <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-                  {METHOD_SOURCE[contentLocale]}
-                </p>
-                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                  {METHOD_AUTHOR[contentLocale]}
-                </p>
-              </section>
-
-              <section id="faq" className="mt-10 scroll-mt-24 border-t border-border pt-6">
-                <h2 className="text-lg font-bold text-foreground">{t("aiBooks.faq.title")}</h2>
-                <div className="mt-3 divide-y divide-border rounded-xl border border-border bg-card">
-                  {FAQ.map((item) => (
-                    <details key={item.id} className="group px-4 py-3">
-                      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium text-foreground [&::-webkit-details-marker]:hidden">
-                        {item.q[contentLocale]}
-                        <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" />
-                      </summary>
-                      <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                        {item.a[contentLocale]}
-                      </p>
-                    </details>
-                  ))}
-                </div>
-              </section>
-            </section>
-          </div>
+          {/* FAQ */}
+          <section className="aix-frame" id="faq">
+            <div className="aix-sec-head">
+              <div>
+                <div className="aix-section-num">02</div>
+                <h2 className="aix-sec-title">{t("aiBooks.faq.title")}</h2>
+              </div>
+              <span className="aix-dot-sm" />
+            </div>
+            <div className="aix-faq">
+              {FAQ.map((item) => (
+                <details key={item.id}>
+                  <summary>
+                    <span>{item.q[contentLocale]}</span>
+                    <span className="plus">＋</span>
+                  </summary>
+                  <p className="answer">{item.a[contentLocale]}</p>
+                </details>
+              ))}
+            </div>
+          </section>
         </div>
       </main>
       <AppFooter />
