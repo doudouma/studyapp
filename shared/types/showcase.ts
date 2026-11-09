@@ -32,15 +32,15 @@ export type ShowcaseCategory = (typeof CATEGORIES)[number];
  * 案例强调色：固定站点主绿，**不随分类变化**。
  * 分类色只在列表页的过滤 pill 文本上体现，详情页与卡片统一用这一组。
  */
-export const SHOWCASE_ACCENT = "#006c49";
-export const SHOWCASE_ACCENT_DARK = "#4edea3";
+export const SHOWCASE_ACCENT = "#111214";
+export const SHOWCASE_ACCENT_DARK = "#d8ff00";
 
 /** 结论/档位的语义色调（替代能力、风险提示等） */
 export type ShowcaseTone = "good" | "warn" | "neutral" | "bad";
 
 /** 浅色 / 暗色两套色值，渲染时写成 CSS 变量（内联样式无法被 dark: 覆盖） */
 export const TONE_COLORS: Record<ShowcaseTone, { light: string; dark: string }> = {
-  good: { light: "#0e7a4f", dark: "#4edea3" },
+  good: { light: "#0e7a4f", dark: "#d8ff00" },
   warn: { light: "#92400e", dark: "#fbbf24" },
   neutral: { light: "#4b5563", dark: "#9fb0c3" },
   bad: { light: "#b91c1c", dark: "#fca5a5" },

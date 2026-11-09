@@ -116,7 +116,7 @@ function BurnPage() {
         </section>
 
         {/* Use cases */}
-        <section className="bg-[#eff4ff] px-6 py-16 dark:bg-[#1e314a]">
+        <section className="bg-[#ededed] px-6 py-16 dark:bg-[#15171a]">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="mb-4 text-2xl font-bold tracking-tight md:text-3xl">
               {t("burn.useCasesTitle")}

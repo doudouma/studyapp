@@ -92,7 +92,7 @@ function QuestionsPage() {
               {t("questions.assessmentCta")}
             </Link>
 
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-b border-dashed border-[#e0e0e0] pb-3 dark:border-[#243244]">
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-b border-dashed border-[#e0e0e0] pb-3 dark:border-[#2a2d32]">
               <div className="text-[11px]">
                 <TerminalPrompt /> <TerminalCmd>ls /100-questions</TerminalCmd>{" "}
                 <span className="text-muted-foreground">
@@ -135,7 +135,7 @@ function QuestionsPage() {
                 ))}
               </div>
             ) : (
-              <div className="mt-4 border border-dashed border-[#cfcfcf] px-4 py-8 text-center dark:border-[#243244]">
+              <div className="mt-4 border border-dashed border-[#cfcfcf] px-4 py-8 text-center dark:border-[#2a2d32]">
                 <p className="text-[11px]">
                   <TerminalPrompt /> <TerminalCmd>grep</TerminalCmd>{" "}
                   <span className="text-muted-foreground">{t("questions.empty")}</span>{" "}

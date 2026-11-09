@@ -39,7 +39,7 @@ export function CompliancePanel({ ready, ratioPct, rangePct, showRuler, onToggle
           type="checkbox"
           checked={showRuler}
           onChange={(e) => onToggleRuler(e.target.checked)}
-          className="accent-[#006c49]"
+          className="accent-[#d8ff00]"
         />
         {t("idphoto.ruler.show")}
       </label>

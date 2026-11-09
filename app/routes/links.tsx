@@ -33,8 +33,8 @@ interface PomodoroCount {
 
 function StatCard({ icon, label, value, accent, tip }: { icon: React.ReactNode; label: string; value: string | number; accent?: string; tip?: string }) {
   return (
-    <div className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] p-5 flex items-center gap-4">
-      <div className={`flex size-12 shrink-0 items-center justify-center rounded-xl ${accent || "bg-[#006c49]/10 dark:bg-[#4edea3]/10"}`}>
+    <div className="rounded-2xl border border-[#e3e3e3]/60 dark:border-[#2a2d32] bg-white dark:bg-[#15171a] p-5 flex items-center gap-4">
+      <div className={`flex size-12 shrink-0 items-center justify-center rounded-xl ${accent || "bg-[#111214]/10 dark:bg-[#d8ff00]/10"}`}>
         {icon}
       </div>
       <div className="min-w-0">
@@ -100,8 +100,8 @@ function LinksPage() {
         <AppNav />
         <main className="flex flex-1 items-center justify-center p-8">
           <div className="text-center">
-            <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-[#006c49]/10 dark:bg-[#4edea3]/10">
-              <User className="size-6 text-[#006c49] dark:text-[#4edea3]" />
+            <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-[#111214]/10 dark:bg-[#d8ff00]/10">
+              <User className="size-6 text-[#111214] dark:text-[#d8ff00]" />
             </div>
             <h1 className="text-2xl font-bold text-foreground">{t("profile.heading")}</h1>
             <p className="mt-2 text-muted-foreground">
@@ -109,7 +109,7 @@ function LinksPage() {
             </p>
             <Link
               to="/"
-              className="mt-4 inline-flex h-10 items-center justify-center rounded-xl bg-[#006c49] px-5 text-sm font-medium text-white shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)] transition-colors hover:bg-[#006c49]/90 dark:bg-[#4edea3] dark:text-[#002113] dark:hover:bg-[#4edea3]/90"
+              className="mt-4 inline-flex h-10 items-center justify-center rounded-xl bg-[#111214] px-5 text-sm font-medium text-white shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)] transition-colors hover:bg-[#111214]/90 dark:bg-[#d8ff00] dark:text-[#111214] dark:hover:bg-[#d8ff00]/90"
             >
               {t("profile.loginCta")}
             </Link>
@@ -156,7 +156,7 @@ function LinksPage() {
             </div>
             <Link
               to="/"
-              className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#006c49] px-5 text-sm font-medium text-white shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)] transition-all hover:bg-[#006c49]/90 active:shadow-[inset_0_-1px_0_rgba(0,0,0,0.2)] dark:bg-[#4edea3] dark:text-[#002113] dark:hover:bg-[#4edea3]/90"
+              className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#111214] px-5 text-sm font-medium text-white shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)] transition-all hover:bg-[#111214]/90 active:shadow-[inset_0_-1px_0_rgba(0,0,0,0.2)] dark:bg-[#d8ff00] dark:text-[#111214] dark:hover:bg-[#d8ff00]/90"
             >
               {t("profile.newLink")}
             </Link>
@@ -164,8 +164,8 @@ function LinksPage() {
 
           {/* Stats Grid */}
           <div className="mb-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] p-5 flex items-center gap-4 col-span-2 md:col-span-1">
-              <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-[#006c49]/10 dark:bg-[#4edea3]/10">
+            <div className="rounded-2xl border border-[#e3e3e3]/60 dark:border-[#2a2d32] bg-white dark:bg-[#15171a] p-5 flex items-center gap-4 col-span-2 md:col-span-1">
+              <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-[#111214]/10 dark:bg-[#d8ff00]/10">
                 <span className="text-lg">🍅</span>
               </div>
               <div className="min-w-0 flex-1">
@@ -191,7 +191,7 @@ function LinksPage() {
               </div>
             </div>
             <StatCard
-              icon={<LinkIcon className="size-5 text-[#006c49] dark:text-[#4edea3]" />}
+              icon={<LinkIcon className="size-5 text-[#111214] dark:text-[#d8ff00]" />}
               label={t("profile.stat.links")}
               value={data?.total ?? "-"}
             />
@@ -207,30 +207,30 @@ function LinksPage() {
           {/* Links Section */}
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-              <LinkIcon className="size-5 text-[#006c49] dark:text-[#4edea3]" />
+              <LinkIcon className="size-5 text-[#111214] dark:text-[#d8ff00]" />
               {t("profile.section.links")}
             </h2>
           </div>
 
           {loading ? (
-            <div className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] p-12">
+            <div className="rounded-2xl border border-[#e3e3e3]/60 dark:border-[#2a2d32] bg-white dark:bg-[#15171a] p-12">
               <div className="space-y-4">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="flex items-center gap-4">
-                    <div className="size-10 animate-pulse rounded-xl bg-[#e5eeff] dark:bg-[#1e314a]" />
+                    <div className="size-10 animate-pulse rounded-xl bg-[#f2f2f2] dark:bg-[#15171a]" />
                     <div className="flex-1 space-y-2">
-                      <div className="h-4 w-1/3 animate-pulse rounded bg-[#e5eeff] dark:bg-[#1e314a]" />
-                      <div className="h-3 w-1/5 animate-pulse rounded bg-[#e5eeff] dark:bg-[#1e314a]" />
+                      <div className="h-4 w-1/3 animate-pulse rounded bg-[#f2f2f2] dark:bg-[#15171a]" />
+                      <div className="h-3 w-1/5 animate-pulse rounded bg-[#f2f2f2] dark:bg-[#15171a]" />
                     </div>
                   </div>
                 ))}
               </div>
             </div>
           ) : error ? (
-            <div className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] p-12 text-center">
+            <div className="rounded-2xl border border-[#e3e3e3]/60 dark:border-[#2a2d32] bg-white dark:bg-[#15171a] p-12 text-center">
               <p className="text-destructive">{error}</p>
               <button
-                className="mt-4 text-sm text-[#0058be] dark:text-[#adc6ff] hover:underline"
+                className="mt-4 text-sm text-[#111214] dark:text-[#ededed] hover:underline"
                 onClick={fetchPages}
               >
                 {t("common.retry")}

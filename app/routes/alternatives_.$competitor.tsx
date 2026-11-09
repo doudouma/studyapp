@@ -126,9 +126,9 @@ function AlternativePage() {
 
           {/* Who it's for */}
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            <div className="rounded-2xl border border-[#006c49]/20 bg-[#006c49]/5 p-5 dark:border-[#4edea3]/20 dark:bg-[#4edea3]/5">
+            <div className="rounded-2xl border border-[#111214]/20 bg-[#111214]/5 p-5 dark:border-[#d8ff00]/20 dark:bg-[#d8ff00]/5">
               <h2 className="flex items-center gap-2 text-base font-semibold text-foreground">
-                <Check className="size-4 text-[#006c49] dark:text-[#4edea3]" />
+                <Check className="size-4 text-[#111214] dark:text-[#d8ff00]" />
                 {t("alternatives.ours.title")}
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">

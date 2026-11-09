@@ -74,8 +74,8 @@ export function DropZone({ file, onFileSelect, acceptZip = true, maxBytes = MAX_
 
   if (file) {
     return (
-      <div className="flex items-center gap-4 rounded-xl border border-[#d3e4fe] dark:border-[#3c4a42] bg-[#e5eeff]/40 dark:bg-[#1e314a]/40 p-5">
-        <div className="flex size-11 items-center justify-center rounded-xl bg-[#006c49]/10 text-[#006c49] dark:bg-[#4edea3]/10 dark:text-[#4edea3]">
+      <div className="flex items-center gap-4 rounded-xl border border-[#e3e3e3] dark:border-[#2a2d32] bg-[#f2f2f2]/40 dark:bg-[#15171a]/40 p-5">
+        <div className="flex size-11 items-center justify-center rounded-xl bg-[#111214]/10 text-[#111214] dark:bg-[#d8ff00]/10 dark:text-[#d8ff00]">
           {file.name.endsWith(".zip") ? <Archive className="size-5" /> : <FileText className="size-5" />}
         </div>
         <div className="flex-1 min-w-0">
@@ -83,7 +83,7 @@ export function DropZone({ file, onFileSelect, acceptZip = true, maxBytes = MAX_
           <div className="text-xs text-muted-foreground mt-0.5">{formatSize(file.size)}</div>
         </div>
         <button
-          className="inline-flex items-center justify-center rounded-lg p-1.5 text-muted-foreground hover:bg-[#e5eeff] dark:hover:bg-[#1e314a] hover:text-foreground transition-colors"
+          className="inline-flex items-center justify-center rounded-lg p-1.5 text-muted-foreground hover:bg-[#f2f2f2] dark:hover:bg-[#15171a] hover:text-foreground transition-colors"
           onClick={() => onFileSelect(null)}
         >
           <X className="size-4" />
@@ -96,8 +96,8 @@ export function DropZone({ file, onFileSelect, acceptZip = true, maxBytes = MAX_
     <div
       className={`flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-14 text-center cursor-pointer transition-all ${
         dragOver
-          ? "border-[#006c49] bg-[#006c49]/5 dark:border-[#4edea3] dark:bg-[#4edea3]/5"
-          : "border-[#bbcabf]/40 bg-[#e5eeff]/30 dark:border-[#3c4a42] dark:bg-[#1e314a]/30 hover:border-[#bbcabf]/60"
+          ? "border-[#111214] bg-[#111214]/5 dark:border-[#d8ff00] dark:bg-[#d8ff00]/5"
+          : "border-[#e3e3e3]/40 bg-[#f2f2f2]/30 dark:border-[#2a2d32] dark:bg-[#15171a]/30 hover:border-[#e3e3e3]/60"
       }`}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
@@ -111,7 +111,7 @@ export function DropZone({ file, onFileSelect, acceptZip = true, maxBytes = MAX_
         className="hidden"
         onChange={handleInputChange}
       />
-      <div className="flex size-14 items-center justify-center rounded-2xl bg-[#006c49]/10 text-[#006c49] dark:bg-[#4edea3]/10 dark:text-[#4edea3]">
+      <div className="flex size-14 items-center justify-center rounded-2xl bg-[#111214]/10 text-[#111214] dark:bg-[#d8ff00]/10 dark:text-[#d8ff00]">
         <Upload className="size-7" />
       </div>
       <div className="mt-4 text-base text-foreground mb-1">

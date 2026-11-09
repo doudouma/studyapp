@@ -135,9 +135,9 @@ export function QuestionSidebar({
     <aside className="hidden lg:block lg:self-stretch">
       <div
         style={{ fontFamily: TERMINAL_FONT }}
-        className="sticky top-20 overflow-hidden rounded-xl border border-[#cfcfcf] bg-white dark:border-[#243244] dark:bg-[#0f1720]"
+        className="sticky top-20 overflow-hidden rounded-xl border border-[#cfcfcf] bg-white dark:border-[#2a2d32] dark:bg-[#0f1720]"
       >
-        <div className="flex items-center justify-between gap-2 border-b border-[#cfcfcf] bg-[#ececec] px-3 py-2 dark:border-[#243244] dark:bg-[#151d2b]">
+        <div className="flex items-center justify-between gap-2 border-b border-[#cfcfcf] bg-[#ececec] px-3 py-2 dark:border-[#2a2d32] dark:bg-[#151d2b]">
           <span className="text-[10px] text-muted-foreground">$ cat toc.md</span>
           <span
             className="shrink-0 text-[9px] text-muted-foreground"
@@ -149,9 +149,9 @@ export function QuestionSidebar({
             {readCount}/{totalQuestions}
           </span>
         </div>
-        <div className="h-0.5 bg-[#e0e0e0] dark:bg-[#243244]">
+        <div className="h-0.5 bg-[#e0e0e0] dark:bg-[#2a2d32]">
           <div
-            className="h-full bg-[#006c49] transition-[width] dark:bg-[#4edea3]"
+            className="h-full bg-[#111214] transition-[width] dark:bg-[#d8ff00]"
             style={{ width: `${totalQuestions ? (readCount / totalQuestions) * 100 : 0}%` }}
           />
         </div>
@@ -172,7 +172,7 @@ export function QuestionSidebar({
                 <div
                   className={`flex items-center gap-0.5 rounded-md transition-colors ${
                     activeChapter
-                      ? "bg-[#006c49]/10 text-[#006c49] dark:bg-[#4edea3]/10 dark:text-[#4edea3]"
+                      ? "bg-[#111214]/10 text-[#111214] dark:bg-[#d8ff00]/10 dark:text-[#d8ff00]"
                       : "text-[#000000] hover:bg-[#ececec] dark:text-[#e6edf6] dark:hover:bg-[#151d2b]"
                   }`}
                 >
@@ -202,7 +202,7 @@ export function QuestionSidebar({
                     {chapterVisited && !activeChapter ? (
                       <Check
                         aria-label={t("questions.visited")}
-                        className="size-2.5 shrink-0 text-[#006c49] dark:text-[#4edea3]"
+                        className="size-2.5 shrink-0 text-[#111214] dark:text-[#d8ff00]"
                       />
                     ) : null}
                     <span className="truncate">{chapter.title}</span>
@@ -215,7 +215,7 @@ export function QuestionSidebar({
                 {open && chapter.questions.length > 0 ? (
                   <ul
                     id={`toc-${chapter.id}`}
-                    className="mb-1 ml-[1.15rem] mt-0.5 space-y-0.5 border-l border-dashed border-[#e0e0e0] pl-1.5 dark:border-[#243244]"
+                    className="mb-1 ml-[1.15rem] mt-0.5 space-y-0.5 border-l border-dashed border-[#e0e0e0] pl-1.5 dark:border-[#2a2d32]"
                   >
                     {chapter.questions.map((question) => {
                       const active = activeQuestionId === question.id;
@@ -233,14 +233,14 @@ export function QuestionSidebar({
                             title={question.title}
                             className={`flex items-center gap-1 rounded px-1.5 py-[3px] text-[10px] transition-colors ${
                               active
-                                ? "bg-[#006c49] font-semibold text-white dark:bg-[#4edea3] dark:text-[#002113]"
+                                ? "bg-[#111214] font-semibold text-white dark:bg-[#d8ff00] dark:text-[#111214]"
                                 : "text-muted-foreground hover:bg-[#ececec] hover:text-foreground dark:hover:bg-[#151d2b]"
                             }`}
                           >
                             {seen && !active ? (
                               <Check
                                 aria-label={t("questions.visited")}
-                                className="size-2.5 shrink-0 text-[#006c49] dark:text-[#4edea3]"
+                                className="size-2.5 shrink-0 text-[#111214] dark:text-[#d8ff00]"
                               />
                             ) : null}
                             <span className="truncate">{question.title}</span>

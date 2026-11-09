@@ -72,7 +72,7 @@ export function BgColorPicker({ preset, bgColor, keepBg, onColor, onKeepBg }: Bg
             type="checkbox"
             checked={keepBg}
             onChange={(e) => onKeepBg(e.target.checked)}
-            className="accent-[#006c49]"
+            className="accent-[#d8ff00]"
           />
           {t("idphoto.bg.keep")}
         </label>

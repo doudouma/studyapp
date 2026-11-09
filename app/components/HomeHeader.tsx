@@ -21,8 +21,8 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
       to={href}
       className={
         isActive
-          ? "border-b-2 border-primary pb-0.5 text-sm font-semibold text-primary"
-          : "text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          ? "border-b-2 border-[#111214] pb-0.5 text-[11px] font-bold uppercase tracking-[0.1em] text-[#111214] dark:border-[#d8ff00] dark:text-[#ededed]"
+          : "text-[11px] font-bold uppercase tracking-[0.1em] text-muted-foreground transition-colors hover:text-foreground"
       }
     >
       {children}
@@ -43,8 +43,8 @@ function MobileNavLink({ href, onClick, children }: { href: string; onClick: () 
       onClick={onClick}
       className={
         isActive
-          ? "block rounded-lg bg-[#006c49]/10 dark:bg-[#4edea3]/10 px-4 py-2.5 text-sm font-semibold text-[#006c49] dark:text-[#4edea3]"
-          : "block rounded-lg px-4 py-2.5 text-sm font-medium text-muted-foreground hover:bg-[#e5eeff] dark:hover:bg-[#1e314a] transition-colors"
+          ? "block rounded-[2px] bg-[#111214] px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.1em] text-[#d8ff00]"
+          : "block rounded-[2px] px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.1em] text-muted-foreground transition-colors hover:bg-[#f2f2f2] hover:text-[#111214] dark:hover:bg-[#1b1e22] dark:hover:text-[#ededed]"
       }
     >
       {children}
@@ -60,7 +60,7 @@ function MobileGroup({ label, children }: { label: string; children: React.React
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="flex w-full items-center justify-between rounded-lg px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground transition-colors hover:bg-[#e5eeff] dark:hover:bg-[#1e314a]"
+        className="flex w-full items-center justify-between rounded-[2px] px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.1em] text-muted-foreground transition-colors hover:bg-[#f2f2f2] hover:text-[#111214] dark:hover:bg-[#1b1e22] dark:hover:text-[#ededed]"
       >
         {label}
         <ChevronDown className={`size-4 transition-transform ${open ? "rotate-180" : ""}`} />
@@ -114,7 +114,7 @@ function ToolsDropdown() {
         <ChevronDown className={`size-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
-        <div className="absolute left-0 top-full z-50 mt-2 min-w-40 rounded-lg border border-border bg-popover py-1 shadow-lg">
+        <div className="absolute left-0 top-full z-50 mt-2 min-w-40 rounded-[2px] border border-[#e3e3e3] bg-white py-1 dark:border-[#2a2d32] dark:bg-[#15171a]">
           <DropdownLink href="/freetool" onClick={() => setOpen(false)}>
             {t("nav.toolsAll")}
           </DropdownLink>
@@ -193,7 +193,7 @@ function GamesDropdown() {
         <ChevronDown className={`size-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
-        <div className="absolute left-0 top-full z-50 mt-2 min-w-40 rounded-lg border border-border bg-popover py-1 shadow-lg">
+        <div className="absolute left-0 top-full z-50 mt-2 min-w-40 rounded-[2px] border border-[#e3e3e3] bg-white py-1 dark:border-[#2a2d32] dark:bg-[#15171a]">
           <DropdownLink href="/games" onClick={() => setOpen(false)}>
             {t("nav.gamesAll")}
           </DropdownLink>
@@ -226,8 +226,8 @@ function DropdownLink({ href, onClick, children }: { href: string; onClick: () =
       onClick={onClick}
       className={
         isActive
-          ? "block px-3 py-2 text-sm font-semibold text-primary transition-colors hover:bg-muted"
-          : "block px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          ? "block px-3 py-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[#111214] transition-colors hover:bg-[#f2f2f2] dark:text-[#ededed] dark:hover:bg-[#1b1e22]"
+          : "block px-3 py-2 text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground transition-colors hover:bg-[#f2f2f2] hover:text-[#111214] dark:hover:bg-[#1b1e22] dark:hover:text-[#ededed]"
       }
     >
       {children}
@@ -296,14 +296,14 @@ export function AppNav() {
   // ========== 未登录模式 ==========
   if (!user) {
     return (
-      <header className="sticky top-0 z-50 w-full border-b border-[#d3e4fe] dark:border-[#3c4a42] bg-white/95 dark:bg-[#0b1c30]/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+      <header className="aix-header sticky top-0 z-50 w-full border-b border-[#e3e3e3] bg-[#ededed]/95 backdrop-blur dark:border-[#2a2d32] dark:bg-[#0c0d0f]/95">
         <nav className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
           <div className="flex items-center gap-6">
             <Link to="/" className="flex items-center gap-2">
-              <div className="flex size-9 items-center justify-center rounded-xl bg-[#006c49] text-white dark:bg-[#4edea3] dark:text-[#002113]">
+              <div className="flex size-9 items-center justify-center rounded-[2px] bg-[#111214] text-[#d8ff00] dark:bg-[#d8ff00] dark:text-[#111214]">
                 <Code2 className="size-5" />
               </div>
-              <span className="text-xl font-bold tracking-tight">100mini</span>
+              <span className="text-[15px] font-extrabold uppercase tracking-[0.16em]">100mini</span>
             </Link>
             <div className="hidden items-center gap-6 md:flex">
               <NavLink href="/">{t("nav.home")}</NavLink>
@@ -340,6 +340,7 @@ export function AppNav() {
             <Button
               variant="ghost"
               size="sm"
+              className="text-[11px] font-bold uppercase tracking-[0.1em]"
               onClick={() => setAuthOpen(true)}
             >
               {t("nav.login")}
@@ -352,7 +353,7 @@ export function AppNav() {
           />
         </nav>
         {mobileNavOpen && (
-          <div className="border-t border-[#d3e4fe] dark:border-[#3c4a42] bg-white dark:bg-[#0b1c30] md:hidden">
+          <div className="border-t border-[#e3e3e3] bg-[#ededed] dark:border-[#2a2d32] dark:bg-[#0c0d0f] md:hidden">
             <div className="flex flex-col gap-1 px-6 py-4">
               <MobileNavLink href="/" onClick={() => setMobileNavOpen(false)}>{t("nav.home")}</MobileNavLink>
               <div onPointerEnter={prefetchSquare}>
@@ -393,15 +394,15 @@ export function AppNav() {
 
   // ========== 已登录模式 ==========
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[#d3e4fe] dark:border-[#3c4a42] bg-white/95 dark:bg-[#0b1c30]/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+    <header className="aix-header sticky top-0 z-50 w-full border-b border-[#e3e3e3] bg-[#ededed]/95 backdrop-blur dark:border-[#2a2d32] dark:bg-[#0c0d0f]/95">
       <nav className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
         {/* Left: Logo + Nav links */}
         <div className="flex items-center gap-6">
           <Link to="/" className="flex items-center gap-2">
-            <div className="flex size-9 items-center justify-center rounded-xl bg-[#006c49] text-white dark:bg-[#4edea3] dark:text-[#002113]">
+            <div className="flex size-9 items-center justify-center rounded-[2px] bg-[#111214] text-[#d8ff00] dark:bg-[#d8ff00] dark:text-[#111214]">
               <Code2 className="size-5" />
             </div>
-            <span className="text-xl font-bold tracking-tight">100mini</span>
+            <span className="text-[15px] font-extrabold uppercase tracking-[0.16em]">100mini</span>
           </Link>
             <div className="hidden items-center gap-6 md:flex">
             <NavLink href="/">{t("nav.home")}</NavLink>
@@ -444,7 +445,7 @@ export function AppNav() {
           </div>
           <div className="relative" ref={menuRef}>
             <button
-              className="flex size-8 items-center justify-center rounded-full bg-primary font-bold text-xs text-primary-foreground cursor-pointer overflow-hidden"
+              className="flex size-8 items-center justify-center rounded-[2px] bg-[#111214] text-xs font-bold text-[#d8ff00] cursor-pointer overflow-hidden dark:bg-[#d8ff00] dark:text-[#111214]"
               onClick={() => setMenuOpen(!menuOpen)}
             >
               {user.image ? (
@@ -458,7 +459,7 @@ export function AppNav() {
               )}
             </button>
             {menuOpen && (
-              <div className="absolute right-0 top-10 z-50 w-52 rounded-lg border border-border bg-popover shadow-lg">
+              <div className="absolute right-0 top-10 z-50 w-52 rounded-[2px] border border-[#e3e3e3] bg-white dark:border-[#2a2d32] dark:bg-[#15171a]">
                 <button
                   className="group flex w-full cursor-pointer items-center gap-2 border-b px-3 py-2 text-left text-sm font-medium text-foreground transition-colors hover:bg-muted hover:text-primary"
                   onClick={() => { setMenuOpen(false); navigate({ to: "/links" }); }}
@@ -495,7 +496,7 @@ export function AppNav() {
         </div>
       </nav>
       {mobileNavOpen && (
-        <div className="border-t border-[#d3e4fe] dark:border-[#3c4a42] bg-white dark:bg-[#0b1c30] md:hidden">
+        <div className="border-t border-[#e3e3e3] bg-[#ededed] dark:border-[#2a2d32] dark:bg-[#0c0d0f] md:hidden">
           <div className="flex flex-col gap-1 px-6 py-4">
             <MobileNavLink href="/" onClick={() => setMobileNavOpen(false)}>{t("nav.home")}</MobileNavLink>
             <div onPointerEnter={prefetchSquare}>

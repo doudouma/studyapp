@@ -190,9 +190,9 @@ function TemporaryLinkPage() {
       <AppNav />
       <main className="flex-1">
         {/* Hero */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-[#006c49]/10 via-[#006c49]/[0.02] to-background dark:from-[#4edea3]/10 dark:via-[#4edea3]/[0.02] dark:to-background pb-10 pt-16 md:pt-24">
+        <section className="relative overflow-hidden bg-gradient-to-b from-[#111214]/10 via-[#111214]/[0.02] to-background dark:from-[#d8ff00]/10 dark:via-[#d8ff00]/[0.02] dark:to-background pb-10 pt-16 md:pt-24">
           <div className="mx-auto max-w-3xl px-6 text-center">
-            <div className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-[#006c49]/20 bg-[#006c49]/5 px-3 py-1 text-xs font-medium text-[#006c49] dark:border-[#4edea3]/20 dark:bg-[#4edea3]/5 dark:text-[#4edea3]">
+            <div className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-[#111214]/20 bg-[#111214]/5 px-3 py-1 text-xs font-medium text-[#111214] dark:border-[#d8ff00]/20 dark:bg-[#d8ff00]/5 dark:text-[#d8ff00]">
               {t(`${PREFIX}.badge`)}
             </div>
             <h1 className="text-4xl font-bold tracking-tight text-foreground md:text-5xl">
@@ -217,7 +217,7 @@ function TemporaryLinkPage() {
           <div className="grid gap-6 md:grid-cols-3">
             {STEP_ICONS.map((Icon, i) => (
               <div key={i} className="flex flex-col items-center rounded-2xl border border-border/70 bg-card p-6 text-center">
-                <div className="mb-4 flex size-12 items-center justify-center rounded-xl bg-[#006c49]/10 text-[#006c49] dark:bg-[#4edea3]/10 dark:text-[#4edea3]">
+                <div className="mb-4 flex size-12 items-center justify-center rounded-xl bg-[#111214]/10 text-[#111214] dark:bg-[#d8ff00]/10 dark:text-[#d8ff00]">
                   <Icon className="size-6" />
                 </div>
                 <h2 className="text-base font-semibold text-foreground">
@@ -309,13 +309,13 @@ function TemporaryLinkPage() {
           <div className="mt-5 flex flex-col items-center gap-2 text-center text-sm text-muted-foreground">
             <p>
               {t(`${PREFIX}.notBurn`)}{" "}
-              <Link to="/burn-after-reading-link" className="font-medium text-[#0058be] dark:text-[#adc6ff] hover:underline">
+              <Link to="/burn-after-reading-link" className="font-medium text-[#111214] dark:text-[#ededed] hover:underline">
                 {t(`${PREFIX}.notBurnLink`)}
               </Link>
             </p>
             <p>
               {t(`${PREFIX}.notHost`)}{" "}
-              <Link to="/host-single-html" className="font-medium text-[#0058be] dark:text-[#adc6ff] hover:underline">
+              <Link to="/host-single-html" className="font-medium text-[#111214] dark:text-[#ededed] hover:underline">
                 {t(`${PREFIX}.notHostLink`)}
               </Link>
             </p>

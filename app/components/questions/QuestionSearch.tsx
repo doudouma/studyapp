@@ -98,7 +98,7 @@ export function QuestionSearch({
         blurTimer.current = window.setTimeout(() => setOpen(false), 120);
       }}
     >
-      <div className="flex items-center gap-2 rounded-lg border border-[#cfcfcf] bg-white px-3 py-2 dark:border-[#243244] dark:bg-[#0f1720]">
+      <div className="flex items-center gap-2 rounded-lg border border-[#cfcfcf] bg-white px-3 py-2 dark:border-[#2a2d32] dark:bg-[#0f1720]">
         <Search aria-hidden className="size-3.5 shrink-0 text-muted-foreground" />
         <input
           ref={inputRef}
@@ -128,7 +128,7 @@ export function QuestionSearch({
         <div
           id="qs-search-results"
           role="listbox"
-          className="absolute inset-x-0 top-full z-30 mt-1 max-h-72 overflow-y-auto rounded-lg border border-[#cfcfcf] bg-white shadow-lg dark:border-[#243244] dark:bg-[#0f1720]"
+          className="absolute inset-x-0 top-full z-30 mt-1 max-h-72 overflow-y-auto rounded-lg border border-[#cfcfcf] bg-white shadow-lg dark:border-[#2a2d32] dark:bg-[#0f1720]"
         >
           {results.length > 0 ? (
             results.map((item, index) => (
@@ -143,7 +143,7 @@ export function QuestionSearch({
                 onClick={() => select(item)}
                 className={`flex w-full items-start gap-2 px-3 py-2 text-left transition-colors ${
                   index === activeIndex
-                    ? "bg-[#006c49]/10 text-[#006c49] dark:bg-[#4edea3]/10 dark:text-[#4edea3]"
+                    ? "bg-[#111214]/10 text-[#111214] dark:bg-[#d8ff00]/10 dark:text-[#d8ff00]"
                     : "hover:bg-[#f3f3f3] dark:hover:bg-[#151d2b]"
                 }`}
               >

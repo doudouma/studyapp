@@ -83,8 +83,8 @@ export function SuccessCard({ url, expiresAt, isPermanent, pageId, onReset, user
   return (
     <Card className="w-full max-w-md text-center">
       <CardContent className="flex flex-col items-center gap-5 pt-10 pb-10">
-        <div className="flex size-16 items-center justify-center rounded-2xl bg-[#006c49]/10 dark:bg-[#4edea3]/10">
-          <CheckCircle2 className="size-8 text-[#006c49] dark:text-[#4edea3]" />
+        <div className="flex size-16 items-center justify-center rounded-2xl bg-[#111214]/10 dark:bg-[#d8ff00]/10">
+          <CheckCircle2 className="size-8 text-[#111214] dark:text-[#d8ff00]" />
         </div>
         <h2 className="text-2xl font-bold text-foreground">{t("components.success.heading")}</h2>
         {(isPermanent || expiresAt) && (
@@ -120,7 +120,7 @@ export function SuccessCard({ url, expiresAt, isPermanent, pageId, onReset, user
         )}
 
         {qrDataUrl && (
-          <div className="size-40 rounded-2xl border border-[#d3e4fe] dark:border-[#3c4a42] bg-white dark:bg-[#15243b] flex items-center justify-center overflow-hidden">
+          <div className="size-40 rounded-2xl border border-[#e3e3e3] dark:border-[#2a2d32] bg-white dark:bg-[#15171a] flex items-center justify-center overflow-hidden">
             <div
               className="[&>svg]:block"
               dangerouslySetInnerHTML={{ __html: qrDataUrl }}
@@ -131,8 +131,8 @@ export function SuccessCard({ url, expiresAt, isPermanent, pageId, onReset, user
         <div className="flex w-full gap-2">
           <input
             className={cn(
-              "flex-1 rounded-lg border-2 border-[#bbcabf] dark:border-[#3c4a42] bg-[#e5eeff]/30 dark:bg-[#1e314a]/30 px-3 py-2 text-sm font-mono text-foreground outline-none",
-              "focus-visible:border-[#0058be] focus-visible:ring-3 focus-visible:ring-[#0058be]/30"
+              "flex-1 rounded-lg border-2 border-[#e3e3e3] dark:border-[#2a2d32] bg-[#f2f2f2]/30 dark:bg-[#15171a]/30 px-3 py-2 text-sm font-mono text-foreground outline-none",
+              "focus-visible:border-[#111214] focus-visible:ring-3 focus-visible:ring-[#111214]/30"
             )}
             value={fullUrl}
             readOnly
@@ -147,7 +147,7 @@ export function SuccessCard({ url, expiresAt, isPermanent, pageId, onReset, user
           href={url}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-sm font-semibold text-[#0058be] dark:text-[#adc6ff] hover:underline"
+          className="inline-flex items-center gap-1 text-sm font-semibold text-[#111214] dark:text-[#ededed] hover:underline"
         >
           {t("components.success.preview")} <ExternalLink className="size-3.5" />
         </a>

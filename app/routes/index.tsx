@@ -8,6 +8,7 @@ import { StatsSection } from "~/components/StatsSection";
 import { GuideSection } from "~/components/GuideSection";
 import { AgentSection } from "~/components/AgentSection";
 import { AppFooter } from "~/components/AppFooter";
+import { AIX_CSS } from "~/components/aix/aix-styles";
 import { Card, CardContent } from "~/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "~/components/ui/dialog";
 
@@ -199,7 +200,7 @@ function UploadForm({
                 <p
                   className={`mt-1 text-xs ${
                     slugStatus === "ok"
-                      ? "text-[#006c49] dark:text-[#4edea3]"
+                      ? "text-[#111214] dark:text-[#d8ff00]"
                       : slugStatus === "checking"
                         ? "text-muted-foreground"
                         : "text-destructive"
@@ -274,36 +275,36 @@ function UploadForm({
                 <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">{t("home.upsell.anonymousExpiry")}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Infinity className="size-3.5 text-[#006c49] dark:text-[#4edea3]" />
-                <span className="text-xs text-[#006c49] dark:text-[#4edea3] font-medium">{t("home.upsell.permanent")}</span>
+                <Infinity className="size-3.5 text-[#111214] dark:text-[#d8ff00]" />
+                <span className="text-xs text-[#111214] dark:text-[#d8ff00] font-medium">{t("home.upsell.permanent")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">{t("home.upsell.noTitle")}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Tags className="size-3.5 text-[#006c49] dark:text-[#4edea3]" />
-                <span className="text-xs text-[#006c49] dark:text-[#4edea3] font-medium">{t("home.upsell.withTitle")}</span>
+                <Tags className="size-3.5 text-[#111214] dark:text-[#d8ff00]" />
+                <span className="text-xs text-[#111214] dark:text-[#d8ff00] font-medium">{t("home.upsell.withTitle")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">{t("home.upsell.noShare")}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Share2 className="size-3.5 text-[#006c49] dark:text-[#4edea3]" />
-                <span className="text-xs text-[#006c49] dark:text-[#4edea3] font-medium">{t("home.upsell.canShare")}</span>
+                <Share2 className="size-3.5 text-[#111214] dark:text-[#d8ff00]" />
+                <span className="text-xs text-[#111214] dark:text-[#d8ff00] font-medium">{t("home.upsell.canShare")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">{t("home.upsell.noManage")}</span>
               </div>
               <div className="flex items-center gap-2">
-                <List className="size-3.5 text-[#006c49] dark:text-[#4edea3]" />
-                <span className="text-xs text-[#006c49] dark:text-[#4edea3] font-medium">{t("home.upsell.canManage")}</span>
+                <List className="size-3.5 text-[#111214] dark:text-[#d8ff00]" />
+                <span className="text-xs text-[#111214] dark:text-[#d8ff00] font-medium">{t("home.upsell.canManage")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">{t("home.upsell.anonFixedExpiry")}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Flame className="size-3.5 text-[#006c49] dark:text-[#4edea3]" />
-                <span className="text-xs text-[#006c49] dark:text-[#4edea3] font-medium">{t("home.upsell.userExpiry")}</span>
+                <Flame className="size-3.5 text-[#111214] dark:text-[#d8ff00]" />
+                <span className="text-xs text-[#111214] dark:text-[#d8ff00] font-medium">{t("home.upsell.userExpiry")}</span>
               </div>
             </div>
           </div>
@@ -327,44 +328,77 @@ function UploadForm({
   );
 }
 
+const HOME_CSS = `
+.aix-home{padding:26px 20px 44px}
+.aix-home .rounded-xl,.aix-home .rounded-2xl,.aix-home .rounded-lg,.aix-home .rounded-md{border-radius:2px}
+.aix-home .bg-card{background:var(--aix-paper)}
+.aix-home .bg-background{background:var(--aix-paper)}
+.aix-home .bg-muted{background:var(--aix-grey)}
+.aix-home .bg-white{background:var(--aix-paper)}
+.aix-home .border-border,.aix-home .border-input{border-color:var(--aix-line)}
+.aix-home .text-muted-foreground{color:var(--aix-mute)}
+.aix-home .text-primary{color:var(--aix-ink)}
+.aix-home .bg-primary{background:#111214;color:var(--aix-lime)}
+.aix-home .text-primary-foreground{color:var(--aix-lime)}
+.aix-home .accent-primary{accent-color:#111214}
+.aix-home .shadow-sm,.aix-home .shadow-md,.aix-home .shadow-lg{box-shadow:none}
+.aix-home input,.aix-home textarea,.aix-home select,.aix-home button{border-radius:2px}
+.aix-cta-btn{
+  display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 18px;
+  border:1px solid var(--aix-line);background:var(--aix-paper);color:var(--aix-ink);
+  font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  border-radius:2px;text-decoration:none;cursor:pointer;transition:.15s;
+}
+.aix-cta-btn:hover{border-color:var(--aix-ink);background:var(--aix-grey)}
+.aix-cta-btn.primary{background:#111214;color:var(--aix-lime);border-color:#111214}
+.aix-cta-btn.primary:hover{background:var(--aix-lime);color:#111214;border-color:var(--aix-lime)}
+`;
+
 function HeroSection({ onUpload, onBrowse }: { onUpload: () => void; onBrowse: () => void }) {
   const { t } = useTranslation();
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-[#006c49]/10 via-[#006c49]/[0.02] to-background dark:from-[#4edea3]/10 dark:via-[#4edea3]/[0.02] dark:to-background pb-12 pt-20 md:pt-28">
-      <div className="mx-auto max-w-4xl px-6 text-center">
-        <h1 className="text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-[52px] lg:leading-[1.15]">
-          {t("home.hero.title")}
-        </h1>
-        <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground leading-relaxed md:text-xl">
-          {t("home.hero.subtitle")}
-        </p>
-        <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-          <Button
-            size="lg"
-            className="gap-2 h-11 px-6 text-base rounded-xl"
-            onClick={onUpload}
-          >
-            {t("home.hero.cta1")}
-            <ArrowDown className="size-4" />
-          </Button>
-          <a
-            href="https://chromewebstore.google.com/detail/dmmhkdcmifenlihbbhihkagnebgiekep?utm_source=item-share-cb"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 h-11 px-6 text-base rounded-xl border border-border bg-background hover:bg-muted hover:text-foreground transition-all"
-          >
-            <Puzzle className="size-4" />
-            {t("home.hero.chromeExtension")}
-          </a>
-          <Button
-            variant="outline"
-            size="lg"
-            className="text-base h-11 px-6 rounded-xl"
-            onClick={onBrowse}
-          >
-            {t("home.hero.cta2")}
-          </Button>
+    <section className="aix-frame" style={{ marginTop: 0 }}>
+      <div className="aix-mininav">
+        <span className="brand">
+          <span className="dot" />
+          100MINI / HTML
+        </span>
+        <a href="#upload">
+          {t("home.hero.cta1")}
+          <ArrowDown className="size-3.5" />
+        </a>
+      </div>
+
+      <div className="aix-lead" style={{ borderBottom: 0, marginBottom: 0, paddingBottom: 0 }}>
+        <div>
+          <div className="aix-topline">
+            <span className="aix-pill lime">
+              <span className="dot" />
+              HTML HOSTING / 2026
+            </span>
+          </div>
+          <h1>{t("home.hero.title")}</h1>
+          <p>{t("home.hero.subtitle")}</p>
         </div>
+      </div>
+
+      <div className="mt-7 flex flex-wrap gap-2">
+        <button type="button" className="aix-cta-btn primary" onClick={onUpload}>
+          {t("home.hero.cta1")}
+          <ArrowDown className="size-4" />
+        </button>
+        <a
+          href="https://chromewebstore.google.com/detail/dmmhkdcmifenlihbbhihkagnebgiekep?utm_source=item-share-cb"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="aix-cta-btn"
+        >
+          <Puzzle className="size-4" />
+          {t("home.hero.chromeExtension")}
+        </a>
+        <button type="button" className="aix-cta-btn" onClick={onBrowse}>
+          {t("home.hero.cta2")}
+        </button>
       </div>
     </section>
   );
@@ -531,20 +565,25 @@ function HomePage() {
 
   if (result) {
     return (
-      <div className="flex min-h-screen flex-col">
+      <div className="flex min-h-screen flex-col bg-[#ededed] dark:bg-[#0c0d0f]">
         <MemoAppNav />
         <main className="flex flex-1 flex-col items-center justify-center p-8">
-          <SuccessCard
-            url={result.url}
-            expiresAt={result.expiresAt || undefined}
-            isPermanent={result.isPermanent}
-            pageId={result.id}
-            onReset={handleReset}
-            user={user}
-            shareToSquare={result.isSharedToSquare}
-            maxViews={result.maxViews}
-            isOneTime={result.isOneTime}
-          />
+          <div className="aix aix-home w-full" style={{ padding: 0 }}>
+            <style>{AIX_CSS}{HOME_CSS}</style>
+            <div className="aix-frame" style={{ maxWidth: 560, margin: "0 auto" }}>
+              <SuccessCard
+                url={result.url}
+                expiresAt={result.expiresAt || undefined}
+                isPermanent={result.isPermanent}
+                pageId={result.id}
+                onReset={handleReset}
+                user={user}
+                shareToSquare={result.isSharedToSquare}
+                maxViews={result.maxViews}
+                isOneTime={result.isOneTime}
+              />
+            </div>
+          </div>
         </main>
         <MemoAppFooter />
       </div>
@@ -552,22 +591,24 @@ function HomePage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-[#ededed] dark:bg-[#0c0d0f]">
       <MemoAppNav />
       <main className="flex-1">
-        <MemoHero onUpload={scrollToUpload} onBrowse={browseSquare} />
+        <div className="aix aix-home">
+          <style>{AIX_CSS}{HOME_CSS}</style>
+          <MemoHero onUpload={scrollToUpload} onBrowse={browseSquare} />
 
-        {/* Upload area */}
-        <section
-          ref={uploadRef}
-          className="scroll-mt-24 mx-auto max-w-2xl px-6 pb-8 -mt-8 relative z-10"
-        >
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold tracking-tight">{t("home.section.upload")}</h2>
-            <p className="mt-2 text-base text-muted-foreground">
-              {t("home.section.uploadDesc")}
-            </p>
-          </div>
+          {/* Upload area */}
+          <section id="upload" ref={uploadRef} className="aix-frame" style={{ scrollMarginTop: 84 }}>
+            <div className="aix-sec-head">
+              <div>
+                <div className="aix-section-num">01</div>
+                <h2 className="aix-sec-title">{t("home.section.upload")}</h2>
+              </div>
+              <span className="aix-dot-sm" />
+            </div>
+            <p className="aix-body" style={{ marginBottom: 18 }}>{t("home.section.uploadDesc")}</p>
+            <div className="mx-auto max-w-2xl">
           <UploadForm
             mode={mode}
             setMode={setMode}
@@ -598,12 +639,13 @@ function HomePage() {
             maxBytes={maxBytes}
             sizeFee={sizeFee}
           />
-        </section>
+            </div>
+          </section>
 
-        <AgentSection />
-
-        <MemoStatsSection />
-        <MemoGuideSection />
+          <div className="aix-frame"><AgentSection /></div>
+          <div className="aix-frame"><MemoStatsSection /></div>
+          <div className="aix-frame"><MemoGuideSection /></div>
+        </div>
       </main>
       <MemoAppFooter />
 

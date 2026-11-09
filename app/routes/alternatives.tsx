@@ -71,13 +71,13 @@ function AlternativesHubPage() {
                 key={c.slug}
                 to="/alternatives/$competitor"
                 params={{ competitor: c.slug }}
-                className="group flex flex-col rounded-2xl border border-border bg-card p-6 transition-all hover:-translate-y-0.5 hover:border-[#006c49]/40 hover:shadow-md dark:hover:border-[#4edea3]/40"
+                className="group flex flex-col rounded-2xl border border-border bg-card p-6 transition-all hover:-translate-y-0.5 hover:border-[#111214]/40 hover:shadow-md dark:hover:border-[#d8ff00]/40"
               >
                 <h2 className="text-lg font-semibold text-foreground">{c.name}</h2>
                 <p className="mt-1.5 flex-1 text-sm leading-relaxed text-muted-foreground">
                   {t(`${c.i18nKey}.desc`)}
                 </p>
-                <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-[#006c49] dark:text-[#4edea3]">
+                <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-[#111214] dark:text-[#d8ff00]">
                   {t("alternatives.read")}
                   <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
                 </span>

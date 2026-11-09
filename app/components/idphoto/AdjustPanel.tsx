@@ -23,7 +23,7 @@ function Row({ label, min, max, value, onChange }: { label: string; min: number;
         max={max}
         value={value}
         onChange={(e) => onChange(+e.target.value)}
-        className="h-1.5 flex-1 accent-[#006c49]"
+        className="h-1.5 flex-1 accent-[#d8ff00]"
       />
       <span className="w-10 shrink-0 text-right text-xs tabular-nums text-muted-foreground">{value}</span>
     </div>

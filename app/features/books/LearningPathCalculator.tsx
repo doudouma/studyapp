@@ -434,7 +434,7 @@ export function LearningPathCalculator({
                       key={resource.url + resource.name}
                       className="flex items-start gap-2 rounded-lg px-1 py-1 text-xs hover:bg-muted"
                     >
-                      <input type="checkbox" className="mt-0.5 size-3.5 accent-[#006c49]" />
+                      <input type="checkbox" className="mt-0.5 size-3.5 accent-[#d8ff00]" />
                       <span>
                         <span className="font-semibold text-foreground">
                           {fill(copy.week, { n: index + 1 })}: {resource.name}

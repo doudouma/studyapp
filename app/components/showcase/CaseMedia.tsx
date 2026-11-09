@@ -83,7 +83,7 @@ export function CaseMedia({ item }: { item: ShowcaseCase }) {
           src={cover.video}
           alt={item.name}
           onError={() => setFailedSrc(cover.video!)}
-          className="w-full rounded-lg border border-[#cfcfcf] dark:border-[#243244]"
+          className="w-full rounded-lg border border-[#cfcfcf] dark:border-[#2a2d32]"
         />
       </figure>
     );
@@ -103,7 +103,7 @@ export function CaseMedia({ item }: { item: ShowcaseCase }) {
           playsInline
           preload="metadata"
           aria-label={item.name}
-          className="w-full rounded-lg border border-[#cfcfcf] bg-black dark:border-[#243244]"
+          className="w-full rounded-lg border border-[#cfcfcf] bg-black dark:border-[#2a2d32]"
         />
       </figure>
     );
@@ -117,7 +117,7 @@ export function CaseMedia({ item }: { item: ShowcaseCase }) {
       src={cover.src}
       alt={item.name}
       onError={() => setFailedImageSrc(cover.src)}
-      className="w-full rounded-lg border border-[#cfcfcf] dark:border-[#243244]"
+      className="w-full rounded-lg border border-[#cfcfcf] dark:border-[#2a2d32]"
     />
   );
 

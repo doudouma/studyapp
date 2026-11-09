@@ -99,7 +99,7 @@ function ShowcasePage() {
             <p className="mt-1 text-muted-foreground">{t("showcase.subtitle")}</p>
 
             {/* 命令栏 + 分类过滤 */}
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-b border-dashed border-[#e0e0e0] pb-3 dark:border-[#243244]">
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-b border-dashed border-[#e0e0e0] pb-3 dark:border-[#2a2d32]">
               <div className="text-[11px]">
                 <TerminalPrompt /> <TerminalCmd>ls /showcase</TerminalCmd>{" "}
                 <span className="text-muted-foreground">
@@ -112,8 +112,8 @@ function ShowcasePage() {
                   onClick={() => setActiveCategory("")}
                   className={`cursor-pointer rounded-full border px-2.5 py-0.5 text-[10px] font-semibold transition-colors ${
                     activeCategory === ""
-                      ? "border-[#006c49] bg-[#006c49] text-white dark:border-[#4edea3] dark:bg-[#4edea3] dark:text-[#002113]"
-                      : "border-[#cfcfcf] text-muted-foreground hover:text-foreground dark:border-[#243244]"
+                      ? "border-[#111214] bg-[#111214] text-white dark:border-[#d8ff00] dark:bg-[#d8ff00] dark:text-[#111214]"
+                      : "border-[#cfcfcf] text-muted-foreground hover:text-foreground dark:border-[#2a2d32]"
                   }`}
                 >
                   {t("showcase.filter.all")}
@@ -125,8 +125,8 @@ function ShowcasePage() {
                     onClick={() => setActiveCategory(activeCategory === cat ? "" : cat)}
                     className={`cursor-pointer rounded-full border px-2.5 py-0.5 text-[10px] font-semibold transition-colors ${
                       activeCategory === cat
-                        ? "border-[#006c49] bg-[#006c49] text-white dark:border-[#4edea3] dark:bg-[#4edea3] dark:text-[#002113]"
-                        : "border-[#cfcfcf] text-muted-foreground hover:text-foreground dark:border-[#243244]"
+                        ? "border-[#111214] bg-[#111214] text-white dark:border-[#d8ff00] dark:bg-[#d8ff00] dark:text-[#111214]"
+                        : "border-[#cfcfcf] text-muted-foreground hover:text-foreground dark:border-[#2a2d32]"
                     }`}
                   >
                     {t(`showcase.category.${cat}`)}
@@ -172,7 +172,7 @@ function ShowcasePage() {
                 ))}
               </div>
             ) : (
-              <div className="mt-4 border border-dashed border-[#cfcfcf] px-4 py-8 text-center dark:border-[#243244]">
+              <div className="mt-4 border border-dashed border-[#cfcfcf] px-4 py-8 text-center dark:border-[#2a2d32]">
                 <p className="text-[11px]">
                   <TerminalPrompt /> <TerminalCmd>grep</TerminalCmd>{" "}
                   <span className="text-muted-foreground">{t("showcase.empty")}</span>{" "}
