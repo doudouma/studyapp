@@ -276,8 +276,10 @@ const CSS = `
   position:fixed; top:76px; left:50%; transform:translateX(-50%) translateY(-200%);
   background:#111827; color:#fff; padding:10px 16px; border-radius:10px; font-size:13px; z-index:70;
   transition:.3s; box-shadow:0 10px 30px rgba(0,0,0,.25); pointer-events:none; max-width:90vw;
+  /* 未弹出时完全隐藏：只靠 translateY 移出屏幕，空内容会留下一个黑点挂在导航上 */
+  opacity:0;
 }
-.tl-toast.show{transform:translateX(-50%) translateY(0)}
+.tl-toast.show{transform:translateX(-50%) translateY(0); opacity:1}
 @media(hover:none){
   /* 触屏没有 hover：动作按钮常显，并改成卡片底部一行，避免遮住工具名 */
   .tl-chip .cact{position:static; opacity:1; pointer-events:auto; margin-top:6px; justify-content:flex-end}

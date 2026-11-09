@@ -210,6 +210,11 @@ test("ai-tierlist 页面挂上了 Reddit 统计入口", async ({ page }) => {
   await expect(link).toContainText("Reddit stats");
 });
 
+test("空 toast 完全透明，导航顶部不会出现黑点", async ({ page }) => {
+  await page.goto("/ai-tierlist");
+  await expect(page.locator(".tl-toast")).toHaveCSS("opacity", "0");
+});
+
 test("freetool 列表挂上了 AI Tier List 入口", async ({ page }) => {
   await page.goto("/freetool");
   await expect(page.getByRole("link", { name: /AI Tools Tier List Maker/ })).toBeVisible();
