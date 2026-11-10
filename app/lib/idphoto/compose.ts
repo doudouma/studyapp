@@ -109,7 +109,7 @@ export function drawRuler(
   const [, cyTop] = srcToCanvas(o.headSrc.cx, o.headSrc.crownY, o);
   const [, cyBot] = srcToCanvas(o.headSrc.cx, o.headSrc.chinY, o);
   const pass = ratio >= o.lo - 0.005 && ratio <= o.hi + 0.005;
-  const color = pass ? "#10b981" : "#ef4444";
+  const color = pass ? "#d8ff00" : "#ef4444";
   const mx = o.W * 0.5;
   ctx.save();
   ctx.strokeStyle = color;

@@ -6,6 +6,8 @@ import i18n from "~/lib/i18n";
 import { BASE_URL, currentLang, withLangPrefix } from "~/lib/seo";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
+import { AIX_CSS } from "~/components/aix/aix-styles";
+import { BOOKS_CSS } from "~/components/aix/books-styles";
 import { BookCard } from "~/features/books/BookCard";
 import { BOOKS } from "~/features/books/data";
 import { score } from "~/features/books/scoring";
@@ -68,6 +70,14 @@ export const Route = createFileRoute("/ai-books_/$slug")({
   },
   component: AiBookProgrammaticPage,
 });
+
+const SLUG_CSS = `
+.ab-tips{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.ab-tips li{display:flex;gap:8px;font-size:12px;line-height:1.6;color:var(--aix-mute)}
+.ab-tips li::before{content:"—";opacity:.5}
+.ab-related{display:grid;gap:6px;margin-top:14px}
+@media(min-width:640px){.ab-related{grid-template-columns:repeat(2,minmax(0,1fr))}}
+`;
 
 function AiBookProgrammaticPage() {
   const { t } = useTranslation();
@@ -148,124 +158,151 @@ function AiBookProgrammaticPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-[#ededed] dark:bg-[#0c0d0f]">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
       />
       <AppNav />
       <main className="flex-1">
-        <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
-          <nav className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-            <Link to="/ai-books" className="font-medium text-primary hover:underline">
-              {t("aiBooks.h1")}
-            </Link>
-            <ChevronRight className="size-3.5" />
-            <span>{copy.topic}</span>
-          </nav>
+        <div className="aix">
+          <style dangerouslySetInnerHTML={{ __html: AIX_CSS + BOOKS_CSS + SLUG_CSS }} />
 
-          <h1 className="mt-4 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-            {copy.h1}
-          </h1>
-          <p className="mt-3 max-w-3xl rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm leading-relaxed text-foreground/90">
-            {answer}
-          </p>
-          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-            {copy.intro}
-          </p>
-          <p className="mt-2 text-[11px] text-muted-foreground">
-            {t("aiBookPage.meta", {
-              count: books.length,
-              ratings: totalRatings.toLocaleString("en-US"),
-              date: AI_BOOKS_UPDATED,
-            })}
-          </p>
+          {/* BOOKS */}
+          <section className="aix-frame">
+            <div className="aix-lead">
+              <div>
+                <div className="aix-topline">
+                  <span className="aix-pill lime">
+                    <span className="dot" />
+                    {copy.topic}
+                  </span>
+                  <span className="aix-kicker">{AI_BOOKS_UPDATED}</span>
+                </div>
+                <h1>{copy.h1}</h1>
+                <p>{answer}</p>
+                <p>{copy.intro}</p>
+              </div>
+              <div className="aix-lead-meta">
+                <span>
+                  {t("aiBookPage.meta", {
+                    count: books.length,
+                    ratings: totalRatings.toLocaleString("en-US"),
+                    date: AI_BOOKS_UPDATED,
+                  })}
+                </span>
+                <Link to="/ai-books">
+                  {t("aiBookPage.back")}
+                  <ChevronRight className="size-3.5" />
+                </Link>
+              </div>
+            </div>
+            <div className="aix-sec-head">
+              <div>
+                <div className="aix-section-num">01</div>
+                <h2 className="aix-sec-title">
+                  {t("aiBookPage.listTitle", { count: books.length, topic: copy.topic })}
+                </h2>
+              </div>
+              <span className="aix-dot-sm" />
+            </div>
+            <div className="ab-grid">
+              {books.map((book, index) => (
+                <BookCard key={book.asin} book={book} index={index} subtag={page.slug} />
+              ))}
+            </div>
+          </section>
 
-          <h2 className="mt-7 text-base font-bold text-foreground">
-            {t("aiBookPage.listTitle", { count: books.length, topic: copy.topic })}
-          </h2>
-
-          <div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {books.map((book, index) => (
-              <BookCard key={book.asin} book={book} index={index} subtag={page.slug} />
-            ))}
-          </div>
-
-          <section className="mt-10 border-t border-border pt-5">
-            <h2 className="text-base font-bold text-foreground">{t("aiBookPage.tipsTitle")}</h2>
-            <ul className="mt-2 space-y-1.5 text-xs leading-relaxed text-muted-foreground">
-              <li>• {t("aiBookPage.tip1")}</li>
-              <li>• {t("aiBookPage.tip2")}</li>
-              <li>• {t("aiBookPage.tip3")}</li>
+          {/* TIPS */}
+          <section className="aix-frame">
+            <div className="aix-sec-head">
+              <div>
+                <div className="aix-section-num">02</div>
+                <h2 className="aix-sec-title">{t("aiBookPage.tipsTitle")}</h2>
+              </div>
+              <span className="aix-dot-sm" />
+            </div>
+            <ul className="ab-tips">
+              <li>{t("aiBookPage.tip1")}</li>
+              <li>{t("aiBookPage.tip2")}</li>
+              <li>{t("aiBookPage.tip3")}</li>
             </ul>
           </section>
 
-          <section className="mt-8 border-t border-border pt-5">
-            <h2 className="text-base font-bold text-foreground">{t("aiBookPage.method")}</h2>
-            <p className="mt-1 max-w-3xl text-xs leading-relaxed text-muted-foreground">
+          {/* METHOD + FAQ */}
+          <section className="aix-frame">
+            <div className="aix-sec-head">
+              <div>
+                <div className="aix-section-num">03</div>
+                <h2 className="aix-sec-title">{t("aiBookPage.faqTitle")}</h2>
+              </div>
+              <span className="aix-dot-sm" />
+            </div>
+            <p className="aix-body">
               {t("aiBookPage.methodText")}{" "}
-              <Link
-                to="/ai-books"
-                hash="methodology"
-                className="font-medium text-primary hover:underline"
-              >
+              <Link to="/ai-books" hash="methodology" className="font-semibold underline">
                 {t("aiBookPage.methodLink")}
               </Link>
             </p>
-          </section>
-
-          <section className="mt-8">
-            <h2 className="text-base font-bold text-foreground">{t("aiBookPage.faqTitle")}</h2>
-            <div className="mt-2 divide-y divide-border rounded-xl border border-border bg-card">
+            <div className="aix-faq" style={{ marginTop: 14 }}>
               {faqs.map((faq, index) => (
-                <details key={index} className="group px-4 py-3">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium text-foreground [&::-webkit-details-marker]:hidden">
-                    {faq.q}
-                    <ChevronRight className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-90" />
+                <details key={index}>
+                  <summary>
+                    <span>{faq.q}</span>
+                    <span className="plus">＋</span>
                   </summary>
-                  <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{faq.a}</p>
+                  <p className="answer">{faq.a}</p>
                 </details>
               ))}
             </div>
           </section>
 
-          <section className="mt-8 rounded-xl border border-border bg-card px-4 py-3">
-            <p className="text-sm font-medium text-foreground">{t("aiBookPage.freeCta")}</p>
-            <Link
-              to="/ai-books/free"
-              className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
-            >
-              <Sparkles className="size-3.5" />
-              {t("aiBookPage.freeLink")}
-            </Link>
-          </section>
-
-          <section className="mt-8 border-t border-border pt-5">
-            <h2 className="text-base font-bold text-foreground">{t("aiBookPage.related")}</h2>
-            <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          {/* RELATED + FREE CTA */}
+          <section className="aix-frame">
+            <div className="aix-sec-head">
+              <div>
+                <div className="aix-section-num">04</div>
+                <h2 className="aix-sec-title">{t("aiBookPage.related")}</h2>
+              </div>
+              <span className="aix-dot-sm" />
+            </div>
+            <div className="ab-related">
               {related.map((item) => (
                 <Link
                   key={item.slug}
                   to="/ai-books/$slug"
                   params={{ slug: item.slug }}
-                  className="group flex items-center justify-between gap-3 rounded-lg border border-border px-3 py-2 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+                  className="ab-link"
                 >
                   <span>{item.copy[lang].topic}</span>
-                  <ChevronRight className="size-4 shrink-0 text-muted-foreground group-hover:text-primary" />
+                  <ChevronRight className="size-4 shrink-0" />
                 </Link>
               ))}
             </div>
-          </section>
-
-          <div className="mt-8">
+            <a
+              href={withLangPrefix(lang, "/ai-books/free")}
+              className="aix-strip"
+              style={{ marginTop: 14 }}
+            >
+              <span className="k">FREE</span>
+              <span>
+                <strong>{t("aiBookPage.freeLink")}</strong>
+                <small>{t("aiBookPage.freeCta")}</small>
+              </span>
+              <span className="go">
+                <Sparkles className="size-4" />
+              </span>
+            </a>
             <Link
               to="/ai-books"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="mt-6 inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground"
             >
-              <ArrowLeft className="size-4" />
+              <ArrowLeft className="size-3.5" />
               {t("aiBookPage.back")}
             </Link>
-          </div>
+          </section>
         </div>
       </main>
       <AppFooter />

@@ -206,7 +206,7 @@ function IdPhotoPage() {
                     <div className="min-w-0 flex-1">
                       <h3 className="text-sm font-semibold text-foreground">{f.title}</h3>
                       <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">{f.desc}</p>
-                      <span className="mt-2 inline-block rounded-md bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary dark:text-[#4edea3]">
+                      <span className="mt-2 inline-block rounded-md bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary dark:text-[#d8ff00]">
                         {f.pain}
                       </span>
                     </div>
@@ -271,7 +271,7 @@ function IdPhotoPage() {
               <thead>
                 <tr className="border-b border-border/60">
                   <th className="px-4 py-3 text-left font-semibold text-foreground">{t("idphoto.vs.th1")}</th>
-                  <th className="px-4 py-3 text-left font-semibold text-primary dark:text-[#4edea3]">{t("idphoto.vs.th2")}</th>
+                  <th className="px-4 py-3 text-left font-semibold text-primary dark:text-[#d8ff00]">{t("idphoto.vs.th2")}</th>
                   <th className="px-4 py-3 text-left font-semibold text-muted-foreground">{t("idphoto.vs.th3")}</th>
                 </tr>
               </thead>

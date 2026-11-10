@@ -13,7 +13,7 @@ export function canonicalCaseUrl(slug: string, locale: ShowcaseLocale = DEFAULT_
 const BTN =
   "inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-bold transition-colors";
 const BTN_PRIMARY = `${BTN} bg-[color:var(--sc-accent)] text-white hover:opacity-90`;
-const BTN_SECONDARY = `${BTN} border border-[#cfcfcf] bg-white text-[#000000] hover:bg-[#ececec] dark:border-[#243244] dark:bg-[#0f1720] dark:text-[#c9d5e4] dark:hover:bg-[#151d2b]`;
+const BTN_SECONDARY = `${BTN} border border-[#cfcfcf] bg-white text-[#000000] hover:bg-[#ececec] dark:border-[#2a2d32] dark:bg-[#0f1720] dark:text-[#c9d5e4] dark:hover:bg-[#151d2b]`;
 
 /**
  * 案例主要动作：直接访问原站 + 分享（复用通用 ShareModal）。
@@ -64,7 +64,7 @@ export function CaseActions({ item }: { item: ShowcaseCase }) {
       </div>
 
       {/* 移动端/平板：底部横排 */}
-      <div className="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-[#cfcfcf] bg-[#ffffff]/95 px-4 py-3 backdrop-blur lg:hidden dark:border-[#243244] dark:bg-[#0d1117]/95">
+      <div className="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-[#cfcfcf] bg-[#ffffff]/95 px-4 py-3 backdrop-blur lg:hidden dark:border-[#2a2d32] dark:bg-[#0d1117]/95">
         {visit ? <span className="flex-1 [&>*]:w-full">{visit}</span> : null}
         <span className="flex-1 [&>*]:w-full">{share}</span>
       </div>

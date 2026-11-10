@@ -182,6 +182,10 @@ function pageKeys(basePath: string): {
       return { name: "games.heading", desc: "games.desc" };
     case "/idphoto":
       return { name: "idphoto.heading", desc: "idphoto.desc" };
+    case "/ai-tierlist":
+      return { name: "aiTierlist.heading", desc: "aiTierlist.desc" };
+    case "/ai-tierlist-stats":
+      return { name: "aiTierlistStats.heading", desc: "aiTierlistStats.desc" };
     case "/pomodoro":
       return { name: "nav.pomodoro", desc: "pomodoro.desc" };
     case "/rhythm":

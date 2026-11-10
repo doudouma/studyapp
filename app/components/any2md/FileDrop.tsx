@@ -51,8 +51,8 @@ export function FileDrop({ engineStatus, busy, onFile, onRetry, error }: FileDro
         className={cn(
           "flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-14 text-center cursor-pointer transition-all",
           dragOver
-            ? "border-[#006c49] bg-[#006c49]/5 dark:border-[#4edea3] dark:bg-[#4edea3]/5"
-            : "border-[#bbcabf]/40 bg-[#e5eeff]/30 dark:border-[#3c4a42] dark:bg-[#1e314a]/30 hover:border-[#bbcabf]/60"
+            ? "border-[#111214] bg-[#111214]/5 dark:border-[#d8ff00] dark:bg-[#d8ff00]/5"
+            : "border-[#e3e3e3]/40 bg-[#f2f2f2]/30 dark:border-[#2a2d32] dark:bg-[#15171a]/30 hover:border-[#e3e3e3]/60"
         )}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
@@ -71,12 +71,12 @@ export function FileDrop({ engineStatus, busy, onFile, onRetry, error }: FileDro
         />
         {busy ? (
           <>
-            <Loader2 className="size-7 animate-spin text-[#006c49] dark:text-[#4edea3]" />
+            <Loader2 className="size-7 animate-spin text-[#111214] dark:text-[#d8ff00]" />
             <div className="mt-4 text-base text-foreground">{t("any2md.converting")}</div>
           </>
         ) : engineStatus === "loading" ? (
           <>
-            <Loader2 className="size-7 animate-spin text-[#006c49] dark:text-[#4edea3]" />
+            <Loader2 className="size-7 animate-spin text-[#111214] dark:text-[#d8ff00]" />
             <div className="mt-4 text-base text-foreground">{t("any2md.loading")}</div>
           </>
         ) : engineStatus === "error" ? (
@@ -92,7 +92,7 @@ export function FileDrop({ engineStatus, busy, onFile, onRetry, error }: FileDro
           </>
         ) : (
           <>
-            <div className="flex size-14 items-center justify-center rounded-2xl bg-[#006c49]/10 text-[#006c49] dark:bg-[#4edea3]/10 dark:text-[#4edea3]">
+            <div className="flex size-14 items-center justify-center rounded-2xl bg-[#111214]/10 text-[#111214] dark:bg-[#d8ff00]/10 dark:text-[#d8ff00]">
               <Upload className="size-7" />
             </div>
             <div className="mt-4 text-base text-foreground mb-1">{t("any2md.drop")}</div>

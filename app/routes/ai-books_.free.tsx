@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import {
+  ArrowUpRight,
   BookMarked,
   BookOpen,
   ChevronDown,
@@ -20,6 +21,8 @@ import i18n from "~/lib/i18n";
 import { BASE_URL, currentLang, withLangPrefix } from "~/lib/seo";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
+import { AIX_CSS } from "~/components/aix/aix-styles";
+import { BOOKS_CSS } from "~/components/aix/books-styles";
 import {
   FREE_ITEMS,
   FREE_TOPICS,
@@ -132,11 +135,7 @@ function Chip({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={
-        active
-          ? "h-[30px] whitespace-nowrap rounded-full border border-primary bg-primary px-3.5 text-xs font-medium text-primary-foreground"
-          : "h-[30px] whitespace-nowrap rounded-full border border-border bg-card px-3.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
-      }
+      className={`ab-chip${active ? " is-active" : ""}`}
     >
       {children}
     </button>
@@ -145,8 +144,8 @@ function Chip({
 
 function FilterRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <span className="min-w-14 text-xs text-muted-foreground">{label}</span>
+    <div className="ab-filterrow">
+      <span>{label}</span>
       {children}
     </div>
   );
@@ -154,50 +153,42 @@ function FilterRow({ label, children }: { label: string; children: React.ReactNo
 
 function ResourceSection({
   id,
+  num,
   title,
   desc,
   items,
   lang,
-  columns = "sm:grid-cols-2",
+  columns = "two",
 }: {
   id: string;
+  num: string;
   title: string;
   desc: string;
   items: FreeResource[];
   lang: ResourceLocale;
-  columns?: string;
+  columns?: "two" | "three";
 }) {
   const { t } = useTranslation();
   return (
-    <section id={id} className="mt-10 scroll-mt-24">
-      <div className="border-b border-border pb-2">
-        <h2 className="text-lg font-bold text-foreground">{title}</h2>
-        <p className="mt-1 max-w-3xl text-xs leading-relaxed text-muted-foreground">{desc}</p>
+    <section id={id} className="free-section">
+      <div className="aix-sec-head">
+        <div>
+          <div className="aix-section-num">{num}</div>
+          <h2 className="aix-sec-title">{title}</h2>
+        </div>
+        <span className="aix-dot-sm" />
       </div>
-      <div className={`mt-4 grid gap-3 ${columns}`}>
+      <p className="aix-body">{desc}</p>
+      <div className={`free-res-grid${columns === "three" ? " three" : ""}`}>
         {items.map((item) => (
-          <a
-            key={item.id}
-            href={item.url}
-            target="_blank"
-            rel="noopener"
-            className="group flex flex-col rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/40 hover:bg-muted/40"
-          >
-            <div className="flex items-start justify-between gap-2">
-              <h3 className="text-sm font-semibold leading-snug text-foreground">
-                {item.name}
-              </h3>
-              <span className="shrink-0 whitespace-nowrap rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
-                {t(`freeLib.resTag.${item.tag}`)}
-              </span>
+          <a key={item.id} href={item.url} target="_blank" rel="noopener" className="free-res">
+            <div className="free-res-top">
+              <h3>{item.name}</h3>
+              <span className="free-tag">{t(`freeLib.resTag.${item.tag}`)}</span>
             </div>
-            <p className="mt-0.5 truncate text-[11px] text-muted-foreground">{item.by}</p>
-            <p className="mt-2 flex-1 text-xs leading-relaxed text-muted-foreground">
-              {item.desc[lang] ?? item.desc.en}
-            </p>
-            <span className="mt-3 text-xs font-semibold text-primary group-hover:underline">
-              {t("freeLib.openResource")} →
-            </span>
+            <p className="free-by">{item.by}</p>
+            <p className="free-desc">{item.desc[lang] ?? item.desc.en}</p>
+            <span className="free-open">{t("freeLib.openResource")} →</span>
           </a>
         ))}
       </div>
@@ -222,13 +213,11 @@ function SidebarLink({
   active?: boolean;
   external?: boolean;
 }) {
-  const className = active
-    ? "flex w-auto shrink-0 items-center gap-2.5 rounded-lg bg-primary/10 px-3 py-2 text-sm font-semibold text-primary lg:w-full"
-    : "flex w-auto shrink-0 items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:w-full";
+  const className = `ab-nav-item${active ? " is-active" : ""}`;
   const content = (
     <>
-      <Icon className="size-4 shrink-0" />
-      <span className="whitespace-nowrap">{label}</span>
+      <Icon className="ic" />
+      <span>{label}</span>
     </>
   );
   if (external) {
@@ -260,17 +249,80 @@ function TopicButton({
     <button
       type="button"
       onClick={onClick}
-      className={
-        active
-          ? "flex shrink-0 items-center justify-between gap-3 rounded-lg bg-muted px-3 py-2 text-sm font-semibold text-foreground lg:w-full"
-          : "flex shrink-0 items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:w-full"
-      }
+      className={`ab-topic${active ? " is-active" : ""}`}
     >
-      <span className="whitespace-nowrap">{label}</span>
-      <span className="text-xs tabular-nums text-muted-foreground">{fmt(count)}</span>
+      <span>{label}</span>
+      <span className="n">{fmt(count)}</span>
     </button>
   );
 }
+
+const FREE_CSS = `
+.free-section{margin-top:34px;scroll-margin-top:84px}
+.free-res-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:16px}
+@media(min-width:640px){.free-res-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:1280px){.free-res-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.free-res{
+  display:flex;flex-direction:column;gap:6px;min-height:150px;padding:14px;border:1px solid var(--aix-line);
+  border-radius:2px;background:var(--aix-paper);color:inherit;text-decoration:none;transition:.15s;
+}
+.free-res:hover{border-color:var(--aix-ink);background:var(--aix-grey)}
+.free-res-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.free-res h3{margin:0;font-size:13px;font-weight:800;line-height:1.35}
+.free-tag{flex:none;background:var(--aix-lime);color:#111214;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 6px;border-radius:2px}
+.free-by{font-size:10.5px;color:var(--aix-mute)}
+.free-desc{flex:1;font-size:12px;line-height:1.55;color:var(--aix-mute)}
+.free-open{margin-top:auto;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--aix-ink)}
+.free-res:hover .free-open{text-decoration:underline}
+
+.free-method{margin-top:16px;background:var(--aix-lime);color:#111214;border-radius:2px;padding:14px 16px}
+.free-method strong{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:800}
+.free-method ul{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:4px}
+.free-method li{font-size:11.5px;line-height:1.5}
+.free-method li::before{content:"—";margin-right:6px;opacity:.5}
+
+.free-rule{margin:14px 0 0;border:1px solid var(--aix-line);border-left:3px solid var(--aix-lime);background:var(--aix-grey);padding:12px 14px;font-size:12.5px;line-height:1.6;color:var(--aix-mute)}
+.free-pathcards{display:grid;gap:10px;padding:14px}
+@media(min-width:640px){.free-pathcards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:1280px){.free-pathcards{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.free-pathcard{border:1px solid var(--aix-line);border-radius:2px;background:var(--aix-paper);padding:14px}
+.free-kicker{display:inline-block;background:var(--aix-lime);color:#111214;font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;padding:2px 5px;border-radius:2px}
+.free-pathcard h3{margin:8px 0 0;font-size:14px;font-weight:800;line-height:1.3}
+.free-pathcard p{margin:4px 0 0;font-size:11.5px;line-height:1.55;color:var(--aix-mute)}
+.free-pathcard ul{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:4px}
+.free-pathcard a{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:3px 0;border-bottom:1px solid var(--aix-line);text-decoration:none}
+.free-pathcard a:hover .name{text-decoration:underline}
+.free-pathcard .name{font-size:11.5px;font-weight:700;color:var(--aix-ink)}
+.free-pathcard .by2{display:block;font-size:10px;color:var(--aix-mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.free-pathcard .tag{flex:none;font-size:9px;font-weight:700;background:var(--aix-grey);color:var(--aix-mute);padding:2px 5px;border-radius:2px}
+
+.free-cards{display:grid;gap:18px 12px;padding:18px 0}
+.free-cards.courses{grid-template-columns:1fr}
+@media(min-width:640px){.free-cards.courses{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:1280px){.free-cards.courses{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.free-cards.ebooks{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(min-width:640px){.free-cards.ebooks{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(min-width:768px){.free-cards.ebooks{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(min-width:1024px){.free-cards.ebooks{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media(min-width:1280px){.free-cards.ebooks{grid-template-columns:repeat(6,minmax(0,1fr))}}
+.free-card{display:flex;min-width:0;flex-direction:column;color:inherit;text-decoration:none}
+.free-cover{position:relative;overflow:hidden;border:1px solid var(--aix-line);border-radius:2px;background:var(--aix-grey);transition:.2s}
+.free-cover.course{aspect-ratio:16/9}
+.free-cover.ebook{aspect-ratio:3/4}
+.free-card:hover .free-cover{transform:translateY(-3px);border-color:var(--aix-ink)}
+.free-cover img{display:block;width:100%;height:100%;object-fit:cover}
+.free-badge{position:absolute;bottom:6px;left:6px;background:#111214;color:var(--aix-lime);font-size:9px;font-weight:700;padding:2px 6px;border-radius:2px}
+.free-card h3{margin:9px 0 0;font-size:12.5px;font-weight:800;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.free-card .by{margin:2px 0 0;font-size:10.5px;color:var(--aix-mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.free-card .meta{margin:5px 0 0;display:flex;justify-content:space-between;gap:8px;font-size:10px;color:var(--aix-mute);white-space:nowrap}
+.free-card .meta b{font-weight:800;color:var(--aix-ink)}
+.dark .free-card .meta b{color:var(--aix-lime)}
+.free-head-meta{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--aix-mute)}
+.free-empty{padding:56px 0;text-align:center;font-size:12px;color:var(--aix-mute)}
+.free-about{margin-top:36px;border-top:1px solid var(--aix-line);padding-top:16px;font-size:11px;line-height:1.6;color:var(--aix-mute);scroll-margin-top:84px}
+.free-about strong{color:var(--aix-ink);font-weight:800}
+.free-about a{color:var(--aix-ink);text-decoration:underline;text-underline-offset:2px}
+`;
 
 function FreeLibraryPage() {
   const { t } = useTranslation();
@@ -352,7 +404,7 @@ function FreeLibraryPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-[#ededed] dark:bg-[#0c0d0f]">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -361,180 +413,164 @@ function FreeLibraryPage() {
       />
       <AppNav />
       <main className="flex-1">
-        <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:py-10">
-          <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
-            <aside className="min-w-0 lg:sticky lg:top-24 lg:self-start">
-              <nav className="flex gap-1 overflow-x-auto pb-2 lg:flex-col lg:gap-0.5 lg:overflow-visible lg:pb-0">
-                <SidebarLink href="/ai-books" icon={Star} label={t("freeLib.allBooks")} />
-                <SidebarLink
-                  href="/ai-books/free"
-                  icon={Library}
-                  label={t("freeLib.freeLibrary")}
-                  active
-                />
-                <SidebarLink href="#start" icon={Compass} label={t("freeLib.startHere")} external />
-                <SidebarLink href="#path" icon={PathIcon} label={t("freeLib.learningPath")} external />
-                <SidebarLink
-                  href="#courses"
-                  icon={GraduationCap}
-                  label={t("freeLib.freeCourses")}
-                  external
-                />
-                <SidebarLink href="#ebooks" icon={BookOpen} label={t("freeLib.freeEbooks")} external />
-                <SidebarLink href="#books" icon={BookMarked} label={t("freeLib.freeBooksPdf")} external />
-                <SidebarLink href="#repos" icon={Code2} label={t("freeLib.githubRepos")} external />
-                <SidebarLink href="#videos" icon={Video} label={t("freeLib.videoChannels")} external />
-                <SidebarLink href="#about" icon={Info} label={t("freeLib.about")} external />
-              </nav>
+        <div className="aix">
+          <style dangerouslySetInnerHTML={{ __html: AIX_CSS + BOOKS_CSS + FREE_CSS }} />
 
-              <p className="mt-6 hidden px-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground lg:block">
-                {t("freeLib.topics")}
-              </p>
-              <div className="mt-1 flex gap-1.5 overflow-x-auto pb-3 lg:mt-1.5 lg:flex-col lg:gap-px lg:overflow-visible lg:pb-0">
-                <TopicButton
-                  active={topic === "all"}
-                  label={t("freeLib.topic.all")}
-                  count={FREE_TOTAL}
-                  onClick={() => setTopic("all")}
-                />
-                {FREE_TOPICS.map((key) => (
-                  <TopicButton
-                    key={key}
-                    active={topic === key}
-                    label={t(`freeLib.topic.${key}`)}
-                    count={TOPIC_COUNTS[key] ?? 0}
-                    onClick={() => setTopic(key)}
-                  />
-                ))}
+          {/* CATALOG */}
+          <section className="aix-frame">
+            <div className="aix-lead">
+              <div>
+                <div className="aix-topline">
+                  <span className="aix-pill lime">
+                    <span className="dot" />
+                    {t("freeLib.freeLibrary")}
+                  </span>
+                </div>
+                <h1>{t("freeLib.h1")}</h1>
+                <p>{t("freeLib.intro")}</p>
               </div>
-
-              <div className="mt-7 hidden px-3 text-xs leading-relaxed text-muted-foreground lg:block">
-                <div>
+              <div className="aix-lead-meta">
+                <span>
                   {t("freeLib.sideStats", {
                     courses: FREE_COURSE_COUNT,
                     ebooks: FREE_EBOOK_COUNT,
                     extras: FREE_RESOURCE_COUNT,
                   })}
-                </div>
-                <div className="mt-2">{t("freeLib.sideNote")}</div>
+                </span>
+                <Link to="/ai-books">
+                  {t("freeLib.allBooks")}
+                  <ArrowUpRight className="size-3.5" />
+                </Link>
               </div>
-            </aside>
+            </div>
+            <div className="ab-layout">
+              <aside className="ab-side">
+                <nav className="ab-nav">
+                  <SidebarLink href="/ai-books" icon={Star} label={t("freeLib.allBooks")} />
+                  <SidebarLink
+                    href="/ai-books/free"
+                    icon={Library}
+                    label={t("freeLib.freeLibrary")}
+                    active
+                  />
+                  <SidebarLink href="#start" icon={Compass} label={t("freeLib.startHere")} external />
+                  <SidebarLink href="#path" icon={PathIcon} label={t("freeLib.learningPath")} external />
+                  <SidebarLink
+                    href="#courses"
+                    icon={GraduationCap}
+                    label={t("freeLib.freeCourses")}
+                    external
+                  />
+                  <SidebarLink href="#ebooks" icon={BookOpen} label={t("freeLib.freeEbooks")} external />
+                  <SidebarLink
+                    href="#books"
+                    icon={BookMarked}
+                    label={t("freeLib.freeBooksPdf")}
+                    external
+                  />
+                  <SidebarLink href="#repos" icon={Code2} label={t("freeLib.githubRepos")} external />
+                  <SidebarLink href="#videos" icon={Video} label={t("freeLib.videoChannels")} external />
+                  <SidebarLink href="#about" icon={Info} label={t("freeLib.about")} external />
+                </nav>
 
-            <section className="min-w-0">
-              <div className="relative w-full sm:max-w-md">
-                <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                <input
-                  ref={searchRef}
-                  type="search"
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder={t("freeLib.searchPlaceholder")}
-                  autoComplete="off"
-                  className="h-10 w-full rounded-lg border border-border bg-card pl-9 pr-10 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-primary focus:ring-2 focus:ring-primary/15"
-                />
-                <kbd className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground sm:block">
-                  /
-                </kbd>
-              </div>
-
-              <div className="mt-6">
-                <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                  {t("freeLib.h1")}
-                </h1>
-                <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-                  {t("freeLib.intro")}
-                </p>
-                <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-                  {t("freeLib.intro2")}
-                </p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {[
-                    t("freeLib.stat.courses", { count: FREE_COURSE_COUNT }),
-                    t("freeLib.stat.ebooks", { count: FREE_EBOOK_COUNT }),
-                    t("freeLib.stat.extras", { count: FREE_RESOURCE_COUNT }),
-                    t("freeLib.stat.topics", { count: FREE_TOPICS.length }),
-                  ].map((stat) => (
-                    <span
-                      key={stat}
-                      className="rounded-full border border-border bg-card px-3 py-1 text-[11px] font-medium text-muted-foreground"
-                    >
-                      {stat}
-                    </span>
+                <div className="ab-label">{t("freeLib.topics")}</div>
+                <div className="ab-nav">
+                  <TopicButton
+                    active={topic === "all"}
+                    label={t("freeLib.topic.all")}
+                    count={FREE_TOTAL}
+                    onClick={() => setTopic("all")}
+                  />
+                  {FREE_TOPICS.map((key) => (
+                    <TopicButton
+                      key={key}
+                      active={topic === key}
+                      label={t(`freeLib.topic.${key}`)}
+                      count={TOPIC_COUNTS[key] ?? 0}
+                      onClick={() => setTopic(key)}
+                    />
                   ))}
                 </div>
-                <div className="mt-4 max-w-3xl rounded-xl border border-border bg-card px-4 py-3">
-                  <p className="text-xs font-semibold text-foreground">
-                    {t("freeLib.method.title")}
-                  </p>
-                  <ul className="mt-2 space-y-1 text-xs leading-relaxed text-muted-foreground">
-                    <li>• {t("freeLib.method.sources")}</li>
-                    <li>• {t("freeLib.method.filter")}</li>
-                    <li>• {t("freeLib.method.update")}</li>
+
+                <p className="ab-side-note hidden lg:block">
+                  {t("freeLib.sideStats", {
+                    courses: FREE_COURSE_COUNT,
+                    ebooks: FREE_EBOOK_COUNT,
+                    extras: FREE_RESOURCE_COUNT,
+                  })}
+                  <br />
+                  {t("freeLib.sideNote")}
+                </p>
+              </aside>
+
+              <div className="min-w-0">
+                <div className="ab-search">
+                  <Search className="ic" />
+                  <input
+                    ref={searchRef}
+                    type="search"
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder={t("freeLib.searchPlaceholder")}
+                    autoComplete="off"
+                  />
+                  <kbd>/</kbd>
+                </div>
+
+                <div className="free-method">
+                  <strong>{t("freeLib.method.title")}</strong>
+                  <ul>
+                    <li>{t("freeLib.method.sources")}</li>
+                    <li>{t("freeLib.method.filter")}</li>
+                    <li>{t("freeLib.method.update")}</li>
                   </ul>
                 </div>
-              </div>
 
-              <ResourceSection
-                id="start"
-                title={t("freeLib.section.start.title")}
-                desc={t("freeLib.section.start.desc")}
-                items={resourcesFor("start")}
-                lang={resourceLocale}
-                columns="sm:grid-cols-2 xl:grid-cols-3"
-              />
+                <ResourceSection
+                  id="start"
+                  num="01"
+                  title={t("freeLib.section.start.title")}
+                  desc={t("freeLib.section.start.desc")}
+                  items={resourcesFor("start")}
+                  lang={resourceLocale}
+                  columns="three"
+                />
 
-              <section id="path" className="mt-10 scroll-mt-24">
-                <p className="rounded-xl border border-border bg-card px-4 py-3 text-sm leading-relaxed text-muted-foreground">
-                  {t("freeLib.pathRule")}
-                </p>
+                <section id="path" className="free-section">
+                  <div className="aix-sec-head">
+                    <div>
+                      <div className="aix-section-num">02</div>
+                      <h2 className="aix-sec-title">{t("freeLib.learningPath")}</h2>
+                    </div>
+                    <span className="aix-dot-sm" />
+                  </div>
+                  <p className="free-rule">{t("freeLib.pathRule")}</p>
+                  <div className="aix-calc">
+                    <LearningPathCalculator compact />
+                  </div>
 
-                <div className="mt-5">
-                  <LearningPathCalculator compact />
-                </div>
-
-                <details className="group mt-5 rounded-xl border border-border bg-card">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-4 py-3 [&::-webkit-details-marker]:hidden">
-                    <h2 className="text-sm font-semibold text-foreground">
-                      {t("freeLib.path.details")}
-                    </h2>
-                    <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" />
-                  </summary>
-                  <div className="border-t border-border p-4">
-                    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                  <details className="ab-details">
+                    <summary>
+                      <ChevronDown className="chev" />
+                      <span>{t("freeLib.path.details")}</span>
+                    </summary>
+                    <div className="free-pathcards">
                       {LEARNING_PATH.map((stage) => (
-                        <article
-                          key={stage.id}
-                          className="rounded-xl border border-border bg-card p-4"
-                        >
-                          <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-primary">
+                        <article key={stage.id} className="free-pathcard">
+                          <span className="free-kicker">
                             {t(`freeLib.path.${stage.id}.kicker`)}
                           </span>
-                          <h3 className="mt-1 text-base font-semibold text-foreground">
-                            {t(`freeLib.path.${stage.id}.title`)}
-                          </h3>
-                          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                            {t(`freeLib.path.${stage.id}.desc`)}
-                          </p>
-                          <ul className="mt-3 space-y-1.5">
+                          <h3>{t(`freeLib.path.${stage.id}.title`)}</h3>
+                          <p>{t(`freeLib.path.${stage.id}.desc`)}</p>
+                          <ul>
                             {stage.resources.map((resource) => (
                               <li key={resource.url + resource.name}>
-                                <a
-                                  href={resource.url}
-                                  target="_blank"
-                                  rel="noopener"
-                                  className="group flex items-start justify-between gap-2 rounded-md px-1 py-1 transition-colors hover:bg-muted"
-                                >
+                                <a href={resource.url} target="_blank" rel="noopener">
                                   <span className="min-w-0">
-                                    <span className="block truncate text-xs font-medium text-foreground group-hover:text-primary">
-                                      {resource.name}
-                                    </span>
-                                    <span className="block truncate text-[11px] text-muted-foreground">
-                                      {resource.by}
-                                    </span>
+                                    <span className="name">{resource.name}</span>
+                                    <span className="by2">{resource.by}</span>
                                   </span>
-                                  <span className="shrink-0 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
-                                    {resource.tag}
-                                  </span>
+                                  <span className="tag">{resource.tag}</span>
                                 </a>
                               </li>
                             ))}
@@ -542,193 +578,161 @@ function FreeLibraryPage() {
                         </article>
                       ))}
                     </div>
-                    <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-                      {t("freeLib.pathFoot")}
-                    </p>
-                  </div>
-                </details>
-              </section>
+                    <p className="note">{t("freeLib.pathFoot")}</p>
+                  </details>
+                </section>
 
-              <div className="mt-8 flex flex-col gap-2.5">
-                <FilterRow label={t("freeLib.typeLabel")}>
-                  {TYPE_OPTIONS.map((value) => (
-                    <Chip key={value} active={type === value} onClick={() => setType(value)}>
-                      {t(`freeLib.type.${value}`)}
-                    </Chip>
-                  ))}
-                </FilterRow>
-                <FilterRow label={t("freeLib.sortLabel")}>
-                  {SORT_OPTIONS.map((value) => (
-                    <Chip key={value} active={sort === value} onClick={() => setSort(value)}>
-                      {t(`freeLib.sort.${value}`)}
-                    </Chip>
-                  ))}
-                </FilterRow>
+                <div className="ab-filters" style={{ marginTop: 28 }}>
+                  <FilterRow label={t("freeLib.typeLabel")}>
+                    {TYPE_OPTIONS.map((value) => (
+                      <Chip key={value} active={type === value} onClick={() => setType(value)}>
+                        {t(`freeLib.type.${value}`)}
+                      </Chip>
+                    ))}
+                  </FilterRow>
+                  <FilterRow label={t("freeLib.sortLabel")}>
+                    {SORT_OPTIONS.map((value) => (
+                      <Chip key={value} active={sort === value} onClick={() => setSort(value)}>
+                        {t(`freeLib.sort.${value}`)}
+                      </Chip>
+                    ))}
+                  </FilterRow>
+                </div>
+
+                {showCourses && (
+                  <section id="courses" className="free-section">
+                    <div className="aix-sec-head">
+                      <div>
+                        <div className="aix-section-num">03</div>
+                        <h2 className="aix-sec-title">{t("freeLib.coursesTitle")}</h2>
+                      </div>
+                      <div className="free-head-meta">
+                        <span>{t("freeLib.countFree", { count: courses.length })}</span>
+                        <span className="free-tag">{t("freeLib.coursesBadge")}</span>
+                      </div>
+                    </div>
+                    {courses.length === 0 ? (
+                      <div className="free-empty">{t("freeLib.empty")}</div>
+                    ) : (
+                      <div className="free-cards courses">
+                        {courses.map((item, index) => (
+                          <a
+                            key={item.id}
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener"
+                            className="free-card"
+                          >
+                            <div className="free-cover course">
+                              <img
+                                src={item.image}
+                                alt={item.title}
+                                loading={index < 6 ? undefined : "lazy"}
+                                fetchPriority={index === 0 ? "high" : undefined}
+                                decoding="async"
+                              />
+                              <span className="free-badge">{courseBadge(item, t)}</span>
+                            </div>
+                            <h3 title={item.title}>{item.displayTitle || item.title}</h3>
+                            <p className="by">{item.displayAuthor || item.provider}</p>
+                            <p className="meta">
+                              <span>
+                                ★ {Number(item.rating || 0).toFixed(1)} · {short(item.reviews)}
+                              </span>
+                              <b>{t("freeLib.viewCourse")} →</b>
+                            </p>
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </section>
+                )}
+
+                {showEbooks && (
+                  <section id="ebooks" className="free-section">
+                    <div className="aix-sec-head">
+                      <div>
+                        <div className="aix-section-num">04</div>
+                        <h2 className="aix-sec-title">{t("freeLib.ebooksTitle")}</h2>
+                      </div>
+                      <div className="free-head-meta">
+                        <span>{t("freeLib.countFree", { count: ebooks.length })}</span>
+                        <span className="free-tag">{t("freeLib.ebooksBadge")}</span>
+                      </div>
+                    </div>
+                    {ebooks.length === 0 ? (
+                      <div className="free-empty">{t("freeLib.empty")}</div>
+                    ) : (
+                      <div className="free-cards ebooks">
+                        {ebooks.map((item, index) => (
+                          <a
+                            key={item.id}
+                            href={`${item.url}&ascsubtag=free-${item.id}-${index + 1}`}
+                            target="_blank"
+                            rel="nofollow sponsored noopener"
+                            className="free-card"
+                          >
+                            <div className="free-cover ebook">
+                              <img
+                                src={item.image}
+                                alt={item.title}
+                                loading={index < 8 ? undefined : "lazy"}
+                                fetchPriority={index === 0 ? "high" : undefined}
+                                decoding="async"
+                              />
+                              <span className="free-badge">{t("freeLib.freeBadge")}</span>
+                            </div>
+                            <h3 title={item.title}>{item.displayTitle || item.title}</h3>
+                            <p className="by">{item.displayAuthor || "—"}</p>
+                            <p className="meta">
+                              <span>
+                                ★ {Number(item.rating || 0).toFixed(1)} · {short(item.reviews)}
+                              </span>
+                              <b>{t("freeLib.getAmazon")} →</b>
+                            </p>
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </section>
+                )}
+
+                <ResourceSection
+                  id="books"
+                  num="05"
+                  title={t("freeLib.section.books.title")}
+                  desc={t("freeLib.section.books.desc")}
+                  items={resourcesFor("books")}
+                  lang={resourceLocale}
+                />
+
+                <ResourceSection
+                  id="repos"
+                  num="06"
+                  title={t("freeLib.section.repos.title")}
+                  desc={t("freeLib.section.repos.desc")}
+                  items={resourcesFor("repos")}
+                  lang={resourceLocale}
+                />
+
+                <ResourceSection
+                  id="videos"
+                  num="07"
+                  title={t("freeLib.section.videos.title")}
+                  desc={t("freeLib.section.videos.desc")}
+                  items={resourcesFor("videos")}
+                  lang={resourceLocale}
+                  columns="three"
+                />
+
+                <footer id="about" className="free-about">
+                  <strong>{t("freeLib.disclosureTitle")}</strong>{" "}
+                  {t("freeLib.disclosure", { date: FREE_GENERATED_AT })}{" "}
+                  <Link to="/ai-books">{t("freeLib.browsePaid")}</Link>
+                </footer>
               </div>
-
-              {showCourses && (
-                <section id="courses" className="mt-8 scroll-mt-24">
-                  <div className="flex flex-wrap items-center gap-3 border-b border-border pb-2">
-                    <h2 className="text-lg font-bold text-foreground">{t("freeLib.coursesTitle")}</h2>
-                    <span className="text-xs tabular-nums text-muted-foreground">
-                      {t("freeLib.countFree", { count: courses.length })}
-                    </span>
-                    <span className="ml-auto rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
-                      {t("freeLib.coursesBadge")}
-                    </span>
-                  </div>
-                  {courses.length === 0 ? (
-                    <div className="py-14 text-center text-sm text-muted-foreground">
-                      {t("freeLib.empty")}
-                    </div>
-                  ) : (
-                    <div className="grid gap-x-4 gap-y-6 py-5 sm:grid-cols-2 xl:grid-cols-3">
-                      {courses.map((item, index) => (
-                        <a
-                          key={item.id}
-                          href={item.url}
-                          target="_blank"
-                          rel="noopener"
-                          className="group flex min-w-0 flex-col"
-                        >
-                          <div className="relative aspect-video overflow-hidden rounded-md bg-muted shadow-sm transition duration-200 group-hover:-translate-y-1 group-hover:shadow-lg">
-                            <img
-                              src={item.image}
-                              alt={item.title}
-                              loading={index < 6 ? undefined : "lazy"}
-                              fetchPriority={index === 0 ? "high" : undefined}
-                              decoding="async"
-                              className="size-full object-cover"
-                            />
-                            <span className="absolute bottom-2 left-2 whitespace-nowrap rounded bg-black/80 px-1.5 py-0.5 text-[10.5px] text-white">
-                              {courseBadge(item, t)}
-                            </span>
-                          </div>
-                          <h3
-                            className="mt-3 line-clamp-2 text-sm font-semibold leading-snug text-foreground"
-                            title={item.title}
-                          >
-                            {item.displayTitle || item.title}
-                          </h3>
-                          <p className="mt-1 truncate text-xs text-muted-foreground">
-                            {item.displayAuthor || item.provider}
-                          </p>
-                          <p className="mt-1.5 flex items-center justify-between gap-2 whitespace-nowrap text-[11px] text-muted-foreground/80">
-                            <span>
-                              ★ {Number(item.rating || 0).toFixed(1)} · {short(item.reviews)}
-                            </span>
-                            <span className="font-semibold text-primary group-hover:underline">
-                              {t("freeLib.viewCourse")}
-                            </span>
-                          </p>
-                        </a>
-                      ))}
-                    </div>
-                  )}
-                </section>
-              )}
-
-              {showEbooks && (
-                <section id="ebooks" className="mt-8 scroll-mt-24">
-                  <div className="flex flex-wrap items-center gap-3 border-b border-border pb-2">
-                    <h2 className="text-lg font-bold text-foreground">{t("freeLib.ebooksTitle")}</h2>
-                    <span className="text-xs tabular-nums text-muted-foreground">
-                      {t("freeLib.countFree", { count: ebooks.length })}
-                    </span>
-                    <span className="ml-auto rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
-                      {t("freeLib.ebooksBadge")}
-                    </span>
-                  </div>
-                  {ebooks.length === 0 ? (
-                    <div className="py-14 text-center text-sm text-muted-foreground">
-                      {t("freeLib.empty")}
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-2 gap-x-3 gap-y-6 py-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-                      {ebooks.map((item, index) => (
-                        <a
-                          key={item.id}
-                          href={`${item.url}&ascsubtag=free-${item.id}-${index + 1}`}
-                          target="_blank"
-                          rel="nofollow sponsored noopener"
-                          className="group flex min-w-0 flex-col"
-                        >
-                          <div className="relative aspect-[3/4] overflow-hidden rounded-md bg-muted shadow-sm transition duration-200 group-hover:-translate-y-1 group-hover:shadow-lg">
-                            <img
-                              src={item.image}
-                              alt={item.title}
-                              loading={index < 8 ? undefined : "lazy"}
-                              fetchPriority={index === 0 ? "high" : undefined}
-                              decoding="async"
-                              className="size-full object-cover"
-                            />
-                            <span className="absolute bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-primary px-1.5 py-0.5 text-[10.5px] font-semibold text-primary-foreground">
-                              {t("freeLib.freeBadge")}
-                            </span>
-                          </div>
-                          <h3
-                            className="mt-3 line-clamp-2 text-sm font-semibold leading-snug text-foreground"
-                            title={item.title}
-                          >
-                            {item.displayTitle || item.title}
-                          </h3>
-                          <p className="mt-1 truncate text-xs text-muted-foreground">
-                            {item.displayAuthor || "—"}
-                          </p>
-                          <p className="mt-1.5 flex items-center justify-between gap-2 whitespace-nowrap text-[11px] text-muted-foreground/80">
-                            <span>
-                              ★ {Number(item.rating || 0).toFixed(1)} · {short(item.reviews)}
-                            </span>
-                            <span className="font-semibold text-primary group-hover:underline">
-                              {t("freeLib.getAmazon")}
-                            </span>
-                          </p>
-                        </a>
-                      ))}
-                    </div>
-                  )}
-                </section>
-              )}
-
-              <ResourceSection
-                id="books"
-                title={t("freeLib.section.books.title")}
-                desc={t("freeLib.section.books.desc")}
-                items={resourcesFor("books")}
-                lang={resourceLocale}
-              />
-
-              <ResourceSection
-                id="repos"
-                title={t("freeLib.section.repos.title")}
-                desc={t("freeLib.section.repos.desc")}
-                items={resourcesFor("repos")}
-                lang={resourceLocale}
-              />
-
-              <ResourceSection
-                id="videos"
-                title={t("freeLib.section.videos.title")}
-                desc={t("freeLib.section.videos.desc")}
-                items={resourcesFor("videos")}
-                lang={resourceLocale}
-                columns="sm:grid-cols-2 xl:grid-cols-3"
-              />
-
-              <footer
-                id="about"
-                className="mt-6 scroll-mt-24 border-t border-border pb-2 pt-5 text-xs leading-relaxed text-muted-foreground"
-              >
-                <strong className="font-semibold text-foreground">
-                  {t("freeLib.disclosureTitle")}
-                </strong>{" "}
-                {t("freeLib.disclosure", { date: FREE_GENERATED_AT })}{" "}
-                <Link to="/ai-books" className="underline underline-offset-2 hover:text-primary">
-                  {t("freeLib.browsePaid")}
-                </Link>
-              </footer>
-            </section>
-          </div>
+            </div>
+          </section>
         </div>
       </main>
       <AppFooter />

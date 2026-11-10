@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Timer, Music, FileText, FileCode2, Camera, ArrowRight, Sparkles, PawPrint, ShieldAlert, Link2, CalendarClock, ClipboardCheck } from "lucide-react";
+import { Timer, Music, FileText, FileCode2, Camera, ArrowRight, Sparkles, PawPrint, ShieldAlert, Link2, CalendarClock, ClipboardCheck, Layers } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { useTranslation } from "react-i18next";
@@ -94,6 +94,12 @@ export const Route = createFileRoute("/freetool")({
                 name: i18n.t("freetool.item.aiAssessment.title"),
                 url: "https://100mini.com/ai-skills-assessment",
               },
+              {
+                "@type": "ListItem",
+                position: 11,
+                name: i18n.t("aiTierlist.heading"),
+                url: "https://100mini.com/ai-tierlist",
+              },
             ],
           }),
         },
@@ -167,6 +173,12 @@ function FreeToolPage() {
       title: t("freetool.item.aiAssessment.title"),
       desc: t("freetool.item.aiAssessment.desc"),
     },
+    {
+      href: "/ai-tierlist" as const,
+      icon: Layers,
+      title: t("aiTierlist.heading"),
+      desc: t("aiTierlist.subheading"),
+    },
   ];
 
   return (
@@ -174,10 +186,10 @@ function FreeToolPage() {
       <AppNav />
       <main className="flex-1">
         {/* Hero */}
-        <section className="relative overflow-hidden bg-[#006c49] dark:bg-[#0b1c30]">
+        <section className="relative overflow-hidden bg-[#111214] dark:bg-[#0c0d0f]">
           {/* 装饰：光晕 + 点阵纹理 */}
           <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-            <div className="absolute -left-24 -top-24 size-72 rounded-full bg-[#4edea3]/20 blur-3xl" />
+            <div className="absolute -left-24 -top-24 size-72 rounded-full bg-[#d8ff00]/20 blur-3xl" />
             <div className="absolute -bottom-32 -right-24 size-80 rounded-full bg-white/10 blur-3xl" />
             <div
               className="absolute inset-0 opacity-[0.15]"
@@ -190,13 +202,13 @@ function FreeToolPage() {
           </div>
           <div className="relative mx-auto max-w-5xl px-6 py-20 text-center sm:py-28">
             <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-sm">
-              <Sparkles className="size-4 text-[#4edea3]" />
+              <Sparkles className="size-4 text-[#d8ff00]" />
               {t("freetool.more")}
             </div>
             <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
               {t("freetool.heading")}
             </h1>
-            <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-[#cfe8dd] sm:text-lg">
+            <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-[#c7c7c7] sm:text-lg">
               {t("freetool.subheading")}
             </p>
           </div>
@@ -211,19 +223,19 @@ function FreeToolPage() {
                 <Link
                   key={tool.href}
                   to={tool.href}
-                  className="group relative flex flex-col overflow-hidden rounded-2xl border border-[#d3e4fe]/70 bg-white p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#006c49]/40 hover:shadow-md dark:border-[#3c4a42] dark:bg-[#15243b] dark:hover:border-[#4edea3]/40 sm:p-7"
+                  className="group relative flex flex-col overflow-hidden rounded-2xl border border-[#e3e3e3]/70 bg-white p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#111214]/40 hover:shadow-md dark:border-[#2a2d32] dark:bg-[#15171a] dark:hover:border-[#d8ff00]/40 sm:p-7"
                 >
                   <div className="flex items-start justify-between">
-                    <div className="flex size-12 items-center justify-center rounded-xl bg-[#006c49]/10 text-[#006c49] transition-colors group-hover:bg-[#006c49] group-hover:text-white dark:bg-[#4edea3]/10 dark:text-[#4edea3] dark:group-hover:bg-[#4edea3] dark:group-hover:text-[#002113]">
+                    <div className="flex size-12 items-center justify-center rounded-xl bg-[#111214]/10 text-[#111214] transition-colors group-hover:bg-[#111214] group-hover:text-white dark:bg-[#d8ff00]/10 dark:text-[#d8ff00] dark:group-hover:bg-[#d8ff00] dark:group-hover:text-[#111214]">
                       <Icon className="size-6" />
                     </div>
-                    <ArrowRight className="size-5 text-muted-foreground/40 transition-all group-hover:translate-x-0.5 group-hover:text-[#006c49] dark:group-hover:text-[#4edea3]" />
+                    <ArrowRight className="size-5 text-muted-foreground/40 transition-all group-hover:translate-x-0.5 group-hover:text-[#111214] dark:group-hover:text-[#d8ff00]" />
                   </div>
                   <h2 className="mt-4 text-lg font-semibold text-foreground">{tool.title}</h2>
                   <p className="mt-1.5 flex-1 text-sm leading-relaxed text-muted-foreground">
                     {tool.desc}
                   </p>
-                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-[#006c49] dark:text-[#4edea3]">
+                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-[#111214] dark:text-[#d8ff00]">
                     {t("freetool.cta")}
                     <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
                   </span>

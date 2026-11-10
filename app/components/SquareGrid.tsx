@@ -20,20 +20,6 @@ interface SquareGridProps {
   onDeleted?: (id: string) => void;
 }
 
-function getCategoryColor(cat: string): string {
-  const colors: Record<string, string> = {
-    chinese: "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400",
-    math: "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
-    english: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400",
-    physics: "bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400",
-    chemistry: "bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400",
-    history: "bg-orange-50 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400",
-    biology: "bg-teal-50 text-teal-700 dark:bg-teal-900/20 dark:text-teal-400",
-    geography: "bg-cyan-50 text-cyan-700 dark:bg-cyan-900/20 dark:text-cyan-400",
-  };
-  return colors[cat] || "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400";
-}
-
 function PreviewCell({ item, index }: { item: SquareItem; index: number }) {
   const [showIframe, setShowIframe] = useState(false);
   const isPriority = index < 8;
@@ -106,9 +92,9 @@ export function SquareGrid({ items, onDeleted }: SquareGridProps) {
 
   if (items.length === 0) {
     return (
-      <div className="rounded-2xl border border-[#d3e4fe] dark:border-[#3c4a42] bg-white dark:bg-[#15243b] p-14 text-center">
-        <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-[#006c49]/10 dark:bg-[#4edea3]/10">
-          <FileText className="size-6 text-[#006c49] dark:text-[#4edea3]" />
+      <div className="rounded-[2px] border border-[#e3e3e3] bg-white p-14 text-center dark:border-[#2a2d32] dark:bg-[#15171a]">
+        <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-[2px] bg-[#d8ff00]">
+          <FileText className="size-6 text-[#111214] dark:text-[#d8ff00]" />
         </div>
         <h3 className="text-lg font-semibold text-foreground">{t("square.empty.title")}</h3>
         <p className="mt-1.5 text-sm text-muted-foreground">
@@ -120,11 +106,11 @@ export function SquareGrid({ items, onDeleted }: SquareGridProps) {
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {items.map((item, index) => (
           <article
             key={item.id}
-            className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] overflow-hidden group hover:shadow-sm transition-all duration-300"
+            className="group overflow-hidden rounded-[2px] border border-[#e3e3e3] bg-white transition-colors hover:border-[#111214] dark:border-[#2a2d32] dark:bg-[#15171a] dark:hover:border-[#d8ff00]"
           >
             {/* HTML preview via iframe */}
             <a
@@ -132,7 +118,7 @@ export function SquareGrid({ items, onDeleted }: SquareGridProps) {
               target="_blank"
               className="relative block overflow-hidden"
             >
-              <div className="relative overflow-hidden bg-muted" style={{ aspectRatio: "2/3" }}>
+              <div className="relative overflow-hidden bg-[#f2f2f2] dark:bg-[#1b1e22]" style={{ aspectRatio: "2/3" }}>
                 <PreviewCell item={item} index={index} />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4 z-10">
                   <span className="flex items-center gap-2 text-sm font-medium text-white">
@@ -147,20 +133,20 @@ export function SquareGrid({ items, onDeleted }: SquareGridProps) {
             <div className="p-4">
               <div className="flex flex-wrap items-center gap-1.5 mb-2">
                 <span
-                  className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${getCategoryColor(item.category)}`}
+                  className="inline-block rounded-[2px] bg-[#f2f2f2] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[.06em] text-[#111214] dark:bg-[#1b1e22] dark:text-[#ededed]"
                 >
                   {getCategoryLabel(item.category)}
                 </span>
                 {item.tags && item.tags.split(/[,，]+/).map((tag) => tag.trim()).filter(Boolean).map((tag) => (
                   <span
                     key={tag}
-                    className="inline-block px-2 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground"
+                    className="inline-block rounded-[2px] bg-[#f2f2f2] px-2 py-0.5 text-[9px] font-semibold text-[#6f6f6f] dark:bg-[#1b1e22] dark:text-[#9a9a9a]"
                   >
                     {tag.trim()}
                   </span>
                 ))}
               </div>
-              <h3 className="text-base font-semibold text-foreground truncate">
+              <h3 className="truncate text-[13px] font-bold text-foreground">
                 {item.title || t("square.unnamed")}
               </h3>
               <div className="mt-3 flex items-center justify-between">
@@ -171,10 +157,10 @@ export function SquareGrid({ items, onDeleted }: SquareGridProps) {
                         <img
                           src={item.userImage}
                           alt={item.userName}
-                          className="size-5 rounded-full"
+                          className="size-5 rounded-[2px]"
                         />
                       ) : (
-                        <div className="size-5 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary">
+                        <div className="flex size-5 items-center justify-center rounded-[2px] bg-[#d8ff00] text-[10px] font-bold text-[#111214]">
                           {item.userName.charAt(0)}
                         </div>
                       )}

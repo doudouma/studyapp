@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { createFileRoute, useLoaderData } from "@tanstack/react-router";
-import { Globe, Loader2, Search } from "lucide-react";
-import { Input } from "~/components/ui/input";
+import { Loader2, Search } from "lucide-react";
 import { AppNav } from "~/components/HomeHeader";
 import { AppFooter } from "~/components/AppFooter";
 import { SquareGrid } from "~/components/SquareGrid";
@@ -10,6 +9,8 @@ import type { SquareItem } from "@shared/types/square";
 import { SQUARE_PAGE_SIZE } from "@shared/types/square";
 import { useTranslation } from "react-i18next";
 import i18n from "~/lib/i18n";
+import { AIX_CSS } from "~/components/aix/aix-styles";
+import { BOOKS_CSS } from "~/components/aix/books-styles";
 
 export const Route = createFileRoute("/square")({
   // Only carry `q` when it is actually present. Returning a default `{ q: "" }`
@@ -149,99 +150,92 @@ function SquarePage() {
   });
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-[#ededed] dark:bg-[#0c0d0f]">
       <AppNav />
 
       <main className="flex-1">
-        <div className="mx-auto max-w-360 px-6 pt-10 pb-12">
-          {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center gap-2">
-              <Globe className="size-6 text-[#006c49] dark:text-[#4edea3]" />
-              <h1 className="text-2xl font-bold text-foreground">{t("square.heading")}</h1>
+        <div className="aix">
+          <style dangerouslySetInnerHTML={{ __html: AIX_CSS + BOOKS_CSS }} />
+          <section className="aix-frame" style={{ marginTop: 0 }}>
+            <div className="aix-lead">
+              <div>
+                <div className="aix-topline">
+                  <span className="aix-pill lime">
+                    <span className="dot" />
+                    COMMUNITY
+                  </span>
+                </div>
+                <h1>{t("square.heading")}</h1>
+                <p>{t("square.subtitle")}</p>
+              </div>
+              <div className="aix-lead-meta">
+                <span>{allItems.length} PAGES</span>
+              </div>
             </div>
-            <p className="mt-1.5 text-base text-muted-foreground">
-              {t("square.subtitle")}
-            </p>
-          </div>
 
-          {/* Search */}
-          <div className="relative mb-6">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              className="h-10 w-full bg-muted pl-9 text-sm"
-              placeholder={t("nav.search")}
-              value={searchQuery}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-            />
-          </div>
+            <div className="ab-search">
+              <Search className="ic" />
+              <input
+                type="search"
+                placeholder={t("nav.search")}
+                value={searchQuery}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                autoComplete="off"
+              />
+            </div>
 
-          {/* Category filter */}
-          <div className="mb-4 flex items-center gap-2 overflow-x-auto border-b border-[#d3e4fe] dark:border-[#3c4a42] pb-3">
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat.key}
-                onClick={() => setActiveCategory(cat.key)}
-                className={`whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
-                  activeCategory === cat.key
-                    ? "bg-[#006c49] text-white dark:bg-[#4edea3] dark:text-[#002113]"
-                    : "bg-[#e5eeff] text-[#3c4a42] dark:bg-[#1e314a] dark:text-[#8f9e95] hover:bg-[#dce9ff] dark:hover:bg-[#213145]"
-                }`}
-              >
-                {t(cat.tKey)}
-              </button>
-            ))}
-          </div>
-
-          {/* Tag filter */}
-          {allTags.length > 0 && (
-            <div className="mb-8 flex flex-wrap items-center gap-2">
-              <button
-                onClick={() => setActiveTag("")}
-                className={`rounded-md px-2.5 py-1 text-xs font-medium transition-all ${
-                  activeTag === ""
-                    ? "bg-secondary text-secondary-foreground"
-                    : "bg-muted text-muted-foreground hover:bg-muted/80"
-                }`}
-              >
-                {t("square.allTags")}
-              </button>
-              {allTags.map((tag) => (
+            <div className="ab-filterrow" style={{ marginTop: 14 }}>
+              {CATEGORIES.map((cat) => (
                 <button
-                  key={tag}
-                  onClick={() => setActiveTag(activeTag === tag ? "" : tag)}
-                  className={`rounded-md px-2.5 py-1 text-xs font-medium transition-all ${
-                    activeTag === tag
-                      ? "bg-secondary text-secondary-foreground"
-                      : "bg-muted text-muted-foreground hover:bg-muted/80"
-                  }`}
+                  key={cat.key}
+                  onClick={() => setActiveCategory(cat.key)}
+                  className={`ab-chip${activeCategory === cat.key ? " is-active" : ""}`}
                 >
-                  {tag}
+                  {t(cat.tKey)}
                 </button>
               ))}
             </div>
-          )}
 
-          {/* Grid */}
-          <SquareGrid items={filtered} onDeleted={handleDeleted} />
+            {allTags.length > 0 && (
+              <div className="ab-filterrow" style={{ marginTop: 10 }}>
+                <button
+                  onClick={() => setActiveTag("")}
+                  className={`ab-chip${activeTag === "" ? " is-active" : ""}`}
+                >
+                  {t("square.allTags")}
+                </button>
+                {allTags.map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => setActiveTag(activeTag === tag ? "" : tag)}
+                    className={`ab-chip${activeTag === tag ? " is-active" : ""}`}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            )}
 
-          {/* Infinite scroll sentinel */}
-          <div ref={sentinelRef} className="h-4" />
-          {loading && (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="size-5 animate-spin text-muted-foreground" />
-              <span className="ml-2 text-sm text-muted-foreground">{t("common.loading")}</span>
+            <div style={{ marginTop: 22 }}>
+              <SquareGrid items={filtered} onDeleted={handleDeleted} />
             </div>
-          )}
-          {!hasMore && allItems.length > SQUARE_PAGE_SIZE && (
-            <p className="py-8 text-center text-sm text-muted-foreground">
-              {t("square.loadedAll")}
-            </p>
-          )}
+
+            <div ref={sentinelRef} className="h-4" />
+            {loading && (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="size-5 animate-spin text-muted-foreground" />
+                <span className="ml-2 text-sm text-muted-foreground">{t("common.loading")}</span>
+              </div>
+            )}
+            {!hasMore && allItems.length > SQUARE_PAGE_SIZE && (
+              <p className="py-8 text-center text-sm text-muted-foreground">
+                {t("square.loadedAll")}
+              </p>
+            )}
+          </section>
         </div>
       </main>
 
       <AppFooter />
     </div>
-  );
-}
+  );}

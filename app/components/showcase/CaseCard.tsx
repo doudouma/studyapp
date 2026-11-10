@@ -16,7 +16,7 @@ export function CaseCard({ item, index = 0 }: { item: ShowcaseCase; index?: numb
       to="/showcase/$slug"
       params={{ slug: item.slug }}
       style={{ ...accentVars(), fontFamily: TERMINAL_FONT }}
-      className="group flex flex-col overflow-hidden rounded-lg border border-[#cfcfcf] bg-white transition-colors hover:border-[#006c49] dark:border-[#243244] dark:bg-[#0f1720] dark:hover:border-[#4edea3]"
+      className="group flex flex-col overflow-hidden rounded-lg border border-[#cfcfcf] bg-white transition-colors hover:border-[#111214] dark:border-[#2a2d32] dark:bg-[#0f1720] dark:hover:border-[#d8ff00]"
     >
       {/* 缩略图按卡片宽度自适应（16:9），宽度越大图越大 */}
       <div
@@ -65,13 +65,13 @@ export function CaseCard({ item, index = 0 }: { item: ShowcaseCase; index?: numb
         </p>
 
         {lead ? (
-          <div className="mt-2 border-t border-dashed border-[#e0e0e0] pt-2 text-[10px] text-muted-foreground dark:border-[#243244]">
+          <div className="mt-2 border-t border-dashed border-[#e0e0e0] pt-2 text-[10px] text-muted-foreground dark:border-[#2a2d32]">
             <span className="font-bold text-[#000000] dark:text-[#c9d5e4]">{lead.value}</span>{" "}
             {lead.key}
           </div>
         ) : null}
 
-        <div className="mt-auto pt-2 text-[10px] text-muted-foreground transition-colors group-hover:text-[#006c49] dark:group-hover:text-[#4edea3]">
+        <div className="mt-auto pt-2 text-[10px] text-muted-foreground transition-colors group-hover:text-[#111214] dark:group-hover:text-[#d8ff00]">
           → {item.slug}
         </div>
       </div>

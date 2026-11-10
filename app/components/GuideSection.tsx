@@ -109,9 +109,9 @@ export function GuideSection() {
   return (
     <>
       {/* Quick Start */}
-      <section className="w-full py-20">
+      <section className="w-full py-8">
         <div className="mx-auto max-w-5xl px-6">
-          <h2 className="mb-12 text-center text-2xl font-bold tracking-tight md:text-3xl">
+          <h2 className="mb-8 text-2xl font-extrabold tracking-tight md:text-3xl">
             {t("components.guide.heading")}
           </h2>
           <div className="grid gap-10 md:grid-cols-3">
@@ -119,11 +119,11 @@ export function GuideSection() {
               const Icon = step.icon;
               return (
                 <div key={step.title} className="relative flex flex-col items-center text-center">
-                  <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-[#006c49]/10 text-[#006c49] dark:bg-[#4edea3]/10 dark:text-[#4edea3]">
+                  <div className="mb-4 flex size-12 items-center justify-center rounded-[2px] bg-[#d8ff00] text-[#111214]">
                     <Icon className="size-7" />
                   </div>
-                  <h3 className="text-lg font-semibold">{step.title}</h3>
-                  <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed max-w-xs">
+                  <h3 className="text-[13px] font-extrabold uppercase tracking-[.06em]">{step.title}</h3>
+                  <p className="mt-1.5 max-w-xs text-[12px] leading-relaxed text-muted-foreground">
                     {step.description}
                   </p>
                 </div>
@@ -134,12 +134,12 @@ export function GuideSection() {
       </section>
 
       {/* FAQ */}
-      <section className="w-full bg-[#eff4ff] dark:bg-[#1e314a] py-20">
+      <section className="w-full py-8">
         <div className="mx-auto max-w-3xl px-6">
-          <h2 className="mb-12 text-center text-2xl font-bold tracking-tight md:text-3xl">
+          <h2 className="mb-8 text-2xl font-extrabold tracking-tight md:text-3xl">
             {t("components.guide.faq")}
           </h2>
-          <div className="rounded-2xl border border-[#d3e4fe] dark:border-[#3c4a42] bg-white dark:bg-[#15243b] px-6">
+          <div className="rounded-[2px] border border-[#e3e3e3] bg-white px-6 dark:border-[#2a2d32] dark:bg-[#15171a]">
             {faqs.map((faq) => (
               <FaqItem key={faq.q} q={faq.q} a={faq.a} />
             ))}
@@ -148,9 +148,9 @@ export function GuideSection() {
       </section>
 
       {/* Pro Tips */}
-      <section className="w-full py-20">
+      <section className="w-full py-8">
         <div className="mx-auto max-w-5xl px-6">
-          <h2 className="mb-12 text-center text-2xl font-bold tracking-tight md:text-3xl">
+          <h2 className="mb-8 text-2xl font-extrabold tracking-tight md:text-3xl">
             {t("components.guide.tips")}
           </h2>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -159,9 +159,9 @@ export function GuideSection() {
               return (
                 <div
                   key={tip.title}
-                  className="flex flex-col items-center rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] p-8 text-center shadow-sm"
+                  className="flex flex-col items-center rounded-[2px] border border-[#e3e3e3] bg-white p-8 text-center dark:border-[#2a2d32] dark:bg-[#15171a]"
                 >
-                  <div className="mb-4 flex size-12 items-center justify-center rounded-xl bg-[#006c49]/10 text-[#006c49] dark:bg-[#4edea3]/10 dark:text-[#4edea3]">
+                  <div className="mb-4 flex size-10 items-center justify-center rounded-[2px] bg-[#d8ff00] text-[#111214]">
                     <Icon className="size-6" />
                   </div>
                   <h3 className="text-base font-semibold">{tip.title}</h3>

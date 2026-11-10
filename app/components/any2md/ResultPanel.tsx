@@ -42,12 +42,12 @@ export function ResultPanel({
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-white px-4 py-3 dark:bg-[#15243b]">
+    <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-white px-4 py-3 dark:bg-[#15171a]">
       <div className="min-w-0 flex-1">
         <div className="truncate text-sm font-semibold text-foreground">{fileName}</div>
         <div className="mt-0.5 text-xs text-muted-foreground">
           {format && (
-            <span className="mr-2 inline-flex items-center rounded-full bg-[#e5eeff] px-2 py-0.5 font-mono text-[11px] font-medium text-[#0058be] dark:bg-[#1e314a] dark:text-[#adc6ff]">
+            <span className="mr-2 inline-flex items-center rounded-full bg-[#f2f2f2] px-2 py-0.5 font-mono text-[11px] font-medium text-[#111214] dark:bg-[#15171a] dark:text-[#ededed]">
               {format}
             </span>
           )}

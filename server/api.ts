@@ -29,6 +29,7 @@ import { wardrobeRoutes } from "./features/wardrobe/wardrobe.routes";
 import { rankRoutes } from "./features/rank/rank.routes";
 import { ensoRoutes } from "./features/enso/enso.routes";
 import { outbreakRoutes } from "./features/outbreak/outbreak.routes";
+import { tierlistRoutes } from "./features/tierlist/tierlist.routes";
 import { log } from "./lib/log";
 import llmsTxt from "./content/llms.txt?raw";
 import llmsFullTxt from "./content/llms-full.txt?raw";
@@ -80,6 +81,8 @@ const STATIC_PAGES: { loc: string; changefreq: string; priority: string; lastmod
   { loc: "/ai-skills-assessment", changefreq: "monthly", priority: "0.7", lastmod: "2026-11-03" },
   { loc: "/games", changefreq: "weekly", priority: "0.8" },
   { loc: "/idphoto", changefreq: "weekly", priority: "0.7" },
+  { loc: "/ai-tierlist", changefreq: "weekly", priority: "0.7" },
+  { loc: "/ai-tierlist-stats", changefreq: "weekly", priority: "0.7" },
   // /links (My Pages) is a login-gated dashboard — intentionally excluded from
   // the sitemap and marked noindex (see app/routes/links.tsx).
   { loc: "/burn-after-reading-link", changefreq: "weekly", priority: "0.8" },
@@ -385,7 +388,7 @@ api.get("/skill/100mini-upload", (c) => {
 
 
 // Mount feature routers (server/features/*，各自按 repo/service/routes 分层)
-const apiWithFeatures = api.route("/", squareRoutes).route("/", pagesRoutes).route("/", adminRoutes).route("/", pomodoroRoutes).route("/", wardrobeRoutes).route("/", rankRoutes).route("/", ensoRoutes).route("/", outbreakRoutes);
+const apiWithFeatures = api.route("/", squareRoutes).route("/", pagesRoutes).route("/", adminRoutes).route("/", pomodoroRoutes).route("/", wardrobeRoutes).route("/", rankRoutes).route("/", ensoRoutes).route("/", outbreakRoutes).route("/", tierlistRoutes);
 
 // Hono RPC 类型：前端通过 hc<AppType> 获得端到端类型安全的客户端
 export type AppType = typeof apiWithFeatures;

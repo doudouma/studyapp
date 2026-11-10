@@ -248,25 +248,25 @@ function AdminPage() {
     <div className="flex min-h-screen flex-col">
       <AppNav />
 
-      <main className="flex-1 bg-[#eff4ff] dark:bg-[#1e314a]">
+      <main className="flex-1 bg-[#ededed] dark:bg-[#15171a]">
         <div className="mx-auto max-w-5xl px-6 pt-10 pb-12">
           {/* Header */}
           <div className="mb-8 flex items-end justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <Shield className="size-6 text-[#006c49] dark:text-[#4edea3]" />
+                <Shield className="size-6 text-[#111214] dark:text-[#d8ff00]" />
                 <h1 className="text-2xl font-bold text-foreground">{t("admin.heading")}</h1>
               </div>
             </div>
           </div>
 
           {/* Tab toggle */}
-          <div className="mb-6 flex items-center gap-2 border-b border-[#d3e4fe] dark:border-[#3c4a42] pb-3">
+          <div className="mb-6 flex items-center gap-2 border-b border-[#e3e3e3] dark:border-[#2a2d32] pb-3">
             <button
               onClick={() => setTab("users")}
               className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-all ${
                 tab === "users"
-                  ? "bg-[#006c49] text-white dark:bg-[#4edea3] dark:text-[#002113]"
+                  ? "bg-[#111214] text-white dark:bg-[#d8ff00] dark:text-[#111214]"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -276,7 +276,7 @@ function AdminPage() {
               onClick={() => setTab("pages")}
               className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-all ${
                 tab === "pages"
-                  ? "bg-[#006c49] text-white dark:bg-[#4edea3] dark:text-[#002113]"
+                  ? "bg-[#111214] text-white dark:bg-[#d8ff00] dark:text-[#111214]"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -286,7 +286,7 @@ function AdminPage() {
               onClick={() => setTab("logs")}
               className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-all ${
                 tab === "logs"
-                  ? "bg-[#006c49] text-white dark:bg-[#4edea3] dark:text-[#002113]"
+                  ? "bg-[#111214] text-white dark:bg-[#d8ff00] dark:text-[#111214]"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -297,14 +297,14 @@ function AdminPage() {
           {/* ===== User Management ===== */}
           {tab === "users" && (
             loading ? (
-            <div className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] p-12">
+            <div className="rounded-2xl border border-[#e3e3e3]/60 dark:border-[#2a2d32] bg-white dark:bg-[#15171a] p-12">
               <p className="text-center text-muted-foreground">{t("common.loading")}</p>
             </div>
           ) : error ? (
-            <div className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] p-12 text-center">
+            <div className="rounded-2xl border border-[#e3e3e3]/60 dark:border-[#2a2d32] bg-white dark:bg-[#15171a] p-12 text-center">
               <p className="text-destructive">{error}</p>
               <button
-                className="mt-4 text-sm text-[#0058be] dark:text-[#adc6ff] hover:underline"
+                className="mt-4 text-sm text-[#111214] dark:text-[#ededed] hover:underline"
                 onClick={() => fetchUsers(page)}
               >
                 {t("common.retry")}
@@ -312,28 +312,28 @@ function AdminPage() {
             </div>
           ) : (
             <>
-              <div className="overflow-x-auto rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b]">
+              <div className="overflow-x-auto rounded-2xl border border-[#e3e3e3]/60 dark:border-[#2a2d32] bg-white dark:bg-[#15171a]">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-[#d3e4fe] dark:border-[#3c4a42] bg-[#e5eeff]/30 dark:bg-[#1e314a]/30">
-                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.col.user")}</th>
-                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95] hidden md:table-cell">{t("admin.col.email")}</th>
-                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95] hidden sm:table-cell">{t("admin.col.regDate")}</th>
-                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.col.role")}</th>
-                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.col.memberStatus")}</th>
-                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95] hidden md:table-cell">{t("admin.col.expiry")}</th>
-                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.col.points")}</th>
-                      <th className="px-4 py-3 text-right font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.col.action")}</th>
+                    <tr className="border-b border-[#e3e3e3] dark:border-[#2a2d32] bg-[#f2f2f2]/30 dark:bg-[#15171a]/30">
+                      <th className="px-4 py-3 text-left font-medium text-[#2a2d32] dark:text-[#9a9a9a]">{t("admin.col.user")}</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#2a2d32] dark:text-[#9a9a9a] hidden md:table-cell">{t("admin.col.email")}</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#2a2d32] dark:text-[#9a9a9a] hidden sm:table-cell">{t("admin.col.regDate")}</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#2a2d32] dark:text-[#9a9a9a]">{t("admin.col.role")}</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#2a2d32] dark:text-[#9a9a9a]">{t("admin.col.memberStatus")}</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#2a2d32] dark:text-[#9a9a9a] hidden md:table-cell">{t("admin.col.expiry")}</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#2a2d32] dark:text-[#9a9a9a]">{t("admin.col.points")}</th>
+                      <th className="px-4 py-3 text-right font-medium text-[#2a2d32] dark:text-[#9a9a9a]">{t("admin.col.action")}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {users.map((u) => (
-                      <tr key={u.id} className="border-b border-[#d3e4fe] dark:border-[#3c4a42] last:border-0 hover:bg-[#e5eeff]/20 dark:hover:bg-[#1e314a]/20">
+                      <tr key={u.id} className="border-b border-[#e3e3e3] dark:border-[#2a2d32] last:border-0 hover:bg-[#f2f2f2]/20 dark:hover:bg-[#15171a]/20">
                         <td className="px-4 py-3 font-medium">{u.name}</td>
                         <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">{u.email}</td>
                         <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">{formatDate(u.createdAt)}</td>
                         <td className="px-4 py-3">
-                          <span className={u.role === "admin" ? "text-[#006c49] dark:text-[#4edea3] font-semibold" : "text-muted-foreground"}>
+                          <span className={u.role === "admin" ? "text-[#111214] dark:text-[#d8ff00] font-semibold" : "text-muted-foreground"}>
                             {u.role === "admin" ? t("admin.role.admin") : t("admin.role.user")}
                           </span>
                         </td>
@@ -387,27 +387,27 @@ function AdminPage() {
           {/* ===== Page Management ===== */}
           {tab === "pages" && (
             pagesLoading ? (
-              <div className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] p-12">
+              <div className="rounded-2xl border border-[#e3e3e3]/60 dark:border-[#2a2d32] bg-white dark:bg-[#15171a] p-12">
                 <p className="text-center text-muted-foreground">{t("common.loading")}</p>
               </div>
             ) : (
               <>
-                <div className="overflow-x-auto rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b]">
+                <div className="overflow-x-auto rounded-2xl border border-[#e3e3e3]/60 dark:border-[#2a2d32] bg-white dark:bg-[#15171a]">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-[#d3e4fe] dark:border-[#3c4a42] bg-[#e5eeff]/30 dark:bg-[#1e314a]/30">
-                        <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.col.title")}</th>
-                        <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95] hidden md:table-cell">{t("admin.col.author")}</th>
-                        <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95] hidden sm:table-cell">{t("admin.col.category")}</th>
-                        <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.col.views")}</th>
-                        <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.col.square")}</th>
-                        <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95] hidden md:table-cell">{t("admin.col.createdAt")}</th>
-                        <th className="px-4 py-3 text-right font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.col.action")}</th>
+                      <tr className="border-b border-[#e3e3e3] dark:border-[#2a2d32] bg-[#f2f2f2]/30 dark:bg-[#15171a]/30">
+                        <th className="px-4 py-3 text-left font-medium text-[#2a2d32] dark:text-[#9a9a9a]">{t("admin.col.title")}</th>
+                        <th className="px-4 py-3 text-left font-medium text-[#2a2d32] dark:text-[#9a9a9a] hidden md:table-cell">{t("admin.col.author")}</th>
+                        <th className="px-4 py-3 text-left font-medium text-[#2a2d32] dark:text-[#9a9a9a] hidden sm:table-cell">{t("admin.col.category")}</th>
+                        <th className="px-4 py-3 text-left font-medium text-[#2a2d32] dark:text-[#9a9a9a]">{t("admin.col.views")}</th>
+                        <th className="px-4 py-3 text-left font-medium text-[#2a2d32] dark:text-[#9a9a9a]">{t("admin.col.square")}</th>
+                        <th className="px-4 py-3 text-left font-medium text-[#2a2d32] dark:text-[#9a9a9a] hidden md:table-cell">{t("admin.col.createdAt")}</th>
+                        <th className="px-4 py-3 text-right font-medium text-[#2a2d32] dark:text-[#9a9a9a]">{t("admin.col.action")}</th>
                       </tr>
                     </thead>
                     <tbody>
                       {pages.map((p) => (
-                        <tr key={p.id} className="border-b border-[#d3e4fe] dark:border-[#3c4a42] last:border-0 hover:bg-[#e5eeff]/20 dark:hover:bg-[#1e314a]/20">
+                        <tr key={p.id} className="border-b border-[#e3e3e3] dark:border-[#2a2d32] last:border-0 hover:bg-[#f2f2f2]/20 dark:hover:bg-[#15171a]/20">
                           <td className="px-4 py-3 font-medium max-w-[200px] truncate">{p.title || t("admin.unnamed")}</td>
                           <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">{p.userName || p.userEmail || t("admin.anonymous")}</td>
                           <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">{p.category}</td>
@@ -461,7 +461,7 @@ function AdminPage() {
                 <select
                   value={logEventFilter}
                   onChange={(e) => { setLogEventFilter(e.target.value); setLogPage(1); }}
-                  className="rounded-lg border border-[#d3e4fe] dark:border-[#3c4a42] bg-white dark:bg-[#15243b] px-3 py-1.5 text-sm"
+                  className="rounded-lg border border-[#e3e3e3] dark:border-[#2a2d32] bg-white dark:bg-[#15171a] px-3 py-1.5 text-sm"
                 >
                   <option value="">{t("admin.log.allEvents")}</option>
                   <option value="upload">{t("admin.log.upload")}</option>
@@ -474,18 +474,18 @@ function AdminPage() {
               </div>
 
               {/* Table */}
-              <div className="overflow-x-auto rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b]">
+              <div className="overflow-x-auto rounded-2xl border border-[#e3e3e3]/60 dark:border-[#2a2d32] bg-white dark:bg-[#15171a]">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-[#d3e4fe] dark:border-[#3c4a42] bg-[#e5eeff]/30 dark:bg-[#1e314a]/30">
-                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.log.time")}</th>
-                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.log.event")}</th>
-                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.log.status")}</th>
-                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.log.user")}</th>
-                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95]">{t("admin.log.page")}</th>
-                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95] hidden sm:table-cell">{t("admin.log.type")}</th>
-                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95] hidden md:table-cell">{t("admin.log.ip")}</th>
-                      <th className="px-4 py-3 text-left font-medium text-[#3c4a42] dark:text-[#8f9e95] hidden sm:table-cell">{t("admin.log.size")}</th>
+                    <tr className="border-b border-[#e3e3e3] dark:border-[#2a2d32] bg-[#f2f2f2]/30 dark:bg-[#15171a]/30">
+                      <th className="px-4 py-3 text-left font-medium text-[#2a2d32] dark:text-[#9a9a9a]">{t("admin.log.time")}</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#2a2d32] dark:text-[#9a9a9a]">{t("admin.log.event")}</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#2a2d32] dark:text-[#9a9a9a]">{t("admin.log.status")}</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#2a2d32] dark:text-[#9a9a9a]">{t("admin.log.user")}</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#2a2d32] dark:text-[#9a9a9a]">{t("admin.log.page")}</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#2a2d32] dark:text-[#9a9a9a] hidden sm:table-cell">{t("admin.log.type")}</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#2a2d32] dark:text-[#9a9a9a] hidden md:table-cell">{t("admin.log.ip")}</th>
+                      <th className="px-4 py-3 text-left font-medium text-[#2a2d32] dark:text-[#9a9a9a] hidden sm:table-cell">{t("admin.log.size")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -499,7 +499,7 @@ function AdminPage() {
                       </tr>
                     ) : (
                       logs.map((log) => (
-                        <tr key={log.id} className="border-b border-[#d3e4fe] dark:border-[#3c4a42] last:border-0 hover:bg-[#e5eeff]/20 dark:hover:bg-[#1e314a]/20">
+                        <tr key={log.id} className="border-b border-[#e3e3e3] dark:border-[#2a2d32] last:border-0 hover:bg-[#f2f2f2]/20 dark:hover:bg-[#15171a]/20">
                           <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">
                             {new Date(log.createdAt).toLocaleString("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}
                           </td>
@@ -530,7 +530,7 @@ function AdminPage() {
                           </td>
                           <td className="px-4 py-3">
                             <a href={`/p/${log.pageId}`} target="_blank" rel="noopener noreferrer"
-                              className="text-[#0058be] dark:text-[#adc6ff] hover:underline">
+                              className="text-[#111214] dark:text-[#ededed] hover:underline">
                               {log.pageId}
                             </a>
                           </td>

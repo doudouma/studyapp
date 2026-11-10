@@ -26,7 +26,7 @@ export function MdView({ markdown, className = "" }: MdViewProps) {
 
   return (
     <div
-      className={`md-view overflow-x-auto rounded-xl border border-border bg-white p-6 dark:bg-[#15243b] ${className}`}
+      className={`md-view overflow-x-auto rounded-xl border border-border bg-white p-6 dark:bg-[#15171a] ${className}`}
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );

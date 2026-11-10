@@ -148,9 +148,9 @@ export function LinksTable({ pages, total, limit, page = 1, totalPages = 1, onPa
   return (
     <>
       {pages.length === 0 ? (
-        <div className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] p-14 text-center">
-          <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-[#006c49]/10 dark:bg-[#4edea3]/10">
-            <FileText className="size-6 text-[#006c49] dark:text-[#4edea3]" />
+        <div className="rounded-2xl border border-[#e3e3e3]/60 dark:border-[#2a2d32] bg-white dark:bg-[#15171a] p-14 text-center">
+          <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-[#111214]/10 dark:bg-[#d8ff00]/10">
+            <FileText className="size-6 text-[#111214] dark:text-[#d8ff00]" />
           </div>
           <h3 className="text-lg font-semibold text-foreground">{t("components.linksTable.heading.empty")}</h3>
           <p className="mt-1.5 text-sm text-muted-foreground">
@@ -158,13 +158,13 @@ export function LinksTable({ pages, total, limit, page = 1, totalPages = 1, onPa
           </p>
           <Link
             to="/"
-            className="mt-5 inline-flex h-10 items-center justify-center rounded-xl bg-[#006c49] px-5 text-sm font-medium text-white shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)] transition-colors hover:bg-[#006c49]/90 dark:bg-[#4edea3] dark:text-[#002113] dark:hover:bg-[#4edea3]/90"
+            className="mt-5 inline-flex h-10 items-center justify-center rounded-xl bg-[#111214] px-5 text-sm font-medium text-white shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)] transition-colors hover:bg-[#111214]/90 dark:bg-[#d8ff00] dark:text-[#111214] dark:hover:bg-[#d8ff00]/90"
           >
             {t("components.linksTable.goUpload")}
           </Link>
         </div>
       ) : (
-        <div className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] overflow-hidden">
+        <div className="rounded-2xl border border-[#e3e3e3]/60 dark:border-[#2a2d32] bg-white dark:bg-[#15171a] overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
@@ -527,7 +527,7 @@ function EditDialog({
                     <p
                       className={`mt-1 text-xs ${
                         slugStatus === "ok"
-                          ? "text-[#006c49] dark:text-[#4edea3]"
+                          ? "text-[#111214] dark:text-[#d8ff00]"
                           : slugStatus === "checking"
                             ? "text-muted-foreground"
                             : "text-destructive"

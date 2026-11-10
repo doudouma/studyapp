@@ -25,7 +25,7 @@ export function QuestionMap({
   const percent = total ? (read / total) * 100 : 0;
 
   return (
-    <section className="mt-4 rounded-lg border border-[#cfcfcf] bg-white p-3.5 dark:border-[#243244] dark:bg-[#0f1720]">
+    <section className="mt-4 rounded-lg border border-[#cfcfcf] bg-white p-3.5 dark:border-[#2a2d32] dark:bg-[#0f1720]">
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-[11px] font-bold text-[#000000] dark:text-[#e6edf6]">
           {t("questions.map.title")}
@@ -35,7 +35,7 @@ export function QuestionMap({
         </span>
       </div>
 
-      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#e0e0e0] dark:bg-[#243244]">
+      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#e0e0e0] dark:bg-[#2a2d32]">
         <div
           className="h-full rounded-full bg-[color:var(--sc-accent)] transition-[width] dark:bg-[color:var(--sc-accent-dark)]"
           style={{ width: `${percent}%` }}
@@ -57,9 +57,9 @@ export function QuestionMap({
               aria-current={isActive ? "location" : undefined}
               className={`flex aspect-square items-center justify-center rounded-[3px] text-[9px] font-bold transition-colors ${
                 isActive
-                  ? "bg-[color:var(--sc-accent)] text-white ring-2 ring-[color:var(--sc-accent)] ring-offset-1 ring-offset-white dark:bg-[color:var(--sc-accent-dark)] dark:text-[#002113] dark:ring-[color:var(--sc-accent-dark)] dark:ring-offset-[#0f1720]"
+                  ? "bg-[color:var(--sc-accent)] text-white ring-2 ring-[color:var(--sc-accent)] ring-offset-1 ring-offset-white dark:bg-[color:var(--sc-accent-dark)] dark:text-[#111214] dark:ring-[color:var(--sc-accent-dark)] dark:ring-offset-[#0f1720]"
                   : isRead
-                    ? "bg-[color:var(--sc-accent)] text-white hover:opacity-85 dark:bg-[color:var(--sc-accent-dark)] dark:text-[#002113]"
+                    ? "bg-[color:var(--sc-accent)] text-white hover:opacity-85 dark:bg-[color:var(--sc-accent-dark)] dark:text-[#111214]"
                     : "border border-[#d8d8d8] text-muted-foreground hover:border-[color:var(--sc-accent)] hover:text-[color:var(--sc-accent)] dark:border-[#2c3a4b] dark:hover:border-[color:var(--sc-accent-dark)] dark:hover:text-[color:var(--sc-accent-dark)]"
               }`}
             >

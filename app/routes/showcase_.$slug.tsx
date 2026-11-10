@@ -90,7 +90,7 @@ function CaseDetailPage() {
                 {item.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="rounded-full border border-[#cfcfcf] px-2.5 py-0.5 text-[10px] text-muted-foreground dark:border-[#243244]"
+                    className="rounded-full border border-[#cfcfcf] px-2.5 py-0.5 text-[10px] text-muted-foreground dark:border-[#2a2d32]"
                   >
                     {tag}
                   </span>
@@ -118,7 +118,7 @@ function CaseDetailPage() {
                     {related.map((r) => (
                       <li
                         key={r.slug}
-                        className="flex items-center justify-between gap-3 border-t border-dashed border-[#e0e0e0] py-1.5 first:border-t-0 dark:border-[#243244]"
+                        className="flex items-center justify-between gap-3 border-t border-dashed border-[#e0e0e0] py-1.5 first:border-t-0 dark:border-[#2a2d32]"
                       >
                         <Link
                           to="/showcase/$slug"

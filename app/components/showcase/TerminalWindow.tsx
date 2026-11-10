@@ -20,11 +20,11 @@ export function TerminalWindow({
     <div
       style={{ fontFamily: TERMINAL_FONT }}
       className={cn(
-        "overflow-hidden rounded-xl border border-[#cfcfcf] bg-[#ffffff] text-[#000000] dark:border-[#243244] dark:bg-[#0d1117] dark:text-[#c9d5e4]",
+        "overflow-hidden rounded-xl border border-[#cfcfcf] bg-[#ffffff] text-[#000000] dark:border-[#2a2d32] dark:bg-[#0d1117] dark:text-[#c9d5e4]",
         className,
       )}
     >
-      <div className="flex items-center gap-1.5 border-b border-[#cfcfcf] bg-[#ececec] px-3 py-2 dark:border-[#243244] dark:bg-[#151d2b]">
+      <div className="flex items-center gap-1.5 border-b border-[#cfcfcf] bg-[#ececec] px-3 py-2 dark:border-[#2a2d32] dark:bg-[#151d2b]">
         {/* macOS 交通灯：关闭 / 最小化 / 全屏 */}
         <span className="size-2.5 rounded-full bg-[#ff5f57]" />
         <span className="size-2.5 rounded-full bg-[#febc2e]" />
@@ -48,7 +48,7 @@ export function TerminalPrompt() {
 /** 命令文本（强调色） */
 export function TerminalCmd({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <span className={cn("font-bold text-[#006c49] dark:text-[#4edea3]", className)}>{children}</span>
+    <span className={cn("font-bold text-[#111214] dark:text-[#d8ff00]", className)}>{children}</span>
   );
 }
 
@@ -58,7 +58,7 @@ export function TerminalCursor({ className }: { className?: string }) {
     <span
       aria-hidden
       className={cn(
-        "animate-blink ml-1 inline-block h-3 w-[7px] translate-y-0.5 bg-[#006c49] dark:bg-[#4edea3]",
+        "animate-blink ml-1 inline-block h-3 w-[7px] translate-y-0.5 bg-[#111214] dark:bg-[#d8ff00]",
         className,
       )}
     />

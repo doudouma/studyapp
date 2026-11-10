@@ -89,7 +89,7 @@ function RhythmPage() {
     <div className="flex min-h-screen flex-col">
       <AppNav />
       <main className="flex-1">
-        <section className="relative overflow-hidden bg-gradient-to-b from-[#006c49]/10 via-[#006c49]/[0.02] to-background dark:from-[#4edea3]/10 dark:via-[#4edea3]/[0.02] dark:to-background pb-6 pt-6 sm:pt-10">
+        <section className="relative overflow-hidden bg-gradient-to-b from-[#111214]/10 via-[#111214]/[0.02] to-background dark:from-[#d8ff00]/10 dark:via-[#d8ff00]/[0.02] dark:to-background pb-6 pt-6 sm:pt-10">
           <div className="mx-auto w-full max-w-2xl px-4">
             <RhythmGame />
           </div>

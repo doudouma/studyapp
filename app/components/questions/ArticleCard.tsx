@@ -5,7 +5,7 @@ import { TERMINAL_FONT } from "~/components/showcase/TerminalWindow";
 import type { QuestionArticle } from "@shared/types/questions";
 
 const COVER_THEMES = [
-  { from: "#006c49", to: "#0a3d2c" }, // green
+  { from: "#111214", to: "#3f3f3f" }, // green
   { from: "#1d4ed8", to: "#0b2559" }, // blue
   { from: "#6d28d9", to: "#2e1065" }, // purple
   { from: "#b45309", to: "#5c2a06" }, // amber
@@ -41,7 +41,7 @@ export function ArticleCard({ article, index = 0 }: { article: QuestionArticle; 
       to="/100-questions/$slug"
       params={{ slug: article.slug }}
       style={{ ...accentVars(), fontFamily: TERMINAL_FONT }}
-      className="group flex flex-col overflow-hidden rounded-lg border border-[#cfcfcf] bg-white transition-colors hover:border-[#006c49] dark:border-[#243244] dark:bg-[#0f1720] dark:hover:border-[#4edea3]"
+      className="group flex flex-col overflow-hidden rounded-lg border border-[#cfcfcf] bg-white transition-colors hover:border-[#111214] dark:border-[#2a2d32] dark:bg-[#0f1720] dark:hover:border-[#d8ff00]"
     >
       <div
         className="relative flex aspect-[16/9] shrink-0 flex-col justify-between overflow-hidden p-5 text-white"
@@ -82,7 +82,7 @@ export function ArticleCard({ article, index = 0 }: { article: QuestionArticle; 
         <p className="line-clamp-2 text-[11px] leading-relaxed text-muted-foreground">
           {article.summary}
         </p>
-        <div className="mt-auto pt-3 text-[10px] text-muted-foreground transition-colors group-hover:text-[#006c49] dark:group-hover:text-[#4edea3]">
+        <div className="mt-auto pt-3 text-[10px] text-muted-foreground transition-colors group-hover:text-[#111214] dark:group-hover:text-[#d8ff00]">
           → {article.slug}
         </div>
       </div>

@@ -149,7 +149,7 @@ function QuestionArticlePage() {
                     {article.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="rounded-full border border-[#cfcfcf] px-2.5 py-0.5 text-[10px] text-muted-foreground dark:border-[#243244]"
+                        className="rounded-full border border-[#cfcfcf] px-2.5 py-0.5 text-[10px] text-muted-foreground dark:border-[#2a2d32]"
                       >
                         {tag}
                       </span>
@@ -157,11 +157,11 @@ function QuestionArticlePage() {
                   </div>
 
                   {article.facts.length > 0 ? (
-                    <dl className="mt-4 overflow-hidden rounded-lg border border-[#cfcfcf] bg-white dark:border-[#243244] dark:bg-[#0f1720]">
+                    <dl className="mt-4 overflow-hidden rounded-lg border border-[#cfcfcf] bg-white dark:border-[#2a2d32] dark:bg-[#0f1720]">
                       {article.facts.map((f) => (
                         <div
                           key={f.key}
-                          className="grid grid-cols-[110px_1fr] gap-3 border-b border-dashed border-[#e0e0e0] px-3.5 py-1.5 last:border-b-0 sm:grid-cols-[130px_1fr] dark:border-[#243244]"
+                          className="grid grid-cols-[110px_1fr] gap-3 border-b border-dashed border-[#e0e0e0] px-3.5 py-1.5 last:border-b-0 sm:grid-cols-[130px_1fr] dark:border-[#2a2d32]"
                         >
                           <dt className="truncate text-[11px] text-muted-foreground">{f.key}</dt>
                           <dd
@@ -189,7 +189,7 @@ function QuestionArticlePage() {
                     onReset={reset}
                   />
 
-                  <details className="mt-4 rounded-lg border lg:hidden border-[#cfcfcf] bg-white px-3.5 py-3 dark:border-[#243244] dark:bg-[#0f1720]">
+                  <details className="mt-4 rounded-lg border lg:hidden border-[#cfcfcf] bg-white px-3.5 py-3 dark:border-[#2a2d32] dark:bg-[#0f1720]">
                     <summary className="cursor-pointer select-none text-[11px] font-bold text-[#000000] dark:text-[#e6edf6]">
                       {t("questions.toc")}
                       <span className="ml-1.5 font-normal text-muted-foreground">

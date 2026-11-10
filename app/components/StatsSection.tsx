@@ -28,9 +28,9 @@ export function StatsSection() {
   ];
 
   return (
-    <section className="w-full bg-[#eff4ff] dark:bg-[#1e314a] py-20">
+    <section className="w-full">
       <div className="mx-auto max-w-5xl px-6">
-        <h2 className="mb-12 text-center text-2xl font-bold tracking-tight md:text-3xl">
+        <h2 className="mb-8 text-2xl font-extrabold tracking-tight md:text-3xl">
           {t("components.stats.heading")}
         </h2>
         <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-4">
@@ -41,11 +41,11 @@ export function StatsSection() {
                 key={stat.title}
                 className="flex flex-col items-center text-center"
               >
-                <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-[#006c49]/10 text-[#006c49] dark:bg-[#4edea3]/10 dark:text-[#4edea3]">
+                <div className="mb-4 flex size-12 items-center justify-center rounded-[2px] bg-[#d8ff00] text-[#111214]">
                   <Icon className="size-7" />
                 </div>
-                <h3 className="text-lg font-semibold">{stat.title}</h3>
-                <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
+                <h3 className="text-[13px] font-extrabold uppercase tracking-[.06em]">{stat.title}</h3>
+                <p className="mt-1.5 text-[12px] leading-relaxed text-muted-foreground">
                   {stat.description}
                 </p>
               </div>

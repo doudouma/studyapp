@@ -89,9 +89,9 @@ export function ApiKeyManager() {
   };
 
   return (
-    <div className="rounded-2xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-white dark:bg-[#15243b] p-6">
+    <div className="rounded-2xl border border-[#e3e3e3]/60 dark:border-[#2a2d32] bg-white dark:bg-[#15171a] p-6">
       <h3 className="text-lg font-semibold text-foreground flex items-center gap-2 mb-4">
-        <Key className="size-5 text-[#006c49] dark:text-[#4edea3]" />
+        <Key className="size-5 text-[#111214] dark:text-[#d8ff00]" />
         {t("apikey.title")}
       </h3>
       <p className="text-sm text-muted-foreground mb-4">{t("apikey.desc")}</p>
@@ -104,13 +104,13 @@ export function ApiKeyManager() {
           onChange={(e) => setName(e.target.value)}
           placeholder={t("apikey.namePlaceholder")}
           maxLength={64}
-          className="flex-1 h-10 rounded-xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-background px-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#006c49]/30 dark:focus:ring-[#4edea3]/30"
+          className="flex-1 h-10 rounded-xl border border-[#e3e3e3]/60 dark:border-[#2a2d32] bg-background px-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#111214]/30 dark:focus:ring-[#d8ff00]/30"
           onKeyDown={(e) => e.key === "Enter" && handleCreate()}
         />
         <button
           onClick={handleCreate}
           disabled={creating || !name.trim()}
-          className="h-10 rounded-xl bg-[#006c49] px-4 text-sm font-medium text-white shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)] transition-all hover:bg-[#006c49]/90 active:shadow-[inset_0_-1px_0_rgba(0,0,0,0.2)] disabled:opacity-50 dark:bg-[#4edea3] dark:text-[#002113] dark:hover:bg-[#4edea3]/90"
+          className="h-10 rounded-xl bg-[#111214] px-4 text-sm font-medium text-white shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)] transition-all hover:bg-[#111214]/90 active:shadow-[inset_0_-1px_0_rgba(0,0,0,0.2)] disabled:opacity-50 dark:bg-[#d8ff00] dark:text-[#111214] dark:hover:bg-[#d8ff00]/90"
         >
           {creating ? "..." : t("apikey.generate")}
         </button>
@@ -124,7 +124,7 @@ export function ApiKeyManager() {
             <p className="text-sm font-medium text-amber-800 dark:text-amber-300">{t("apikey.onceWarning")}</p>
           </div>
           <div className="flex items-center gap-2">
-            <code className="flex-1 rounded-lg bg-white dark:bg-[#15243b] border border-amber-200 dark:border-amber-800 px-3 py-2 text-sm font-mono break-all select-all">
+            <code className="flex-1 rounded-lg bg-white dark:bg-[#15171a] border border-amber-200 dark:border-amber-800 px-3 py-2 text-sm font-mono break-all select-all">
               {newKey.key}
             </code>
             <button
@@ -150,7 +150,7 @@ export function ApiKeyManager() {
       {loading ? (
         <div className="space-y-3">
           {[1, 2].map((i) => (
-            <div key={i} className="h-16 animate-pulse rounded-xl bg-[#e5eeff] dark:bg-[#1e314a]" />
+            <div key={i} className="h-16 animate-pulse rounded-xl bg-[#f2f2f2] dark:bg-[#15171a]" />
           ))}
         </div>
       ) : keys.length === 0 ? (
@@ -160,7 +160,7 @@ export function ApiKeyManager() {
           {keys.map((k) => (
             <div
               key={k.id}
-              className="flex items-center justify-between rounded-xl border border-[#d3e4fe]/60 dark:border-[#3c4a42] bg-background px-4 py-3"
+              className="flex items-center justify-between rounded-xl border border-[#e3e3e3]/60 dark:border-[#2a2d32] bg-background px-4 py-3"
             >
               <div className="min-w-0">
                 <div className="flex items-center gap-2">

@@ -214,7 +214,7 @@ function Any2MdPage() {
           {/* Hero */}
           <div className="mb-8">
             <div className="flex items-center gap-2">
-              <FileText className="size-6 text-[#006c49] dark:text-[#4edea3]" />
+              <FileText className="size-6 text-[#111214] dark:text-[#d8ff00]" />
               <h1 className="text-2xl font-bold text-foreground">{t("any2md.heading")}</h1>
             </div>
             <p className="mt-2 text-sm text-muted-foreground">{t("any2md.subtitle")}</p>
@@ -256,8 +256,8 @@ function Any2MdPage() {
             <h2 className="text-center text-2xl font-bold tracking-tight text-foreground">{t("any2md.features")}</h2>
             <div className="mt-8 grid gap-4 sm:grid-cols-2">
               {features.map((f, i) => (
-                <div key={f.title} className={`rounded-2xl border border-[#d3e4fe]/60 bg-white p-5 dark:border-[#3c4a42] dark:bg-[#15243b] ${i === features.length - 1 && features.length % 2 !== 0 ? "sm:col-span-2" : ""}`}>
-                  <div className="flex size-9 items-center justify-center rounded-xl bg-[#006c49]/10 text-[#006c49] dark:bg-[#4edea3]/10 dark:text-[#4edea3]">
+                <div key={f.title} className={`rounded-2xl border border-[#e3e3e3]/60 bg-white p-5 dark:border-[#2a2d32] dark:bg-[#15171a] ${i === features.length - 1 && features.length % 2 !== 0 ? "sm:col-span-2" : ""}`}>
+                  <div className="flex size-9 items-center justify-center rounded-xl bg-[#111214]/10 text-[#111214] dark:bg-[#d8ff00]/10 dark:text-[#d8ff00]">
                     <f.icon className="size-4.5" />
                   </div>
                   <h3 className="mt-3 text-sm font-semibold text-foreground">{f.title}</h3>
@@ -283,11 +283,11 @@ function Any2MdPage() {
           {/* Pain points */}
           <section className="mt-12">
             <h2 className="text-center text-2xl font-bold tracking-tight text-foreground">{t("any2md.pain")}</h2>
-            <div className="mt-6 rounded-2xl border border-[#d3e4fe]/60 bg-white p-6 dark:border-[#3c4a42] dark:bg-[#15243b]">
+            <div className="mt-6 rounded-2xl border border-[#e3e3e3]/60 bg-white p-6 dark:border-[#2a2d32] dark:bg-[#15171a]">
               <ul className="space-y-3">
                 {pains.map((p) => (
                   <li key={p} className="flex items-start gap-3 text-sm leading-relaxed text-muted-foreground">
-                    <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-[#006c49]/10 text-[#006c49] dark:bg-[#4edea3]/10 dark:text-[#4edea3]">
+                    <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-[#111214]/10 text-[#111214] dark:bg-[#d8ff00]/10 dark:text-[#d8ff00]">
                       <Check className="size-3" />
                     </span>
                     {p}
@@ -300,7 +300,7 @@ function Any2MdPage() {
           {/* FAQ */}
           <section className="mt-12">
             <h2 className="text-center text-2xl font-bold tracking-tight text-foreground">{t("any2md.faq")}</h2>
-            <div className="mt-6 rounded-2xl border border-[#d3e4fe]/60 bg-white px-6 shadow-sm dark:border-[#3c4a42] dark:bg-[#15243b]">
+            <div className="mt-6 rounded-2xl border border-[#e3e3e3]/60 bg-white px-6 shadow-sm dark:border-[#2a2d32] dark:bg-[#15171a]">
               {faqs.map((faq) => (
                 <FaqItem key={faq.name} name={faq.name} text={faq.text} />
               ))}
@@ -316,7 +316,7 @@ function Any2MdPage() {
 function FaqItem({ name, text }: { name: string; text: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border-b border-[#d3e4fe]/60 last:border-b-0 dark:border-[#3c4a42]">
+    <div className="border-b border-[#e3e3e3]/60 last:border-b-0 dark:border-[#2a2d32]">
       <button
         className="flex w-full cursor-pointer items-center justify-between gap-4 py-4 text-left text-sm font-medium transition-colors hover:text-foreground/80"
         onClick={() => setOpen(!open)}

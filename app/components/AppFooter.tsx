@@ -4,12 +4,12 @@ import { Code2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const FOOTER_LINK =
-  "text-xs text-muted-foreground transition-colors hover:text-[#006c49] dark:hover:text-[#4edea3]";
+  "text-[11px] text-muted-foreground transition-colors hover:text-[#111214] dark:hover:text-[#d8ff00]";
 
 function FooterGroup({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h2 className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#000000] dark:text-[#e6edf6]">
+      <h2 className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#111214] dark:text-[#ededed]">
         {title}
       </h2>
       <ul className="mt-2 space-y-1.5">{children}</ul>
@@ -29,7 +29,7 @@ function TextLink({ href, label }: { href: string; label: string }) {
       title={label}
       target="_blank"
       rel="sponsored nofollow noopener"
-      className="text-xs text-muted-foreground transition-colors hover:text-[#006c49] dark:hover:text-[#4edea3]"
+      className="text-[11px] text-muted-foreground transition-colors hover:text-[#111214] dark:hover:text-[#d8ff00]"
     >
       {label}
     </a>
@@ -63,7 +63,7 @@ function BadgeLink({
       target="_blank"
       {...(rel ? { rel } : {})}
       style={{ height }}
-      className="inline-flex items-center text-xs text-muted-foreground transition-colors hover:text-[#006c49] dark:hover:text-[#4edea3]"
+      className="inline-flex items-center text-xs text-muted-foreground transition-colors hover:text-[#111214] dark:hover:text-[#d8ff00]"
     >
       {failed ? (
         <span className="inline-flex items-center leading-6" style={{ height }}>{label}</span>
@@ -87,13 +87,13 @@ function BadgeLink({
 export function AppFooter() {
   const { t } = useTranslation();
   return (
-    <footer className="w-full border-t border-[#d3e4fe] dark:border-[#3c4a42] bg-white dark:bg-[#0b1c30]">
+    <footer className="aix-footer w-full border-t border-[#e3e3e3] bg-[#ededed] dark:border-[#2a2d32] dark:bg-[#0c0d0f]">
       <div className="mx-auto w-full max-w-5xl px-6 py-8">
         <div className="grid grid-cols-2 gap-x-8 gap-y-6 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
           <div className="col-span-2 md:col-span-1">
             <Link to="/" className="inline-flex items-center gap-2">
-              <Code2 className="size-4 text-[#006c49] dark:text-[#4edea3]" />
-              <span className="text-sm font-bold text-[#006c49] dark:text-[#4edea3]">100mini</span>
+              <Code2 className="size-4 text-[#111214] dark:text-[#d8ff00]" />
+              <span className="text-[15px] font-extrabold uppercase tracking-[0.16em] text-[#111214] dark:text-[#ededed]">100mini</span>
             </Link>
             <p className="mt-2 max-w-xs text-xs text-muted-foreground">
               {t("footer.tagline")}
@@ -121,7 +121,7 @@ export function AppFooter() {
           </FooterGroup>
         </div>
 
-        <div className="mt-8 border-t border-[#e0e8f5] pt-5 dark:border-[#243244]">
+        <div className="mt-8 border-t border-[#e3e3e3] pt-5 dark:border-[#2a2d32]">
           <p className="text-center text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
             {t("footer.featured")}
           </p>

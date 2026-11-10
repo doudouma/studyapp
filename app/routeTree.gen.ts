@@ -35,6 +35,8 @@ import { Route as ClaudeArtifactToLinkRouteImport } from './routes/claude-artifa
 import { Route as BurnAfterReadingLinkRouteImport } from './routes/burn-after-reading-link'
 import { Route as Any2mdRouteImport } from './routes/any2md'
 import { Route as AlternativesRouteImport } from './routes/alternatives'
+import { Route as AiTierlistStatsRouteImport } from './routes/ai-tierlist-stats'
+import { Route as AiTierlistRouteImport } from './routes/ai-tierlist'
 import { Route as AiSkillsAssessmentRouteImport } from './routes/ai-skills-assessment'
 import { Route as AiBooksRouteImport } from './routes/ai-books'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -178,6 +180,16 @@ const AlternativesRoute = AlternativesRouteImport.update({
   path: '/alternatives',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AiTierlistStatsRoute = AiTierlistStatsRouteImport.update({
+  id: '/ai-tierlist-stats',
+  path: '/ai-tierlist-stats',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AiTierlistRoute = AiTierlistRouteImport.update({
+  id: '/ai-tierlist',
+  path: '/ai-tierlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AiSkillsAssessmentRoute = AiSkillsAssessmentRouteImport.update({
   id: '/ai-skills-assessment',
   path: '/ai-skills-assessment',
@@ -245,6 +257,8 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/ai-books': typeof AiBooksRoute
   '/ai-skills-assessment': typeof AiSkillsAssessmentRoute
+  '/ai-tierlist': typeof AiTierlistRoute
+  '/ai-tierlist-stats': typeof AiTierlistStatsRoute
   '/alternatives': typeof AlternativesRoute
   '/any2md': typeof Any2mdRoute
   '/burn-after-reading-link': typeof BurnAfterReadingLinkRoute
@@ -285,6 +299,8 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/ai-books': typeof AiBooksRoute
   '/ai-skills-assessment': typeof AiSkillsAssessmentRoute
+  '/ai-tierlist': typeof AiTierlistRoute
+  '/ai-tierlist-stats': typeof AiTierlistStatsRoute
   '/alternatives': typeof AlternativesRoute
   '/any2md': typeof Any2mdRoute
   '/burn-after-reading-link': typeof BurnAfterReadingLinkRoute
@@ -326,6 +342,8 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/ai-books': typeof AiBooksRoute
   '/ai-skills-assessment': typeof AiSkillsAssessmentRoute
+  '/ai-tierlist': typeof AiTierlistRoute
+  '/ai-tierlist-stats': typeof AiTierlistStatsRoute
   '/alternatives': typeof AlternativesRoute
   '/any2md': typeof Any2mdRoute
   '/burn-after-reading-link': typeof BurnAfterReadingLinkRoute
@@ -368,6 +386,8 @@ export interface FileRouteTypes {
     | '/admin'
     | '/ai-books'
     | '/ai-skills-assessment'
+    | '/ai-tierlist'
+    | '/ai-tierlist-stats'
     | '/alternatives'
     | '/any2md'
     | '/burn-after-reading-link'
@@ -408,6 +428,8 @@ export interface FileRouteTypes {
     | '/admin'
     | '/ai-books'
     | '/ai-skills-assessment'
+    | '/ai-tierlist'
+    | '/ai-tierlist-stats'
     | '/alternatives'
     | '/any2md'
     | '/burn-after-reading-link'
@@ -448,6 +470,8 @@ export interface FileRouteTypes {
     | '/admin'
     | '/ai-books'
     | '/ai-skills-assessment'
+    | '/ai-tierlist'
+    | '/ai-tierlist-stats'
     | '/alternatives'
     | '/any2md'
     | '/burn-after-reading-link'
@@ -489,6 +513,8 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AiBooksRoute: typeof AiBooksRoute
   AiSkillsAssessmentRoute: typeof AiSkillsAssessmentRoute
+  AiTierlistRoute: typeof AiTierlistRoute
+  AiTierlistStatsRoute: typeof AiTierlistStatsRoute
   AlternativesRoute: typeof AlternativesRoute
   Any2mdRoute: typeof Any2mdRoute
   BurnAfterReadingLinkRoute: typeof BurnAfterReadingLinkRoute
@@ -708,6 +734,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AlternativesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ai-tierlist-stats': {
+      id: '/ai-tierlist-stats'
+      path: '/ai-tierlist-stats'
+      fullPath: '/ai-tierlist-stats'
+      preLoaderRoute: typeof AiTierlistStatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ai-tierlist': {
+      id: '/ai-tierlist'
+      path: '/ai-tierlist'
+      fullPath: '/ai-tierlist'
+      preLoaderRoute: typeof AiTierlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ai-skills-assessment': {
       id: '/ai-skills-assessment'
       path: '/ai-skills-assessment'
@@ -801,6 +841,8 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AiBooksRoute: AiBooksRoute,
   AiSkillsAssessmentRoute: AiSkillsAssessmentRoute,
+  AiTierlistRoute: AiTierlistRoute,
+  AiTierlistStatsRoute: AiTierlistStatsRoute,
   AlternativesRoute: AlternativesRoute,
   Any2mdRoute: Any2mdRoute,
   BurnAfterReadingLinkRoute: BurnAfterReadingLinkRoute,

@@ -8,6 +8,7 @@ import { StatsSection } from "~/components/StatsSection";
 import { GuideSection } from "~/components/GuideSection";
 import { AgentSection } from "~/components/AgentSection";
 import { AppFooter } from "~/components/AppFooter";
+import { AIX_CSS } from "~/components/aix/aix-styles";
 import { Card, CardContent } from "~/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "~/components/ui/dialog";
 
@@ -199,7 +200,7 @@ function UploadForm({
                 <p
                   className={`mt-1 text-xs ${
                     slugStatus === "ok"
-                      ? "text-[#006c49] dark:text-[#4edea3]"
+                      ? "text-[#111214] dark:text-[#d8ff00]"
                       : slugStatus === "checking"
                         ? "text-muted-foreground"
                         : "text-destructive"
@@ -274,36 +275,36 @@ function UploadForm({
                 <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">{t("home.upsell.anonymousExpiry")}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Infinity className="size-3.5 text-[#006c49] dark:text-[#4edea3]" />
-                <span className="text-xs text-[#006c49] dark:text-[#4edea3] font-medium">{t("home.upsell.permanent")}</span>
+                <Infinity className="size-3.5 text-[#111214] dark:text-[#d8ff00]" />
+                <span className="text-xs text-[#111214] dark:text-[#d8ff00] font-medium">{t("home.upsell.permanent")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">{t("home.upsell.noTitle")}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Tags className="size-3.5 text-[#006c49] dark:text-[#4edea3]" />
-                <span className="text-xs text-[#006c49] dark:text-[#4edea3] font-medium">{t("home.upsell.withTitle")}</span>
+                <Tags className="size-3.5 text-[#111214] dark:text-[#d8ff00]" />
+                <span className="text-xs text-[#111214] dark:text-[#d8ff00] font-medium">{t("home.upsell.withTitle")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">{t("home.upsell.noShare")}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Share2 className="size-3.5 text-[#006c49] dark:text-[#4edea3]" />
-                <span className="text-xs text-[#006c49] dark:text-[#4edea3] font-medium">{t("home.upsell.canShare")}</span>
+                <Share2 className="size-3.5 text-[#111214] dark:text-[#d8ff00]" />
+                <span className="text-xs text-[#111214] dark:text-[#d8ff00] font-medium">{t("home.upsell.canShare")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">{t("home.upsell.noManage")}</span>
               </div>
               <div className="flex items-center gap-2">
-                <List className="size-3.5 text-[#006c49] dark:text-[#4edea3]" />
-                <span className="text-xs text-[#006c49] dark:text-[#4edea3] font-medium">{t("home.upsell.canManage")}</span>
+                <List className="size-3.5 text-[#111214] dark:text-[#d8ff00]" />
+                <span className="text-xs text-[#111214] dark:text-[#d8ff00] font-medium">{t("home.upsell.canManage")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">{t("home.upsell.anonFixedExpiry")}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Flame className="size-3.5 text-[#006c49] dark:text-[#4edea3]" />
-                <span className="text-xs text-[#006c49] dark:text-[#4edea3] font-medium">{t("home.upsell.userExpiry")}</span>
+                <Flame className="size-3.5 text-[#111214] dark:text-[#d8ff00]" />
+                <span className="text-xs text-[#111214] dark:text-[#d8ff00] font-medium">{t("home.upsell.userExpiry")}</span>
               </div>
             </div>
           </div>
@@ -327,43 +328,201 @@ function UploadForm({
   );
 }
 
+const HOME_CSS = `
+.aix-home{padding:26px 20px 44px}
+.aix-home .rounded-xl,.aix-home .rounded-2xl,.aix-home .rounded-lg,.aix-home .rounded-md{border-radius:2px}
+.aix-home .bg-card{background:var(--aix-paper)}
+.aix-home .bg-background{background:var(--aix-paper)}
+.aix-home .bg-muted{background:var(--aix-grey)}
+.aix-home .bg-white{background:var(--aix-paper)}
+.aix-home .border-border,.aix-home .border-input{border-color:var(--aix-line)}
+.aix-home .text-muted-foreground{color:var(--aix-mute)}
+.aix-home .text-primary{color:var(--aix-ink)}
+.aix-home .bg-primary{background:#111214;color:var(--aix-lime)}
+.aix-home .text-primary-foreground{color:var(--aix-lime)}
+.aix-home .accent-primary{accent-color:#111214}
+.aix-home .shadow-sm,.aix-home .shadow-md,.aix-home .shadow-lg{box-shadow:none}
+.aix-home input,.aix-home textarea,.aix-home select,.aix-home button{border-radius:2px}
+.aix-cta-btn{
+  display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 18px;
+  border:1px solid var(--aix-line);background:var(--aix-paper);color:var(--aix-ink);
+  font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  border-radius:2px;text-decoration:none;cursor:pointer;transition:.15s;
+}
+.aix-cta-btn:hover{border-color:var(--aix-ink);background:var(--aix-grey)}
+.aix-cta-btn.primary{background:#111214;color:var(--aix-lime);border-color:#111214}
+.aix-cta-btn.primary:hover{background:var(--aix-lime);color:#111214;border-color:var(--aix-lime)}
+
+/* hero */
+.aix-hero-stage{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(20px,3.4vw,48px);align-items:stretch}
+.aix-hero-left{display:flex;flex-direction:column;gap:clamp(20px,3vw,34px);min-width:0}
+.aix-hero-h1{margin:0;font-size:clamp(36px,5.2vw,68px);line-height:.98;font-weight:800;letter-spacing:-.045em;text-transform:uppercase;text-wrap:balance;word-break:keep-all}
+.aix-hero-sub{margin:18px 0 0;max-width:52ch;font-size:13px;line-height:1.65;color:var(--aix-mute)}
+.aix-hero-ctas{display:flex;flex-wrap:wrap;gap:8px}
+.aix-hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:auto}
+.aix-stat{border:1px solid var(--aix-line);background:var(--aix-grey);border-radius:2px;padding:14px 14px 12px;display:flex;flex-direction:column;gap:7px;min-width:0}
+.aix-stat b{font-size:clamp(26px,3.4vw,40px);line-height:1;letter-spacing:-.05em;font-weight:800}
+.aix-stat b em{font-style:normal;font-size:.42em;font-weight:700;letter-spacing:0;margin-left:2px;vertical-align:super}
+.aix-stat > span{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--aix-mute)}
+.aix-stat.lime{background:var(--aix-lime);border-color:var(--aix-lime)}
+.aix-stat.lime > span{color:#111214}
+.aix-stat.ink{background:#111214;border-color:#111214;color:var(--aix-lime)}
+.aix-stat.ink > span{color:#a5a5a5}
+
+.aix-hero-visual{
+  position:relative;min-height:clamp(320px,38vw,460px);border:1px solid var(--aix-line);
+  background:var(--aix-grey);border-radius:2px;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;padding:clamp(16px,3vw,36px);
+}
+.aix-hero-contour{
+  position:absolute;inset:-20%;
+  background-image:repeating-radial-gradient(circle at 78% 44%, transparent 0 30px, rgba(17,18,20,.07) 30px 31px);
+  pointer-events:none;
+}
+.dark .aix-hero-contour{background-image:repeating-radial-gradient(circle at 78% 44%, transparent 0 30px, rgba(255,255,255,.07) 30px 31px)}
+.aix-hero-browser{
+  position:relative;z-index:2;width:100%;max-width:420px;background:var(--aix-paper);
+  border:1px solid var(--aix-ink);border-radius:2px;
+  box-shadow:12px 12px 0 rgba(17,18,20,.10);transform:rotate(-1.2deg);
+  transition:transform .4s ease,box-shadow .4s ease;
+}
+.aix-hero-browser:hover{transform:rotate(0) translateY(-3px);box-shadow:14px 17px 0 rgba(17,18,20,.12)}
+.dark .aix-hero-browser{box-shadow:12px 12px 0 rgba(255,255,255,.06)}
+.dark .aix-hero-browser:hover{box-shadow:14px 17px 0 rgba(255,255,255,.08)}
+.aix-hero-browser .bar{display:flex;align-items:center;gap:5px;height:34px;padding:0 10px;border-bottom:1px solid var(--aix-line);background:var(--aix-grey2)}
+.aix-hero-browser .bar i{width:7px;height:7px;border-radius:50%;background:#cfcfcf;border:1px solid #b5b5b5;flex:none}
+.aix-hero-browser .bar i:first-child{background:var(--aix-lime);border-color:#111214}
+.aix-hero-browser .url{margin-left:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:8px;letter-spacing:.02em;color:var(--aix-mute);background:var(--aix-paper);border:1px solid var(--aix-line);border-radius:2px;padding:3px 7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:62%}
+.aix-hero-browser .url b{color:var(--aix-ink);font-weight:700}
+.aix-hero-browser .screen{padding:14px}
+.aix-hero-browser .sl{height:7px;background:var(--aix-grey2);border-radius:2px;margin-bottom:8px}
+.aix-hero-browser .sl.w88{width:88%}
+.aix-hero-browser .sl.w62{width:62%}
+.aix-hero-browser .sl.w45{width:45%}
+.aix-hero-browser .code{margin:12px 0;background:#111214;border-radius:2px;padding:12px;display:flex;flex-direction:column;gap:6px;position:relative}
+.aix-hero-browser .code::after{content:"</>";position:absolute;right:9px;top:7px;font-size:8px;letter-spacing:.08em;color:#5c5c5c}
+.aix-hero-browser .code i{height:5px;border-radius:1px;background:#3a3a3a;display:block}
+.aix-hero-browser .code i:nth-child(1){width:52%;background:var(--aix-lime)}
+.aix-hero-browser .code i:nth-child(2){width:78%}
+.aix-hero-browser .code i:nth-child(3){width:64%;background:#8f8f8f}
+.aix-hero-browser .code i:nth-child(4){width:38%;background:var(--aix-lime);opacity:.55}
+.aix-hero-browser .chips{display:flex;gap:5px;margin-top:10px}
+.aix-hero-browser .chips i{height:12px;width:34px;background:var(--aix-grey);border:1px solid var(--aix-line);border-radius:2px}
+.aix-hero-browser .chips i:first-child{background:var(--aix-lime);border-color:#111214}
+.aix-hero-badge{
+  position:absolute;left:clamp(14px,3vw,28px);bottom:clamp(14px,3vw,28px);z-index:3;
+  background:var(--aix-lime);border:1px solid #111214;padding:8px 12px;
+  font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#111214;
+}
+.aix-hero-corner{position:absolute;right:16px;top:16px;width:10px;height:10px;border-radius:50%;background:var(--aix-lime);border:1px solid #111214;z-index:3}
+@media(max-width:900px){
+  .aix-hero-stage{grid-template-columns:1fr}
+  .aix-hero-visual{min-height:300px}
+}
+@media(max-width:520px){
+  .aix-hero-stats{grid-template-columns:1fr 1fr}
+  .aix-stat:last-child{grid-column:span 2}
+}
+`;
+
 function HeroSection({ onUpload, onBrowse }: { onUpload: () => void; onBrowse: () => void }) {
   const { t } = useTranslation();
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-[#006c49]/10 via-[#006c49]/[0.02] to-background dark:from-[#4edea3]/10 dark:via-[#4edea3]/[0.02] dark:to-background pb-12 pt-20 md:pt-28">
-      <div className="mx-auto max-w-4xl px-6 text-center">
-        <h1 className="text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-[52px] lg:leading-[1.15]">
-          {t("home.hero.title")}
-        </h1>
-        <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground leading-relaxed md:text-xl">
-          {t("home.hero.subtitle")}
-        </p>
-        <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-          <Button
-            size="lg"
-            className="gap-2 h-11 px-6 text-base rounded-xl"
-            onClick={onUpload}
-          >
-            {t("home.hero.cta1")}
-            <ArrowDown className="size-4" />
-          </Button>
-          <a
-            href="https://chromewebstore.google.com/detail/dmmhkdcmifenlihbbhihkagnebgiekep?utm_source=item-share-cb"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 h-11 px-6 text-base rounded-xl border border-border bg-background hover:bg-muted hover:text-foreground transition-all"
-          >
-            <Puzzle className="size-4" />
-            {t("home.hero.chromeExtension")}
-          </a>
-          <Button
-            variant="outline"
-            size="lg"
-            className="text-base h-11 px-6 rounded-xl"
-            onClick={onBrowse}
-          >
-            {t("home.hero.cta2")}
-          </Button>
+    <section className="aix-frame aix-hero" style={{ marginTop: 0 }}>
+      <div className="aix-mininav">
+        <span className="brand">
+          <span className="dot" />
+          100MINI / HTML
+        </span>
+        <a href="#upload">
+          {t("home.hero.cta1")}
+          <ArrowDown className="size-3.5" />
+        </a>
+      </div>
+
+      <div className="aix-hero-stage">
+        <div className="aix-hero-left">
+          <div>
+            <div className="aix-topline">
+              <span className="aix-pill lime">
+                <span className="dot" />
+                HTML HOSTING / 2026
+              </span>
+            </div>
+            <h1 className="aix-hero-h1">{t("home.hero.title")}</h1>
+            <p className="aix-hero-sub">{t("home.hero.subtitle")}</p>
+          </div>
+
+          <div className="aix-hero-ctas">
+            <button type="button" className="aix-cta-btn primary" onClick={onUpload}>
+              {t("home.hero.cta1")}
+              <ArrowDown className="size-4" />
+            </button>
+            <a
+              href="https://chromewebstore.google.com/detail/dmmhkdcmifenlihbbhihkagnebgiekep?utm_source=item-share-cb"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="aix-cta-btn"
+            >
+              <Puzzle className="size-4" />
+              {t("home.hero.chromeExtension")}
+            </a>
+            <button type="button" className="aix-cta-btn" onClick={onBrowse}>
+              {t("home.hero.cta2")}
+            </button>
+          </div>
+
+          <div className="aix-hero-stats">
+            <div className="aix-stat">
+              <b>
+                30<em>s</em>
+              </b>
+              <span>{t("home.hero.stat1Label")}</span>
+            </div>
+            <div className="aix-stat lime">
+              <b>0</b>
+              <span>{t("home.hero.stat2Label")}</span>
+            </div>
+            <div className="aix-stat ink">
+              <b>
+                7<em>d</em>
+              </b>
+              <span>{t("home.hero.stat3Label")}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="aix-hero-visual" aria-hidden="true">
+          <div className="aix-hero-contour" />
+          <div className="aix-hero-browser">
+            <div className="bar">
+              <i />
+              <i />
+              <i />
+              <span className="url">
+                100mini.com/<b>your-page</b>
+              </span>
+            </div>
+            <div className="screen">
+              <div className="sl w88" />
+              <div className="sl w62" />
+              <div className="code">
+                <i />
+                <i />
+                <i />
+                <i />
+              </div>
+              <div className="sl w88" />
+              <div className="sl w45" />
+              <div className="chips">
+                <i />
+                <i />
+                <i />
+              </div>
+            </div>
+          </div>
+          <span className="aix-hero-badge">HTML → LINK</span>
+          <span className="aix-hero-corner" />
         </div>
       </div>
     </section>
@@ -531,20 +690,25 @@ function HomePage() {
 
   if (result) {
     return (
-      <div className="flex min-h-screen flex-col">
+      <div className="flex min-h-screen flex-col bg-[#ededed] dark:bg-[#0c0d0f]">
         <MemoAppNav />
         <main className="flex flex-1 flex-col items-center justify-center p-8">
-          <SuccessCard
-            url={result.url}
-            expiresAt={result.expiresAt || undefined}
-            isPermanent={result.isPermanent}
-            pageId={result.id}
-            onReset={handleReset}
-            user={user}
-            shareToSquare={result.isSharedToSquare}
-            maxViews={result.maxViews}
-            isOneTime={result.isOneTime}
-          />
+          <div className="aix aix-home w-full" style={{ padding: 0 }}>
+            <style dangerouslySetInnerHTML={{ __html: AIX_CSS + HOME_CSS }} />
+            <div className="aix-frame" style={{ maxWidth: 560, margin: "0 auto" }}>
+              <SuccessCard
+                url={result.url}
+                expiresAt={result.expiresAt || undefined}
+                isPermanent={result.isPermanent}
+                pageId={result.id}
+                onReset={handleReset}
+                user={user}
+                shareToSquare={result.isSharedToSquare}
+                maxViews={result.maxViews}
+                isOneTime={result.isOneTime}
+              />
+            </div>
+          </div>
         </main>
         <MemoAppFooter />
       </div>
@@ -552,22 +716,24 @@ function HomePage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-[#ededed] dark:bg-[#0c0d0f]">
       <MemoAppNav />
       <main className="flex-1">
-        <MemoHero onUpload={scrollToUpload} onBrowse={browseSquare} />
+        <div className="aix aix-home">
+          <style dangerouslySetInnerHTML={{ __html: AIX_CSS + HOME_CSS }} />
+          <MemoHero onUpload={scrollToUpload} onBrowse={browseSquare} />
 
-        {/* Upload area */}
-        <section
-          ref={uploadRef}
-          className="scroll-mt-24 mx-auto max-w-2xl px-6 pb-8 -mt-8 relative z-10"
-        >
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold tracking-tight">{t("home.section.upload")}</h2>
-            <p className="mt-2 text-base text-muted-foreground">
-              {t("home.section.uploadDesc")}
-            </p>
-          </div>
+          {/* Upload area */}
+          <section id="upload" ref={uploadRef} className="aix-frame" style={{ scrollMarginTop: 84 }}>
+            <div className="aix-sec-head">
+              <div>
+                <div className="aix-section-num">01</div>
+                <h2 className="aix-sec-title">{t("home.section.upload")}</h2>
+              </div>
+              <span className="aix-dot-sm" />
+            </div>
+            <p className="aix-body" style={{ marginBottom: 18 }}>{t("home.section.uploadDesc")}</p>
+            <div className="mx-auto max-w-2xl">
           <UploadForm
             mode={mode}
             setMode={setMode}
@@ -598,12 +764,13 @@ function HomePage() {
             maxBytes={maxBytes}
             sizeFee={sizeFee}
           />
-        </section>
+            </div>
+          </section>
 
-        <AgentSection />
-
-        <MemoStatsSection />
-        <MemoGuideSection />
+          <div className="aix-frame"><AgentSection /></div>
+          <div className="aix-frame"><MemoStatsSection /></div>
+          <div className="aix-frame"><MemoGuideSection /></div>
+        </div>
       </main>
       <MemoAppFooter />
 
