@@ -165,7 +165,7 @@ function AiTierListStatsPage() {
       <AppNav />
       <main className="flex-1">
         <div className="aix">
-          <style>{AIX_CSS}{STATS_CSS}</style>
+          <style dangerouslySetInnerHTML={{ __html: AIX_CSS + STATS_CSS }} />
 
           {/* 01 CATEGORY */}
           <section className="aix-frame">

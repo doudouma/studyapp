@@ -414,7 +414,7 @@ function FreeLibraryPage() {
       <AppNav />
       <main className="flex-1">
         <div className="aix">
-          <style>{AIX_CSS}{BOOKS_CSS}{FREE_CSS}</style>
+          <style dangerouslySetInnerHTML={{ __html: AIX_CSS + BOOKS_CSS + FREE_CSS }} />
 
           {/* CATALOG */}
           <section className="aix-frame">

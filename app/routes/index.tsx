@@ -352,12 +352,83 @@ const HOME_CSS = `
 .aix-cta-btn:hover{border-color:var(--aix-ink);background:var(--aix-grey)}
 .aix-cta-btn.primary{background:#111214;color:var(--aix-lime);border-color:#111214}
 .aix-cta-btn.primary:hover{background:var(--aix-lime);color:#111214;border-color:var(--aix-lime)}
+
+/* hero */
+.aix-hero-stage{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(20px,3.4vw,48px);align-items:stretch}
+.aix-hero-left{display:flex;flex-direction:column;gap:clamp(20px,3vw,34px);min-width:0}
+.aix-hero-h1{margin:0;font-size:clamp(36px,5.2vw,68px);line-height:.98;font-weight:800;letter-spacing:-.045em;text-transform:uppercase;text-wrap:balance;word-break:keep-all}
+.aix-hero-sub{margin:18px 0 0;max-width:52ch;font-size:13px;line-height:1.65;color:var(--aix-mute)}
+.aix-hero-ctas{display:flex;flex-wrap:wrap;gap:8px}
+.aix-hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:auto}
+.aix-stat{border:1px solid var(--aix-line);background:var(--aix-grey);border-radius:2px;padding:14px 14px 12px;display:flex;flex-direction:column;gap:7px;min-width:0}
+.aix-stat b{font-size:clamp(26px,3.4vw,40px);line-height:1;letter-spacing:-.05em;font-weight:800}
+.aix-stat b em{font-style:normal;font-size:.42em;font-weight:700;letter-spacing:0;margin-left:2px;vertical-align:super}
+.aix-stat > span{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--aix-mute)}
+.aix-stat.lime{background:var(--aix-lime);border-color:var(--aix-lime)}
+.aix-stat.lime > span{color:#111214}
+.aix-stat.ink{background:#111214;border-color:#111214;color:var(--aix-lime)}
+.aix-stat.ink > span{color:#a5a5a5}
+
+.aix-hero-visual{
+  position:relative;min-height:clamp(320px,38vw,460px);border:1px solid var(--aix-line);
+  background:var(--aix-grey);border-radius:2px;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;padding:clamp(16px,3vw,36px);
+}
+.aix-hero-contour{
+  position:absolute;inset:-20%;
+  background-image:repeating-radial-gradient(circle at 78% 44%, transparent 0 30px, rgba(17,18,20,.07) 30px 31px);
+  pointer-events:none;
+}
+.dark .aix-hero-contour{background-image:repeating-radial-gradient(circle at 78% 44%, transparent 0 30px, rgba(255,255,255,.07) 30px 31px)}
+.aix-hero-browser{
+  position:relative;z-index:2;width:100%;max-width:420px;background:var(--aix-paper);
+  border:1px solid var(--aix-ink);border-radius:2px;
+  box-shadow:12px 12px 0 rgba(17,18,20,.10);transform:rotate(-1.2deg);
+  transition:transform .4s ease,box-shadow .4s ease;
+}
+.aix-hero-browser:hover{transform:rotate(0) translateY(-3px);box-shadow:14px 17px 0 rgba(17,18,20,.12)}
+.dark .aix-hero-browser{box-shadow:12px 12px 0 rgba(255,255,255,.06)}
+.dark .aix-hero-browser:hover{box-shadow:14px 17px 0 rgba(255,255,255,.08)}
+.aix-hero-browser .bar{display:flex;align-items:center;gap:5px;height:34px;padding:0 10px;border-bottom:1px solid var(--aix-line);background:var(--aix-grey2)}
+.aix-hero-browser .bar i{width:7px;height:7px;border-radius:50%;background:#cfcfcf;border:1px solid #b5b5b5;flex:none}
+.aix-hero-browser .bar i:first-child{background:var(--aix-lime);border-color:#111214}
+.aix-hero-browser .url{margin-left:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:8px;letter-spacing:.02em;color:var(--aix-mute);background:var(--aix-paper);border:1px solid var(--aix-line);border-radius:2px;padding:3px 7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:62%}
+.aix-hero-browser .url b{color:var(--aix-ink);font-weight:700}
+.aix-hero-browser .screen{padding:14px}
+.aix-hero-browser .sl{height:7px;background:var(--aix-grey2);border-radius:2px;margin-bottom:8px}
+.aix-hero-browser .sl.w88{width:88%}
+.aix-hero-browser .sl.w62{width:62%}
+.aix-hero-browser .sl.w45{width:45%}
+.aix-hero-browser .code{margin:12px 0;background:#111214;border-radius:2px;padding:12px;display:flex;flex-direction:column;gap:6px;position:relative}
+.aix-hero-browser .code::after{content:"</>";position:absolute;right:9px;top:7px;font-size:8px;letter-spacing:.08em;color:#5c5c5c}
+.aix-hero-browser .code i{height:5px;border-radius:1px;background:#3a3a3a;display:block}
+.aix-hero-browser .code i:nth-child(1){width:52%;background:var(--aix-lime)}
+.aix-hero-browser .code i:nth-child(2){width:78%}
+.aix-hero-browser .code i:nth-child(3){width:64%;background:#8f8f8f}
+.aix-hero-browser .code i:nth-child(4){width:38%;background:var(--aix-lime);opacity:.55}
+.aix-hero-browser .chips{display:flex;gap:5px;margin-top:10px}
+.aix-hero-browser .chips i{height:12px;width:34px;background:var(--aix-grey);border:1px solid var(--aix-line);border-radius:2px}
+.aix-hero-browser .chips i:first-child{background:var(--aix-lime);border-color:#111214}
+.aix-hero-badge{
+  position:absolute;left:clamp(14px,3vw,28px);bottom:clamp(14px,3vw,28px);z-index:3;
+  background:var(--aix-lime);border:1px solid #111214;padding:8px 12px;
+  font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#111214;
+}
+.aix-hero-corner{position:absolute;right:16px;top:16px;width:10px;height:10px;border-radius:50%;background:var(--aix-lime);border:1px solid #111214;z-index:3}
+@media(max-width:900px){
+  .aix-hero-stage{grid-template-columns:1fr}
+  .aix-hero-visual{min-height:300px}
+}
+@media(max-width:520px){
+  .aix-hero-stats{grid-template-columns:1fr 1fr}
+  .aix-stat:last-child{grid-column:span 2}
+}
 `;
 
 function HeroSection({ onUpload, onBrowse }: { onUpload: () => void; onBrowse: () => void }) {
   const { t } = useTranslation();
   return (
-    <section className="aix-frame" style={{ marginTop: 0 }}>
+    <section className="aix-frame aix-hero" style={{ marginTop: 0 }}>
       <div className="aix-mininav">
         <span className="brand">
           <span className="dot" />
@@ -369,36 +440,90 @@ function HeroSection({ onUpload, onBrowse }: { onUpload: () => void; onBrowse: (
         </a>
       </div>
 
-      <div className="aix-lead" style={{ borderBottom: 0, marginBottom: 0, paddingBottom: 0 }}>
-        <div>
-          <div className="aix-topline">
-            <span className="aix-pill lime">
-              <span className="dot" />
-              HTML HOSTING / 2026
-            </span>
+      <div className="aix-hero-stage">
+        <div className="aix-hero-left">
+          <div>
+            <div className="aix-topline">
+              <span className="aix-pill lime">
+                <span className="dot" />
+                HTML HOSTING / 2026
+              </span>
+            </div>
+            <h1 className="aix-hero-h1">{t("home.hero.title")}</h1>
+            <p className="aix-hero-sub">{t("home.hero.subtitle")}</p>
           </div>
-          <h1>{t("home.hero.title")}</h1>
-          <p>{t("home.hero.subtitle")}</p>
-        </div>
-      </div>
 
-      <div className="mt-7 flex flex-wrap gap-2">
-        <button type="button" className="aix-cta-btn primary" onClick={onUpload}>
-          {t("home.hero.cta1")}
-          <ArrowDown className="size-4" />
-        </button>
-        <a
-          href="https://chromewebstore.google.com/detail/dmmhkdcmifenlihbbhihkagnebgiekep?utm_source=item-share-cb"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="aix-cta-btn"
-        >
-          <Puzzle className="size-4" />
-          {t("home.hero.chromeExtension")}
-        </a>
-        <button type="button" className="aix-cta-btn" onClick={onBrowse}>
-          {t("home.hero.cta2")}
-        </button>
+          <div className="aix-hero-ctas">
+            <button type="button" className="aix-cta-btn primary" onClick={onUpload}>
+              {t("home.hero.cta1")}
+              <ArrowDown className="size-4" />
+            </button>
+            <a
+              href="https://chromewebstore.google.com/detail/dmmhkdcmifenlihbbhihkagnebgiekep?utm_source=item-share-cb"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="aix-cta-btn"
+            >
+              <Puzzle className="size-4" />
+              {t("home.hero.chromeExtension")}
+            </a>
+            <button type="button" className="aix-cta-btn" onClick={onBrowse}>
+              {t("home.hero.cta2")}
+            </button>
+          </div>
+
+          <div className="aix-hero-stats">
+            <div className="aix-stat">
+              <b>
+                30<em>s</em>
+              </b>
+              <span>{t("home.hero.stat1Label")}</span>
+            </div>
+            <div className="aix-stat lime">
+              <b>0</b>
+              <span>{t("home.hero.stat2Label")}</span>
+            </div>
+            <div className="aix-stat ink">
+              <b>
+                7<em>d</em>
+              </b>
+              <span>{t("home.hero.stat3Label")}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="aix-hero-visual" aria-hidden="true">
+          <div className="aix-hero-contour" />
+          <div className="aix-hero-browser">
+            <div className="bar">
+              <i />
+              <i />
+              <i />
+              <span className="url">
+                100mini.com/<b>your-page</b>
+              </span>
+            </div>
+            <div className="screen">
+              <div className="sl w88" />
+              <div className="sl w62" />
+              <div className="code">
+                <i />
+                <i />
+                <i />
+                <i />
+              </div>
+              <div className="sl w88" />
+              <div className="sl w45" />
+              <div className="chips">
+                <i />
+                <i />
+                <i />
+              </div>
+            </div>
+          </div>
+          <span className="aix-hero-badge">HTML → LINK</span>
+          <span className="aix-hero-corner" />
+        </div>
       </div>
     </section>
   );
@@ -569,7 +694,7 @@ function HomePage() {
         <MemoAppNav />
         <main className="flex flex-1 flex-col items-center justify-center p-8">
           <div className="aix aix-home w-full" style={{ padding: 0 }}>
-            <style>{AIX_CSS}{HOME_CSS}</style>
+            <style dangerouslySetInnerHTML={{ __html: AIX_CSS + HOME_CSS }} />
             <div className="aix-frame" style={{ maxWidth: 560, margin: "0 auto" }}>
               <SuccessCard
                 url={result.url}
@@ -595,7 +720,7 @@ function HomePage() {
       <MemoAppNav />
       <main className="flex-1">
         <div className="aix aix-home">
-          <style>{AIX_CSS}{HOME_CSS}</style>
+          <style dangerouslySetInnerHTML={{ __html: AIX_CSS + HOME_CSS }} />
           <MemoHero onUpload={scrollToUpload} onBrowse={browseSquare} />
 
           {/* Upload area */}

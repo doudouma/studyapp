@@ -168,7 +168,7 @@ function AiBookProgrammaticPage() {
       <AppNav />
       <main className="flex-1">
         <div className="aix">
-          <style>{AIX_CSS}{BOOKS_CSS}{SLUG_CSS}</style>
+          <style dangerouslySetInnerHTML={{ __html: AIX_CSS + BOOKS_CSS + SLUG_CSS }} />
 
           {/* BOOKS */}
           <section className="aix-frame">

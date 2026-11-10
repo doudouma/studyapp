@@ -200,13 +200,19 @@ const CSS = `
 }
 .tl-tier-label{
   width:148px; flex:none; display:flex; flex-direction:column; justify-content:center;
-  padding:12px 14px; border-right:1px solid rgba(0,0,0,.14);
+  padding:12px 40px 12px 14px; border-right:1px solid rgba(0,0,0,.14);
   color:#fff; position:relative; cursor:pointer;
 }
 .dark .tlw .tl-tier-label{border-right-color:rgba(255,255,255,.16)}
 .tl-tier-label .tname{font-size:20px; font-weight:900; line-height:1.1; letter-spacing:-.02em; text-transform:uppercase}
 .tl-tier-label .ten{font-size:11px; opacity:.85; font-weight:600; letter-spacing:.4px; text-transform:uppercase; margin-top:3px}
-.tl-tier-label .edit{position:absolute; top:8px; right:8px; font-size:11px; opacity:.7}
+.tl-tier-label .tl-edit-btn{
+  position:absolute; top:6px; right:6px; width:26px; height:26px; border-radius:8px;
+  border:1px solid rgba(255,255,255,.38); background:rgba(0,0,0,.18); color:#fff;
+  font-size:12px; line-height:1; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; opacity:.85; transition:.15s;
+}
+.tl-tier-label .tl-edit-btn:hover{opacity:1; background:rgba(0,0,0,.34)}
 .tl-tier-body{
   flex:1; padding:12px; display:flex; flex-wrap:wrap; gap:10px; align-content:flex-start;
   background-color:var(--panel);
@@ -304,7 +310,7 @@ const CSS = `
 }
 @media(max-width:640px){
   .tl-tier{flex-direction:column}
-  .tl-tier-label{width:100%; flex-direction:row; align-items:center; gap:10px; padding:10px 14px}
+  .tl-tier-label{width:100%; flex-direction:row; align-items:center; gap:10px; padding:10px 44px 10px 14px}
   .tl-tier-label .ten{margin-top:0}
   .tl-doc-title{min-width:120px; max-width:40vw}
   .tl-search{margin-left:0; width:100%}
@@ -530,7 +536,8 @@ export function TierListMaker() {
       const row = b.tiers.find((x) => x.id === tierId);
       if (!row) return;
       if (label) row.label = label;
-      if (en) row.en = en;
+      // 副标题允许清空（直接赋值，不做真值判断）
+      row.en = en;
       if (color) row.color = color;
     });
     setTierModalId(null);
@@ -778,7 +785,18 @@ export function TierListMaker() {
             >
               <div className="tname">{tier.label}</div>
               <div className="ten">{tier.en}</div>
-              <div className="edit">✎</div>
+              <button
+                type="button"
+                className="tl-edit-btn"
+                aria-label={t("aiTierlist.ui.editTier")}
+                title={t("aiTierlist.ui.editTier")}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  editTier(tier.id);
+                }}
+              >
+                ✎
+              </button>
             </div>
             <div
               className={`tl-tier-body${dragOver === tier.id ? " dragover" : ""}`}

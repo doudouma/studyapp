@@ -10,13 +10,16 @@ export const AIX_CSS = `
   --aix-bg:#ededed; --aix-paper:#ffffff; --aix-ink:#111214; --aix-lime:#d8ff00;
   --aix-grey:#f2f2f2; --aix-grey2:#e9e9e9; --aix-mute:#6f6f6f; --aix-line:#e3e3e3;
   --aix-pad:clamp(18px,3.2vw,44px);
-  background:var(--aix-bg); color:var(--aix-ink);
+  background-color:var(--aix-bg); color:var(--aix-ink);
+  background-image:radial-gradient(circle, oklch(0.556 0 0 / 0.32) 1px, transparent 1px);
+  background-size:20px 20px;
   font-feature-settings:"tnum" 1;
   padding:26px 20px 64px;
 }
 .dark .aix{
   --aix-bg:#0c0d0f; --aix-paper:#15171a; --aix-ink:#ededed; --aix-mute:#9a9a9a;
   --aix-grey:#1b1e22; --aix-grey2:#22262b; --aix-line:#2a2d32;
+  background-image:radial-gradient(circle, oklch(0.708 0 0 / 0.28) 1px, transparent 1px);
 }
 .aix *,.aix *::before,.aix *::after{box-sizing:border-box}
 .aix ::selection{background:var(--aix-lime);color:#111214}

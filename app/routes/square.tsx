@@ -155,7 +155,7 @@ function SquarePage() {
 
       <main className="flex-1">
         <div className="aix">
-          <style>{AIX_CSS}{BOOKS_CSS}</style>
+          <style dangerouslySetInnerHTML={{ __html: AIX_CSS + BOOKS_CSS }} />
           <section className="aix-frame" style={{ marginTop: 0 }}>
             <div className="aix-lead">
               <div>
