@@ -1,9 +1,7 @@
 :root {
   --green: #111214;
-  --green-light: #d8ff00;
   --green-bg: rgba(17, 18, 20, 0.06);
   --lime: #d8ff00;
-  --blue: #111214;
   --amber: #8a6a00;
   --bg: #ffffff;
   --bg-secondary: #f2f2f2;
@@ -491,8 +489,8 @@ select.input {
 }
 
 .badge-warning {
-  background: rgba(196, 159, 0, 0.1);
-  color: #735c00;
+  background: rgba(138, 106, 0, 0.1);
+  color: var(--amber);
 }
 
 .badge-success {

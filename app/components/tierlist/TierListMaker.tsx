@@ -773,14 +773,6 @@ export function TierListMaker() {
               className="tl-tier-label"
               style={{ background: tier.color, color: contrastInk(tier.color) }}
               onClick={() => editTier(tier.id)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  editTier(tier.id);
-                }
-              }}
-              role="button"
-              tabIndex={0}
               title={t("aiTierlist.ui.editTier")}
             >
               <div className="tname">{tier.label}</div>
