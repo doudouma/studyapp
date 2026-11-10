@@ -21,8 +21,8 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
       to={href}
       className={
         isActive
-          ? "border-b-2 border-[#111214] pb-0.5 text-[11px] font-bold uppercase tracking-[0.1em] text-[#111214] dark:border-[#d8ff00] dark:text-[#ededed]"
-          : "text-[11px] font-bold uppercase tracking-[0.1em] text-muted-foreground transition-colors hover:text-foreground"
+          ? "flex items-center whitespace-nowrap border-b-2 border-[#111214] pb-0.5 text-[11px] font-bold uppercase tracking-[0.1em] text-[#111214] dark:border-[#d8ff00] dark:text-[#ededed]"
+          : "flex items-center whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.1em] text-muted-foreground transition-colors hover:text-foreground"
       }
     >
       {children}
@@ -106,8 +106,8 @@ function ToolsDropdown() {
         onClick={() => setOpen(!open)}
         className={
           isActive || open
-            ? "flex items-center gap-0.5 border-b-2 border-primary pb-0.5 text-sm font-semibold text-primary"
-            : "flex items-center gap-0.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            ? "flex items-center gap-0.5 whitespace-nowrap border-b-2 border-[#111214] pb-0.5 text-[11px] font-bold uppercase tracking-[0.1em] text-[#111214] dark:border-[#d8ff00] dark:text-[#ededed]"
+            : "flex items-center gap-0.5 whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.1em] text-muted-foreground transition-colors hover:text-foreground"
         }
       >
         {t("nav.tools")}
@@ -185,8 +185,8 @@ function GamesDropdown() {
         onClick={() => setOpen(!open)}
         className={
           isActive || open
-            ? "flex items-center gap-0.5 border-b-2 border-primary pb-0.5 text-sm font-semibold text-primary"
-            : "flex items-center gap-0.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            ? "flex items-center gap-0.5 whitespace-nowrap border-b-2 border-[#111214] pb-0.5 text-[11px] font-bold uppercase tracking-[0.1em] text-[#111214] dark:border-[#d8ff00] dark:text-[#ededed]"
+            : "flex items-center gap-0.5 whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.1em] text-muted-foreground transition-colors hover:text-foreground"
         }
       >
         {t("nav.game")}
@@ -297,7 +297,7 @@ export function AppNav() {
   if (!user) {
     return (
       <header className="aix-header sticky top-0 z-50 w-full border-b border-[#e3e3e3] bg-[#ededed]/95 backdrop-blur dark:border-[#2a2d32] dark:bg-[#0c0d0f]/95">
-        <nav className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
+        <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <div className="flex items-center gap-6">
             <Link to="/" className="flex items-center gap-2">
               <div className="flex size-9 items-center justify-center rounded-[2px] bg-[#111214] text-[#d8ff00] dark:bg-[#d8ff00] dark:text-[#111214]">
@@ -305,7 +305,7 @@ export function AppNav() {
               </div>
               <span className="text-[15px] font-extrabold uppercase tracking-[0.16em]">100mini</span>
             </Link>
-            <div className="hidden items-center gap-6 md:flex">
+            <div className="hidden items-center gap-5 lg:flex">
               <NavLink href="/">{t("nav.home")}</NavLink>
               <div onPointerEnter={prefetchSquare}>
                 <NavLink href="/square">{t("nav.square")}</NavLink>
@@ -319,7 +319,7 @@ export function AppNav() {
           </div>
 
           <button
-            className="flex items-center justify-center size-9 md:hidden"
+            className="flex items-center justify-center size-9 lg:hidden"
             onClick={() => setMobileNavOpen(!mobileNavOpen)}
             aria-label={t("nav.menu")}
           >
@@ -334,7 +334,7 @@ export function AppNav() {
             >
               <Bookmark className="size-4" />
             </button>
-            <div className="hidden md:flex items-center">
+            <div className="hidden lg:flex items-center">
               <LangSwitcher />
             </div>
             <Button
@@ -353,7 +353,7 @@ export function AppNav() {
           />
         </nav>
         {mobileNavOpen && (
-          <div className="border-t border-[#e3e3e3] bg-[#ededed] dark:border-[#2a2d32] dark:bg-[#0c0d0f] md:hidden">
+          <div className="border-t border-[#e3e3e3] bg-[#ededed] dark:border-[#2a2d32] dark:bg-[#0c0d0f] lg:hidden">
             <div className="flex flex-col gap-1 px-6 py-4">
               <MobileNavLink href="/" onClick={() => setMobileNavOpen(false)}>{t("nav.home")}</MobileNavLink>
               <div onPointerEnter={prefetchSquare}>
@@ -395,7 +395,7 @@ export function AppNav() {
   // ========== 已登录模式 ==========
   return (
     <header className="aix-header sticky top-0 z-50 w-full border-b border-[#e3e3e3] bg-[#ededed]/95 backdrop-blur dark:border-[#2a2d32] dark:bg-[#0c0d0f]/95">
-      <nav className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
+      <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
         {/* Left: Logo + Nav links */}
         <div className="flex items-center gap-6">
           <Link to="/" className="flex items-center gap-2">
@@ -404,7 +404,7 @@ export function AppNav() {
             </div>
             <span className="text-[15px] font-extrabold uppercase tracking-[0.16em]">100mini</span>
           </Link>
-            <div className="hidden items-center gap-6 md:flex">
+            <div className="hidden items-center gap-5 lg:flex">
             <NavLink href="/">{t("nav.home")}</NavLink>
             <div onPointerEnter={prefetchSquare}>
               <NavLink href="/square">{t("nav.square")}</NavLink>
@@ -420,7 +420,7 @@ export function AppNav() {
         {/* Right: Icons + Avatar */}
         <div className="flex items-center gap-3">
           <button
-            className="flex items-center justify-center size-9 md:hidden"
+            className="flex items-center justify-center size-9 lg:hidden"
             onClick={() => setMobileNavOpen(!mobileNavOpen)}
             aria-label={t("nav.menu")}
           >
@@ -440,7 +440,7 @@ export function AppNav() {
           >
             <Bookmark className="size-4" />
           </button>
-          <div className="hidden md:flex items-center size-9">
+          <div className="hidden lg:flex items-center size-9">
             <LangSwitcher />
           </div>
           <div className="relative" ref={menuRef}>
@@ -496,7 +496,7 @@ export function AppNav() {
         </div>
       </nav>
       {mobileNavOpen && (
-        <div className="border-t border-[#e3e3e3] bg-[#ededed] dark:border-[#2a2d32] dark:bg-[#0c0d0f] md:hidden">
+        <div className="border-t border-[#e3e3e3] bg-[#ededed] dark:border-[#2a2d32] dark:bg-[#0c0d0f] lg:hidden">
           <div className="flex flex-col gap-1 px-6 py-4">
             <MobileNavLink href="/" onClick={() => setMobileNavOpen(false)}>{t("nav.home")}</MobileNavLink>
             <div onPointerEnter={prefetchSquare}>
