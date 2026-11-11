@@ -465,6 +465,16 @@ select.input-comic { cursor: pointer; }
   font-size: 0.95em;
 }
 
+/* 正文内嵌案例图：整宽、圆角边框，与表格/pre 的边框语言一致 */
+.sc-md img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0 auto 0.9em;
+  border: 1px solid #cfcfcf;
+  border-radius: 8px;
+}
+
 /* 提示词代码块：终端风可横向滚动的 pre */
 .sc-md pre {
   margin: 0 0 1em;
@@ -568,6 +578,7 @@ select.input-comic { cursor: pointer; }
 .dark .sc-md a { color: #7dd3fc; }
 .dark .sc-md code { background: #1b2637; }
 .dark .sc-md pre { background: #101a24; border-color: #2a2d32; }
+.dark .sc-md img { border-color: #2a2d32; }
 .dark .sc-md pre code { background: none; }
 .dark .sc-copy { background: #1b2637; border-color: #2a2d32; color: #9fb0c3; }
 .dark .sc-copy:hover,
