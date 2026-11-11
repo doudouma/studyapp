@@ -93,15 +93,27 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
 
       <TabsContent value="signin">
         <form onSubmit={handleSignIn} className="space-y-4 mt-4">
-          <Input name="email" type="email" placeholder={t("components.auth.email")} required />
+          <Input
+            name="email"
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            autoCapitalize="none"
+            autoCorrect="off"
+            className="max-sm:h-11"
+            placeholder={t("components.auth.email")}
+            required
+          />
           <Input
             name="password"
             type="password"
+            autoComplete="current-password"
+            className="max-sm:h-11"
             placeholder={t("components.auth.password")}
             required
           />
           {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full max-sm:h-11" disabled={loading}>
             {loading ? t("components.auth.loggingIn") : t("components.auth.loginBtn")}
           </Button>
         </form>
@@ -109,17 +121,35 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
 
       <TabsContent value="signup">
         <form onSubmit={handleSignUp} className="space-y-4 mt-4">
-          <Input name="name" placeholder={t("components.auth.nickname")} required />
-          <Input name="email" type="email" placeholder={t("components.auth.email")} required />
+          <Input
+            name="name"
+            autoComplete="nickname"
+            className="max-sm:h-11"
+            placeholder={t("components.auth.nickname")}
+            required
+          />
+          <Input
+            name="email"
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            autoCapitalize="none"
+            autoCorrect="off"
+            className="max-sm:h-11"
+            placeholder={t("components.auth.email")}
+            required
+          />
           <Input
             name="password"
             type="password"
+            autoComplete="new-password"
+            className="max-sm:h-11"
             placeholder={t("components.auth.passwordHint")}
             required
             minLength={8}
           />
           {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full max-sm:h-11" disabled={loading}>
             {loading ? t("components.auth.registering") : t("components.auth.registerBtn")}
           </Button>
         </form>
@@ -155,15 +185,21 @@ export function AuthDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>{t("components.auth.dialogTitle")}</DialogTitle>
+      <DialogContent
+        className={
+          // 桌面居中卡片；移动端（<sm）改为底部抽屉：贴底、占满宽度、圆角只留上方、
+          // 高度上限留给键盘，底部留出 iPhone home indicator 的安全区。
+          "sm:max-w-md max-sm:inset-x-0 max-sm:bottom-0 max-sm:top-auto max-sm:left-0 max-sm:right-0 max-sm:w-full max-sm:max-w-none max-sm:translate-x-0 max-sm:translate-y-0 max-sm:rounded-b-none max-sm:rounded-t-2xl max-sm:px-5 max-sm:pb-[calc(1.25rem+env(safe-area-inset-bottom))] max-sm:max-h-[88dvh]"
+        }
+      >
+        <DialogHeader className="max-sm:sticky max-sm:top-0 max-sm:z-10 max-sm:-mx-5 max-sm:-mt-4 max-sm:border-b max-sm:border-border max-sm:px-5 max-sm:pt-4 max-sm:pb-2 max-sm:bg-popover">
+          <DialogTitle className="pr-10">{t("components.auth.dialogTitle")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <Button
             type="button"
             variant="outline"
-            className="w-full"
+            className="w-full max-sm:h-11"
             disabled={googleLoading}
             onClick={handleGoogle}
           >
