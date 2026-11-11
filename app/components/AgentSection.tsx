@@ -39,19 +39,19 @@ export function AgentSection() {
               100mini-skill
             </code>
           </p>
-          <div className="mt-2 flex items-center gap-2">
+          <div className="mt-2 flex items-start gap-2">
             <a
               href={SKILL_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs font-mono text-muted-foreground hover:text-[#111214] dark:hover:text-[#d8ff00] transition-colors"
+              className="min-w-0 flex flex-1 items-start gap-1.5 text-xs font-mono leading-relaxed text-muted-foreground hover:text-[#111214] dark:hover:text-[#d8ff00] transition-colors"
             >
-              <ExternalLink className="size-3 shrink-0" />
-              {SKILL_URL}
+              <ExternalLink className="mt-0.5 size-3 shrink-0" />
+              <span className="min-w-0 break-words">{SKILL_URL}</span>
             </a>
             <button
               onClick={handleCopy}
-              className="size-6 inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              className="size-6 shrink-0 inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
               title={t("common.copy")}
             >
               {copied ? <Check className="size-3.5 text-green-600 dark:text-green-400" /> : <Copy className="size-3.5" />}
