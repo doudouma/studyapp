@@ -2551,5 +2551,7 @@
   "nav.aiAssessment": "AI 准备度测试",
   "freetool.item.aiAssessment.title": "AI 准备度自测",
   "freetool.item.aiAssessment.desc": "10 条陈述，得到 0–100 的 AI 准备度分数、最薄弱领域和接下来该读的指南。",
-  "questions.assessmentCta": "测试你的 AI 准备度 →"
+  "questions.assessmentCta": "测试你的 AI 准备度 →",
+  "showcase.toc": "目录",
+  "showcase.tocMeta": "共 {{sections}} 节 · {{items}} 条"
 }

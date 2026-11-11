@@ -2505,5 +2505,7 @@
   "nav.aiAssessment": "Test de preparación IA",
   "freetool.item.aiAssessment.title": "Autoevaluación de preparación en IA",
   "freetool.item.aiAssessment.desc": "Diez afirmaciones dan una puntuación de 0 a 100, tus áreas más débiles y las próximas guías.",
-  "questions.assessmentCta": "Comprueba tu preparación en IA →"
+  "questions.assessmentCta": "Comprueba tu preparación en IA →",
+  "showcase.toc": "Contenido",
+  "showcase.tocMeta": "{{sections}} secciones · {{items}} entradas"
 }

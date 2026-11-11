@@ -60,13 +60,33 @@ function applyTableTones(html: string): string {
   });
 }
 
+/**
+ * 给正文标题注入锚点 id，供左侧目录滚动定位：
+ *   `## ` → sec-{n}，`### ` → sec-{n}-{m}（与 buildCaseToc 一致）
+ */
+function injectHeadingIds(html: string): string {
+  let h2 = 0;
+  let h3 = 0;
+  return html.replace(/<h(2|3)>/g, (_match, level: string) => {
+    if (level === "2") {
+      h2 += 1;
+      h3 = 0; // 每节重置小节计数，与 buildCaseToc 的 sec-{n}-{m} 对齐
+      return `<h2 id="sec-${h2}">`;
+    }
+    h3 += 1;
+    return `<h3 id="sec-${h2}-${h3}">`;
+  });
+}
+
 /** 渲染正文 Markdown。同一个 body 会被多次调用，结果缓存 */
 const cache = new Map<string, string>();
 
 export function renderCaseBody(markdown: string): string {
   const hit = cache.get(markdown);
   if (hit !== undefined) return hit;
-  const html = applyTableTones(marked.parse(markdown, { async: false }) as string)
+  const html = injectHeadingIds(
+    applyTableTones(marked.parse(markdown, { async: false }) as string),
+  )
     // 包一层横向滚动容器，窄屏不压缩表格列宽
     .replace(/<table>/g, '<div class="sc-table-wrap"><table>')
     .replace(/<\/table>/g, "</table></div>");

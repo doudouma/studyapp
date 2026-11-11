@@ -2563,5 +2563,7 @@
   "nav.aiAssessment": "AI Readiness Test",
   "freetool.item.aiAssessment.title": "AI Readiness Self-Assessment",
   "freetool.item.aiAssessment.desc": "Ten statements give you a 0–100 AI readiness score, your weakest areas and the next guides to read.",
-  "questions.assessmentCta": "Test your AI readiness →"
+  "questions.assessmentCta": "Test your AI readiness →",
+  "showcase.toc": "Contents",
+  "showcase.tocMeta": "{{sections}} sections · {{items}} items"
 }

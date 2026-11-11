@@ -170,7 +170,7 @@ describe("showcase case helpers", () => {
 describe("renderCaseBody", () => {
   it("renders sections as headings and wraps tables for horizontal scroll", () => {
     const html = renderCaseBody("## Heading\n\n| A | B |\n| --- | --- |\n| 1 | 2 |");
-    expect(html).toContain("<h2>Heading</h2>");
+    expect(html).toContain('<h2 id="sec-1">Heading</h2>');
     expect(html).toContain('<div class="sc-table-wrap"><table>');
   });
 

@@ -8,6 +8,7 @@ import { CaseBody } from "~/components/showcase/CaseBody";
 import { CaseFacts } from "~/components/showcase/CaseFacts";
 import { CaseMedia } from "~/components/showcase/CaseMedia";
 import { CaseSources } from "~/components/showcase/CaseSources";
+import { CaseToc } from "~/components/showcase/CaseToc";
 import {
   TerminalCmd,
   TerminalCursor,
@@ -20,6 +21,7 @@ import {
   getFactRows,
   getRelatedCases,
 } from "~/features/showcase/cases";
+import { buildCaseToc } from "~/features/showcase/toc";
 import { buildCaseHead } from "~/features/showcase/seo";
 
 export const Route = createFileRoute("/showcase_/$slug")({
@@ -29,7 +31,7 @@ export const Route = createFileRoute("/showcase_/$slug")({
     const item = await getCaseBySlug(params.slug, lang);
     if (!item) throw notFound();
     const related = await getRelatedCases(item.slug, lang, 3);
-    return { item, related };
+    return { item, related, toc: buildCaseToc(item.body) };
   },
   head: async ({ params }) => {
     const item = await getCaseBySlug(params.slug, currentLang());
@@ -48,7 +50,7 @@ export const Route = createFileRoute("/showcase_/$slug")({
 
 function CaseDetailPage() {
   const { t } = useTranslation();
-  const { item, related } = useLoaderData({ from: Route.id });
+  const { item, related, toc } = useLoaderData({ from: Route.id });
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -56,11 +58,14 @@ function CaseDetailPage() {
 
       {/* 移动端底部有固定的操作条（CaseActions），留出可滚动空间 */}
       <main className="flex-1 pb-24 lg:pb-0">
-        <div className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
-          <TerminalWindow
-            title={`100mini ~ /showcase/${item.slug} — zsh`}
-            bodyClassName="p-4 text-[11.5px] sm:p-6"
-          >
+        <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[200px_minmax(0,1fr)] xl:grid-cols-[220px_768px] xl:justify-center">
+            <CaseToc toc={toc} />
+            <div className="min-w-0">
+              <TerminalWindow
+                title={`100mini ~ /showcase/${item.slug} — zsh`}
+                bodyClassName="p-4 text-[11.5px] sm:p-6"
+              >
             <article style={accentVars()}>
               <div className="text-[10px]">
                 <TerminalPrompt /> <TerminalCmd>cat /showcase/{item.slug}</TerminalCmd>
@@ -104,6 +109,47 @@ function CaseDetailPage() {
               <div className="mt-5">
                 <CaseFacts facts={getFactRows(item)} />
               </div>
+
+              {/* 移动端目录：左侧导航只在 lg 以上显示 */}
+              {toc.length > 0 ? (
+                <details className="mt-4 rounded-lg border border-[#cfcfcf] bg-white px-3.5 py-3 lg:hidden dark:border-[#2a2d32] dark:bg-[#0f1720]">
+                  <summary className="cursor-pointer select-none text-[11px] font-bold text-[#000000] dark:text-[#e6edf6]">
+                    {t("showcase.toc")}
+                    <span className="ml-1.5 font-normal text-muted-foreground">
+                      {t("showcase.tocMeta", {
+                        sections: toc.length,
+                        items: toc.reduce((n, s) => n + s.children.length, 0),
+                      })}
+                    </span>
+                  </summary>
+                  <div className="mt-3 space-y-2">
+                    {toc.map((section) => (
+                      <div key={section.id}>
+                        <a
+                          href={`#${section.id}`}
+                          className="text-[11px] font-bold text-[color:var(--sc-accent)] hover:underline dark:text-[color:var(--sc-accent-dark)]"
+                        >
+                          {section.title}
+                        </a>
+                        {section.children.length > 0 ? (
+                          <ul className="mt-1 grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+                            {section.children.map((child) => (
+                              <li key={child.id} className="truncate">
+                                <a
+                                  href={`#${child.id}`}
+                                  className="text-[10.5px] text-muted-foreground hover:text-foreground hover:underline"
+                                >
+                                  {child.title}
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                </details>
+              ) : null}
 
               <CaseBody item={item} />
 
@@ -150,8 +196,10 @@ function CaseDetailPage() {
                   ← {t("showcase.backToList")}
                 </Link>
               </div>
-            </article>
-          </TerminalWindow>
+              </article>
+              </TerminalWindow>
+            </div>
+          </div>
         </div>
       </main>
 

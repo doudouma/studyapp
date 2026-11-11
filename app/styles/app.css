@@ -435,6 +435,7 @@ select.input-comic { cursor: pointer; }
 }
 .sc-md > :first-child { margin-top: 0; }
 .sc-md h2 {
+  scroll-margin-top: 5rem;
   margin: 1.6em 0 0.5em;
   font-size: 13px;
   font-weight: 700;
@@ -445,6 +446,7 @@ select.input-comic { cursor: pointer; }
   color: rgba(0, 0, 0, 0.28);
 }
 .sc-md h3 {
+  scroll-margin-top: 5rem;
   margin: 1.3em 0 0.4em;
   font-size: 12px;
   font-weight: 700;

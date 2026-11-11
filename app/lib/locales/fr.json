@@ -2456,5 +2456,7 @@
   "nav.aiAssessment": "Test de préparation IA",
   "freetool.item.aiAssessment.title": "Auto-évaluation de préparation à l'IA",
   "freetool.item.aiAssessment.desc": "Dix affirmations donnent un score sur 100, vos points faibles et les prochains guides à lire.",
-  "questions.assessmentCta": "Testez votre préparation à l'IA →"
+  "questions.assessmentCta": "Testez votre préparation à l'IA →",
+  "showcase.toc": "Sommaire",
+  "showcase.tocMeta": "{{sections}} sections · {{items}} entrées"
 }
