@@ -56,8 +56,8 @@ function CaseDetailPage() {
     <div className="flex min-h-screen flex-col">
       <AppNav />
 
-      {/* 移动端底部有固定的操作条（CaseActions），留出可滚动空间 */}
-      <main className="flex-1 pb-24 lg:pb-0">
+      {/* 移动端/平板（xl 以下）有固定的底部操作条（CaseActions），留出可滚动空间 */}
+      <main className="flex-1 pb-24 xl:pb-0">
         <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-[200px_minmax(0,1fr)] xl:grid-cols-[220px_768px] xl:justify-center">
             <CaseToc toc={toc} />

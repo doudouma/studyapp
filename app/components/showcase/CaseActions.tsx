@@ -54,17 +54,17 @@ export function CaseActions({ item }: { item: ShowcaseCase }) {
   return (
     <>
       {/*
-        桌面：视口右侧竖排，但**贴着正文栏的右边缘**而不是视口边缘。
-        23.25rem = max-w-3xl/2 (24rem) − 详情页 px-6 (1.5rem) + 与正文栏的间距 (0.75rem)。
-        lg 以下隐藏（此时窗口宽度 < 正文栏 + 按钮宽，会把按钮压在正文上）。
+        桌面：视口右侧竖排，**贴着正文栏的右边缘外侧**而不是视口边缘。
+        32.5rem = 详情页 xl 栅格宽度一半 (220 + 24 + 768 = 1012px → 506px) + 14px 间距。
+        只从 xl 起显示：lg 档栅格是 1fr（正文更宽），放不下一列按钮。
       */}
-      <div className="fixed left-[calc(50%+23.25rem)] top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-2 lg:flex">
+      <div className="fixed left-[calc(50%+32.5rem)] top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-2 xl:flex">
         {visit}
         {share}
       </div>
 
       {/* 移动端/平板：底部横排 */}
-      <div className="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-[#cfcfcf] bg-[#ffffff]/95 px-4 py-3 backdrop-blur lg:hidden dark:border-[#2a2d32] dark:bg-[#0d1117]/95">
+      <div className="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-[#cfcfcf] bg-[#ffffff]/95 px-4 py-3 backdrop-blur xl:hidden dark:border-[#2a2d32] dark:bg-[#0d1117]/95">
         {visit ? <span className="flex-1 [&>*]:w-full">{visit}</span> : null}
         <span className="flex-1 [&>*]:w-full">{share}</span>
       </div>
