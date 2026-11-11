@@ -101,6 +101,7 @@ drizzle/            # Drizzle Kit 迁移产物
 | 全局 | Inter 字体发现晚，需等 CSS 解析后才下载 | `<link rel="preload">` 提前发现字体 | `app/routes/__root.tsx:42` |
 | 广场 | 首屏缩略图被 `loading="lazy"` 降级 | 前 8 张无 `loading`，第 1 张 `fetchpriority="high"` | `app/components/SquareGrid.tsx:54-55` |
 | 广场 | 缩略图浏览器缓存仅 24h | 改为 `max-age=31536000, immutable`（1 年） | `server/api.ts:845` |
+| showcase 正文 | 案例 md 内嵌大图全部 eager + 无尺寸（CLS） | `renderCaseBody` 注入：第 1 张 eager + `fetchpriority="high"`，其余 `loading="lazy" decoding="async"`；尺寸来自 `shared/showcase/image-sizes.ts`（由 `scripts/gen-showcase-image-sizes.mjs` 生成，**新增案例素材后要重跑**） | `app/features/showcase/markdown.ts` |
 
 ### 原则
 

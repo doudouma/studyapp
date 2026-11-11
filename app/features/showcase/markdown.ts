@@ -1,5 +1,6 @@
 import { marked } from "marked";
 import { TONE_COLORS, type ShowcaseTone } from "@shared/types/showcase";
+import { SHOWCASE_IMAGE_SIZES } from "@shared/showcase/image-sizes";
 
 /**
  * 案例正文（Markdown）→ HTML
@@ -78,14 +79,41 @@ function injectHeadingIds(html: string): string {
   });
 }
 
+/**
+ * 给正文 <img> 注入加载属性与固有尺寸：
+ *   第 1 张   eager + fetchpriority="high"（首屏正文图即 LCP 候选，与 SquareGrid 首卡一致）
+ *   其余     loading="lazy" + decoding="async"（案例正文可含十余 MB 动图，
+ *            全部 eager 会和 LCP 抢带宽）
+ *   已知尺寸  width/height（浏览器自动据此算 aspect-ratio，解码前预留高度，消除 CLS；
+ *            尺寸表由 scripts/gen-showcase-image-sizes.mjs 生成，新素材需重新生成）
+ */
+function enhanceImages(html: string): string {
+  let first = true;
+  return html.replace(/<img\b[^>]*>/g, (tag) => {
+    const src = /src="([^"]+)"/.exec(tag)?.[1];
+    const attrs: string[] = [];
+    if (first) {
+      attrs.push('fetchpriority="high"');
+      first = false;
+    } else {
+      attrs.push('loading="lazy"', 'decoding="async"');
+    }
+    const size = src ? SHOWCASE_IMAGE_SIZES[src] : undefined;
+    if (size) attrs.push(`width="${size.w}"`, `height="${size.h}"`);
+    if (attrs.length === 0) return tag;
+    // img 是 void 元素，去掉可选的 "/>" 斜杠后统一以 ">" 收尾
+    return tag.replace(/\s*\/?>$/, ` ${attrs.join(" ")}>`);
+  });
+}
+
 /** 渲染正文 Markdown。同一个 body 会被多次调用，结果缓存 */
 const cache = new Map<string, string>();
 
 export function renderCaseBody(markdown: string): string {
   const hit = cache.get(markdown);
   if (hit !== undefined) return hit;
-  const html = injectHeadingIds(
-    applyTableTones(marked.parse(markdown, { async: false }) as string),
+  const html = enhanceImages(
+    injectHeadingIds(applyTableTones(marked.parse(markdown, { async: false }) as string)),
   )
     // 包一层横向滚动容器，窄屏不压缩表格列宽
     .replace(/<table>/g, '<div class="sc-table-wrap"><table>')

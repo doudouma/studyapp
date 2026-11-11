@@ -9,6 +9,7 @@ import {
   getRelatedCases,
 } from "../app/features/showcase/cases";
 import { renderCaseBody } from "../app/features/showcase/markdown";
+import { SHOWCASE_IMAGE_SIZES } from "../shared/showcase/image-sizes";
 
 const HTTPS = /^https:\/\/.+/;
 const SLUG = /^[a-z0-9-]+$/;
@@ -189,5 +190,40 @@ describe("renderCaseBody", () => {
     const html = renderCaseBody("> **Verdict**\n>\n> body text");
     expect(html).toContain("<blockquote>");
     expect(html).toContain("<strong>Verdict</strong>");
+  });
+
+  it("makes the first body image eager and the rest lazy", () => {
+    const html = renderCaseBody(
+      "![](https://example.com/a.gif)\n\n![](/showcase/lemo-ink.gif)\n\n![](/showcase/lemo-ink.gif)",
+    );
+    // 第 1 张（首屏 LCP 候选）不加 lazy，并提示高优先级
+    expect(html.match(/<img\b[^>]*>/g)?.[0]).toContain('fetchpriority="high"');
+    expect(html.match(/<img\b[^>]*>/g)?.[0]).not.toContain('loading="lazy"');
+    // 其余全部 lazy + 异步解码
+    expect(html.match(/loading="lazy"/g)?.length).toBe(2);
+    // 已知尺寸注入 width/height（lemo-ink.gif 的固有尺寸，见 image-sizes.ts）
+    expect(html).toContain('<img src="/showcase/lemo-ink.gif" alt="" loading="lazy" decoding="async" width="520" height="293">');
+  });
+
+  it("leaves images without a known size untouched by dimensions", () => {
+    const html = renderCaseBody("![](/showcase/lemo-ink.gif)\n\n![](/showcase/not-in-table.png)");
+    expect(html).toContain('loading="lazy"');
+    expect(html.match(/<img\b[^>]*not-in-table[^>]*>/)?.[0]).not.toContain("width=");
+  });
+
+  // 新增案例素材后如果忘了跑 scripts/gen-showcase-image-sizes.mjs，这条会失败
+  it("covers every locally referenced image (body + cover) in the size table", async () => {
+    const check = (owner: string, src: string) =>
+      expect(SHOWCASE_IMAGE_SIZES[src], `${owner} 不在尺寸表`).toBeDefined();
+    for (const slug of getCaseSlugs()) {
+      for (const locale of getCaseLocales(slug)) {
+        const item = await loadCase(slug, locale);
+        for (const m of item!.body.matchAll(/!\[[^\]]*\]\((\/showcase\/[^)]+)\)/g)) {
+          check(`${slug}/${locale} 正文图 ${m[1]}`, m[1]);
+        }
+        if (item!.cover.src.startsWith("/")) check(`${slug}/${locale} 封面 ${item!.cover.src}`, item!.cover.src);
+        if (item!.cover.video?.startsWith("/")) check(`${slug}/${locale} 视频 ${item!.cover.video}`, item!.cover.video);
+      }
+    }
   });
 });

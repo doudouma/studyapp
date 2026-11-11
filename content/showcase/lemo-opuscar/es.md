@@ -32,7 +32,7 @@ sources:
     url: https://github.com/lemomo-ai/lemo-opuscar
     publisher: GitHub
 cover:
-  src: /showcase/lemo-opuscar.jpg
+  src: /showcase/lemo-style-guide.jpg
 ---
 
 ## Convirtió los videos hechos con Opus 5.5 en una biblioteca de estilos

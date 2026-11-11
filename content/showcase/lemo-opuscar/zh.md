@@ -32,7 +32,7 @@ sources:
     url: https://github.com/lemomo-ai/lemo-opuscar
     publisher: GitHub
 cover:
-  src: /showcase/lemo-opuscar.jpg
+  src: /showcase/lemo-style-guide.jpg
 ---
 
 ## 它把用 Opus 5.5 做的视频整理成了风格库
