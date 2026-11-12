@@ -25,7 +25,7 @@ export const Route = createFileRoute("/host-single-html")({
     // FAQ schema too (schema must mirror visible content).
     const faqs = [
       { name: i18n.t(`${PREFIX}.definition.q`), text: i18n.t(`${PREFIX}.definition.a`) },
-      ...Array.from({ length: 5 }, (_, i) => ({
+      ...Array.from({ length: 14 }, (_, i) => ({
         name: i18n.t(`${PREFIX}.faq${i + 1}.q`),
         text: i18n.t(`${PREFIX}.faq${i + 1}.a`),
       })),
@@ -163,7 +163,7 @@ function HostSingleHtmlPage() {
     );
   }
 
-  const faqs = Array.from({ length: 5 }, (_, i) => ({
+  const faqs = Array.from({ length: 14 }, (_, i) => ({
     q: t(`${PREFIX}.faq${i + 1}.q`),
     a: t(`${PREFIX}.faq${i + 1}.a`),
   }));
@@ -292,6 +292,63 @@ function HostSingleHtmlPage() {
               {t(`${PREFIX}.notClaudeLink`)}
             </Link>
           </p>
+        </section>
+
+        {/* Upload */}
+        <section className="mx-auto max-w-3xl px-6 pb-14">
+          <h2 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+            {t(`${PREFIX}.upload.title`)}
+          </h2>
+          <p className="mt-4 text-base leading-relaxed text-muted-foreground">
+            {t(`${PREFIX}.upload.lead`)}
+          </p>
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            {[1, 2, 3].map((n) => (
+              <div key={n} className="rounded-2xl border border-border/70 bg-card p-6">
+                <h3 className="text-sm font-semibold text-foreground">
+                  {t(`${PREFIX}.upload.c${n}.title`)}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {t(`${PREFIX}.upload.c${n}.desc`)}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Share */}
+        <section className="mx-auto max-w-3xl px-6 pb-14">
+          <h2 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+            {t(`${PREFIX}.share.title`)}
+          </h2>
+          <p className="mt-4 text-base leading-relaxed text-muted-foreground">
+            {t(`${PREFIX}.share.lead`)}
+          </p>
+          <div className="mt-8 space-y-4">
+            {[1, 2, 3].map((n) => (
+              <div key={n} className="rounded-2xl border border-border/70 bg-card p-6">
+                <h3 className="text-sm font-semibold text-foreground">
+                  {t(`${PREFIX}.share.m${n}.title`)}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {t(`${PREFIX}.share.m${n}.desc`)}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Disambiguation: HTML link code vs. link to your HTML file */}
+        <section className="mx-auto max-w-3xl px-6 pb-14">
+          <div className="rounded-2xl border border-border bg-muted/30 p-6">
+            <h3 className="text-sm font-semibold text-foreground">
+              {t(`${PREFIX}.disamb.title`)}
+            </h3>
+            <div className="mt-3 space-y-2 text-sm leading-relaxed text-muted-foreground">
+              <p>{t(`${PREFIX}.disamb.code`)}</p>
+              <p>{t(`${PREFIX}.disamb.file`)}</p>
+            </div>
+          </div>
         </section>
 
         {/* FAQ */}
