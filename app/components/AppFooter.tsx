@@ -39,6 +39,14 @@ function TextLink({ href, label }: { href: string; label: string }) {
 const BADGE_HEIGHT = 24;
 const BADGE_WIDTH = 116;
 
+/** 纯文字目录外链：单独一排展示，不与徽章图混排。 */
+const DIRECTORY_TEXT_LINKS = [
+  { href: "https://mossai.org", label: "MossAI Tools" },
+  { href: "https://realisticai.io", label: "Realistic AI" },
+  { href: "https://www.aitoolzdir.com", label: "AI Toolz Dir" },
+  { href: "https://startupbase.io", label: "StartupBase" },
+];
+
 function BadgeLink({
   href,
   imgSrc,
@@ -129,8 +137,6 @@ export function AppFooter() {
             {/* 目录站/徽章互链：显式标注 sponsored + nofollow。
                 这些链接出现在全站共享页脚，N 个页面 × N 条即跨全站 dofollow 外链，
                 会触发 link spam 判定（降权的是链接来源站，也就是我们自己）。 */}
-            <TextLink href="https://mossai.org" label="MossAI Tools" />
-            <TextLink href="https://realisticai.io" label="Realistic AI" />
             {/* <BadgeLink
               href="https://dironix.com"
               imgSrc="https://dironix.com/bage.png"
@@ -281,8 +287,19 @@ export function AppFooter() {
               label="Featured on AgentHunter"
               rel="noopener"
             />
-            <TextLink href="https://www.aitoolzdir.com" label="AI Toolz Dir" />
-            <TextLink href="https://startupbase.io" label="Listed on StartupBase" />
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1.5">
+            {DIRECTORY_TEXT_LINKS.map((link, i) => (
+              <span key={link.href} className="inline-flex items-center gap-2.5">
+                {i > 0 && (
+                  <span aria-hidden="true" className="text-[10px] text-muted-foreground/40">
+                    ·
+                  </span>
+                )}
+                <TextLink href={link.href} label={link.label} />
+              </span>
+            ))}
           </div>
         </div>
       </div>
