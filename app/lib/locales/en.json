@@ -2648,5 +2648,7 @@
   "makeHtmlWebsite.faq5.a": "Not on 100mini — links live on 100mini.com. If you expect to need a domain, start with route 2 instead. Moving later means redeploying the same file, which is quick but not automatic.",
   "makeHtmlWebsite.cta.title": "Have the file ready?",
   "makeHtmlWebsite.cta.desc": "Paste it or upload it, and you will have a link in about 30 seconds.",
-  "makeHtmlWebsite.cta.button": "Publish an HTML file"
+  "makeHtmlWebsite.cta.button": "Publish an HTML file",
+  "altTiinyHost.s4.title": "Tiiny Host's HTML viewer vs. a published link",
+  "altTiinyHost.s4.body": "Tiiny Host ships a free HTML viewer: paste code and it renders on the spot, which is handy when you only need to look at it yourself. The catch is the second person. A viewer is a tool, not an address — whoever you send the code to needs the same tool, and on a phone they usually end up with a download instead. 100mini takes the other route: publish the file once and you get a URL that opens full screen for anyone, on any device, with an optional expiry, view limit, or one-time link. If you want to check your own markup, a viewer is fine. If you want someone else to see it, send a link."
 }

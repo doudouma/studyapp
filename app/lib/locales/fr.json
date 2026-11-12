@@ -2650,5 +2650,7 @@
   "makeHtmlWebsite.faq5.a": "Pas sur 100mini : les liens vivent sur 100mini.com. Si vous pensez avoir besoin d'un domaine, commencez par la voie 2. Migrer plus tard revient à redéployer le même fichier : rapide, mais pas automatique.",
   "makeHtmlWebsite.cta.title": "Le fichier est prêt ?",
   "makeHtmlWebsite.cta.desc": "Collez-le ou importez-le, et vous aurez un lien en une trentaine de secondes.",
-  "makeHtmlWebsite.cta.button": "Publier un fichier HTML"
+  "makeHtmlWebsite.cta.button": "Publier un fichier HTML",
+  "altTiinyHost.s4.title": "Le visualiseur HTML de Tiiny Host face à un lien publié",
+  "altTiinyHost.s4.body": "Tiiny Host propose un visualiseur HTML gratuit : vous collez le code et il s'affiche aussitôt, pratique quand c'est juste pour vous. Le problème, c'est la deuxième personne. Un visualiseur est un outil, pas une adresse : celui à qui vous envoyez le code doit avoir le même outil, et sur mobile il finit presque toujours par télécharger le fichier. 100mini prend l'autre chemin : publiez le fichier une fois et vous obtenez une URL que n'importe qui ouvre en plein écran, sur n'importe quel appareil, avec expiration, limite de vues ou lien à usage unique en option. Pour vérifier votre propre balisage, un visualiseur suffit. Pour que quelqu'un d'autre le voie, envoyez un lien."
 }

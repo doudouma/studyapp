@@ -2648,5 +2648,7 @@
   "makeHtmlWebsite.faq5.a": "100mini 不支持——链接都在 100mini.com 上。如果预判会需要域名，直接走路线二。以后再迁移等于把同一个文件重新部署一次，快，但不会自动完成。",
   "makeHtmlWebsite.cta.title": "文件准备好了？",
   "makeHtmlWebsite.cta.desc": "粘贴或上传，大约 30 秒后就能拿到链接。",
-  "makeHtmlWebsite.cta.button": "发布一个 HTML 文件"
+  "makeHtmlWebsite.cta.button": "发布一个 HTML 文件",
+  "altTiinyHost.s4.title": "Tiiny Host 的 HTML viewer 与「已发布的链接」有什么不同",
+  "altTiinyHost.s4.body": "Tiiny Host 提供了一个免费的 HTML viewer：粘贴代码就能当场渲染，如果你只是想自己看一眼，这很方便。问题出在第二个人身上。viewer 是一个工具，不是一个地址——你把代码发给谁，对方就得有同样的工具；在手机上，多数情况最后只得到一个下载。100mini 走的是另一条路：文件发布一次，就得到一个谁都能全屏打开的网址，任何设备都行，还可以加有效期、访问次数上限或一次性链接。只想检查自己的代码，viewer 够用；想让别人看到，发链接。"
 }

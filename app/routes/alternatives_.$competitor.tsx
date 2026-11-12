@@ -9,6 +9,8 @@ import { getCompetitor } from "~/features/alternatives/data";
 
 const TABLE_ROWS = ["r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8"];
 const SECTIONS = ["s1", "s2", "s3"];
+// 可选段落：仅当该竞品在某语言里有 `<i18nKey>.s<idx>.body` 时才渲染。
+const OPTIONAL_SECTIONS = ["s4"];
 const FAQS = ["faq1", "faq2", "faq3", "faq4"];
 
 export const Route = createFileRoute("/alternatives_/$competitor")({
@@ -113,16 +115,21 @@ function AlternativePage() {
           </div>
 
           {/* Narrative sections */}
-          {SECTIONS.map((s) => (
-            <section key={s} className="mt-8">
-              <h2 className="text-xl font-semibold tracking-tight text-foreground">
-                {t(`alternatives.sections.${s}.title`)}
-              </h2>
-              <p className="mt-2 text-base leading-relaxed text-muted-foreground">
-                {t(`${competitor.i18nKey}.${s}.body`)}
-              </p>
-            </section>
-          ))}
+          {[...SECTIONS, ...OPTIONAL_SECTIONS]
+            .filter((s) => i18n.exists(`${competitor.i18nKey}.${s}.body`))
+            .map((s) => {
+              const ownTitle = `${competitor.i18nKey}.${s}.title`;
+              return (
+                <section key={s} className="mt-8">
+                  <h2 className="text-xl font-semibold tracking-tight text-foreground">
+                    {i18n.exists(ownTitle) ? t(ownTitle) : t(`alternatives.sections.${s}.title`)}
+                  </h2>
+                  <p className="mt-2 text-base leading-relaxed text-muted-foreground">
+                    {t(`${competitor.i18nKey}.${s}.body`)}
+                  </p>
+                </section>
+              );
+            })}
 
           {/* Who it's for */}
           <div className="mt-8 grid gap-4 sm:grid-cols-2">

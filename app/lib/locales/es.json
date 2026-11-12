@@ -2649,5 +2649,7 @@
   "makeHtmlWebsite.faq5.a": "En 100mini no: los enlaces viven en 100mini.com. Si crees que vas a necesitar dominio, empieza por la ruta 2. Mudarte después implica volver a desplegar el mismo archivo: rápido, pero no automático.",
   "makeHtmlWebsite.cta.title": "¿Tienes el archivo listo?",
   "makeHtmlWebsite.cta.desc": "Pégalo o súbelo y tendrás un enlace en unos 30 segundos.",
-  "makeHtmlWebsite.cta.button": "Publicar un archivo HTML"
+  "makeHtmlWebsite.cta.button": "Publicar un archivo HTML",
+  "altTiinyHost.s4.title": "El visor HTML de Tiiny Host frente a un enlace publicado",
+  "altTiinyHost.s4.body": "Tiiny Host incluye un visor HTML gratuito: pegas el código y se renderiza al momento, útil si solo quieres mirarlo tú. El problema es la segunda persona. Un visor es una herramienta, no una dirección: quien recibe el código necesita la misma herramienta, y en el móvil casi siempre acaba en una descarga. 100mini va por otro camino: publicas el archivo una vez y obtienes una URL que se abre a pantalla completa para cualquiera, en cualquier dispositivo, con caducidad, límite de visitas o enlace de un solo uso opcionales. Si quieres revisar tu propio marcado, un visor sirve. Si quieres que otra persona lo vea, envía un enlace."
 }

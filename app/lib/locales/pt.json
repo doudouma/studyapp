@@ -2649,5 +2649,7 @@
   "makeHtmlWebsite.faq5.a": "No 100mini não: os links ficam em 100mini.com. Se você acha que vai precisar de domínio, comece pela rota 2. Migrar depois significa reimplantar o mesmo arquivo: rápido, mas não automático.",
   "makeHtmlWebsite.cta.title": "O arquivo está pronto?",
   "makeHtmlWebsite.cta.desc": "Cole ou envie, e você terá um link em cerca de 30 segundos.",
-  "makeHtmlWebsite.cta.button": "Publicar um arquivo HTML"
+  "makeHtmlWebsite.cta.button": "Publicar um arquivo HTML",
+  "altTiinyHost.s4.title": "O visualizador HTML do Tiiny Host versus um link publicado",
+  "altTiinyHost.s4.body": "O Tiiny Host tem um visualizador HTML gratuito: você cola o código e ele renderiza na hora, o que ajuda quando é só você querendo olhar. O problema é a segunda pessoa. Um visualizador é uma ferramenta, não um endereço: quem recebe o código precisa da mesma ferramenta, e no celular quase sempre acaba num download. O 100mini segue outro caminho: publique o arquivo uma vez e receba uma URL que abre em tela cheia para qualquer pessoa, em qualquer aparelho, com expiração, limite de visualizações ou link de uso único opcionais. Para conferir o seu próprio código, um visualizador basta. Para outra pessoa ver, envie um link."
 }
