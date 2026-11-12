@@ -292,6 +292,16 @@ function HostSingleHtmlPage() {
               {t(`${PREFIX}.notClaudeLink`)}
             </Link>
           </p>
+
+          <p className="mt-2 text-center text-sm text-muted-foreground">
+            {t(`${PREFIX}.notWebsite`)}{" "}
+            <Link
+              to="/make-html-file-into-website"
+              className="font-medium text-[#111214] dark:text-[#ededed] hover:underline"
+            >
+              {t(`${PREFIX}.notWebsiteLink`)}
+            </Link>
+          </p>
         </section>
 
         {/* Upload */}
@@ -335,6 +345,15 @@ function HostSingleHtmlPage() {
                 </p>
               </div>
             ))}
+          </div>
+
+          <div className="mt-4 rounded-2xl border border-border/70 bg-card p-6">
+            <h3 className="text-sm font-semibold text-foreground">
+              {t(`${PREFIX}.share.longTitle`)}
+            </h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              {t(`${PREFIX}.share.longDesc`)}
+            </p>
           </div>
         </section>
 

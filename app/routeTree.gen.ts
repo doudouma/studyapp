@@ -22,6 +22,7 @@ import { Route as PetbadgeRouteImport } from './routes/petbadge'
 import { Route as PapercutRouteImport } from './routes/papercut'
 import { Route as OutbreakRouteImport } from './routes/outbreak'
 import { Route as Md2htmlRouteImport } from './routes/md2html'
+import { Route as MakeHtmlFileIntoWebsiteRouteImport } from './routes/make-html-file-into-website'
 import { Route as LinksRouteImport } from './routes/links'
 import { Route as IdphotoRouteImport } from './routes/idphoto'
 import { Route as HostSingleHtmlRouteImport } from './routes/host-single-html'
@@ -113,6 +114,11 @@ const OutbreakRoute = OutbreakRouteImport.update({
 const Md2htmlRoute = Md2htmlRouteImport.update({
   id: '/md2html',
   path: '/md2html',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MakeHtmlFileIntoWebsiteRoute = MakeHtmlFileIntoWebsiteRouteImport.update({
+  id: '/make-html-file-into-website',
+  path: '/make-html-file-into-website',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LinksRoute = LinksRouteImport.update({
@@ -272,6 +278,7 @@ export interface FileRoutesByFullPath {
   '/host-single-html': typeof HostSingleHtmlRoute
   '/idphoto': typeof IdphotoRoute
   '/links': typeof LinksRoute
+  '/make-html-file-into-website': typeof MakeHtmlFileIntoWebsiteRoute
   '/md2html': typeof Md2htmlRoute
   '/outbreak': typeof OutbreakRoute
   '/papercut': typeof PapercutRoute
@@ -314,6 +321,7 @@ export interface FileRoutesByTo {
   '/host-single-html': typeof HostSingleHtmlRoute
   '/idphoto': typeof IdphotoRoute
   '/links': typeof LinksRoute
+  '/make-html-file-into-website': typeof MakeHtmlFileIntoWebsiteRoute
   '/md2html': typeof Md2htmlRoute
   '/outbreak': typeof OutbreakRoute
   '/papercut': typeof PapercutRoute
@@ -357,6 +365,7 @@ export interface FileRoutesById {
   '/host-single-html': typeof HostSingleHtmlRoute
   '/idphoto': typeof IdphotoRoute
   '/links': typeof LinksRoute
+  '/make-html-file-into-website': typeof MakeHtmlFileIntoWebsiteRoute
   '/md2html': typeof Md2htmlRoute
   '/outbreak': typeof OutbreakRoute
   '/papercut': typeof PapercutRoute
@@ -401,6 +410,7 @@ export interface FileRouteTypes {
     | '/host-single-html'
     | '/idphoto'
     | '/links'
+    | '/make-html-file-into-website'
     | '/md2html'
     | '/outbreak'
     | '/papercut'
@@ -443,6 +453,7 @@ export interface FileRouteTypes {
     | '/host-single-html'
     | '/idphoto'
     | '/links'
+    | '/make-html-file-into-website'
     | '/md2html'
     | '/outbreak'
     | '/papercut'
@@ -485,6 +496,7 @@ export interface FileRouteTypes {
     | '/host-single-html'
     | '/idphoto'
     | '/links'
+    | '/make-html-file-into-website'
     | '/md2html'
     | '/outbreak'
     | '/papercut'
@@ -528,6 +540,7 @@ export interface RootRouteChildren {
   HostSingleHtmlRoute: typeof HostSingleHtmlRoute
   IdphotoRoute: typeof IdphotoRoute
   LinksRoute: typeof LinksRoute
+  MakeHtmlFileIntoWebsiteRoute: typeof MakeHtmlFileIntoWebsiteRoute
   Md2htmlRoute: typeof Md2htmlRoute
   OutbreakRoute: typeof OutbreakRoute
   PapercutRoute: typeof PapercutRoute
@@ -641,6 +654,13 @@ declare module '@tanstack/react-router' {
       path: '/md2html'
       fullPath: '/md2html'
       preLoaderRoute: typeof Md2htmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/make-html-file-into-website': {
+      id: '/make-html-file-into-website'
+      path: '/make-html-file-into-website'
+      fullPath: '/make-html-file-into-website'
+      preLoaderRoute: typeof MakeHtmlFileIntoWebsiteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/links': {
@@ -856,6 +876,7 @@ const rootRouteChildren: RootRouteChildren = {
   HostSingleHtmlRoute: HostSingleHtmlRoute,
   IdphotoRoute: IdphotoRoute,
   LinksRoute: LinksRoute,
+  MakeHtmlFileIntoWebsiteRoute: MakeHtmlFileIntoWebsiteRoute,
   Md2htmlRoute: Md2htmlRoute,
   OutbreakRoute: OutbreakRoute,
   PapercutRoute: PapercutRoute,
