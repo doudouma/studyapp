@@ -263,6 +263,26 @@ export function AppFooter() {
               label="Listed on InventList"
               rel="noopener"
             />
+            <BadgeLink
+              href="https://nicklaunches.com/"
+              imgSrc="https://nicklaunches.com/badges/featured.png"
+              label="Featured on Nick Launches"
+              rel="noopener"
+            />
+            <BadgeLink
+              href="https://foundrlist.com/product/100mini?utm_source=badge&utm_medium=embed"
+              imgSrc="https://foundrlist.com/api/badge/100mini"
+              label="Featured on FoundrList"
+              rel="noopener"
+            />
+            <BadgeLink
+              href="https://www.agenthunter.io"
+              imgSrc="https://www.agenthunter.io/logo-light.svg"
+              label="Featured on AgentHunter"
+              rel="noopener"
+            />
+            <TextLink href="https://www.aitoolzdir.com" label="AI Toolz Dir" />
+            <TextLink href="https://startupbase.io" label="Listed on StartupBase" />
           </div>
         </div>
       </div>
