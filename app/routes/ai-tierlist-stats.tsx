@@ -58,7 +58,6 @@ export const Route = createFileRoute("/ai-tierlist-stats")({
         { name: "twitter:description", content: i18n.t("aiTierlistStats.desc") },
         { name: "twitter:image", content: DEFAULT_OG_IMAGE },
       ],
-      links: [{ rel: "canonical", href: pageUrl }],
       scripts: [
         {
           type: "application/ld+json",

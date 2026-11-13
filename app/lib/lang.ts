@@ -85,7 +85,13 @@ export function withLangPrefix(lang: Lang, basePath: string): string {
 }
 
 export interface HeadLink {
-  rel: string;
+  /**
+   * 只允许 `alternate`：canonical 由 `app/routes/__root.tsx` 的 RootDocument
+   * 统一输出一条，任何地方再构造一条都会让页面出现两个 canonical 声明。
+   * 路由 `head().links` 的类型由 TanStack 提供（无法收窄），所以那边靠
+   * `tests/canonical-single-source.spec.ts` 兜底。
+   */
+  rel: "alternate";
   href: string;
   // React's DOM property for the hreflang attribute is camelCase `hrefLang`
   // (TanStack renders head links through React on the client, which would warn
@@ -111,17 +117,4 @@ export function buildHreflangLinksFor(basePath: string, langs: readonly Lang[]):
     href: BASE_URL + withLangPrefix(DEFAULT_LANG, basePath),
   });
   return links;
-}
-
-/** hreflang alternate <link> entries for every language + x-default. */
-export function buildHreflangLinks(basePath: string): HeadLink[] {
-  return buildHreflangLinksFor(basePath, LANGS);
-}
-
-/** Canonical <link> for the current language version of a base path. */
-export function buildCanonicalLink(basePath: string, lang: Lang): HeadLink {
-  return {
-    rel: "canonical",
-    href: BASE_URL + withLangPrefix(lang, basePath),
-  };
 }

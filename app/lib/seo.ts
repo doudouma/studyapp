@@ -33,8 +33,6 @@ export {
   stripLangPrefix,
   langBasepath,
   withLangPrefix,
-  buildHreflangLinks,
-  buildCanonicalLink,
   type Lang,
   type HeadLink,
 } from "./lang";

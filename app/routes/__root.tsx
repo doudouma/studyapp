@@ -148,7 +148,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
               the client branch below does not re-render them, so there is no
               duplication and no client-side prop warning. HTML attribute names
               are case-insensitive, so `hrefLang=` is parsed identically to
-              `hreflang=` by browsers and Google. */}
+              `hreflang=` by browsers and Google.
+
+              NOTE: this is the ONLY place a canonical link may be emitted.
+              路由层不要再在 head() 的 links 里声明 canonical —— 那会让页面出现
+              两条 <link rel="canonical">，Google 会忽略重复声明。
+              tests/canonical-single-source.spec.ts 会拦住这种回归。 */}
           <link rel="canonical" href={canonicalHref} />
           {hreflangLinks.map((l) => (
             <link key={l.hrefLang} rel={l.rel} hrefLang={l.hrefLang} href={l.href} />

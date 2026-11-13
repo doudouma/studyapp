@@ -6,7 +6,7 @@ import { buttonVariants } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
 import { useTranslation } from "react-i18next";
 import i18n, { getBcp47 } from "~/lib/i18n";
-import { withLangPrefix, currentLang, BASE_URL, DEFAULT_OG_IMAGE } from "~/lib/seo";
+import { DEFAULT_OG_IMAGE } from "~/lib/seo";
 
 const PREFIX = "makeHtmlWebsite";
 const FAQ_COUNT = 5;
@@ -16,7 +16,6 @@ const ROUTE_ICONS = [Link2, Globe, Store];
 export const Route = createFileRoute("/make-html-file-into-website")({
   head: () => {
     const bcp = getBcp47(i18n.language);
-    const pageUrl = BASE_URL + withLangPrefix(currentLang(), "/make-html-file-into-website");
     const faqs = Array.from({ length: FAQ_COUNT }, (_, i) => ({
       name: i18n.t(`${PREFIX}.faq${i + 1}.q`),
       text: i18n.t(`${PREFIX}.faq${i + 1}.a`),
@@ -37,7 +36,6 @@ export const Route = createFileRoute("/make-html-file-into-website")({
         { name: "twitter:description", content: i18n.t(`${PREFIX}.desc`) },
         { name: "twitter:image", content: DEFAULT_OG_IMAGE },
       ],
-      links: [{ rel: "canonical", href: pageUrl }],
       scripts: [
         {
           type: "application/ld+json",

@@ -11,7 +11,7 @@ import { Card, CardContent } from "~/components/ui/card";
 import { useAuth } from "~/lib/auth-context";
 import { useTranslation } from "react-i18next";
 import i18n, { getBcp47 } from "~/lib/i18n";
-import { withLangPrefix, currentLang, BASE_URL, DEFAULT_OG_IMAGE } from "~/lib/seo";
+import { DEFAULT_OG_IMAGE } from "~/lib/seo";
 import { uploadPage } from "~/features/pages/api";
 import { MAX_CONTENT_SIZE, MAX_USER_CONTENT_SIZE } from "@shared/types/pages";
 import type { UploadResult, UploadExpiryOptions } from "@shared/types/pages";
@@ -28,7 +28,6 @@ const TEMPORARY_DEFAULT_EXPIRY: UploadExpiryOptions = {
 export const Route = createFileRoute("/temporary-link")({
   head: () => {
     const bcp = getBcp47(i18n.language);
-    const pageUrl = BASE_URL + withLangPrefix(currentLang(), "/temporary-link");
     // The definition block is rendered visibly in the hero, so it belongs in the
     // FAQ schema too (schema must mirror visible content).
     const faqs = [
@@ -54,7 +53,6 @@ export const Route = createFileRoute("/temporary-link")({
         { name: "twitter:description", content: i18n.t(`${PREFIX}.desc`) },
         { name: "twitter:image", content: DEFAULT_OG_IMAGE },
       ],
-      links: [{ rel: "canonical", href: pageUrl }],
       scripts: [
         {
           type: "application/ld+json",
