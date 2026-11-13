@@ -1,7 +1,14 @@
 // 免费资源补充清单：参考 Reddit / X 社区共识整理。
 // 名称与提供方保留英文；介绍按语言本地化，缺失时回退英文。
 
-export type FreeResourceGroup = "start" | "books" | "repos" | "videos" | "games" | "vendors";
+export type FreeResourceGroup =
+  | "start"
+  | "books"
+  | "repos"
+  | "videos"
+  | "games"
+  | "vendors"
+  | "robotics";
 export type FreeResourceTag =
   | "hub"
   | "course"
@@ -21,6 +28,27 @@ export interface FreeResource {
   url: string;
   tag: FreeResourceTag;
   desc: Record<ResourceLocale, string>;
+  /**
+   * 需要付费的部分（课程报名、硬件、API 调用）。免费资源里最容易踩的坑，
+   * 有就写清楚，没有就省略——不写等于让人以为全都不要钱。
+   */
+  cost?: Record<ResourceLocale, string>;
+  /**
+   * 真实用户评价：只有在能指出具体来源（Reddit 帖子 / HN 评论 / 评测媒体）时才填，
+   * 拿不到可靠来源就整段省略——不编造评分，也不留空壳。
+   */
+  review?: FreeResourceReview;
+}
+
+export interface FreeResourceReview {
+  /** 引述按语言本地化；en 为原话（或英文媒体的原文） */
+  quote: Record<ResourceLocale, string>;
+  /** 来源描述，如 "Reddit · r/learnprogramming" */
+  source: string;
+  /** 来源链接 */
+  url?: string;
+  /** 有明确数值评分时填，如 "4.8/5"、"36 upvotes" */
+  score?: string;
 }
 
 export const FREE_RESOURCE_GROUPS: FreeResourceGroup[] = [
@@ -30,6 +58,7 @@ export const FREE_RESOURCE_GROUPS: FreeResourceGroup[] = [
   "videos",
   "games",
   "vendors",
+  "robotics",
 ];
 
 export const FREE_RESOURCES: FreeResource[] = [
@@ -392,6 +421,18 @@ export const FREE_RESOURCES: FreeResource[] = [
       es: "Doce wargames, y Bandit es la puerta de entrada: 34 niveles por SSH que enseñan el shell de Linux obligándote a buscar contraseñas ocultas. Conviene haber usado una terminal antes de empezar.",
       pt: "Doze wargames, e o Bandit é a porta de entrada: 34 níveis via SSH que ensinam o shell do Linux fazendo você caçar senhas escondidas. Melhor já ter usado um terminal antes de começar.",
     },
+    review: {
+      quote: {
+        en: "It has 34 levels and I started getting stuck around level 17/18. The difficulty grew rapidly and I'm not even sure what I'm doing anymore.",
+        zh: "一共 34 关，我在 17/18 关左右就开始卡住。难度涨得太快，我都不确定自己在干什么了。",
+        fr: "Il y a 34 niveaux et j'ai commencé à bloquer vers le 17/18. La difficulté monte vite et je ne sais même plus ce que je fais.",
+        es: "Tiene 34 niveles y empecé a atascarme hacia el 17/18. La dificultad sube muy rápido y ya no sé ni qué estoy haciendo.",
+        pt: "São 34 níveis e eu comecei a travar por volta do 17/18. A dificuldade sobe rápido e eu já não sei o que estou fazendo.",
+      },
+      source: "Reddit · r/securityCTF",
+      score: "36 upvotes",
+      url: "https://www.reddit.com/r/securityCTF/comments/i7xjl3/overthewire_bandit_is_getting_hard_advice_on_how/",
+    },
   },
   {
     id: "oh-my-git",
@@ -406,6 +447,18 @@ export const FREE_RESOURCES: FreeResource[] = [
       fr: "Montre le graphe de commits se réorganiser pendant que vous jouez, avec des cartes qui expliquent chaque concept. Version bureau Windows, macOS et Linux ; le projet est en maintenance minimale, à utiliser pour le modèle mental, pas comme aide-mémoire des commandes.",
       es: "Muestra el grafo de commits reorganizándose mientras juegas, con cartas que explican cada concepto. Versión de escritorio para Windows, macOS y Linux; el proyecto está en modo de bajo mantenimiento: úsalo para el modelo mental, no como referencia de comandos.",
       pt: "Mostra o grafo de commits se reorganizando enquanto você joga, com cartas que explicam cada conceito. Versão desktop para Windows, macOS e Linux; o projeto está em modo de baixa manutenção: use para formar o modelo mental, não como referência de comandos.",
+    },
+    review: {
+      quote: {
+        en: "For a person who could never muster the strength to learn git, and from what I have played so far, it's pretty great.",
+        zh: "对我这种一直下不了决心学 git 的人，就目前玩到的部分来说，相当棒。",
+        fr: "Pour quelqu'un qui n'a jamais eu le courage d'apprendre git, et d'après ce que j'ai joué jusqu'ici, c'est très bien.",
+        es: "Para alguien que nunca reunió fuerzas para aprender git, y por lo que he jugado hasta ahora, está muy bien.",
+        pt: "Para quem nunca teve disposição para aprender git, e pelo que joguei até agora, é muito bom.",
+      },
+      source: "Reddit · r/learnprogramming",
+      score: "24 upvotes",
+      url: "https://www.reddit.com/r/learnprogramming/comments/mu1sk5/oh_my_git_a_trime_travel_themed_game_to_learn_git/",
     },
   },
   {
@@ -422,6 +475,17 @@ export const FREE_RESOURCES: FreeResource[] = [
       es: "Un RPG donde los hechizos son Python o JavaScript de verdad. Los niveles gratis se acaban pronto —unos cinco en la campaña inicial—, así que es una probada de sintaxis, no un curso.",
       pt: "Um RPG onde os feitiços são Python ou JavaScript de verdade. Os níveis grátis acabam cedo — cerca de cinco na campanha inicial —, então é uma amostra de sintaxe, não um curso.",
     },
+    review: {
+      quote: {
+        en: "CodeCombat's free RPG adventures do a great job of turning the basics of coding into fun games for kids.",
+        zh: "CodeCombat 的免费 RPG 冒险很擅长把编程基础变成孩子愿意玩的游戏。",
+        fr: "Les aventures RPG gratuites de CodeCombat transforment très bien les bases du code en jeux amusants pour les enfants.",
+        es: "Las aventuras RPG gratuitas de CodeCombat convierten muy bien las bases de la programación en juegos divertidos para niños.",
+        pt: "As aventuras de RPG gratuitas do CodeCombat transformam muito bem o básico de programação em jogos divertidos para crianças.",
+      },
+      source: "PCMag",
+      url: "https://www.pcmag.com/reviews/codecombat",
+    },
   },
   {
     id: "codepip",
@@ -436,6 +500,18 @@ export const FREE_RESOURCES: FreeResource[] = [
       fr: "Flexbox Froggy et Grid Garden sont les deux que tout le monde recommande : on déplace des grenouilles et on arrose des carottes en écrivant du CSS. Idéal pour l'intuition du layout, même s'il saute flex-grow, flex-shrink et flex-basis.",
       es: "Flexbox Froggy y Grid Garden son los dos que todos recomiendan: mueves ranas y riegas zanahorias escribiendo CSS. Rápido para ganar intuición de layout, aunque se salta flex-grow, flex-shrink y flex-basis.",
       pt: "Flexbox Froggy e Grid Garden são os dois que todo mundo recomenda: você move sapos e rega cenouras escrevendo CSS. Rápido para ganhar intuição de layout, embora pule flex-grow, flex-shrink e flex-basis.",
+    },
+    review: {
+      quote: {
+        en: "It really helped me understand Flexbox but it skipped over all of the flex properties. Flex grow, flex shrink and flex-basis.",
+        zh: "它确实帮我理解了 flexbox，但把 flex-grow、flex-shrink 和 flex-basis 全跳过了。",
+        fr: "Ça m'a vraiment aidé à comprendre Flexbox, mais ça saute toutes les propriétés flex : flex-grow, flex-shrink et flex-basis.",
+        es: "Me ayudó mucho a entender Flexbox, pero se salta todas las propiedades flex: flex-grow, flex-shrink y flex-basis.",
+        pt: "Ajudou muito a entender Flexbox, mas pula todas as propriedades flex: flex-grow, flex-shrink e flex-basis.",
+      },
+      source: "Reddit · r/webdev",
+      score: "24 upvotes",
+      url: "https://www.reddit.com/r/webdev/comments/c9kxwf/flexbox_froggy_is_an_incredible_resource_to_learn/",
     },
   },
   {
@@ -452,6 +528,18 @@ export const FREE_RESOURCES: FreeResource[] = [
       es: "Lo que antes era picoCTF: mismo equipo, misma plataforma gratuita, ahora bajo CyLab de CMU con rutas de seguridad en IA y blockchain. Las credenciales antiguas siguen funcionando. Termina General Skills antes de tocar los retos de Practice.",
       pt: "O antigo picoCTF: mesma equipe, mesma plataforma gratuita, agora sob o CyLab da CMU com trilhas de segurança em IA e blockchain. As credenciais antigas continuam valendo. Termine General Skills antes de encarar os desafios de Practice.",
     },
+    review: {
+      quote: {
+        en: "Then I tried the practice challenges and it was too much — learning PHP object injection and cryptography while finishing high school seems impossibly hard.",
+        zh: "然后我去做 Practice 题，实在太多了——一边读高中一边学 PHP 对象注入和密码学，难到不可能。",
+        fr: "Puis j'ai essayé les défis Practice et c'était trop : apprendre l'injection d'objets PHP et la cryptographie en terminant le lycée semble impossible.",
+        es: "Luego probé los retos de Practice y era demasiado: aprender inyección de objetos PHP y criptografía mientras terminas el instituto parece imposible.",
+        pt: "Aí tentei os desafios de Practice e era demais: aprender injeção de objetos PHP e criptografia enquanto termina o ensino médio parece impossível.",
+      },
+      source: "Reddit · r/hacking",
+      score: "15 upvotes",
+      url: "https://www.reddit.com/r/hacking/comments/u1gl2r/completely_overwhelmed_by_pico_ctf/",
+    },
   },
   {
     id: "sololearn",
@@ -466,6 +554,18 @@ export const FREE_RESOURCES: FreeResource[] = [
       fr: "Des leçons courtes pensées pour le téléphone, avec sous chacune une section de commentaires souvent plus utile que la leçon. Bien pour la révision et les séries ; mince dès qu'on veut écrire un vrai programme.",
       es: "Lecciones cortas pensadas para el móvil, con una sección de comentarios bajo cada una que suele ser más útil que la lección. Bien para repasar y mantener la racha; escaso cuando quieres escribir un programa real.",
       pt: "Lições curtas feitas para o celular, com uma seção de comentários abaixo de cada uma que costuma ser mais útil que a lição. Bom para revisar e manter a sequência; raso quando você quer escrever um programa de verdade.",
+    },
+    review: {
+      quote: {
+        en: "The tutorials are often lacking or lack relevant information to accomplish the next task. That said, the comment sections have gotten me out of many binds.",
+        zh: "教程经常缺东西，缺到没法完成下一道题。不过每节的评论区帮我解过很多次围。",
+        fr: "Les tutoriels manquent souvent d'informations pour faire l'exercice suivant. Cela dit, les commentaires m'ont sorti de pas mal de galères.",
+        es: "Los tutoriales suelen quedarse cortos y no dan la información para la siguiente tarea. Dicho esto, los comentarios me han sacado de muchos apuros.",
+        pt: "Os tutoriais costumam faltar informação para concluir a próxima tarefa. Dito isso, os comentários já me tiraram de muitos apertos.",
+      },
+      source: "Reddit · r/learnprogramming",
+      score: "14 upvotes",
+      url: "https://www.reddit.com/r/learnprogramming/comments/ds3ow6/an_honest_review_of_sololearn_so_far/",
     },
   },
   {
@@ -482,6 +582,18 @@ export const FREE_RESOURCES: FreeResource[] = [
       es: "Arrastra bloques para crear historias, juegos y animaciones, y compártelos en una comunidad moderada. Pensado para 8–16 años; al profesorado le gustan los conceptos y echa en falta un depurador paso a paso.",
       pt: "Arraste blocos para criar histórias, jogos e animações, e compartilhe em uma comunidade moderada. Voltado a 8–16 anos; professores gostam dos conceitos e reclamam da falta de depurador passo a passo.",
     },
+    review: {
+      quote: {
+        en: "It has literally no debugging features whatsoever. If your code doesn't work, you're screwed.",
+        zh: "它完全没有任何调试功能。代码跑不通，你就完了。",
+        fr: "Il n'a littéralement aucune fonction de débogage. Si votre code ne marche pas, vous êtes coincé.",
+        es: "No tiene literalmente ninguna función de depuración. Si tu código no funciona, estás perdido.",
+        pt: "Não tem literalmente nenhum recurso de depuração. Se o seu código não funciona, você está perdido.",
+      },
+      source: "Reddit · r/Teachers",
+      score: "10 upvotes",
+      url: "https://www.reddit.com/r/Teachers/comments/if5ci4/scratch_is_actually_an_awful_programming_language/",
+    },
   },
   {
     id: "codingame",
@@ -497,6 +609,18 @@ export const FREE_RESOURCES: FreeResource[] = [
       es: "Puzles y batallas de bots en más de 25 lenguajes, con una clasificación competitiva. Explícitamente no es para principiantes ni para aprender un lenguaje nuevo: afina lo que ya sabes. El sitio ahora también promociona la evaluación de agentes.",
       pt: "Puzzles e batalhas de bots em mais de 25 linguagens, com ranking competitivo. Explicitamente não é para iniciantes nem para aprender uma linguagem nova: afia o que você já sabe. O site agora também divulga avaliação de agentes.",
     },
+    review: {
+      quote: {
+        en: "CodinGame is very nice for gaining skills useful in writing a game. But there is a long way from the pieces you practise here to the final result.",
+        zh: "CodinGame 对练写游戏用得上的技能很不错。但从这里练的碎片到最终成品，还有很长的路。",
+        fr: "CodinGame est très bien pour acquérir des compétences utiles à l'écriture d'un jeu. Mais il y a un long chemin entre les pièces pratiquées ici et le résultat final.",
+        es: "CodinGame está muy bien para adquirir habilidades útiles al escribir un juego. Pero hay un largo camino de las piezas que practicas aquí al resultado final.",
+        pt: "O CodinGame é muito bom para ganhar habilidades úteis ao escrever um jogo. Mas há um longo caminho das peças praticadas aqui até o resultado final.",
+      },
+      source: "Reddit · r/learnprogramming",
+      score: "top reply",
+      url: "https://www.reddit.com/r/learnprogramming/comments/8ex4ib/is_codingame_really_good/",
+    },
   },
   {
     id: "anthropic-courses",
@@ -511,6 +635,18 @@ export const FREE_RESOURCES: FreeResource[] = [
       fr: "Le catalogue d'Anthropic, hébergé sur Skilljar : prompting Claude, usage des outils et construction d'agents. Gratuit ; un compte Skilljar permet de suivre sa progression.",
       es: "El catálogo propio de Anthropic, alojado en Skilljar: prompting de Claude, uso de herramientas y construcción de agentes. Gratis; con una cuenta de Skilljar se guarda el progreso.",
       pt: "O catálogo da própria Anthropic, hospedado no Skilljar: prompting do Claude, uso de ferramentas e construção de agentes. Grátis; uma conta Skilljar registra o progresso.",
+    },
+    review: {
+      quote: {
+        en: "I have worked as a training developer and trainer, and IMO their content is actually quite well done, kind of unusual for free-tier training.",
+        zh: "我做过培训开发，也当过讲师。我认为他们的内容做得相当好，在免费培训里算少见。",
+        fr: "J'ai été développeur de formations et formateur, et à mon avis leur contenu est vraiment bien fait, ce qui est rare pour de la formation gratuite.",
+        es: "He trabajado como desarrollador de formación y formador, y en mi opinión su contenido está muy bien hecho, algo poco habitual en formación gratuita.",
+        pt: "Já trabalhei como desenvolvedor de treinamentos e instrutor, e na minha opinião o conteúdo deles é muito bem feito, algo incomum em treinamento gratuito.",
+      },
+      source: "Reddit · r/ClaudeAI",
+      score: "28 upvotes",
+      url: "https://www.reddit.com/r/ClaudeAI/comments/1u3zl82/went_through_everything_on_anthropic_academy_so/",
     },
   },
   {
@@ -572,6 +708,18 @@ export const FREE_RESOURCES: FreeResource[] = [
       es: "Módulos y rutas de aprendizaje autoguiados sobre Azure, Fabric e IA. Estudiar es gratis; los exámenes de certificación se pagan aparte.",
       pt: "Módulos e trilhas de estudo autoguiados em Azure, Fabric e IA. Estudar é grátis; os exames de certificação são pagos.",
     },
+    review: {
+      quote: {
+        en: "They just throw modules at you left and right, making it impossible to navigate through what order I should learn things.",
+        zh: "他们把模块随便往你身上砸，根本没法判断该按什么顺序学。",
+        fr: "Ils vous jettent des modules de tous les côtés, impossible de savoir dans quel ordre apprendre.",
+        es: "Te lanzan módulos por todas partes, imposible saber en qué orden aprender.",
+        pt: "Eles jogam módulos de todo lado em você, impossível saber em que ordem aprender.",
+      },
+      source: "Reddit · r/learncsharp",
+      score: "49 upvotes",
+      url: "https://www.reddit.com/r/learncsharp/comments/1o6mx4a/microsoft_learn_feels_like_a_jungle/",
+    },
   },
   {
     id: "openai-academy",
@@ -616,6 +764,217 @@ export const FREE_RESOURCES: FreeResource[] = [
       fr: "Des cours numériques gratuits sur AWS et l'IA, mais le catalogue complet, les labs pratiques et les examens blancs sont derrière un abonnement, et les examens de certification sont facturés à part.",
       es: "Cursos digitales gratis sobre AWS e IA, pero el catálogo completo, los laboratorios prácticos y los exámenes de práctica están tras una suscripción, y los exámenes de certificación se cobran aparte.",
       pt: "Cursos digitais grátis sobre AWS e IA, mas o catálogo completo, os laboratórios práticos e os simulados ficam atrás de uma assinatura, e os exames de certificação são cobrados à parte.",
+    },
+    review: {
+      quote: {
+        en: "It seems incredibly disorganized, lacking, and just not very intuitive to navigate.",
+        zh: "它看起来非常杂乱、内容不足，导航也不直观。",
+        fr: "Cela semble très désorganisé, incomplet, et pas du tout intuitif à parcourir.",
+        es: "Parece muy desorganizado, escaso y nada intuitivo de navegar.",
+        pt: "Parece muito desorganizado, incompleto e nada intuitivo de navegar.",
+      },
+      source: "Reddit · r/AWSCertifications",
+      score: "30 upvotes",
+      url: "https://www.reddit.com/r/AWSCertifications/comments/1ps9gvm/skill_builder_is_kind_of_trash/",
+    },
+  },
+  {
+    id: "nvidia-physical-ai",
+    group: "robotics",
+    name: "NVIDIA Physical AI Learning",
+    by: "NVIDIA",
+    url: "https://docs.nvidia.com/learning/physical-ai",
+    tag: "course",
+    desc: {
+      en: "NVIDIA's free self-paced robotics track: Isaac Sim, Isaac ROS, Isaac Lab, plus end-to-end labs that train a Unitree G1 humanoid and an SO-101 arm in simulation before moving to real hardware.",
+      zh: "NVIDIA 免费的机器人自学课程：Isaac Sim、Isaac ROS、Isaac Lab，还有先在仿真里训练 Unitree G1 人形和 SO-101 机械臂、再迁移到真机的完整实验。",
+      fr: "Le parcours robotique gratuit de NVIDIA : Isaac Sim, Isaac ROS, Isaac Lab, avec des labs de bout en bout qui entraînent un humanoïde Unitree G1 et un bras SO-101 en simulation avant le matériel réel.",
+      es: "La ruta gratuita de robótica de NVIDIA: Isaac Sim, Isaac ROS e Isaac Lab, con laboratorios que entrenan un humanoide Unitree G1 y un brazo SO-101 en simulación antes de pasar al hardware real.",
+      pt: "A trilha gratuita de robótica da NVIDIA: Isaac Sim, Isaac ROS e Isaac Lab, com laboratórios que treinam um humanoide Unitree G1 e um braço SO-101 em simulação antes do hardware real.",
+    },
+    cost: {
+      en: "Courses are free; the optional certification exams are paid, and Isaac Sim wants an RTX-class GPU or a rented cloud one.",
+      zh: "课程免费；可选的认证考试要收费，跑 Isaac Sim 还需要 RTX 级显卡或按小时租云 GPU。",
+      fr: "Les cours sont gratuits ; les examens de certification sont payants, et Isaac Sim demande un GPU de classe RTX ou un GPU loué à l'heure.",
+      es: "Los cursos son gratis; los exámenes de certificación se pagan, e Isaac Sim pide una GPU de gama RTX o una alquilada por horas.",
+      pt: "Os cursos são grátis; os exames de certificação são pagos, e o Isaac Sim pede uma GPU classe RTX ou uma alugada por hora.",
+    },
+  },
+  {
+    id: "hf-robotics-course",
+    group: "robotics",
+    name: "Hugging Face Robotics Course",
+    by: "Hugging Face",
+    url: "https://huggingface.co/learn/robotics-course",
+    tag: "course",
+    desc: {
+      en: "Hugging Face's free course on robot learning: imitation learning, vision-language-action models and the LeRobot stack, written as runnable notebooks.",
+      zh: "Hugging Face 的机器人学习免费课程：模仿学习、VLA 模型和 LeRobot 工具栈，全部写成可直接运行的 notebook。",
+      fr: "Le cours gratuit de Hugging Face sur l'apprentissage robotique : imitation learning, modèles vision-langage-action et la stack LeRobot, en notebooks exécutables.",
+      es: "El curso gratuito de Hugging Face sobre aprendizaje robótico: imitation learning, modelos visión-lenguaje-acción y el stack LeRobot, en notebooks ejecutables.",
+      pt: "O curso gratuito do Hugging Face sobre aprendizado robótico: imitation learning, modelos visão-linguagem-ação e a stack LeRobot, em notebooks executáveis.",
+    },
+  },
+  {
+    id: "mujoco",
+    group: "robotics",
+    name: "MuJoCo",
+    by: "Google DeepMind",
+    url: "https://mujoco.readthedocs.io",
+    tag: "hub",
+    desc: {
+      en: "The physics engine most robotics RL papers are built on: contact simulation, Python bindings and model files, now maintained by DeepMind after years as a closed MuJoCo license.",
+      zh: "多数机器人强化学习论文背后的物理引擎：接触仿真、Python 绑定与模型文件。它曾长期是闭源许可，现在由 DeepMind 维护。",
+      fr: "Le moteur physique derrière la plupart des articles de RL en robotique : simulation de contacts, bindings Python et fichiers de modèles, maintenu par DeepMind après des années de licence fermée.",
+      es: "El motor físico detrás de la mayoría de los artículos de RL en robótica: simulación de contactos, bindings de Python y ficheros de modelos, mantenido por DeepMind tras años de licencia cerrada.",
+      pt: "O motor físico por trás da maioria dos artigos de RL em robótica: simulação de contato, bindings Python e arquivos de modelos, mantido pelo DeepMind depois de anos de licença fechada.",
+    },
+  },
+  {
+    id: "gemini-robotics",
+    group: "robotics",
+    name: "Gemini Robotics (docs)",
+    by: "Google",
+    url: "https://aistudio.google.com/docs/robotics-overview",
+    tag: "hub",
+    desc: {
+      en: "Documentation for Gemini Robotics ER, a vision-language model built for embodied reasoning — reading camera input to reason about objects, space and motion.",
+      zh: "Gemini Robotics ER 的文档：一个为具身推理训练的视觉语言模型，读摄像头画面来推断物体、空间与运动。",
+      fr: "La documentation de Gemini Robotics ER, un modèle vision-langage conçu pour le raisonnement incarné : il lit la caméra pour raisonner sur les objets, l'espace et le mouvement.",
+      es: "La documentación de Gemini Robotics ER, un modelo visión-lenguaje pensado para razonamiento encarnado: lee la cámara para razonar sobre objetos, espacio y movimiento.",
+      pt: "A documentação do Gemini Robotics ER, um modelo visão-linguagem feito para raciocínio corporificado: lê a câmera para raciocinar sobre objetos, espaço e movimento.",
+    },
+    cost: {
+      en: "The model is in preview, so quotas are limited; regular Gemini API usage is billed per token.",
+      zh: "模型目前是 preview，配额有限；常规 Gemini API 调用按 token 计费。",
+      fr: "Le modèle est en preview, donc les quotas sont limités ; l'usage normal de l'API Gemini est facturé au token.",
+      es: "El modelo está en preview, así que las cuotas son limitadas; el uso normal de la API de Gemini se cobra por token.",
+      pt: "O modelo está em preview, então as cotas são limitadas; o uso normal da API Gemini é cobrado por token.",
+    },
+  },
+  {
+    id: "openpi",
+    group: "robotics",
+    name: "openpi",
+    by: "Physical Intelligence",
+    url: "https://github.com/Physical-Intelligence/openpi",
+    tag: "github",
+    desc: {
+      en: "Open code and base checkpoints for π0, π0-FAST and π0.5 — vision-language-action models pre-trained on 10k+ hours of robot data, with fine-tuning examples for your own setup.",
+      zh: "π0、π0-FAST 与 π0.5 的开放代码和基础权重：在 1 万小时以上机器人数据上预训练的 VLA 模型，附带针对自有设备的微调示例。",
+      fr: "Code et checkpoints de base ouverts pour π0, π0-FAST et π0.5 : des modèles vision-langage-action pré-entraînés sur plus de 10 000 heures de données robotiques, avec des exemples de fine-tuning.",
+      es: "Código y checkpoints base abiertos de π0, π0-FAST y π0.5: modelos visión-lenguaje-acción preentrenados con más de 10 000 horas de datos de robots, con ejemplos de fine-tuning.",
+      pt: "Código e checkpoints base abertos do π0, π0-FAST e π0.5: modelos visão-linguagem-ação pré-treinados com mais de 10 mil horas de dados de robôs, com exemplos de fine-tuning.",
+    },
+    cost: {
+      en: "Code and checkpoints are free; fine-tuning needs GPU time, and running a policy needs hardware or a simulator.",
+      zh: "代码和权重免费；微调要烧 GPU 时间，真跑策略还需要硬件或仿真环境。",
+      fr: "Le code et les checkpoints sont gratuits ; le fine-tuning demande du temps GPU, et exécuter une politique demande du matériel ou un simulateur.",
+      es: "El código y los checkpoints son gratis; el fine-tuning consume tiempo de GPU, y ejecutar una política requiere hardware o un simulador.",
+      pt: "Código e checkpoints são grátis; o fine-tuning consome tempo de GPU, e rodar uma política exige hardware ou um simulador.",
+    },
+  },
+  {
+    id: "ur-academy",
+    group: "robotics",
+    name: "Universal Robots Academy",
+    by: "Universal Robots",
+    url: "https://academy.universal-robots.com",
+    tag: "course",
+    desc: {
+      en: "The cobot maker's own training portal: setup, programming and safety modules for Universal Robots arms, as free e-learning.",
+      zh: "协作机器人厂商自己的培训门户：Universal Robots 机械臂的安装、编程与安全模块，以免费 e-learning 形式提供。",
+      fr: "Le portail de formation du fabricant de cobots : modules d'installation, de programmation et de sécurité pour les bras Universal Robots, en e-learning gratuit.",
+      es: "El portal de formación del fabricante de cobots: módulos de instalación, programación y seguridad para brazos Universal Robots, en e-learning gratuito.",
+      pt: "O portal de treinamento do fabricante de cobots: módulos de instalação, programação e segurança para braços Universal Robots, em e-learning gratuito.",
+    },
+    cost: {
+      en: "E-learning is free. Instructor-led in-class and virtual courses are paid, and the arms themselves are industrial hardware.",
+      zh: "e-learning 免费；instructor-led 的线下课和虚拟课要收费，机械臂本体是工业级硬件。",
+      fr: "L'e-learning est gratuit. Les cours en présentiel et virtuels avec formateur sont payants, et les bras sont du matériel industriel.",
+      es: "El e-learning es gratis. Los cursos presenciales y virtuales con instructor son de pago, y los brazos son hardware industrial.",
+      pt: "O e-learning é grátis. Os cursos presenciais e virtuais com instrutor são pagos, e os braços são hardware industrial.",
+    },
+  },
+  {
+    id: "spot-sdk",
+    group: "robotics",
+    name: "Spot SDK",
+    by: "Boston Dynamics",
+    url: "https://dev.bostondynamics.com",
+    tag: "hub",
+    desc: {
+      en: "The developer documentation for Spot: Python client, autonomy, perception and payload APIs, with examples for writing behaviours before you get near the robot.",
+      zh: "Spot 的开发者文档：Python 客户端、自主导航、感知与载荷 API，附示例代码，可以先用它写行为再接触真机。",
+      fr: "La documentation développeur de Spot : client Python, autonomie, perception et API de charges utiles, avec des exemples pour écrire des comportements avant d'approcher le robot.",
+      es: "La documentación para desarrolladores de Spot: cliente de Python, autonomía, percepción y APIs de carga útil, con ejemplos para escribir comportamientos antes de acercarte al robot.",
+      pt: "A documentação de desenvolvedor do Spot: cliente Python, autonomia, percepção e APIs de carga útil, com exemplos para escrever comportamentos antes de chegar perto do robô.",
+    },
+    cost: {
+      en: "Docs are free. Spot is a five-figure industrial robot, so in practice this is for people whose lab or employer already owns one.",
+      zh: "文档免费。Spot 是五万美元级的工业机器人，实际上这是给实验室或公司已经有机器的人看的。",
+      fr: "La doc est gratuite. Spot est un robot industriel à cinq chiffres : en pratique, c'est pour ceux dont le labo ou l'employeur en possède déjà un.",
+      es: "La documentación es gratis. Spot es un robot industrial de cinco cifras: en la práctica es para quien ya tiene uno en su laboratorio o empresa.",
+      pt: "A documentação é grátis. O Spot é um robô industrial de cinco dígitos: na prática, serve para quem já tem um no laboratório ou na empresa.",
+    },
+  },
+  {
+    id: "unitree-rl-gym",
+    group: "robotics",
+    name: "Unitree RL Gym",
+    by: "Unitree",
+    url: "https://github.com/unitreerobotics/unitree_rl_gym",
+    tag: "github",
+    desc: {
+      en: "Reinforcement-learning environments for Unitree's Go2, H1, H1-2 and G1, with training configurations for Isaac Gym and MuJoCo so you can teach a policy to walk in simulation first.",
+      zh: "Unitree Go2、H1、H1-2、G1 的强化学习环境，带 Isaac Gym 与 MuJoCo 的训练配置，可以先在仿真里把行走策略训出来。",
+      fr: "Des environnements d'apprentissage par renforcement pour les Unitree Go2, H1, H1-2 et G1, avec des configurations Isaac Gym et MuJoCo pour entraîner une politique de marche en simulation.",
+      es: "Entornos de aprendizaje por refuerzo para los Unitree Go2, H1, H1-2 y G1, con configuraciones de Isaac Gym y MuJoCo para entrenar una política de marcha en simulación.",
+      pt: "Ambientes de aprendizado por reforço para os Unitree Go2, H1, H1-2 e G1, com configurações de Isaac Gym e MuJoCo para treinar uma política de caminhada na simulação.",
+    },
+    cost: {
+      en: "Training in simulation is free; putting the resulting policy on hardware needs the robot, which is the expensive part.",
+      zh: "仿真训练免费；把策略放到真机上跑，就要买机器人了——贵的是这一步。",
+      fr: "L'entraînement en simulation est gratuit ; déployer la politique sur du matériel exige le robot, et c'est là que le coût arrive.",
+      es: "Entrenar en simulación es gratis; llevar la política al hardware exige el robot, y ahí llega el gasto.",
+      pt: "Treinar na simulação é grátis; levar a política para o hardware exige o robô, e é aí que vem o custo.",
+    },
+  },
+  {
+    id: "ros2-tutorials",
+    group: "robotics",
+    name: "ROS 2 Jazzy tutorials",
+    by: "Open Robotics",
+    url: "https://docs.ros.org/en/jazzy/Tutorials.html",
+    tag: "course",
+    desc: {
+      en: "The official ROS 2 beginner track: nodes, topics, services, launch files, tf2 and URDF, in both C++ and Python. The default vocabulary of every robotics job posting.",
+      zh: "ROS 2 官方入门教程：节点、话题、服务、launch 文件、tf2 与 URDF，C++ 和 Python 双版本。几乎所有机器人岗位的默认词汇。",
+      fr: "Le parcours débutant officiel de ROS 2 : nœuds, topics, services, launch files, tf2 et URDF, en C++ et Python. Le vocabulaire par défaut de presque toutes les offres en robotique.",
+      es: "La ruta oficial de iniciación a ROS 2: nodos, topics, servicios, launch files, tf2 y URDF, en C++ y Python. El vocabulario por defecto de casi cualquier oferta de robótica.",
+      pt: "A trilha oficial de iniciante em ROS 2: nós, tópicos, serviços, launch files, tf2 e URDF, em C++ e Python. O vocabulário padrão de quase toda vaga em robótica.",
+    },
+  },
+  {
+    id: "so-arm100",
+    group: "robotics",
+    name: "SO-ARM100",
+    by: "The Robot Studio",
+    url: "https://github.com/TheRobotStudio/SO-ARM100",
+    tag: "github",
+    desc: {
+      en: "An open-source design for the SO-100 and SO-101 arms — a leader and a follower — with 3D-printable parts and a bill of materials, which is why it became the default cheap arm in VLA tutorials.",
+      zh: "SO-100 与 SO-101 机械臂的开源设计：一条主臂、一条从臂，含可 3D 打印的零件和物料清单。正因为便宜，它成了 VLA 教程里的默认选择。",
+      fr: "Un design open source pour les bras SO-100 et SO-101 — un leader et un follower — avec pièces imprimables en 3D et nomenclature, d'où son statut de bras pas cher par défaut dans les tutoriels VLA.",
+      es: "Un diseño open source para los brazos SO-100 y SO-101 —uno líder y uno seguidor— con piezas imprimibles en 3D y lista de materiales, por eso es el brazo barato por defecto en los tutoriales de VLA.",
+      pt: "Um design open source para os braços SO-100 e SO-101 — um líder e um seguidor — com peças imprimíveis em 3D e lista de materiais, por isso virou o braço barato padrão nos tutoriais de VLA.",
+    },
+    cost: {
+      en: "Files are free; the parts run about $230 plus 3D printing, which is still the cheapest way into real robot data.",
+      zh: "文件免费；零件约 $230，再加 3D 打印，这仍然是最便宜的「摸到真机器人数据」的方式。",
+      fr: "Les fichiers sont gratuits ; les pièces coûtent environ 230 $ plus l'impression 3D, ce qui reste la voie la moins chère vers de vraies données robotiques.",
+      es: "Los archivos son gratis; las piezas cuestan unos 230 $ más la impresión 3D, que sigue siendo la vía más barata a datos reales de robot.",
+      pt: "Os arquivos são grátis; as peças custam cerca de US$ 230 mais a impressão 3D, que ainda é o caminho mais barato para dados reais de robô.",
     },
   },
 ];

@@ -33,7 +33,10 @@ export const BOOKS_CSS = `
 .ab-topic .n{font-size:10px;font-variant-numeric:tabular-nums;opacity:.6}
 .ab-side-note{padding:10px;font-size:10.5px;line-height:1.5;color:var(--aix-mute)}
 
-.ab-search{position:relative;width:100%;max-width:420px}
+.ab-search{position:sticky;top:72px;z-index:40;width:100%;max-width:420px}
+/* 吸顶后锚点跳转要避开搜索条（64 + 搜索条高度） */
+.ab-layout .aix-frame{scroll-margin-top:130px}
+.ab-details{scroll-margin-top:130px}
 .ab-search input{
   width:100%;height:38px;border:1px solid var(--aix-line);background:var(--aix-paper);border-radius:2px;
   padding:0 36px 0 32px;font-size:12px;color:var(--aix-ink);outline:none;

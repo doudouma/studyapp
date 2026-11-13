@@ -6,7 +6,7 @@ import type { ResourceLocale } from "~/features/books/free-resources";
 
 type Localized = Record<ResourceLocale, string>;
 
-export const AI_BOOKS_UPDATED = "2026-11-01";
+export const AI_BOOKS_UPDATED = "2026-11-13";
 
 export const QUICK_ANSWER: Localized = {
   en: "For most readers, start with Co-Intelligence by Ethan Mollick. Builders should read AI Engineering by Chip Huyen, and managers will get the most from The AI-Driven Leader by Geoff Woods. This shelf ranks 84 AI books using 26,414 Amazon ratings.",

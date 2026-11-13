@@ -1,7 +1,7 @@
 // 数据来源：免费课程（Udemy）与永久免费 Kindle 电子书（Amazon）快照。
 // 课程链接不参与联盟分成；电子书链接带 partner tag 与 ascsubtag 追踪。
 
-export const FREE_GENERATED_AT = "2026-11-03";
+export const FREE_GENERATED_AT = "2026-11-13";
 
 export type FreeKind = "course" | "ebook";
 export type FreeTopic = "chatgpt" | "agents" | "genai" | "ml" | "foundations";

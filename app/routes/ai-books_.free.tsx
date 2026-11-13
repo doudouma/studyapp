@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -6,6 +6,7 @@ import {
   BookMarked,
   BookOpen,
   Building2,
+  Bot,
   ChevronDown,
   Code2,
   Compass,
@@ -190,6 +191,21 @@ function ResourceSection({
             </div>
             <p className="free-by">{item.by}</p>
             <p className="free-desc">{item.desc[lang] ?? item.desc.en}</p>
+            {item.cost && (
+              <p className="free-cost">
+                <span className="free-cost-label">{t("freeLib.costLabel")}</span>
+                {item.cost[lang] ?? item.cost.en}
+              </p>
+            )}
+            {item.review && (
+              <div className="free-review">
+                <p className="free-review-quote">{item.review.quote[lang] ?? item.review.quote.en}</p>
+                <p className="free-review-meta">
+                  {item.review.score && <b>{item.review.score}</b>}
+                  <span>{item.review.source}</span>
+                </p>
+              </div>
+            )}
             <span className="free-open">{t("freeLib.openResource")} →</span>
           </a>
         ))}
@@ -260,7 +276,7 @@ function TopicButton({
 }
 
 const FREE_CSS = `
-.free-section{margin-top:34px;scroll-margin-top:84px}
+.free-section{margin-top:34px;scroll-margin-top:130px}
 .free-res-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:16px}
 @media(min-width:640px){.free-res-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(min-width:1280px){.free-res-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}}
@@ -276,6 +292,13 @@ const FREE_CSS = `
 .free-desc{flex:1;font-size:12px;line-height:1.55;color:var(--aix-mute)}
 .free-open{margin-top:auto;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--aix-ink)}
 .free-res:hover .free-open{text-decoration:underline}
+.free-review{margin-top:2px;padding-left:9px;border-left:2px solid var(--aix-lime)}.free-review-quote{margin:0;font-size:11px;line-height:1.5;color:var(--aix-ink);font-style:italic}
+.free-review-quote::before{content:"“"}
+.free-review-quote::after{content:"”"}
+.free-review-meta{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;margin:4px 0 0;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--aix-mute)}
+.free-review-meta b{font-weight:800;color:var(--aix-ink)}
+.free-cost{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;margin:2px 0 0;padding:6px 8px;border:1px dashed var(--aix-line);font-size:10.5px;line-height:1.5;color:var(--aix-ink)}
+.free-cost-label{flex:none;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--aix-mute)}
 
 .free-method{margin-top:16px;background:var(--aix-lime);color:#111214;border-radius:2px;padding:14px 16px}
 .free-method strong{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:800}
@@ -321,7 +344,7 @@ const FREE_CSS = `
 .dark .free-card .meta b{color:var(--aix-lime)}
 .free-head-meta{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--aix-mute)}
 .free-empty{padding:56px 0;text-align:center;font-size:12px;color:var(--aix-mute)}
-.free-about{margin-top:36px;border-top:1px solid var(--aix-line);padding-top:16px;font-size:11px;line-height:1.6;color:var(--aix-mute);scroll-margin-top:84px}
+.free-about{margin-top:36px;border-top:1px solid var(--aix-line);padding-top:16px;font-size:11px;line-height:1.6;color:var(--aix-mute);scroll-margin-top:130px}
 .free-about strong{color:var(--aix-ink);font-weight:800}
 .free-about a{color:var(--aix-ink);text-decoration:underline;text-underline-offset:2px}
 `;
@@ -379,6 +402,16 @@ function FreeLibraryPage() {
 
   const showCourses = type !== "ebook";
   const showEbooks = type !== "course";
+
+  // 话题按钮在侧边栏，结果列表在页面下方很多屏之外——点完不滚动的话
+  // 视觉上完全没反应。选中话题后把滤镜区滚进视口，并让状态在列表旁也可见。
+  const filtersRef = useRef<HTMLDivElement>(null);
+  const selectTopic = useCallback((next: TopicFilter) => {
+    setTopic(next);
+    // 用即时滚动而不是 smooth：这里只求「点了有反馈」，smooth 在部分环境
+    // （后台标签、减少动效设置）会被跳过，反而又变成「没反应」。
+    filtersRef.current?.scrollIntoView({ block: "start" });
+  }, []);
 
   const freeJsonLd = {
     "@context": "https://schema.org",
@@ -484,6 +517,12 @@ function FreeLibraryPage() {
                     label={t("freeLib.vendorCourses")}
                     external
                   />
+                  <SidebarLink
+                    href="#robotics"
+                    icon={Bot}
+                    label={t("freeLib.roboticsCourses")}
+                    external
+                  />
                   <SidebarLink href="#about" icon={Info} label={t("freeLib.about")} external />
                 </nav>
 
@@ -493,7 +532,7 @@ function FreeLibraryPage() {
                     active={topic === "all"}
                     label={t("freeLib.topic.all")}
                     count={FREE_TOTAL}
-                    onClick={() => setTopic("all")}
+                    onClick={() => selectTopic("all")}
                   />
                   {FREE_TOPICS.map((key) => (
                     <TopicButton
@@ -501,7 +540,7 @@ function FreeLibraryPage() {
                       active={topic === key}
                       label={t(`freeLib.topic.${key}`)}
                       count={TOPIC_COUNTS[key] ?? 0}
-                      onClick={() => setTopic(key)}
+                      onClick={() => selectTopic(key)}
                     />
                   ))}
                 </div>
@@ -596,11 +635,21 @@ function FreeLibraryPage() {
                   </details>
                 </section>
 
-                <div className="ab-filters" style={{ marginTop: 28 }}>
+                <div className="ab-filters" style={{ marginTop: 28 }} ref={filtersRef}>
                   <FilterRow label={t("freeLib.typeLabel")}>
                     {TYPE_OPTIONS.map((value) => (
                       <Chip key={value} active={type === value} onClick={() => setType(value)}>
                         {t(`freeLib.type.${value}`)}
+                      </Chip>
+                    ))}
+                  </FilterRow>
+                  <FilterRow label={t("freeLib.topics")}>
+                    <Chip active={topic === "all"} onClick={() => setTopic("all")}>
+                      {t("freeLib.topic.all")}
+                    </Chip>
+                    {FREE_TOPICS.map((key) => (
+                      <Chip key={key} active={topic === key} onClick={() => setTopic(key)}>
+                        {t(`freeLib.topic.${key}`)}
                       </Chip>
                     ))}
                   </FilterRow>
@@ -755,6 +804,16 @@ function FreeLibraryPage() {
                   title={t("freeLib.section.vendors.title")}
                   desc={t("freeLib.section.vendors.desc")}
                   items={resourcesFor("vendors")}
+                  lang={resourceLocale}
+                  columns="three"
+                />
+
+                <ResourceSection
+                  id="robotics"
+                  num="10"
+                  title={t("freeLib.section.robotics.title")}
+                  desc={t("freeLib.section.robotics.desc")}
+                  items={resourcesFor("robotics")}
                   lang={resourceLocale}
                   columns="three"
                 />

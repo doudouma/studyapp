@@ -316,7 +316,12 @@ function AiBooksPage() {
       <AppNav />
       <main className="flex-1">
         <div className="aix">
-          <style dangerouslySetInnerHTML={{ __html: AIX_CSS + BOOKS_CSS }} />
+          <style
+            dangerouslySetInnerHTML={{
+              // 搜索条吸顶后，锚点跳转要额外让开它（header 64px + 搜索条 ~56px）
+              __html: AIX_CSS + BOOKS_CSS + ".aix-frame{scroll-margin-top:130px}",
+            }}
+          />
 
           {/* CATALOG */}
           <section className="aix-frame">
@@ -563,6 +568,7 @@ function AiBooksPage() {
               ))}
             </div>
             <p className="aix-kicker" style={{ marginTop: 14 }}>{METHOD_SOURCE[contentLocale]}</p>
+            <p className="aix-kicker">{t("aiBooks.updatedOn", { date: AI_BOOKS_UPDATED })}</p>
             <p className="aix-kicker">{METHOD_AUTHOR[contentLocale]}</p>
           </section>
 
