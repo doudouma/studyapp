@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect, memo, useMemo, useCallback } from "react";
-import { ArrowDown, Code2, Clock, Infinity, Tags, Share2, List, Crown, LogIn, Loader2, Puzzle, Flame } from "lucide-react";
+import { useState, useRef, useEffect, memo, useMemo, useCallback, Fragment } from "react";
+import { ArrowDown, Code2, Infinity, Tags, Share2, List, Crown, LogIn, Loader2, Puzzle, Flame } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { DropZone } from "~/components/DropZone";
 import { SuccessCard } from "~/components/SuccessCard";
@@ -43,6 +43,15 @@ export const Route = createFileRoute("/")({
 });
 
 type TabMode = "paste" | "drop";
+
+/** 「登录后可解锁」对比表：左列匿名现状，右列登录后能力 */
+const UPSELL_ROWS = [
+  { anon: "anonymousExpiry", win: "permanent", icon: Infinity },
+  { anon: "noTitle", win: "withTitle", icon: Tags },
+  { anon: "noShare", win: "canShare", icon: Share2 },
+  { anon: "noManage", win: "canManage", icon: List },
+  { anon: "anonFixedExpiry", win: "userExpiry", icon: Flame },
+] as const;
 
 /** 自定义地址可用性状态 */
 type SlugStatus = "idle" | "checking" | "ok" | "length" | "invalid" | "reserved" | "taken";
@@ -262,50 +271,25 @@ function UploadForm({
         )}
 
         {!user && (
-          <div className="mb-5 rounded-2xl border border-[#c49f00]/20 bg-[#c49f00]/5 dark:border-[#eec200]/20 dark:bg-[#eec200]/5 p-5">
-            <div className="flex items-center gap-2 mb-3">
-              <Crown className="size-4 text-[#c49f00] dark:text-[#eec200]" />
-              <span className="text-xs font-semibold text-[#735c00] dark:text-[#eec200] tracking-wide uppercase">
-                {t("home.upsell.title")}
-              </span>
+          <div className="aix-upsell">
+            <div className="aix-upsell-head">
+              <span className="dot" aria-hidden="true" />
+              <Crown className="size-3.5" aria-hidden="true" />
+              <b>{t("home.upsell.title")}</b>
             </div>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-              <div className="flex items-center gap-2">
-                <Clock className="size-3.5 text-[#c49f00] dark:text-[#eec200]" />
-                <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">{t("home.upsell.anonymousExpiry")}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Infinity className="size-3.5 text-[#111214] dark:text-[#d8ff00]" />
-                <span className="text-xs text-[#111214] dark:text-[#d8ff00] font-medium">{t("home.upsell.permanent")}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">{t("home.upsell.noTitle")}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Tags className="size-3.5 text-[#111214] dark:text-[#d8ff00]" />
-                <span className="text-xs text-[#111214] dark:text-[#d8ff00] font-medium">{t("home.upsell.withTitle")}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">{t("home.upsell.noShare")}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Share2 className="size-3.5 text-[#111214] dark:text-[#d8ff00]" />
-                <span className="text-xs text-[#111214] dark:text-[#d8ff00] font-medium">{t("home.upsell.canShare")}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">{t("home.upsell.noManage")}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <List className="size-3.5 text-[#111214] dark:text-[#d8ff00]" />
-                <span className="text-xs text-[#111214] dark:text-[#d8ff00] font-medium">{t("home.upsell.canManage")}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-[#735c00] dark:text-[#eec200]/80">{t("home.upsell.anonFixedExpiry")}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Flame className="size-3.5 text-[#111214] dark:text-[#d8ff00]" />
-                <span className="text-xs text-[#111214] dark:text-[#d8ff00] font-medium">{t("home.upsell.userExpiry")}</span>
-              </div>
+            <div className="aix-upsell-grid">
+              {UPSELL_ROWS.map((row) => (
+                <Fragment key={row.anon}>
+                  <div className="aix-upsell-cell anon">
+                    <span className="mark" aria-hidden="true">—</span>
+                    <span>{t(`home.upsell.${row.anon}`)}</span>
+                  </div>
+                  <div className="aix-upsell-cell win">
+                    <row.icon className="size-3.5" aria-hidden="true" />
+                    <span>{t(`home.upsell.${row.win}`)}</span>
+                  </div>
+                </Fragment>
+              ))}
             </div>
           </div>
         )}
@@ -329,8 +313,7 @@ function UploadForm({
 }
 
 const HOME_CSS = `
-.aix-home{padding:26px 20px 44px}
-.aix-home .rounded-xl,.aix-home .rounded-2xl,.aix-home .rounded-lg,.aix-home .rounded-md{border-radius:2px}
+.aix-home{padding:26px 20px 44px}.aix-home .rounded-xl,.aix-home .rounded-2xl,.aix-home .rounded-lg,.aix-home .rounded-md{border-radius:2px}
 .aix-home .bg-card{background:var(--aix-paper)}
 .aix-home .bg-background{background:var(--aix-paper)}
 .aix-home .bg-muted{background:var(--aix-grey)}
@@ -422,6 +405,25 @@ const HOME_CSS = `
 @media(max-width:520px){
   .aix-hero-stats{grid-template-columns:1fr 1fr}
   .aix-stat:last-child{grid-column:span 2}
+}
+
+/* upsell: anonymous vs signed-in comparison */
+.aix-upsell{margin-bottom:20px;border:1px solid var(--aix-line);background:var(--aix-paper);border-radius:2px;overflow:hidden}
+.aix-upsell-head{display:flex;align-items:center;gap:8px;padding:11px 14px;background:var(--aix-grey);border-bottom:1px solid var(--aix-line)}
+.aix-upsell-head .dot{width:7px;height:7px;border-radius:50%;background:var(--aix-lime);border:1px solid var(--aix-ink);flex:none}
+.aix-upsell-head b{font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--aix-ink)}
+.aix-upsell-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--aix-line)}
+.aix-upsell-cell{display:flex;align-items:center;gap:7px;background:var(--aix-paper);padding:9px 14px;font-size:11px;line-height:1.35;min-width:0}
+.aix-upsell-cell.anon{color:var(--aix-mute)}
+.aix-upsell-cell.anon .mark{flex:none;font-weight:700;color:var(--aix-line)}
+.aix-upsell-cell.win{color:var(--aix-ink);font-weight:700;box-shadow:inset 2px 0 0 var(--aix-lime)}
+.aix-upsell-cell.win svg{flex:none;color:var(--aix-ink)}
+.dark .aix-upsell-cell.win svg{color:var(--aix-lime)}
+@media(max-width:520px){
+  .aix-upsell-grid{grid-template-columns:1fr}
+  .aix-upsell-cell{padding:8px 14px}
+  .aix-upsell-cell.anon{border-bottom:1px dashed var(--aix-line)}
+  .aix-upsell-cell.win{box-shadow:inset 3px 0 0 var(--aix-lime)}
 }
 `;
 
