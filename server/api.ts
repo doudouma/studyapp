@@ -1,6 +1,5 @@
 /// <reference types="@cloudflare/workers-types" />
 import { Hono } from "hono";
-import { eq, desc } from "drizzle-orm";
 import {
   LANGS,
   DEFAULT_LANG,
@@ -9,8 +8,6 @@ import {
   getBcp47,
   type Lang,
 } from "../app/lib/lang";
-import { page } from "./db/schema";
-import { createDb } from "./db";
 import { getCaseLocales, getCaseSlugs, loadCase } from "../shared/showcase";
 import { AI_BOOK_PAGES } from "../shared/books/programmatic";
 import { type ShowcaseLocale } from "../shared/types/showcase";
@@ -22,7 +19,6 @@ import {
 } from "../shared/types/questions";
 import { squareRoutes } from "./features/square/square.routes";
 import { pagesRoutes } from "./features/pages/pages.routes";
-import { selectIndexableSharedPages } from "./features/pages/pages.quality";
 import { adminRoutes } from "./features/admin/admin.routes";
 import { pomodoroRoutes } from "./features/pomodoro/pomodoro.routes";
 import { wardrobeRoutes } from "./features/wardrobe/wardrobe.routes";
@@ -129,12 +125,33 @@ const AI_TRAINING_BOTS = [
   "Google-Extended", // controls Gemini training/grounding of crawled content
 ];
 
-function aiBotGroup(agents: string[]): string {
+// Link-preview fetchers (iMessage, Slack, X, Telegram, Discord, LinkedIn,
+// WhatsApp, Pinterest, Facebook). These are the ONLY agents allowed to reach
+// /p/* — blocking them would kill the OG card for every shared link, which is
+// the core of the product.
+const SOCIAL_PREVIEW_BOTS = [
+  "facebookexternalhit", // Facebook, iMessage, Signal, Mastodon
+  "Twitterbot", // X / Twitter
+  "Slackbot", // Slack unfurls (Slackbot-LinkExpanding)
+  "TelegramBot",
+  "Discordbot",
+  "LinkedInBot",
+  "WhatsApp",
+  "Pinterestbot",
+  "redditbot",
+];
+
+/**
+ * 生成一个 User-agent 组。搜索/AI 爬虫统一 Disallow `/p/`：
+ * `/p/*` 是用户上传的任意 HTML（主题、语言、质量都不可控），收录它只会
+ * 稀释站点级质量信号。预览类爬虫是唯一例外，见 SOCIAL_PREVIEW_BOTS。
+ */
+function botGroup(agents: string[], allowUserPages: boolean): string {
   return agents
     .map(
       (a) => `User-agent: ${a}
 Allow: /
-Allow: /p/
+${allowUserPages ? "Allow: /p/" : "Disallow: /p/"}
 Disallow: /api/
 Disallow: /admin`
     )
@@ -143,19 +160,27 @@ Disallow: /admin`
 
 api.get("/robots.txt", (c) => {
   const sitemapLines = LANGS.map((l) => `Sitemap: ${BASE_URL}/sitemap-${l}.xml`).join("\n");
-  return c.text(`User-agent: *
+  return c.text(`# /p/* is user-uploaded HTML: arbitrary topic, language and
+# quality. It is deliberately kept out of the search index — blocking the
+# crawl also stops Google from re-reviewing thousands of thin UGC pages.
+# Link-preview fetchers are exempt at the bottom of this file, otherwise every
+# shared link would lose its OG card.
+User-agent: *
 Allow: /
-Allow: /p/
+Disallow: /p/
 Disallow: /api/
 Disallow: /admin
 
 # AI search & retrieval crawlers — allowed so pages can be cited by
 # ChatGPT, Perplexity, Claude, and Copilot.
-${aiBotGroup(AI_RETRIEVAL_BOTS)}
+${botGroup(AI_RETRIEVAL_BOTS, false)}
 
 # AI training crawlers — allowed by policy to maximize brand presence.
 # Change "Allow: /" to "Disallow: /" on any agent to opt out of training.
-${aiBotGroup(AI_TRAINING_BOTS)}
+${botGroup(AI_TRAINING_BOTS, false)}
+
+# Link-preview fetchers — the only agents allowed on /p/* so previews work.
+${botGroup(SOCIAL_PREVIEW_BOTS, true)}
 
 ${sitemapLines}
 `);
@@ -260,7 +285,7 @@ function caseAlternateLinksXml(slug: string, locales: ShowcaseLocale[]): string 
   return lines.join("");
 }
 
-async function buildLangSitemap(c: any, lang: Lang): Promise<string> {
+async function buildLangSitemap(lang: Lang): Promise<string> {
   const urls: string[] = STATIC_PAGES.map((p) => {
     const loc = `${BASE_URL}${withLangPrefix(lang, p.loc)}`;
     const lastmod = p.lastmod ? `\n    <lastmod>${p.lastmod}</lastmod>` : "";
@@ -335,40 +360,9 @@ async function buildLangSitemap(c: any, lang: Lang): Promise<string> {
   </url>`);
   }
 
-  // User-generated shared pages live at root only (single canonical URL, no
-  // language variants — /{lang}/p/:id 301-redirects to /p/:id). Include them
-  // only in the default-language (en) sitemap, and only when they pass the
-  // quality gate (owned + permanent + titled + past the review cooldown).
-  // Low-quality UGC stays reachable but is noindexed at serve time.
-  if (lang === DEFAULT_LANG && c.env?.D1) {
-    const db = createDb(c.env.D1);
-    const dynamicPages = await db
-      .select({
-        id: page.id,
-        sharedAt: page.sharedAt,
-        title: page.title,
-        state: page.state,
-        isSharedToSquare: page.isSharedToSquare,
-        userId: page.userId,
-        maxViews: page.maxViews,
-        expiresAt: page.expiresAt,
-        createdAt: page.createdAt,
-        contentHash: page.contentHash,
-      })
-      .from(page)
-      .where(eq(page.isSharedToSquare, true))
-      .orderBy(desc(page.sharedAt))
-      .limit(2000);
-
-    for (const p of selectIndexableSharedPages(dynamicPages, Date.now(), 1000)) {
-      const lastmod = new Date(p.sharedAt as Date).toISOString().split("T")[0];
-      urls.push(`
-  <url>
-    <loc>${BASE_URL}/p/${escapeXml(p.id)}</loc>
-    <lastmod>${lastmod}</lastmod>
-  </url>`);
-    }
-  }
+  // User-generated shared pages (/p/*) are intentionally absent: /p/ is
+  // Disallowed in robots.txt and served noindex, so listing them here would
+  // only produce "submitted but blocked by robots.txt" warnings in GSC.
 
   return `${XML_HDR}\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">${urls.join("")}\n</urlset>`;
 }
@@ -376,7 +370,7 @@ async function buildLangSitemap(c: any, lang: Lang): Promise<string> {
 // Register one sitemap route per language: /sitemap-zh.xml, /sitemap-en.xml, ...
 for (const lang of LANGS) {
   api.get(`/sitemap-${lang}.xml`, async (c) => {
-    const body = await buildLangSitemap(c, lang as Lang);
+    const body = await buildLangSitemap(lang as Lang);
     return c.text(body, 200, { "Content-Type": "application/xml" });
   });
 }
