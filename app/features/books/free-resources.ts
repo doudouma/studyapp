@@ -1,7 +1,7 @@
 // 免费资源补充清单：参考 Reddit / X 社区共识整理。
 // 名称与提供方保留英文；介绍按语言本地化，缺失时回退英文。
 
-export type FreeResourceGroup = "start" | "books" | "repos" | "videos" | "games";
+export type FreeResourceGroup = "start" | "books" | "repos" | "videos" | "games" | "vendors";
 export type FreeResourceTag =
   | "hub"
   | "course"
@@ -29,6 +29,7 @@ export const FREE_RESOURCE_GROUPS: FreeResourceGroup[] = [
   "repos",
   "videos",
   "games",
+  "vendors",
 ];
 
 export const FREE_RESOURCES: FreeResource[] = [
@@ -495,6 +496,126 @@ export const FREE_RESOURCES: FreeResource[] = [
       fr: "Des puzzles et des batailles de bots dans plus de 25 langages, avec un classement compétitif. Explicitement pas pour les débutants ni pour apprendre un langage : cela aiguise ce que vous savez déjà. Le site met désormais aussi en avant l'évaluation d'agents.",
       es: "Puzles y batallas de bots en más de 25 lenguajes, con una clasificación competitiva. Explícitamente no es para principiantes ni para aprender un lenguaje nuevo: afina lo que ya sabes. El sitio ahora también promociona la evaluación de agentes.",
       pt: "Puzzles e batalhas de bots em mais de 25 linguagens, com ranking competitivo. Explicitamente não é para iniciantes nem para aprender uma linguagem nova: afia o que você já sabe. O site agora também divulga avaliação de agentes.",
+    },
+  },
+  {
+    id: "anthropic-courses",
+    group: "vendors",
+    name: "Anthropic Courses",
+    by: "Anthropic",
+    url: "https://anthropic.skilljar.com",
+    tag: "course",
+    desc: {
+      en: "Anthropic's own catalogue, hosted on Skilljar: Claude prompting, tool use and agent building. Free to take; you create a Skilljar account so progress is tracked.",
+      zh: "Anthropic 自己的课程目录，托管在 Skilljar：Claude 提示词、工具调用与智能体搭建。课程免费，注册 Skilljar 账号即可记录进度。",
+      fr: "Le catalogue d'Anthropic, hébergé sur Skilljar : prompting Claude, usage des outils et construction d'agents. Gratuit ; un compte Skilljar permet de suivre sa progression.",
+      es: "El catálogo propio de Anthropic, alojado en Skilljar: prompting de Claude, uso de herramientas y construcción de agentes. Gratis; con una cuenta de Skilljar se guarda el progreso.",
+      pt: "O catálogo da própria Anthropic, hospedado no Skilljar: prompting do Claude, uso de ferramentas e construção de agentes. Grátis; uma conta Skilljar registra o progresso.",
+    },
+  },
+  {
+    id: "google-ai-training",
+    group: "vendors",
+    name: "Google AI training",
+    by: "Google",
+    url: "https://grow.google/ai",
+    tag: "hub",
+    desc: {
+      en: "Google's umbrella page for its AI programmes. Some modules are free, but several cards lead to Coursera specializations that need a paid subscription — check each one before you start.",
+      zh: "Google 各类 AI 培训项目的总入口。部分模块免费，但有多个卡片指向 Coursera 专项课程，需要付费订阅——开始前先看清是哪一个。",
+      fr: "La page chapeau des programmes IA de Google. Certains modules sont gratuits, mais plusieurs cartes mènent à des spécialisations Coursera payantes : vérifiez avant de commencer.",
+      es: "La página paraguas de los programas de IA de Google. Algunos módulos son gratis, pero varias tarjetas llevan a especializaciones de Coursera que exigen suscripción de pago: revísalo antes de empezar.",
+      pt: "A página guarda-chuva dos programas de IA do Google. Alguns módulos são grátis, mas vários cartões levam a especializações da Coursera que exigem assinatura paga: confira antes de começar.",
+    },
+  },
+  {
+    id: "meta-ai-resources",
+    group: "vendors",
+    name: "Meta AI Resources",
+    by: "Meta",
+    url: "https://ai.meta.com/resources/",
+    tag: "hub",
+    desc: {
+      en: "A resource library rather than a course catalogue: Llama model cards, papers, demos and developer docs. Useful once you already know what you want to build.",
+      zh: "资源库而非课程目录：Llama 模型卡、论文、demo 与开发者文档。适合已经知道自己要做什么之后再来看。",
+      fr: "Une bibliothèque de ressources plutôt qu'un catalogue de cours : fiches des modèles Llama, articles, démos et documentation développeur. Utile quand on sait déjà quoi construire.",
+      es: "Una biblioteca de recursos más que un catálogo de cursos: fichas de los modelos Llama, artículos, demos y documentación para desarrolladores. Útil cuando ya sabes qué quieres construir.",
+      pt: "Uma biblioteca de recursos, não um catálogo de cursos: fichas dos modelos Llama, artigos, demos e documentação para desenvolvedores. Útil quando você já sabe o que quer construir.",
+    },
+  },
+  {
+    id: "nvidia-cuda",
+    group: "vendors",
+    name: "NVIDIA CUDA",
+    by: "NVIDIA",
+    url: "https://developer.nvidia.com/cuda",
+    tag: "hub",
+    desc: {
+      en: "The CUDA toolkit and CUDA Python, with docs and samples. This is a developer platform, not a course — NVIDIA's structured classes sit separately under its Deep Learning Institute.",
+      zh: "CUDA 工具链与 CUDA Python，附文档和示例。这是开发者平台，不是课程——NVIDIA 的系统课程放在单独的 Deep Learning Institute 里。",
+      fr: "La boîte à outils CUDA et CUDA Python, avec documentation et exemples. C'est une plateforme développeur, pas un cours : les formations structurées de NVIDIA sont regroupées dans son Deep Learning Institute.",
+      es: "El kit CUDA y CUDA Python, con documentación y ejemplos. Es una plataforma para desarrolladores, no un curso: las clases estructuradas de NVIDIA están en su Deep Learning Institute.",
+      pt: "O kit CUDA e o CUDA Python, com documentação e exemplos. É uma plataforma de desenvolvedor, não um curso: as aulas estruturadas da NVIDIA ficam no Deep Learning Institute.",
+    },
+  },
+  {
+    id: "microsoft-learn",
+    group: "vendors",
+    name: "Microsoft Learn",
+    by: "Microsoft",
+    url: "https://learn.microsoft.com/en-us/training/",
+    tag: "course",
+    desc: {
+      en: "Self-paced modules and learning paths across Azure, Fabric and AI. Studying is free; the certification exams at the end are paid.",
+      zh: "覆盖 Azure、Fabric 与 AI 的自学模块和学习路径。学习免费，末端的认证考试要付费。",
+      fr: "Des modules et parcours en autonomie sur Azure, Fabric et l'IA. L'apprentissage est gratuit ; les examens de certification sont payants.",
+      es: "Módulos y rutas de aprendizaje autoguiados sobre Azure, Fabric e IA. Estudiar es gratis; los exámenes de certificación se pagan aparte.",
+      pt: "Módulos e trilhas de estudo autoguiados em Azure, Fabric e IA. Estudar é grátis; os exames de certificação são pagos.",
+    },
+  },
+  {
+    id: "openai-academy",
+    group: "vendors",
+    name: "OpenAI Academy",
+    by: "OpenAI",
+    url: "https://academy.openai.com",
+    tag: "course",
+    desc: {
+      en: "OpenAI's own training hub: prompting habits, repeatable workflows and directing agents. Aimed at people using ChatGPT at work rather than at developers building on the API.",
+      zh: "OpenAI 自己的培训中心：提示词习惯、可复用的工作流、如何指挥智能体。面向在工作中使用 ChatGPT 的人，而不是基于 API 开发的工程师。",
+      fr: "Le centre de formation d'OpenAI : habitudes de prompting, workflows reproductibles et pilotage d'agents. Destiné aux personnes qui utilisent ChatGPT au travail plutôt qu'aux développeurs d'API.",
+      es: "El centro de formación de OpenAI: hábitos de prompting, flujos de trabajo repetibles y dirección de agentes. Pensado para quien usa ChatGPT en el trabajo, no para quienes desarrollan sobre la API.",
+      pt: "O centro de treinamento da OpenAI: hábitos de prompting, fluxos repetíveis e como dirigir agentes. Voltado a quem usa o ChatGPT no trabalho, não a quem desenvolve sobre a API.",
+    },
+  },
+  {
+    id: "ibm-skillsbuild",
+    group: "vendors",
+    name: "IBM SkillsBuild",
+    by: "IBM",
+    url: "https://skillsbuild.org",
+    tag: "course",
+    desc: {
+      en: "IBM's catalogue across AI, cybersecurity and data, ending in digital credentials. The site states the learning is 100% free.",
+      zh: "IBM 的课程目录，覆盖 AI、网络安全与数据，学完可拿数字徽章。官网明确写「100% free」。",
+      fr: "Le catalogue d'IBM en IA, cybersécurité et data, avec des badges numériques à la clé. Le site annonce un apprentissage 100 % gratuit.",
+      es: "El catálogo de IBM en IA, ciberseguridad y datos, con credenciales digitales al final. El sitio afirma que el aprendizaje es 100 % gratis.",
+      pt: "O catálogo da IBM em IA, cibersegurança e dados, com credenciais digitais ao final. O site afirma que o aprendizado é 100% gratuito.",
+    },
+  },
+  {
+    id: "aws-skill-builder",
+    group: "vendors",
+    name: "AWS Skill Builder",
+    by: "Amazon Web Services",
+    url: "https://skillbuilder.aws",
+    tag: "course",
+    desc: {
+      en: "Free digital courses on AWS and AI, but the full catalogue, hands-on labs and practice exams sit behind a subscription, and certification exams are billed separately.",
+      zh: "AWS 与 AI 方向有免费数字课程，但完整目录、动手实验和模拟考试在订阅后面，认证考试另外收费。",
+      fr: "Des cours numériques gratuits sur AWS et l'IA, mais le catalogue complet, les labs pratiques et les examens blancs sont derrière un abonnement, et les examens de certification sont facturés à part.",
+      es: "Cursos digitales gratis sobre AWS e IA, pero el catálogo completo, los laboratorios prácticos y los exámenes de práctica están tras una suscripción, y los exámenes de certificación se cobran aparte.",
+      pt: "Cursos digitais grátis sobre AWS e IA, mas o catálogo completo, os laboratórios práticos e os simulados ficam atrás de uma assinatura, e os exames de certificação são cobrados à parte.",
     },
   },
 ];

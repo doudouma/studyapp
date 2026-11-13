@@ -5,6 +5,7 @@ import {
   ArrowUpRight,
   BookMarked,
   BookOpen,
+  Building2,
   ChevronDown,
   Code2,
   Compass,
@@ -477,6 +478,12 @@ function FreeLibraryPage() {
                     label={t("freeLib.playAndLearn")}
                     external
                   />
+                  <SidebarLink
+                    href="#vendors"
+                    icon={Building2}
+                    label={t("freeLib.vendorCourses")}
+                    external
+                  />
                   <SidebarLink href="#about" icon={Info} label={t("freeLib.about")} external />
                 </nav>
 
@@ -738,6 +745,16 @@ function FreeLibraryPage() {
                   title={t("freeLib.section.games.title")}
                   desc={t("freeLib.section.games.desc")}
                   items={resourcesFor("games")}
+                  lang={resourceLocale}
+                  columns="three"
+                />
+
+                <ResourceSection
+                  id="vendors"
+                  num="09"
+                  title={t("freeLib.section.vendors.title")}
+                  desc={t("freeLib.section.vendors.desc")}
+                  items={resourcesFor("vendors")}
                   lang={resourceLocale}
                   columns="three"
                 />
