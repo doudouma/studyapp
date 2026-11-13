@@ -300,11 +300,6 @@ const FREE_CSS = `
 .free-cost{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;margin:2px 0 0;padding:6px 8px;border:1px dashed var(--aix-line);font-size:10.5px;line-height:1.5;color:var(--aix-ink)}
 .free-cost-label{flex:none;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--aix-mute)}
 
-.free-method{margin-top:16px;background:var(--aix-lime);color:#111214;border-radius:2px;padding:14px 16px}
-.free-method strong{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:800}
-.free-method ul{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:4px}
-.free-method li{font-size:11.5px;line-height:1.5}
-.free-method li::before{content:"—";margin-right:6px;opacity:.5}
 
 .free-rule{margin:14px 0 0;border:1px solid var(--aix-line);border-left:3px solid var(--aix-lime);background:var(--aix-grey);padding:12px 14px;font-size:12.5px;line-height:1.6;color:var(--aix-mute)}
 .free-pathcards{display:grid;gap:10px;padding:14px}
@@ -568,15 +563,6 @@ function FreeLibraryPage() {
                     autoComplete="off"
                   />
                   <kbd>/</kbd>
-                </div>
-
-                <div className="free-method">
-                  <strong>{t("freeLib.method.title")}</strong>
-                  <ul>
-                    <li>{t("freeLib.method.sources")}</li>
-                    <li>{t("freeLib.method.filter")}</li>
-                    <li>{t("freeLib.method.update")}</li>
-                  </ul>
                 </div>
 
                 <ResourceSection
