@@ -21,6 +21,7 @@ export const SHOWCASE_IMAGE_SIZES: Record<string, ImageSize> = {
   "/showcase/ai-fishing-game.jpg": { w: 1128, h: 720 },
   "/showcase/ai-video-agent-projects.jpg": { w: 1280, h: 511 },
   "/showcase/awesome-ai-creative-gallery.jpg": { w: 2478, h: 1320 },
+  "/showcase/cat-mess-museum.jpg": { w: 1200, h: 630 },
   "/showcase/fable-minecraft-kirin-mod.jpg": { w: 1200, h: 675 },
   "/showcase/fable52-audio.jpg": { w: 1280, h: 800 },
   "/showcase/fable52-cover.jpg": { w: 1280, h: 512 },
