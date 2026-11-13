@@ -21,75 +21,40 @@ facts:
     value: Jogável localmente · ainda não publicado
 ---
 
-## O que é
+## Um gato, dois prompts, uma fatura
 
-《猫咪拆家：从出租屋拆到博物馆》 é um jogo 3D para navegador em que você controla um gato laranja sozinho em casa. Cada partida dura 90 segundos: derrubar móveis, quebrar objetos, juntar latas de ração e gastá-las em melhorias que liberam cenários cada vez mais ricos, de um apartamento alugado até um museu.
+Um gato laranja fica sozinho em um apartamento com 90 segundos para destruí-lo: derrubar os móveis, quebrar a louça, juntar latas de ração e gastá-las em melhorias que liberam cômodos cada vez melhores. A primeira fase é um aluguel barato. A última é um museu.
 
-O que transforma isso em um caso, e não em uma ficha de produto, é o modo como foi feito. O autor não escreveu uma linha de código. Tudo saiu de dois prompts no Fusion Max 2.0, modelo da singapurense FUMO Lab, com 17 chamadas e um total de US$ 5,77.
+O jogo é a demonstração. O número que vale ler é a fatura: dois prompts, 17 chamadas ao modelo, US$ 5,77 e nenhuma linha de código digitada à mão. O modelo foi o Fusion Max 2.0, da singapurense FUMO Lab, alcançado por um endpoint compatível com a OpenAI, então o mesmo ciclo roda no Cursor ou no Codex assim que você preenche uma base URL e uma chave.
 
-## Proposta de valor
+## O primeiro prompt é uma especificação, não um pedido
 
-O protagonista do experimento é o custo de uma tentativa, não o jogo.
+Quase todo prompt de "faça um jogo para mim" falha porque não existe nada contra o que falhar. Este começa pedindo um documento de design, e o documento é julgado pelos critérios de avaliação do próprio CrazyGames: sessões de pelo menos 10 minutos, retenção no segundo dia entre 10% e 15%, jogável em três segundos, tudo gerado em código para não haver nenhum arquivo para baixar.
 
-- Primeiro o documento de design, não o código: o primeiro prompt pede um documento completo em Markdown montado a partir dos critérios de avaliação do CrazyGames — sessões de pelo menos 10 minutos, retenção no dia 2 de 10–15%, tempo até jogar de 3 segundos — em vez de "faça um jogo". As métricas da plataforma são a especificação.
-- Uma conta mensurável por tentativa: US$ 5,77 em 17 chamadas, contra cerca de US$ 14,92 pelo mesmo volume no Claude Fable 5.1 ou no GPT-6 Astra. Em 100 protótipos a diferença fica perto de US$ 900, e é exatamente esse o argumento, porque a maioria dos protótipos não gera nada.
-- Um único endpoint para todo o ciclo: documento de design, primeira versão de 130 KB, quatro rodadas de revisão e a troca de arte vieram do mesmo modelo. Ele fala a API Chat Completions da OpenAI, então Cursor ou Codex conseguem conduzi-lo com uma base URL e uma chave.
+Essa mudança de enquadramento faz mais trabalho do que a escolha do modelo. As métricas de revisão de uma plataforma são uma especificação gratuita, e elas obrigam a montar o ciclo de que o jogo precisa — partidas curtas, melhorias, tarefas diárias, um motivo para voltar — antes de existir uma única linha de código. O documento saiu com cerca de 27 mil caracteres; a versão seguinte tinha uns 130 KB e funcionou de primeira.
 
-## O que substitui
+## Quatro rodadas, dezesseis de vinte
 
-| Ferramenta de referência | Viabilidade | Veredito e contexto de uso |
-| --- | --- | --- |
-| Ciclo de prototipagem em Unity / Godot | Partial | Para um jogo web de partidas de 90 segundos sem tecnologia própria de engine, dois prompts e quatro rodadas cobriram o que normalmente custa a etapa de protótipo em blocos. Não substitui engenharia de produção: sem física ajustada à mão, sem pipeline de build, sem trabalho de SDK de plataforma. |
-| Modelos de fronteira pagos para programar | Moderate | Quando a entrega é um único jogo HTML/JS autocontido, um endpoint mais barato deu conta de design, código e iteração juntos. Trabalho que exige contexto longo sobre um repositório real continua empurrando de volta para um modelo de fronteira. |
-| Minijogo 3D sob encomenda | Low | Uma encomenda traz direção de arte, QA e publicação na loja. Aqui saiu uma versão jogável, não um título publicado. |
-| Construtores de jogos sem código | Moderate | Construtores entregam modelos e hospedagem; aqui você fica com código próprio, a um custo por tentativa menor depois do primeiro protótipo. |
+Vieram quatro rodadas de revisão. Nelas foram levantados vinte requisitos e 16 confirmados; segundo o autor, os outros quatro precisavam de mais uma passada. Nenhuma correção foi escrita à mão, e é isso que vale registrar: cada rodada foi um prompt novo sobre a versão anterior, não uma sessão de depuração.
 
-## Realidades e limites atuais
+A última passada foi de arte, e é o único passo que sai do modelo. O gato provisório virou um modelo no Blender: um laranja malhado com 24 camadas de pelo.
 
-- Não foi publicado. O jogo continua na máquina do autor e não foi enviado ao CrazyGames nem à plataforma de minijogos do WeChat.
-- Quatro rodadas não fecharam tudo. Dos 20 requisitos levantados, 16 foram confirmados; os quatro restantes precisavam de mais uma passada.
-- US$ 5,77 é uma fatura medida de 17 chamadas, não um preço unitário. Repetir depende dos créditos de teste para novos usuários e do preço promocional atual do modelo.
-- A parte difícil mudou de lugar, não desapareceu. O CrazyGames tem três linhas de revisão, os minijogos do WeChat exigem documentação, e a conclusão do próprio autor é que a maioria dos jogos pequenos continua sem emplacar.
+## O que a comparação de custos mede de fato
 
-## Veredito
+US$ 5,77 por 17 chamadas. Com as tarifas do Claude Fable 5.1 ou do GPT-6 Astra, esse mesmo volume sai por cerca de US$ 14,92, uma razão de 2,6×. Ao longo de 100 protótipos a diferença fica perto de US$ 900.
 
-> **Recomendação principal**
->
-> Trate isto como um modelo de custo para criar o hábito de prototipar, não como prova de que o jogo vai faturar. O que se transfere é a estrutura dos prompts — escrever o documento de design contra as métricas da plataforma e limitar as correções a quatro rodadas — e o número que importa é US$ 5,77 por tentativa, porque é ele que decide quantas tentativas você consegue pagar.
+O valor é real: é uma fatura medida, não uma estimativa. Por baixo dele há duas coisas. A primeira é que depende dos créditos de teste para contas novas e do preço promocional que o fornecedor pratica no momento, então é o custo desta tentativa hoje, não um preço unitário estável. A segunda é que o artigo traz um link de indicação para o fornecedor do modelo, o que transforma a comparação de US$ 14,92 em um cálculo do lado do vendedor, não em um parâmetro neutro.
 
-## Ciclo de desenvolvimento e iteração
+Ainda assim, o argumento não depende da razão exata. O desenvolvedor solo anul agarwal fez em 2023 uma variação estilo Suika com ChatGPT que chegou a mais de 65 milhões de jogadores e rendeu mais de US$ 25 mil, e ele mesmo diz que foram mais de 120 protótipos e que os 100 primeiros quase não faturaram. Se uma tentativa custa US$ 5,77 em vez de US$ 15, esse caminho deixa de ser reservado a quem tem orçamento. Se custa US$ 5,77 e os 100 primeiros continuam sem faturar, o ciclo barato compra mais tentativas, não melhor pontaria.
 
-1. **Documento de design.** Um prompt, cerca de 27 mil caracteres, derivado dos critérios do CrazyGames e não de teoria de design de jogos.
-2. **Primeira versão.** Por volta de 130 KB de código funcional, sem edições manuais.
-3. **Quatro rodadas de revisão.** 20 requisitos levantados, 16 confirmados. O autor afirma que nenhuma linha foi corrigida à mão entre as rodadas.
-4. **Passe de arte.** O gato primitivo padrão virou um gato laranja modelado no Blender com 24 camadas de pelo.
-5. **Ainda pendente.** Envio, QA de plataforma e o processo de registro no WeChat.
+## Nada disso foi publicado
 
-| Etapa | Modelo utilizado |
-| --- | --- |
-| Documento de design | Fusion Max 2.0 |
-| Primeira versão jogável | Fusion Max 2.0 |
-| Quatro rodadas de revisão | Fusion Max 2.0 |
-| Arte 3D do personagem | Blender (externo) |
+O jogo continua na máquina do autor. Não foi enviado ao CrazyGames nem à plataforma de minijogos do WeChat, então não tem jogadores, nem impressões de anúncio, nem receita.
 
-> **Perfil de custo**
->
-> US$ 5,77 em 17 chamadas. Pelas tarifas do Claude Fable 5.1 ou do GPT-6 Astra, o mesmo volume sai por cerca de US$ 14,92: 2,6 vezes mais.
+O que sobra é exatamente o que um modelo não resolve por você: o CrazyGames tem três linhas de revisão, os minijogos do WeChat vêm com exigências de registro, e nenhuma das duas é um problema de design. A conclusão do próprio autor é que a maioria dos jogos pequenos continua sem emplacar, por mais barato que tenha sido construí-los.
 
-## Métricas e monetização
+## O que se aproveita
 
-Ainda não há receita. O jogo não tem jogadores, nem impressões de anúncio, nem gorjetas, porque não foi enviado a lugar nenhum.
+> O ativo reutilizável aqui não é o jogo nem o modelo: é a ordem dos prompts. Escreva primeiro a especificação contra as métricas da plataforma e depois limite a iteração a um número fixo de rodadas, para que o custo por tentativa continue conhecido.
 
-A monetização é o caminho padrão das plataformas, não uma decisão de design: o CrazyGames paga por impressões de anúncio depois que o título passa nas linhas de revisão, e os minijogos do WeChat recebem gorjetas pela plataforma aberta.
-
-A referência com que o artigo abre é uma variação estilo Suika do desenvolvedor solo anul agarwal, feita com ChatGPT em 2023: mais de 65 milhões de jogadores e mais de US$ 25 mil em receita, a partir de mais de 120 protótipos dos quais os primeiros 100 quase não faturaram.
-
-## Repercussão e debates
-
-A publicação reuniu cerca de 300 curtidas e 16 reposts no primeiro dia, então a conversa é pequena. E ela não é principalmente sobre o jogo.
-
-- **Tentativas baratas tornam o volume viável.** Se uma tentativa custa US$ 5,77 em vez de US$ 15, o caminho dos 120 protótipos deixa de ser exclusivo de estúdios com financiamento.
-- **Volume não é o gargalo.** Os próprios números de anul agarwal dizem que os primeiros 100 protótipos quase não renderam, então um ciclo mais barato encurta o processo sem indicar qual ideia vai funcionar.
-- **A comparação tem interesse comercial.** O artigo inclui um link de indicação para o fornecedor do modelo, o que torna a cifra de US$ 14,92 uma estimativa alinhada ao vendedor, não um parâmetro neutro.
-
-Os dois prompts são publicados na íntegra, e é por isso que o caso entra na biblioteca: o fluxo de trabalho pode ser conferido no seu próprio projeto em vez de aceito por confiança.
+O resto é condicional. A vantagem de custo pressupõe um endpoint barato e uma construção pequena e autocontida. A arte continua precisando de uma pessoa e de uma ferramenta que não é um modelo de linguagem. E os dois prompts estão publicados na íntegra, que é a razão de o caso entrar na biblioteca: dá para rodar o fluxo na sua própria ideia em vez de aceitar a conclusão por confiança.

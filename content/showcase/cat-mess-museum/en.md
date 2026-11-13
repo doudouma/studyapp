@@ -1,6 +1,6 @@
 ---
 slug: cat-mess-museum
-name: 猫咪拆家：从出租屋拆到博物馆
+name: Demolition Cat — From Rental Flat to Museum
 summary: A playable 3D web game built from two prompts and zero hand-written code — $5.77 of model calls, four revision rounds, no engine.
 category: experiment
 tags: [AI-generated, Web game, 3D, Prompt-only, Cost breakdown]
@@ -36,75 +36,40 @@ sources:
     publisher: Medium
 ---
 
-## What it is
+## A cat, two prompts, one invoice
 
-《猫咪拆家：从出租屋拆到博物馆》 is a 3D browser game in which you play an orange cat left alone in the house. Each run lasts 90 seconds: knock over furniture, smash things, collect cat-food cans, then spend the cans on stat upgrades that unlock progressively grander venues, from a rented flat up to a museum.
+An orange cat is left alone in a flat with 90 seconds to wreck it: push over the furniture, smash the crockery, collect tins of cat food, spend the tins on upgrades that unlock nicer rooms. The first level is a cheap rental. The last one is a museum.
 
-What makes it a case rather than a product listing is how it was made. The author wrote no game code. The whole thing came from two prompts against Fusion Max 2.0, a model from Singapore's FUMO Lab, called 17 times for a total of $5.77.
+The game is the demo. The number worth reading is the invoice: two prompts, 17 model calls, $5.77, and not one line of code typed by hand. The model was Fusion Max 2.0 from Singapore's FUMO Lab, reached through an OpenAI-compatible endpoint, so the same loop runs from Cursor or Codex once you fill in a base URL and a key.
 
-## Core value proposition
+## The first prompt is a specification, not a wish
 
-The point of the experiment is the cost of one attempt, not the game itself.
+Most "make me a game" prompts fail because there is nothing to fail against. This one starts by asking for a design document, and the document is judged against CrazyGames' own evaluation criteria: sessions of at least 10 minutes, day-2 retention between 10% and 15%, playable within three seconds, everything generated in code so there is no asset to download.
 
-- Design-first prompting: the first prompt asks for a complete Markdown design document aimed at CrazyGames' evaluation criteria — sessions of at least 10 minutes, day-2 retention of 10–15%, a 3-second time-to-play — instead of "make me a game". The platform's metrics are the spec.
-- A measurable bill per attempt: $5.77 across 17 calls, against roughly $14.92 for the same volume on Claude Fable 5.1 or GPT-6 Astra. Across 100 prototypes that gap is about $900, which is the whole argument, because most prototypes earn nothing.
-- One endpoint for the entire loop: design document, a 130 KB first build, four revision rounds and the art pass all came from the same model. It speaks the OpenAI Chat Completions API, so Cursor or Codex can drive it with a base URL and a key.
+That reframing does more work than the choice of model. A platform's review metrics are a free specification, and they force the loop the game needs — short runs, upgrades, daily tasks, a reason to come back — before any code exists. The document came out at roughly 27,000 characters; the build that followed was about 130 KB and ran on the first pass.
 
-## What it can replace
+## Four rounds, sixteen of twenty
 
-| Target software | Feasibility | Verdict & use-case context |
-| --- | --- | --- |
-| Unity / Godot prototype loop | Partial | For a 90-second-session web game with no custom engine tech, two prompts plus four revision rounds covered what a grey-box prototype stage would normally cost. It is not a substitute for production engineering: no hand-tuned physics, no build pipeline, no platform SDK work. |
-| Paid frontier-model coding | Moderate | When the deliverable is one self-contained HTML/JS game, a cheaper endpoint handled design, code and iteration together. Work that needs long context across a real repository still pulls you back to a frontier model. |
-| Commissioned 3D mini-game | Low | A commissioned build brings art direction, QA and store submission. This produced a playable build, not a shipped title. |
-| No-code game builders | Moderate | Builders hand you templates and hosting; this hands you code you own, at a lower cost per attempt once you are past the first prototype. |
+Four revision rounds followed. Twenty requirements were raised across them and 16 were confirmed; the author says the other four needed another pass. None of the fixes were typed by hand, which is the part worth noting: each round was a new prompt against the previous build, not a debugging session.
 
-## Current realities and limitations
+The final pass was art, and it is the one step that leaves the model. The placeholder cat became a Blender model: an orange tabby with 24 layers of fur.
 
-- Not shipped. The game still lives on the author's machine and has not been submitted to CrazyGames or to WeChat's mini-game platform.
-- Four rounds did not close everything. Of 20 requirements raised across those rounds, 16 were confirmed; the remaining four needed another pass.
-- $5.77 is a measured invoice for 17 calls, not a unit price. Reproducing it depends on new-user trial credits and on the model's current promotional pricing.
-- The hard part moved rather than disappeared. CrazyGames runs three review lines, WeChat mini-games need filing paperwork, and the author's own closing note is that most small games still will not land.
+## What the cost comparison actually measures
 
-## Verdict
+$5.77 for 17 calls. Priced at Claude Fable 5.1 or GPT-6 Astra rates, the same volume comes to about $14.92, so the ratio is 2.6×. Across 100 prototypes the difference is roughly $900.
 
-> **Primary recommendation**
->
-> Treat this as a cost model for a prototyping habit, not as evidence that the game will earn. The transferable part is the prompt structure — write the design document against the platform's own metrics, then bound the fixes to four rounds — and the number that matters is $5.77 per attempt, because it decides how many attempts you can afford.
+The dollar figure is real — it is a measured bill, not an estimate. Two things sit underneath it. First, it depends on new-user trial credits and on the vendor's current promotional pricing, so it is the cost of this attempt today rather than a stable unit price. Second, the article carries a referral link to the model vendor, which makes the $14.92 comparison a vendor-side calculation rather than a neutral benchmark.
 
-## Development lifecycle and iteration loop
+Still, the argument does not depend on the exact ratio. Solo developer anul agarwal made a Suika-style variation with ChatGPT in 2023 that reached 65M+ players and earned more than $25,000, and he is explicit that it took 120+ prototypes and the first 100 barely earned anything. If one attempt costs $5.77 instead of $15, that path stops being reserved for people with a budget. If it costs $5.77 and the first 100 still earn nothing, the cheaper loop buys you more attempts but not a better hit rate.
 
-1. **Design document.** One prompt, about 27,000 characters, reverse-engineered from CrazyGames' evaluation criteria rather than from game-design theory.
-2. **First build.** Roughly 130 KB of working code, with no manual edits.
-3. **Four revision rounds.** 20 requirements raised, 16 confirmed. The author states not a single line was fixed by hand between rounds.
-4. **Art pass.** The default primitive cat was swapped for a Blender-modelled orange cat with 24 fur layers.
-5. **Not done yet.** Submission, platform QA and the WeChat filing process.
+## Nothing here has shipped
 
-| Stage | Model used |
-| --- | --- |
-| Game design document | Fusion Max 2.0 |
-| First playable build | Fusion Max 2.0 |
-| Four revision rounds | Fusion Max 2.0 |
-| 3D character art | Blender (external) |
+The game is still on the author's machine. It has not been submitted to CrazyGames or to WeChat's mini-game platform, so it has no players, no ad impressions and no revenue.
 
-> **Cost profile**
->
-> $5.77 across 17 calls. Priced at Claude Fable 5.1 or GPT-6 Astra rates the same volume comes to about $14.92 — 2.6×.
+What is left is the part that models cannot do for you: CrazyGames runs three review lines, WeChat mini-games come with filing requirements, and neither is a design problem. The author's own closing note is that most small games still will not land, however cheap the build was.
 
-## Metrics and monetization
+## What transfers
 
-No revenue yet. The game has no players, no ad impressions and no tipping income because it has not been submitted anywhere.
+> The reusable asset here is not the game and not the model — it is the prompt order. Write the spec against the platform's metrics first, then bound the iteration to a fixed number of rounds so the cost per attempt stays known.
 
-Monetization is the platform default rather than a design decision: CrazyGames pays on ad impressions once a title clears its review lines, and WeChat mini-games take tips through the open platform.
-
-The benchmark the article opens with is a Suika-style variation built by solo developer anul agarwal with ChatGPT in 2023: 65M+ players and more than $25,000 in revenue, out of 120+ prototypes of which the first 100 barely earned anything.
-
-## Community reception and key debates
-
-The post drew roughly 300 likes and 16 reposts in its first day, so the discussion is small. It is also mostly not about the game.
-
-- **Cheap attempts make volume viable.** If one attempt costs $5.77 instead of $15, the 120-prototype path stops being something only well-funded studios can afford.
-- **Volume is not the bottleneck.** anul agarwal's own numbers say the first 100 prototypes earned almost nothing, so a cheaper loop shortens the cycle without telling you which idea will work.
-- **The comparison has a commercial edge.** The article ships with a referral link to the model vendor, which makes the $14.92 figure worth reading as a vendor-adjacent claim rather than a neutral benchmark.
-
-Both prompts are published in full, which is the reason this belongs in the case library: the workflow can be checked against your own project instead of taken on trust.
+Everything else is conditional. The cost advantage assumes a cheap endpoint and a small, self-contained build. The art still needs a human and a tool that is not a language model. And the two prompts are published in full, which is the reason this belongs in the case library: you can run the workflow against your own idea instead of taking the conclusion on trust.
