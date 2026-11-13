@@ -1,7 +1,7 @@
 // 免费资源补充清单：参考 Reddit / X 社区共识整理。
 // 名称与提供方保留英文；介绍按语言本地化，缺失时回退英文。
 
-export type FreeResourceGroup = "start" | "books" | "repos" | "videos";
+export type FreeResourceGroup = "start" | "books" | "repos" | "videos" | "games";
 export type FreeResourceTag =
   | "hub"
   | "course"
@@ -9,7 +9,8 @@ export type FreeResourceTag =
   | "pdf"
   | "online"
   | "guide"
-  | "video";
+  | "video"
+  | "game";
 export type ResourceLocale = "en" | "zh" | "fr" | "es" | "pt";
 
 export interface FreeResource {
@@ -27,6 +28,7 @@ export const FREE_RESOURCE_GROUPS: FreeResourceGroup[] = [
   "books",
   "repos",
   "videos",
+  "games",
 ];
 
 export const FREE_RESOURCES: FreeResource[] = [
@@ -343,6 +345,156 @@ export const FREE_RESOURCES: FreeResource[] = [
       fr: "Des résumés courts et enthousiastes des nouvelles recherches en IA. Pratique pour suivre sans lire chaque article.",
       es: "Resúmenes cortos y entusiastas de nuevas investigaciones en IA. Útil para seguir el ritmo sin leer cada artículo.",
       pt: "Resumos curtos e entusiasmados de novas pesquisas em IA. Útil para acompanhar sem ler cada artigo.",
+    },
+  },
+  {
+    id: "k8s-games",
+    group: "games",
+    name: "K8s Games",
+    by: "Open source · rohitg00",
+    url: "https://k8sgames.com",
+    tag: "game",
+    desc: {
+      en: "A 3D cluster you can wreck in the browser: deploy pods, break them, then fix CrashLoopBackOff by typing real kubectl commands. No install, no account.",
+      zh: "浏览器里的 3D 集群：部署 Pod、把它弄坏，再敲真实 kubectl 命令修好 CrashLoopBackOff。免安装、免注册。",
+      fr: "Un cluster 3D à saccager dans le navigateur : déployer des pods, les casser, puis réparer un CrashLoopBackOff avec de vraies commandes kubectl. Sans installation ni compte.",
+      es: "Un clúster 3D que puedes destrozar en el navegador: desplegar pods, romperlos y arreglar el CrashLoopBackOff con comandos kubectl reales. Sin instalar nada ni crear cuenta.",
+      pt: "Um cluster 3D para destruir no navegador: subir pods, quebrá-los e consertar o CrashLoopBackOff com comandos kubectl reais. Sem instalação e sem conta.",
+    },
+  },
+  {
+    id: "devops-dream",
+    group: "games",
+    name: "DevOps Dream",
+    by: "devops.games",
+    url: "https://devops.games",
+    tag: "game",
+    desc: {
+      en: "Not a coding exercise: you play a CIO investing in delivery initiatives and living with the consequences. It explains why DevOps changes an organisation, not how to write a pipeline.",
+      zh: "不是编程练习：你扮演 CIO，投资交付举措并承担后果。它解释的是 DevOps 为什么改变组织，而不是怎么写流水线。",
+      fr: "Pas un exercice de code : vous jouez un CIO qui investit dans des initiatives de delivery et en subit les conséquences. Cela explique pourquoi le DevOps change une organisation, pas comment écrire un pipeline.",
+      es: "No es un ejercicio de código: juegas como CIO que invierte en iniciativas de entrega y asume las consecuencias. Explica por qué DevOps cambia una organización, no cómo escribir un pipeline.",
+      pt: "Não é um exercício de código: você joga como CIO investindo em iniciativas de entrega e assumindo as consequências. Explica por que o DevOps muda uma organização, não como escrever um pipeline.",
+    },
+  },
+  {
+    id: "overthewire",
+    group: "games",
+    name: "OverTheWire",
+    by: "OverTheWire",
+    url: "https://overthewire.org/wargames/",
+    tag: "game",
+    desc: {
+      en: "Twelve wargames, and Bandit is the entry point: 34 levels over SSH that teach the Linux shell by making you hunt for hidden passwords. You want a terminal before you start, not during.",
+      zh: "12 个 WarGames，入门从 Bandit 开始：34 关 SSH 关卡，靠找隐藏密码把 Linux shell 练熟。前提是先用过终端，而不是边玩边学终端。",
+      fr: "Douze wargames, et Bandit est la porte d'entrée : 34 niveaux en SSH qui enseignent le shell Linux en vous faisant chercher des mots de passe cachés. Mieux vaut connaître un terminal avant de commencer.",
+      es: "Doce wargames, y Bandit es la puerta de entrada: 34 niveles por SSH que enseñan el shell de Linux obligándote a buscar contraseñas ocultas. Conviene haber usado una terminal antes de empezar.",
+      pt: "Doze wargames, e o Bandit é a porta de entrada: 34 níveis via SSH que ensinam o shell do Linux fazendo você caçar senhas escondidas. Melhor já ter usado um terminal antes de começar.",
+    },
+  },
+  {
+    id: "oh-my-git",
+    group: "games",
+    name: "Oh My Git!",
+    by: "Open source · blinry & bleeptrack",
+    url: "https://ohmygit.org",
+    tag: "game",
+    desc: {
+      en: "Shows the commit graph rearranging itself as you play, with cards that explain each new concept. Desktop build for Windows, macOS and Linux; the project is in low-maintenance mode, so use it to build the mental model, not as a command reference.",
+      zh: "边玩边看提交图怎么变，卡牌负责解释新概念。Windows / macOS / Linux 桌面版；项目已进入低维护状态，适合建立心智模型，不适合当命令手册。",
+      fr: "Montre le graphe de commits se réorganiser pendant que vous jouez, avec des cartes qui expliquent chaque concept. Version bureau Windows, macOS et Linux ; le projet est en maintenance minimale, à utiliser pour le modèle mental, pas comme aide-mémoire des commandes.",
+      es: "Muestra el grafo de commits reorganizándose mientras juegas, con cartas que explican cada concepto. Versión de escritorio para Windows, macOS y Linux; el proyecto está en modo de bajo mantenimiento: úsalo para el modelo mental, no como referencia de comandos.",
+      pt: "Mostra o grafo de commits se reorganizando enquanto você joga, com cartas que explicam cada conceito. Versão desktop para Windows, macOS e Linux; o projeto está em modo de baixa manutenção: use para formar o modelo mental, não como referência de comandos.",
+    },
+  },
+  {
+    id: "codecombat",
+    group: "games",
+    name: "CodeCombat",
+    by: "CodeCombat",
+    url: "https://codecombat.com",
+    tag: "game",
+    desc: {
+      en: "An RPG where the spells are real Python or JavaScript. The free levels run out early — about five in the intro campaign — so it works as a taste of syntax, not a course.",
+      zh: "把咒语写成真实 Python 或 JavaScript 的 RPG。免费关卡很早就断了（入门战役大约第 5 关），适合尝个语法味道，不足以当课程。",
+      fr: "Un RPG où les sorts sont du vrai Python ou JavaScript. Les niveaux gratuits s'arrêtent tôt — environ cinq dans la campagne d'introduction — donc c'est un aperçu de syntaxe, pas un cours.",
+      es: "Un RPG donde los hechizos son Python o JavaScript de verdad. Los niveles gratis se acaban pronto —unos cinco en la campaña inicial—, así que es una probada de sintaxis, no un curso.",
+      pt: "Um RPG onde os feitiços são Python ou JavaScript de verdade. Os níveis grátis acabam cedo — cerca de cinco na campanha inicial —, então é uma amostra de sintaxe, não um curso.",
+    },
+  },
+  {
+    id: "codepip",
+    group: "games",
+    name: "Codepip",
+    by: "Thomas Park",
+    url: "https://codepip.com",
+    tag: "game",
+    desc: {
+      en: "Flexbox Froggy and Grid Garden are the two everyone recommends: you move frogs and water carrots by writing CSS. Fast way to build layout intuition, though it skips flex-grow, flex-shrink and flex-basis.",
+      zh: "最常被推荐的是 Flexbox Froggy 和 Grid Garden：写 CSS 把青蛙送上荷叶、给胡萝卜浇水。建立布局直觉很快，但跳过了 flex-grow、flex-shrink 和 flex-basis。",
+      fr: "Flexbox Froggy et Grid Garden sont les deux que tout le monde recommande : on déplace des grenouilles et on arrose des carottes en écrivant du CSS. Idéal pour l'intuition du layout, même s'il saute flex-grow, flex-shrink et flex-basis.",
+      es: "Flexbox Froggy y Grid Garden son los dos que todos recomiendan: mueves ranas y riegas zanahorias escribiendo CSS. Rápido para ganar intuición de layout, aunque se salta flex-grow, flex-shrink y flex-basis.",
+      pt: "Flexbox Froggy e Grid Garden são os dois que todo mundo recomenda: você move sapos e rega cenouras escrevendo CSS. Rápido para ganhar intuição de layout, embora pule flex-grow, flex-shrink e flex-basis.",
+    },
+  },
+  {
+    id: "cylab-security-academy",
+    group: "games",
+    name: "CyLab Security Academy",
+    by: "Carnegie Mellon University",
+    url: "https://picoctf.org",
+    tag: "game",
+    desc: {
+      en: "What used to be picoCTF: same team, same free platform, now under CMU's CyLab with AI-security and blockchain paths. Old picoCTF logins still work. Clear General Skills before touching the practice challenges.",
+      zh: "原 picoCTF：同一团队、同样免费，现在并入 CMU CyLab，新增 AI 安全与区块链方向，旧账号可继续用。先把 General Skills 刷完，再碰 Practice。",
+      fr: "L'ancien picoCTF : même équipe, même plateforme gratuite, désormais sous CyLab (CMU) avec des parcours sécurité IA et blockchain. Les anciens identifiants picoCTF fonctionnent. Terminez General Skills avant les défis Practice.",
+      es: "Lo que antes era picoCTF: mismo equipo, misma plataforma gratuita, ahora bajo CyLab de CMU con rutas de seguridad en IA y blockchain. Las credenciales antiguas siguen funcionando. Termina General Skills antes de tocar los retos de Practice.",
+      pt: "O antigo picoCTF: mesma equipe, mesma plataforma gratuita, agora sob o CyLab da CMU com trilhas de segurança em IA e blockchain. As credenciais antigas continuam valendo. Termine General Skills antes de encarar os desafios de Practice.",
+    },
+  },
+  {
+    id: "sololearn",
+    group: "games",
+    name: "SoloLearn",
+    by: "SoloLearn",
+    url: "https://www.sololearn.com",
+    tag: "game",
+    desc: {
+      en: "Bite-sized lessons built for a phone, with a comment section under each one that is often more useful than the lesson itself. Good for recall and streaks; thin once you want to write a real program.",
+      zh: "为手机设计的碎片课程，每节课下面的评论区常常比课程本身有用。适合刷记忆和保持连续打卡；想写真实程序时就显得太薄。",
+      fr: "Des leçons courtes pensées pour le téléphone, avec sous chacune une section de commentaires souvent plus utile que la leçon. Bien pour la révision et les séries ; mince dès qu'on veut écrire un vrai programme.",
+      es: "Lecciones cortas pensadas para el móvil, con una sección de comentarios bajo cada una que suele ser más útil que la lección. Bien para repasar y mantener la racha; escaso cuando quieres escribir un programa real.",
+      pt: "Lições curtas feitas para o celular, com uma seção de comentários abaixo de cada uma que costuma ser mais útil que a lição. Bom para revisar e manter a sequência; raso quando você quer escrever um programa de verdade.",
+    },
+  },
+  {
+    id: "scratch",
+    group: "games",
+    name: "Scratch",
+    by: "MIT Media Lab",
+    url: "https://scratch.mit.edu",
+    tag: "game",
+    desc: {
+      en: "Drag blocks to build stories, games and animations, then share them in a moderated community. Aimed at ages 8–16; teachers like the concepts and complain that there is no step-through debugger.",
+      zh: "拖积木做故事、游戏和动画，再发到有审核的社区。面向 8–16 岁；老师认可它的概念教学，但常吐槽没有单步调试。",
+      fr: "Assemblez des blocs pour créer histoires, jeux et animations, puis partagez-les dans une communauté modérée. Destiné aux 8–16 ans ; les enseignants aiment les concepts et regrettent l'absence de débogueur pas à pas.",
+      es: "Arrastra bloques para crear historias, juegos y animaciones, y compártelos en una comunidad moderada. Pensado para 8–16 años; al profesorado le gustan los conceptos y echa en falta un depurador paso a paso.",
+      pt: "Arraste blocos para criar histórias, jogos e animações, e compartilhe em uma comunidade moderada. Voltado a 8–16 anos; professores gostam dos conceitos e reclamam da falta de depurador passo a passo.",
+    },
+  },
+  {
+    id: "codingame",
+    group: "games",
+    name: "CodinGame",
+    by: "CodinGame",
+    url: "https://www.codingame.com",
+    tag: "game",
+    desc: {
+      en: "Puzzles and bot battles in 25+ languages, with a competitive ladder. Explicitly not for beginners and not for learning a new language: it sharpens what you already know. The site now also pitches agent evaluation.",
+      zh: "25 种以上语言的谜题与 bot 对战，带天梯排名。官方自己说得很清楚：不适合零基础，也不是用来学新语言，它打磨你已有的能力。网站如今还主推 agent 评测。",
+      fr: "Des puzzles et des batailles de bots dans plus de 25 langages, avec un classement compétitif. Explicitement pas pour les débutants ni pour apprendre un langage : cela aiguise ce que vous savez déjà. Le site met désormais aussi en avant l'évaluation d'agents.",
+      es: "Puzles y batallas de bots en más de 25 lenguajes, con una clasificación competitiva. Explícitamente no es para principiantes ni para aprender un lenguaje nuevo: afina lo que ya sabes. El sitio ahora también promociona la evaluación de agentes.",
+      pt: "Puzzles e batalhas de bots em mais de 25 linguagens, com ranking competitivo. Explicitamente não é para iniciantes nem para aprender uma linguagem nova: afia o que você já sabe. O site agora também divulga avaliação de agentes.",
     },
   },
 ];

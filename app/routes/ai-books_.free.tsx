@@ -9,6 +9,7 @@ import {
   Code2,
   Compass,
   GraduationCap,
+  Gamepad2,
   Info,
   Library,
   Route as PathIcon,
@@ -470,6 +471,12 @@ function FreeLibraryPage() {
                   />
                   <SidebarLink href="#repos" icon={Code2} label={t("freeLib.githubRepos")} external />
                   <SidebarLink href="#videos" icon={Video} label={t("freeLib.videoChannels")} external />
+                  <SidebarLink
+                    href="#games"
+                    icon={Gamepad2}
+                    label={t("freeLib.playAndLearn")}
+                    external
+                  />
                   <SidebarLink href="#about" icon={Info} label={t("freeLib.about")} external />
                 </nav>
 
@@ -721,6 +728,16 @@ function FreeLibraryPage() {
                   title={t("freeLib.section.videos.title")}
                   desc={t("freeLib.section.videos.desc")}
                   items={resourcesFor("videos")}
+                  lang={resourceLocale}
+                  columns="three"
+                />
+
+                <ResourceSection
+                  id="games"
+                  num="08"
+                  title={t("freeLib.section.games.title")}
+                  desc={t("freeLib.section.games.desc")}
+                  items={resourcesFor("games")}
                   lang={resourceLocale}
                   columns="three"
                 />
