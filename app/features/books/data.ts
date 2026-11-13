@@ -1,11 +1,11 @@
-// 数据来源：Amazon 产品数据（构建时快照，2026-11-01）。
+// 数据来源：Amazon 产品数据（构建时快照，2026-11-13 补入 9 本）。
 // 评分/评论数会随时间变化；价格与库存以 Amazon 页面为准。
 // 联盟链接沿用参考站 partner tag，卡片上追加 ascsubtag 用于分位追踪。
 
 export const PARTNER_TAG = "nailsizelab-20";
-export const GENERATED_AT = "2026-11-01";
-export const TOTAL_RATINGS = 26414;
-export const BOOK_COUNT = 84;
+export const GENERATED_AT = "2026-11-13";
+export const TOTAL_RATINGS = 29357;
+export const BOOK_COUNT = 93;
 
 export const CATEGORIES = {
   "ai-tools": "AI Tools & Apps",
@@ -43,7 +43,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/81bNzQ8k4TL._SL500_.jpg",
     "category": "ai-business",
     "query": "AI for business",
-    "url": "https://www.amazon.com/dp/B0GZ8F4C8Z?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0GZ8F4C8Z?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Geoff Woods",
     "displayTitle": "The AI-Driven Leader"
   },
@@ -56,7 +56,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/81NGLopaoHL._SL500_.jpg",
     "category": "ai-business",
     "query": "make money with AI",
-    "url": "https://www.amazon.com/dp/B0DFR5BRTR?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0DFR5BRTR?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Dan Wardrope, Om Beacom-Halliday",
     "displayTitle": "The Instant AI Agency"
   },
@@ -69,7 +69,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/81CHoN5MoSL._SL500_.jpg",
     "category": "ai-business",
     "query": "AI agent book",
-    "url": "https://www.amazon.com/dp/B0F2GVNFTJ?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0F2GVNFTJ?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Pascal Bornet, Jochen Wirtz",
     "displayTitle": "Agentic Artificial Intelligence"
   },
@@ -82,7 +82,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71Nf8KZENWL._SL500_.jpg",
     "category": "ai-business",
     "query": "ChatGPT book",
-    "url": "https://www.amazon.com/dp/1967210020?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/1967210020?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Milo Foster",
     "displayTitle": "The AI Workshop"
   },
@@ -95,7 +95,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71cqj7GH1-L._SL500_.jpg",
     "category": "ai-business",
     "query": "AI marketing book",
-    "url": "https://www.amazon.com/dp/B0CKWSCJ7D?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0CKWSCJ7D?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Ylva Bosemark",
     "displayTitle": "AI Power Funnels"
   },
@@ -108,7 +108,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71RR5bMZ+1L._SL500_.jpg",
     "category": "ai-business",
     "query": "generative AI writing",
-    "url": "https://www.amazon.com/dp/1394270747?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/1394270747?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Pam Baker",
     "displayTitle": "Generative AI For Dummies"
   },
@@ -121,7 +121,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71taF7emvML._SL500_.jpg",
     "category": "ai-business",
     "query": "AI marketing book",
-    "url": "https://www.amazon.com/dp/B0B4Y16B5R?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0B4Y16B5R?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Paul Roetzer, Mike Kaput",
     "displayTitle": "Marketing Artificial Intelligence"
   },
@@ -134,7 +134,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/81X8Y+xZThL._SL500_.jpg",
     "category": "ai-business",
     "query": "designing AI products",
-    "url": "https://www.amazon.com/dp/1098152700?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/1098152700?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Marily Nika",
     "displayTitle": "Building AI-Powered Products"
   },
@@ -147,7 +147,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/61C8BXJMC3L._SL500_.jpg",
     "category": "ai-business",
     "query": "AI for business",
-    "url": "https://www.amazon.com/dp/1507222912?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/1507222912?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Phil Pallen",
     "displayTitle": "AI for Small Business"
   },
@@ -160,7 +160,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/61YppSP3XAL._SL500_.jpg",
     "category": "ai-business",
     "query": "AI time management",
-    "url": "https://www.amazon.com/dp/B0FR1HKP34?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0FR1HKP34?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Hassan Osman",
     "displayTitle": "AI Change Management Made Simple"
   },
@@ -173,7 +173,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/5177w6iOBeL._SL500_.jpg",
     "category": "ai-business",
     "query": "AI for business",
-    "url": "https://www.amazon.com/dp/B0GP2JDJTQ?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0GP2JDJTQ?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Dr Michael Gene Housman",
     "displayTitle": "Future Proof: Transform your Business with AI"
   },
@@ -186,7 +186,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/61A5DXX9AiL._SL500_.jpg",
     "category": "ai-business",
     "query": "AI marketing book",
-    "url": "https://www.amazon.com/dp/1964334101?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/1964334101?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Drew Blumenthal",
     "displayTitle": "Digital Drew's Playbook"
   },
@@ -199,7 +199,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/81XdVoVuy6L._SL500_.jpg",
     "category": "ai-design",
     "query": "AI agent book",
-    "url": "https://www.amazon.com/dp/B0G1PPF5MC?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0G1PPF5MC?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Michael Albada, Nick Mondelli",
     "displayTitle": "Building Applications with AI Agents"
   },
@@ -212,7 +212,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/61kstwqtV-L._SL500_.jpg",
     "category": "ai-design",
     "query": "AI agent book",
-    "url": "https://www.amazon.com/dp/B0G2BCQQJY?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0G2BCQQJY?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Victor Dibia",
     "displayTitle": "Designing Multi-Agent Systems"
   },
@@ -225,7 +225,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/61bhHw4q7qL._SL500_.jpg",
     "category": "ai-design",
     "query": "AI for business",
-    "url": "https://www.amazon.com/dp/B0HJ9CRH5S?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0HJ9CRH5S?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Jordan Samuel Fleming",
     "displayTitle": "The AI Workforce"
   },
@@ -238,7 +238,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/81IvNEsn5XL._SL500_.jpg",
     "category": "ai-design",
     "query": "AI agent book",
-    "url": "https://www.amazon.com/dp/180602957X?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/180602957X?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Dr. Ali Arsanjani, Juan Pablo Bustos",
     "displayTitle": "Agentic Architectural Patterns for Building Multi-Agent…"
   },
@@ -251,7 +251,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71DeGt-58OL._SL500_.jpg",
     "category": "ai-design",
     "query": "AI for designers",
-    "url": "https://www.amazon.com/dp/1394345925?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/1394345925?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Greg Nudelman, Daria Kempka",
     "displayTitle": "UX for AI: A Framework for Designing AI-Driven Products"
   },
@@ -264,7 +264,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/91aBOscjQrL._SL500_.jpg",
     "category": "ai-design",
     "query": "AI for designers",
-    "url": "https://www.amazon.com/dp/1616899158?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/1616899158?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Helen Armstrong, Keetra Dean Dixon",
     "displayTitle": "Big Data Big Design"
   },
@@ -277,7 +277,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/813yHG3nKLL._SL500_.jpg",
     "category": "ai-design",
     "query": "AI for designers",
-    "url": "https://www.amazon.com/dp/B0FN37DV9N?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0FN37DV9N?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Valliappa Lakshmanan, Hannes Hapke",
     "displayTitle": "Generative AI Design Patterns"
   },
@@ -290,7 +290,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/61HjJrsZgjL._SL500_.jpg",
     "category": "ai-design",
     "query": "AI UX design",
-    "url": "https://www.amazon.com/dp/B0H6QW2F1Y?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0H6QW2F1Y?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Constantine Papas",
     "displayTitle": "AI-Powered UX Research"
   },
@@ -303,7 +303,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/515fD3xPXIL._SL500_.jpg",
     "category": "ai-design",
     "query": "AI for designers",
-    "url": "https://www.amazon.com/dp/B0D91XBNHT?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0D91XBNHT?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Lise Pilot",
     "displayTitle": "AI for UX Designers"
   },
@@ -316,7 +316,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/61L7oUE-TWL._SL500_.jpg",
     "category": "ai-design",
     "query": "AI UX design",
-    "url": "https://www.amazon.com/dp/1484280873?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/1484280873?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Akshay Kore",
     "displayTitle": "Designing Human-Centric AI Experiences"
   },
@@ -329,7 +329,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/61c8Op4tkQL._SL500_.jpg",
     "category": "ai-design",
     "query": "AI UX design",
-    "url": "https://www.amazon.com/dp/B0DNBDDTC8?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0DNBDDTC8?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Lise Pilot",
     "displayTitle": "The Ultimate Handbook of UI/UX Product Design"
   },
@@ -342,7 +342,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71v8klRncdL._SL500_.jpg",
     "category": "ai-design",
     "query": "AI for designers",
-    "url": "https://www.amazon.com/dp/B0GKPYCFHP?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0GKPYCFHP?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Lise Pilot",
     "displayTitle": "AI in UX Design"
   },
@@ -355,7 +355,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/61i1KWorf9L._SL500_.jpg",
     "category": "ai-money",
     "query": "ChatGPT book",
-    "url": "https://www.amazon.com/dp/B0BSJ9XMQ8?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0BSJ9XMQ8?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "",
     "displayTitle": "The ChatGPT Millionaire"
   },
@@ -368,7 +368,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/61EHgSdiJcL._SL500_.jpg",
     "category": "ai-money",
     "query": "AI automation book",
-    "url": "https://www.amazon.com/dp/B0DMTGB4MT?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0DMTGB4MT?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "",
     "displayTitle": "AI Guide for Beginners"
   },
@@ -381,7 +381,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/61eRXpP12PL._SL500_.jpg",
     "category": "ai-money",
     "query": "AI for business",
-    "url": "https://www.amazon.com/dp/B0FC6137WT?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0FC6137WT?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Chuck Little",
     "displayTitle": "Build Passive Income with AI – No Code? No Budget? No…"
   },
@@ -394,7 +394,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/81kzycw7OiL._SL500_.jpg",
     "category": "ai-money",
     "query": "AI automation book",
-    "url": "https://www.amazon.com/dp/B08KFLY51Y?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B08KFLY51Y?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Pascal Bornet, Ian Barkin",
     "displayTitle": "INTELLIGENT AUTOMATION"
   },
@@ -407,7 +407,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71MliNLZvtL._SL500_.jpg",
     "category": "ai-money",
     "query": "ChatGPT book",
-    "url": "https://www.amazon.com/dp/B0BXB2T98V?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0BXB2T98V?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Arsath Natheem",
     "displayTitle": "CHATGPT BOOK FOR BEGINNERS"
   },
@@ -420,7 +420,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71wPIZ1o0JL._SL500_.jpg",
     "category": "ai-money",
     "query": "ChatGPT book",
-    "url": "https://www.amazon.com/dp/1923524151?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/1923524151?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "",
     "displayTitle": "ChatGPT For Beginners Over Fifty"
   },
@@ -433,7 +433,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/61wQHVFffxL._SL500_.jpg",
     "category": "ai-money",
     "query": "AI tools for beginners",
-    "url": "https://www.amazon.com/dp/B0GX1HSFF5?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0GX1HSFF5?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Anne Hansen",
     "displayTitle": "AI for Absolute Beginners"
   },
@@ -446,7 +446,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71tc3gGhS-L._SL500_.jpg",
     "category": "ai-money",
     "query": "AI entrepreneur",
-    "url": "https://www.amazon.com/dp/B0D3SMVN8D?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0D3SMVN8D?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Kartikeya Malhotra, Shawn Isola",
     "displayTitle": "AI Entrepreneur’s Handbook"
   },
@@ -459,7 +459,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/81jteUdFC2L._SL500_.jpg",
     "category": "ai-money",
     "query": "AI for business",
-    "url": "https://www.amazon.com/dp/B0F966R531?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0F966R531?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Tessa Quinn Rae",
     "displayTitle": "Launch Your First AI Business in 20 Days"
   },
@@ -472,7 +472,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/81y-DN-tQaL._SL500_.jpg",
     "category": "ai-money",
     "query": "AI entrepreneur",
-    "url": "https://www.amazon.com/dp/B0CW1K8RZ7?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0CW1K8RZ7?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Greg Wayne",
     "displayTitle": "The AI-Powered Entrepreneur. Revolutionizing Online…"
   },
@@ -485,7 +485,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/61hgUj8puIL._SL500_.jpg",
     "category": "ai-money",
     "query": "AI wealth",
-    "url": "https://www.amazon.com/dp/B0GMB5PYWJ?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0GMB5PYWJ?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Mark A. Johnson",
     "displayTitle": "Invest Smarter with AI"
   },
@@ -498,7 +498,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71BA+O6kBfL._SL500_.jpg",
     "category": "ai-money",
     "query": "ChatGPT book",
-    "url": "https://www.amazon.com/dp/B0FPM84XJN?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0FPM84XJN?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Holden Vanek",
     "displayTitle": "Make Money with AI"
   },
@@ -511,7 +511,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/614ZV3Ts-gL._SL500_.jpg",
     "category": "ai-productivity",
     "query": "ChatGPT book",
-    "url": "https://www.amazon.com/dp/180556742X?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/180556742X?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Pierce J. Sheldon",
     "displayTitle": "Claude AI for Beginners Bible"
   },
@@ -524,7 +524,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/61W+HyIDwVL._SL500_.jpg",
     "category": "ai-productivity",
     "query": "ChatGPT book",
-    "url": "https://www.amazon.com/dp/B0DYDSGL2M?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0DYDSGL2M?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Jakob Huber",
     "displayTitle": "The ChatGPT Handbook for Beginners"
   },
@@ -537,7 +537,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71uq21YGUhL._SL500_.jpg",
     "category": "ai-productivity",
     "query": "AI time management",
-    "url": "https://www.amazon.com/dp/B0HJ8VW2LK?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0HJ8VW2LK?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "George Radcliffe, Joe Pavia",
     "displayTitle": "AI Productivity Made Easy"
   },
@@ -550,7 +550,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71-X6TI8SyL._SL500_.jpg",
     "category": "ai-productivity",
     "query": "ChatGPT book",
-    "url": "https://www.amazon.com/dp/1507225555?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/1507225555?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Igor Pogany",
     "displayTitle": "The Ultimate ChatGPT Prompt Book"
   },
@@ -563,7 +563,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71txzcUpyfL._SL500_.jpg",
     "category": "ai-productivity",
     "query": "AI workflow",
-    "url": "https://www.amazon.com/dp/0135489687?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/0135489687?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Sinan Ozdemir",
     "displayTitle": "Building Agentic AI"
   },
@@ -576,7 +576,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/61cE5dVY05L._SL500_.jpg",
     "category": "ai-productivity",
     "query": "AI workflow",
-    "url": "https://www.amazon.com/dp/B0FWD5H3Z2?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0FWD5H3Z2?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Arsath Natheem S",
     "displayTitle": "n8n BOOK FOR BEGINNERS"
   },
@@ -589,7 +589,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71wlNmmnsWL._SL500_.jpg",
     "category": "ai-productivity",
     "query": "AI productivity",
-    "url": "https://www.amazon.com/dp/B0HGKYNDRJ?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0HGKYNDRJ?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Danielle Billetz-Reppert",
     "displayTitle": "The AI Productivity Bible"
   },
@@ -602,7 +602,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/81UH4Dk9Y5L._SL500_.jpg",
     "category": "ai-productivity",
     "query": "generative AI writing",
-    "url": "https://www.amazon.com/dp/B0FDL9QL1G?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0FDL9QL1G?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Daniel Stouffer, Tanya Reuter",
     "displayTitle": "Generative AI Marketers"
   },
@@ -615,7 +615,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/61hOcRpfP2L._SL500_.jpg",
     "category": "ai-productivity",
     "query": "AI productivity",
-    "url": "https://www.amazon.com/dp/B0H32DMHFL?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0H32DMHFL?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Alex R. Sterling",
     "displayTitle": "AI Productivity for ADHD Professionals"
   },
@@ -628,7 +628,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/51ibYLWYVzL._SL500_.jpg",
     "category": "ai-productivity",
     "query": "ChatGPT book",
-    "url": "https://www.amazon.com/dp/B0HKWXKBTQ?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0HKWXKBTQ?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "",
     "displayTitle": "The ChatGPT Bible"
   },
@@ -641,7 +641,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71urNThNDuL._SL500_.jpg",
     "category": "ai-productivity",
     "query": "AI automation book",
-    "url": "https://www.amazon.com/dp/B0FM3RLZNM?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0FM3RLZNM?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Greg Lim",
     "displayTitle": "AI Agents and Workflows Crash Course"
   },
@@ -654,7 +654,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/81lYLMlFRPL._SL500_.jpg",
     "category": "ai-productivity",
     "query": "AI productivity",
-    "url": "https://www.amazon.com/dp/B0HBFX5LRP?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0HBFX5LRP?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "J. Lee Ander, Tom Brooks",
     "displayTitle": "AI Productivity for Women over 40"
   },
@@ -667,7 +667,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/815KH9GjFTL._SL500_.jpg",
     "category": "ai-technical",
     "query": "AI agent book",
-    "url": "https://www.amazon.com/dp/1098166302?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/1098166302?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Chip Huyen",
     "displayTitle": "AI Engineering"
   },
@@ -680,7 +680,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/81aSHEzSB1L._SL500_.jpg",
     "category": "ai-technical",
     "query": "designing AI products",
-    "url": "https://www.amazon.com/dp/1098107969?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/1098107969?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Chip Huyen",
     "displayTitle": "Designing Machine Learning Systems"
   },
@@ -693,7 +693,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/81qHV3ACapL._SL500_.jpg",
     "category": "ai-technical",
     "query": "machine learning beginners",
-    "url": "https://www.amazon.com/dp/1098125975?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/1098125975?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Aurélien Géron",
     "displayTitle": "Hands-On Machine Learning with Scikit-Learn, Keras, and…"
   },
@@ -706,7 +706,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/51sYv0uQ8WL._SL500_.jpg",
     "category": "ai-technical",
     "query": "AI agent book",
-    "url": "https://www.amazon.com/dp/B0GPJM7CYK?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0GPJM7CYK?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Thomas R. Caldwell",
     "displayTitle": "The AI Engineering Bible"
   },
@@ -719,7 +719,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/81czMdb7I-L._SL500_.jpg",
     "category": "ai-technical",
     "query": "machine learning beginners",
-    "url": "https://www.amazon.com/dp/B08RWBSKQB?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B08RWBSKQB?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Oliver Theobald",
     "displayTitle": "Machine Learning for Absolute Beginners"
   },
@@ -732,7 +732,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/61xNgAgvqcL._SL500_.jpg",
     "category": "ai-technical",
     "query": "AI agent book",
-    "url": "https://www.amazon.com/dp/B0H1VQLDTK?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0H1VQLDTK?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Thomas R. Caldwell",
     "displayTitle": "The Agentic AI Bible"
   },
@@ -745,7 +745,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/615IIVepfjL._SL500_.jpg",
     "category": "ai-technical",
     "query": "machine learning beginners",
-    "url": "https://www.amazon.com/dp/1801819319?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/1801819319?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Sebastian Raschka, Yuxi (Hayden) Liu",
     "displayTitle": "Machine Learning with PyTorch and Scikit-Learn"
   },
@@ -758,7 +758,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/61Gm3hBdQUL._SL500_.jpg",
     "category": "ai-technical",
     "query": "ChatGPT book",
-    "url": "https://www.amazon.com/dp/B0FKZ3L1VX?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0FKZ3L1VX?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "",
     "displayTitle": "AI Prompt Engineering Bible"
   },
@@ -771,7 +771,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71XbqqcVfxL._SL500_.jpg",
     "category": "ai-technical",
     "query": "machine learning beginners",
-    "url": "https://www.amazon.com/dp/B07WN1TV57?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B07WN1TV57?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Oliver Theobald",
     "displayTitle": "Machine Learning with Python: A Practical Beginners’ Guide"
   },
@@ -784,7 +784,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/710fD+nJU7L._SL500_.jpg",
     "category": "ai-technical",
     "query": "AI tools for beginners",
-    "url": "https://www.amazon.com/dp/1967210071?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/1967210071?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Milo Foster",
     "displayTitle": "THE AI WORKSHOP"
   },
@@ -797,7 +797,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/818gECYmA9L._SL500_.jpg",
     "category": "ai-technical",
     "query": "everyday AI",
-    "url": "https://www.amazon.com/dp/B0F14NZLLJ?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0F14NZLLJ?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Jordan Blake, Susan Prater",
     "displayTitle": "The Ultimate Generative AI for Beginners Collection"
   },
@@ -810,7 +810,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/81q13cItCXL._SL500_.jpg",
     "category": "ai-technical",
     "query": "AI tools for beginners",
-    "url": "https://www.amazon.com/dp/B0F59SQ3R8?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0F59SQ3R8?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Charlie Hansen",
     "displayTitle": "Master AI for Beginners"
   },
@@ -823,7 +823,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/81FlYGkgrmL._SL500_.jpg",
     "category": "ai-tools",
     "query": "ChatGPT book",
-    "url": "https://www.amazon.com/dp/1250337747?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/1250337747?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Parmy Olson",
     "displayTitle": "Supremacy: AI, ChatGPT, and the Race That Will Change…"
   },
@@ -836,7 +836,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/81hY5nHoaXL._SL500_.jpg",
     "category": "ai-tools",
     "query": "ChatGPT book",
-    "url": "https://www.amazon.com/dp/1579550819?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/1579550819?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Stephen Wolfram",
     "displayTitle": "What Is ChatGPT Doing ... and Why Does It Work?"
   },
@@ -849,7 +849,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/91n+VOhHwwL._SL500_.jpg",
     "category": "ai-tools",
     "query": "AI for business",
-    "url": "https://www.amazon.com/dp/059371671X?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/059371671X?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Ethan Mollick",
     "displayTitle": "Co-Intelligence: Living and Working with AI"
   },
@@ -862,7 +862,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71qzQ91Qe0L._SL500_.jpg",
     "category": "ai-tools",
     "query": "ChatGPT book",
-    "url": "https://www.amazon.com/dp/142325113X?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/142325113X?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Frank Blackwell",
     "displayTitle": "ChatGPT Uses & Prompts"
   },
@@ -875,7 +875,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71ZmNSX6rZL._SL500_.jpg",
     "category": "ai-tools",
     "query": "ChatGPT book",
-    "url": "https://www.amazon.com/dp/1394314450?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/1394314450?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Pam Baker",
     "displayTitle": "ChatGPT For Dummies"
   },
@@ -888,7 +888,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/81dBBG2UYdL._SL500_.jpg",
     "category": "ai-tools",
     "query": "AI agent book",
-    "url": "https://www.amazon.com/dp/B0GX31SFJJ?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0GX31SFJJ?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Pascal Bornet, Jochen Wirtz",
     "displayTitle": "The Human-Agent Orchestrator"
   },
@@ -901,7 +901,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71CSMLfiteL._SL500_.jpg",
     "category": "ai-tools",
     "query": "AI tools for beginners",
-    "url": "https://www.amazon.com/dp/B0GGJ6BS6Q?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0GGJ6BS6Q?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "R.H. Klemm",
     "displayTitle": "AI in 10 Minutes"
   },
@@ -914,7 +914,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/61hPXCd4ScL._SL500_.jpg",
     "category": "ai-tools",
     "query": "AI tools for beginners",
-    "url": "https://www.amazon.com/dp/B0FBNH2D35?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0FBNH2D35?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Angus David",
     "displayTitle": "AI for Beginners"
   },
@@ -927,7 +927,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/61NobSZ3Y-L._SL500_.jpg",
     "category": "ai-tools",
     "query": "AI agent book",
-    "url": "https://www.amazon.com/dp/B0DYH5GHDD?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0DYH5GHDD?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Sam Bhagwat",
     "displayTitle": "Principles of Building AI Agents"
   },
@@ -940,7 +940,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71xtihopQ4L._SL500_.jpg",
     "category": "ai-tools",
     "query": "everyday AI",
-    "url": "https://www.amazon.com/dp/B0F7TJGK7H?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0F7TJGK7H?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "michael smith",
     "displayTitle": "#1 AI FOR BEGINNERS GUIDE"
   },
@@ -953,7 +953,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71gwJShn1VL._SL500_.jpg",
     "category": "ai-tools",
     "query": "everyday AI",
-    "url": "https://www.amazon.com/dp/B0GCNNT1GJ?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0GCNNT1GJ?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Grant Weston",
     "displayTitle": "Everyday AI Unlocked"
   },
@@ -966,7 +966,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71Q2SjL83AL._SL500_.jpg",
     "category": "ai-tools",
     "query": "AI for business",
-    "url": "https://www.amazon.com/dp/1394467230?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/1394467230?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Mike Sullivan, Vinay Gidwaney",
     "displayTitle": "Workforce Intelligence"
   },
@@ -979,7 +979,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71aLR6CS5LL._SL500_.jpg",
     "category": "ai-writing",
     "query": "ChatGPT book",
-    "url": "https://www.amazon.com/dp/B0BRMLVT1H?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0BRMLVT1H?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Hassan Osman",
     "displayTitle": "ChatGPT for Nonfiction Authors"
   },
@@ -992,7 +992,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71+bngLKZEL._SL500_.jpg",
     "category": "ai-writing",
     "query": "ChatGPT for authors",
-    "url": "https://www.amazon.com/dp/B0C3VZBN63?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0C3VZBN63?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Kevin Albert",
     "displayTitle": "ChatGPT for authors"
   },
@@ -1005,7 +1005,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/81f96kjuVyL._SL500_.jpg",
     "category": "ai-writing",
     "query": "ChatGPT for authors",
-    "url": "https://www.amazon.com/dp/B0CRQ8FDKT?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0CRQ8FDKT?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Saif Hussaini",
     "displayTitle": "ChatGPT for Writers"
   },
@@ -1018,7 +1018,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/81SNzUK7LlL._SL500_.jpg",
     "category": "ai-writing",
     "query": "AI writing",
-    "url": "https://www.amazon.com/dp/1394244665?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/1394244665?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Stephanie Diamond, Jeffrey Allan",
     "displayTitle": "Writing AI Prompts For Dummies"
   },
@@ -1031,7 +1031,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/819iHCvPT6L._SL500_.jpg",
     "category": "ai-writing",
     "query": "ChatGPT for authors",
-    "url": "https://www.amazon.com/dp/B0DL4L79PQ?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0DL4L79PQ?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Caryl Westmore",
     "displayTitle": "CHATGPT AI BOOK WRITING FORMULA"
   },
@@ -1044,7 +1044,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/619RvdWqLYL._SL500_.jpg",
     "category": "ai-writing",
     "query": "ChatGPT for authors",
-    "url": "https://www.amazon.com/dp/162385038X?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/162385038X?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "John Iovine",
     "displayTitle": "ChatGPT AI for Writers"
   },
@@ -1057,7 +1057,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71D2dSnacQL._SL500_.jpg",
     "category": "ai-writing",
     "query": "ChatGPT for authors",
-    "url": "https://www.amazon.com/dp/B0BTTN24DN?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0BTTN24DN?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Richard McCartney",
     "displayTitle": "ChatGPT: A Beginner’s Guide to Getting Started : ChatGPT…"
   },
@@ -1070,7 +1070,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/818CkB8DvUL._SL500_.jpg",
     "category": "ai-writing",
     "query": "AI writing",
-    "url": "https://www.amazon.com/dp/1541605527?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/1541605527?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "John Warner",
     "displayTitle": "More Than Words"
   },
@@ -1083,7 +1083,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71hBpbcw1DL._SL500_.jpg",
     "category": "ai-writing",
     "query": "ChatGPT for authors",
-    "url": "https://www.amazon.com/dp/B0C7L31ZBC?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0C7L31ZBC?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "NINA HARRINGTON",
     "displayTitle": "THE CHATGPT ROMANCE AUTHOR"
   },
@@ -1096,7 +1096,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/71hnB1kaP3L._SL500_.jpg",
     "category": "ai-writing",
     "query": "AI book writing",
-    "url": "https://www.amazon.com/dp/B0G21QHSMZ?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0G21QHSMZ?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Jonathan Milligan",
     "displayTitle": "The 90-Day Author"
   },
@@ -1109,7 +1109,7 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/611STlUbbsL._SL500_.jpg",
     "category": "ai-writing",
     "query": "AI writing",
-    "url": "https://www.amazon.com/dp/B0CSB78NPM?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0CSB78NPM?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "",
     "displayTitle": "Write Books Using AI"
   },
@@ -1122,8 +1122,125 @@ export const BOOKS: Book[] = [
     "image": "https://m.media-amazon.com/images/I/61knPlzyeTL._SL500_.jpg",
     "category": "ai-writing",
     "query": "ChatGPT for authors",
-    "url": "https://www.amazon.com/dp/B0CYXXL3GF?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0CYXXL3GF?tag=nailsizelab-20&language=en_US",
     "displayAuthor": "Roajer Gilbert",
     "displayTitle": "ChatGPT for Nonfiction Authors"
-  }
+  },
+  {
+    "asin": "B0H8TD72GW",
+    "title": "LLM Systems Engineering: Training and Building Large Language Models – Engineering AI Models Through Fine-Tuning, Alignment, and Deployment",
+    "author": "Rob McKinsey",
+    "rating": 4.8,
+    "reviews": 104,
+    "image": "https://m.media-amazon.com/images/I/51tTFVTeMML._SL500_.jpg",
+    "category": "ai-technical",
+    "query": "LLM engineering book 2026",
+    "url": "https://www.amazon.com/dp/B0H8TD72GW?tag=nailsizelab-20&language=en_US",
+    "displayAuthor": "Rob McKinsey",
+    "displayTitle": "LLM Systems Engineering"
+  },
+  {
+    "asin": "1778042724",
+    "title": "The Hundred-Page Language Models Book: hands-on with PyTorch",
+    "author": "Andriy Burkov",
+    "rating": 4.7,
+    "reviews": 111,
+    "image": "https://m.media-amazon.com/images/I/51mJGPfhoSL._SL500_.jpg",
+    "category": "ai-technical",
+    "query": "large language models book",
+    "url": "https://www.amazon.com/dp/1778042724?tag=nailsizelab-20&language=en_US",
+    "displayAuthor": "Andriy Burkov",
+    "displayTitle": "The Hundred-Page Language Models Book"
+  },
+  {
+    "asin": "B0GBXL3WTH",
+    "title": "The AGI Chronicles: The Inside Story of the Race to Create an Artificial Superintelligence",
+    "author": "Kevin Roose",
+    "rating": 4.8,
+    "reviews": 305,
+    "image": "https://m.media-amazon.com/images/I/718tEqU4H9L._SL500_.jpg",
+    "category": "ai-business",
+    "query": "artificial intelligence 2026 release",
+    "url": "https://www.amazon.com/dp/B0GBXL3WTH?tag=nailsizelab-20&language=en_US",
+    "displayAuthor": "Kevin Roose",
+    "displayTitle": "The AGI Chronicles"
+  },
+  {
+    "asin": "B0G2KX97FM",
+    "title": "AI For Good: How Real People Are Using Artificial Intelligence to Fix Things That Matter",
+    "author": "Josh Tyrangiel",
+    "rating": 4.4,
+    "reviews": 212,
+    "image": "https://m.media-amazon.com/images/I/71DGEkUzD8L._SL500_.jpg",
+    "category": "ai-business",
+    "query": "artificial intelligence 2026 release",
+    "url": "https://www.amazon.com/dp/B0G2KX97FM?tag=nailsizelab-20&language=en_US",
+    "displayAuthor": "Josh Tyrangiel",
+    "displayTitle": "AI For Good"
+  },
+  {
+    "asin": "1633437167",
+    "title": "Build a Large Language Model (From Scratch)",
+    "author": "Sebastian Raschka",
+    "rating": 4.5,
+    "reviews": 658,
+    "image": "https://m.media-amazon.com/images/I/71eljkULtwL._SL500_.jpg",
+    "category": "ai-technical",
+    "query": "large language models book",
+    "url": "https://www.amazon.com/dp/1633437167?tag=nailsizelab-20&language=en_US",
+    "displayAuthor": "Sebastian Raschka",
+    "displayTitle": "Build a Large Language Model (From Scratch)"
+  },
+  {
+    "asin": "1098150961",
+    "title": "Hands-On Large Language Models: Language Understanding and Generation",
+    "author": "Jay Alammar and Maarten Grootendorst",
+    "rating": 4.6,
+    "reviews": 333,
+    "image": "https://m.media-amazon.com/images/I/81+-sxD0RdL._SL500_.jpg",
+    "category": "ai-technical",
+    "query": "large language models book",
+    "url": "https://www.amazon.com/dp/1098150961?tag=nailsizelab-20&language=en_US",
+    "displayAuthor": "Jay Alammar",
+    "displayTitle": "Hands-On Large Language Models"
+  },
+  {
+    "asin": "0593185749",
+    "title": "Why Machines Learn: The Elegant Math Behind Modern AI",
+    "author": "Anil Ananthaswamy",
+    "rating": 4.7,
+    "reviews": 882,
+    "image": "https://m.media-amazon.com/images/I/81ZtMfYNTeL._SL500_.jpg",
+    "category": "ai-technical",
+    "query": "machine learning book 2026",
+    "url": "https://www.amazon.com/dp/0593185749?tag=nailsizelab-20&language=en_US",
+    "displayAuthor": "Anil Ananthaswamy",
+    "displayTitle": "Why Machines Learn"
+  },
+  {
+    "asin": "B0F2SG98Q9",
+    "title": "Hands-On Machine Learning with Scikit-Learn and PyTorch: Concepts, Tools, and Techniques to Build Intelligent Systems",
+    "author": "Aurélien Géron",
+    "rating": 4.7,
+    "reviews": 91,
+    "image": "https://m.media-amazon.com/images/I/81VywRgKFbL._SL500_.jpg",
+    "category": "ai-technical",
+    "query": "machine learning book 2026",
+    "url": "https://www.amazon.com/dp/B0F2SG98Q9?tag=nailsizelab-20&language=en_US",
+    "displayAuthor": "Aurélien Géron",
+    "displayTitle": "Hands-On Machine Learning with PyTorch"
+  },
+  {
+    "asin": "1836200072",
+    "title": "LLM Engineer's Handbook: Master the art of engineering large language models from concept to production",
+    "author": "Paul Iusztin and Maxime Labonne",
+    "rating": 4.6,
+    "reviews": 247,
+    "image": "https://m.media-amazon.com/images/I/71C2Wlmta-L._SL500_.jpg",
+    "category": "ai-technical",
+    "query": "LLM engineering book 2026",
+    "url": "https://www.amazon.com/dp/1836200072?tag=nailsizelab-20&language=en_US",
+    "displayAuthor": "Paul Iusztin",
+    "displayTitle": "LLM Engineer's Handbook"
+  },
 ];

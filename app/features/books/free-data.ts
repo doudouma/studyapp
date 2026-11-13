@@ -520,7 +520,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 4.4,
     "reviews": 651,
     "image": "https://m.media-amazon.com/images/I/61E94z4RIAL._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B07S3MLGFW?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B07S3MLGFW?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -536,7 +536,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 4.6,
     "reviews": 398,
     "image": "https://m.media-amazon.com/images/I/81jSxBt7MhL._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B0FHDQ62YJ?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0FHDQ62YJ?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -552,7 +552,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 4.4,
     "reviews": 233,
     "image": "https://m.media-amazon.com/images/I/91m2nzY2u6L._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B07654CFFQ?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B07654CFFQ?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -568,7 +568,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 4.5,
     "reviews": 208,
     "image": "https://m.media-amazon.com/images/I/71WNUiVcdiL._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B0GGH2KMF2?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0GGH2KMF2?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -584,7 +584,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 3.3,
     "reviews": 122,
     "image": "https://m.media-amazon.com/images/I/61T5-k7L1gL._SL500_.png",
-    "url": "https://www.amazon.com/dp/B0CGNN6D9Q?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0CGNN6D9Q?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -600,7 +600,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 4.7,
     "reviews": 115,
     "image": "https://m.media-amazon.com/images/I/819iHCvPT6L._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B0DL4L79PQ?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0DL4L79PQ?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -616,7 +616,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 4.4,
     "reviews": 50,
     "image": "https://m.media-amazon.com/images/I/61G51oaCkvL._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B09Z9B6DM3?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B09Z9B6DM3?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -632,7 +632,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 4.1,
     "reviews": 37,
     "image": "https://m.media-amazon.com/images/I/81cQbuP72PL._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B0C1KJ96NB?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0C1KJ96NB?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -648,7 +648,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 4.8,
     "reviews": 35,
     "image": "https://m.media-amazon.com/images/I/81jczAv7egL._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B0GZK4LQS5?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0GZK4LQS5?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -664,7 +664,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 4.4,
     "reviews": 34,
     "image": "https://m.media-amazon.com/images/I/81wYF1o8B4L._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B0C2XXDYS5?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0C2XXDYS5?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -680,7 +680,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 4.3,
     "reviews": 23,
     "image": "https://m.media-amazon.com/images/I/61XYZhpWUeL._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B08ZCKWD38?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B08ZCKWD38?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -696,7 +696,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 4.4,
     "reviews": 20,
     "image": "https://m.media-amazon.com/images/I/611JXvC3hML._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B0BNFT48MH?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0BNFT48MH?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -712,7 +712,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 4,
     "reviews": 17,
     "image": "https://m.media-amazon.com/images/I/81PdquANeyL._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B0DKH3S4MY?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0DKH3S4MY?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -728,7 +728,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 3.6,
     "reviews": 17,
     "image": "https://m.media-amazon.com/images/I/91SBMFCqpFL._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B0BZSQZYSD?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0BZSQZYSD?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -744,7 +744,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 3.9,
     "reviews": 13,
     "image": "https://m.media-amazon.com/images/I/813G38LTlxL._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B0FWMB4GV4?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0FWMB4GV4?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -760,7 +760,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 4.4,
     "reviews": 12,
     "image": "https://m.media-amazon.com/images/I/513M4x6c9IL._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B0BK6164Y3?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0BK6164Y3?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -776,7 +776,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 4.4,
     "reviews": 12,
     "image": "https://m.media-amazon.com/images/I/51doPL1RSML._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B09JDTVPJX?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B09JDTVPJX?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -792,7 +792,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 4.6,
     "reviews": 9,
     "image": "https://m.media-amazon.com/images/I/81uJ+BZ8lxL._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B0GD5XQ7XJ?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0GD5XQ7XJ?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -808,7 +808,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 4.3,
     "reviews": 9,
     "image": "https://m.media-amazon.com/images/I/61tzIr3g4cL._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B0BL6LSSK8?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0BL6LSSK8?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -824,7 +824,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 4.2,
     "reviews": 9,
     "image": "https://m.media-amazon.com/images/I/61ZU7WEqfbL._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B0BRHYGR85?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0BRHYGR85?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -840,7 +840,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 3.6,
     "reviews": 8,
     "image": "https://m.media-amazon.com/images/I/71jHh-BZS+L._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B0C39HXY54?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0C39HXY54?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -856,7 +856,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 5,
     "reviews": 5,
     "image": "https://m.media-amazon.com/images/I/61BHRYCc84L._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B09QG12N9G?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B09QG12N9G?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -872,7 +872,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 5,
     "reviews": 4,
     "image": "https://m.media-amazon.com/images/I/716ZkCdMjEL._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B0HNXRSRH2?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0HNXRSRH2?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -888,7 +888,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 5,
     "reviews": 4,
     "image": "https://m.media-amazon.com/images/I/61NWhUnjJOL._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B0BWR3HPCL?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0BWR3HPCL?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -904,7 +904,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 4.7,
     "reviews": 4,
     "image": "https://m.media-amazon.com/images/I/71e+U-gsZVL._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B0HKRK7QYN?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0HKRK7QYN?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -920,7 +920,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 4,
     "reviews": 4,
     "image": "https://m.media-amazon.com/images/I/71ZtUOLEt1L._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B0BSHCHQP1?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0BSHCHQP1?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -936,7 +936,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 5,
     "reviews": 3,
     "image": "https://m.media-amazon.com/images/I/81SVj3HadgL._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B0HHSLWKQC?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0HHSLWKQC?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -952,7 +952,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 4.4,
     "reviews": 3,
     "image": "https://m.media-amazon.com/images/I/61YePQDmYnL._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B0FV77GTCQ?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0FV77GTCQ?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -968,7 +968,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 3.5,
     "reviews": 3,
     "image": "https://m.media-amazon.com/images/I/61FUNMOTKhL._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B0D79X83N7?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0D79X83N7?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null
@@ -984,7 +984,7 @@ export const FREE_EBOOKS: FreeItem[] = [
     "rating": 3.5,
     "reviews": 3,
     "image": "https://m.media-amazon.com/images/I/81Nzu2QiUbL._SL500_.jpg",
-    "url": "https://www.amazon.com/dp/B0GY36B58Z?tag=nailsizelab-20",
+    "url": "https://www.amazon.com/dp/B0GY36B58Z?tag=nailsizelab-20&language=en_US",
     "hours": "",
     "lectures": "",
     "minutes": null

@@ -1,5 +1,5 @@
 // AI 书单的编辑内容：快速回答、按目标选书表、评分方法与 FAQ。
-// 注意：文案里的 84 本 / 26,414 条评分 / 2026-11-01 是数据快照，更新 data.ts 时需同步修改。
+// 注意：文案里的 93 本 / 29,357 条评分 / 2026-11-13 是数据快照，更新 data.ts 时需同步修改。
 // 文案按语言本地化；书名/作者保留英文原名。
 
 import type { ResourceLocale } from "~/features/books/free-resources";
@@ -9,11 +9,11 @@ type Localized = Record<ResourceLocale, string>;
 export const AI_BOOKS_UPDATED = "2026-11-13";
 
 export const QUICK_ANSWER: Localized = {
-  en: "For most readers, start with Co-Intelligence by Ethan Mollick. Builders should read AI Engineering by Chip Huyen, and managers will get the most from The AI-Driven Leader by Geoff Woods. This shelf ranks 84 AI books using 26,414 Amazon ratings.",
-  zh: "多数读者可以从 Ethan Mollick 的《Co-Intelligence》开始；想动手构建的人读 Chip Huyen 的《AI Engineering》；管理者最适合 Geoff Woods 的《The AI-Driven Leader》。本书单用 26,414 条 Amazon 评分对 84 本 AI 书进行排序。",
-  fr: "Pour la plupart des lecteurs, commencez par Co-Intelligence d'Ethan Mollick. Les builders liront AI Engineering de Chip Huyen, et les managers tireront le plus de The AI-Driven Leader de Geoff Woods. Ce rayon classe 84 livres IA à partir de 26 414 notes Amazon.",
-  es: "Para la mayoría de lectores, empieza por Co-Intelligence de Ethan Mollick. Quienes construyen productos deberían leer AI Engineering de Chip Huyen, y los directivos sacarán más de The AI-Driven Leader de Geoff Woods. Este estante ordena 84 libros de IA con 26.414 valoraciones de Amazon.",
-  pt: "Para a maioria dos leitores, comece por Co-Intelligence, de Ethan Mollick. Quem constrói produtos deve ler AI Engineering, de Chip Huyen, e gestores aproveitarão mais The AI-Driven Leader, de Geoff Woods. Esta estante classifica 84 livros de IA com 26.414 avaliações da Amazon.",
+  en: "For most readers, start with Co-Intelligence by Ethan Mollick. Builders should read AI Engineering by Chip Huyen, and managers will get the most from The AI-Driven Leader by Geoff Woods. This shelf ranks 93 AI books using 29,357 Amazon ratings.",
+  zh: "多数读者可以从 Ethan Mollick 的《Co-Intelligence》开始；想动手构建的人读 Chip Huyen 的《AI Engineering》；管理者最适合 Geoff Woods 的《The AI-Driven Leader》。本书单用 29,357 条 Amazon 评分对 93 本 AI 书进行排序。",
+  fr: "Pour la plupart des lecteurs, commencez par Co-Intelligence d'Ethan Mollick. Les builders liront AI Engineering de Chip Huyen, et les managers tireront le plus de The AI-Driven Leader de Geoff Woods. Ce rayon classe 93 livres IA à partir de 29 357 notes Amazon.",
+  es: "Para la mayoría de lectores, empieza por Co-Intelligence de Ethan Mollick. Quienes construyen productos deberían leer AI Engineering de Chip Huyen, y los directivos sacarán más de The AI-Driven Leader de Geoff Woods. Este estante ordena 93 libros de IA con 29.357 valoraciones de Amazon.",
+  pt: "Para a maioria dos leitores, comece por Co-Intelligence, de Ethan Mollick. Quem constrói produtos deve ler AI Engineering, de Chip Huyen, e gestores aproveitarão mais The AI-Driven Leader, de Geoff Woods. Esta estante classifica 93 livros de IA com 29.357 avaliações da Amazon.",
 };
 
 export interface TopPick {
@@ -215,11 +215,11 @@ export const METHOD_ROWS: MethodRow[] = [
 ];
 
 export const METHOD_SOURCE: Localized = {
-  en: "Ratings and review counts come from Amazon product pages and were captured on 2026-11-01.",
-  zh: "评分与评论数来自 Amazon 商品页，抓取于 2026-11-01。",
-  fr: "Les notes et nombres d'avis viennent des pages produit Amazon et ont été capturés le 2026-11-01.",
-  es: "Las valoraciones y el número de reseñas provienen de las páginas de producto de Amazon y se capturaron el 2026-11-01.",
-  pt: "Avaliações e contagens de comentários vêm das páginas de produto da Amazon e foram capturadas em 2026-11-01.",
+  en: "Ratings and review counts come from Amazon product pages and were captured in November 2026.",
+  zh: "评分与评论数来自 Amazon 商品页，抓取于 2026 年 11 月。",
+  fr: "Les notes et nombres d'avis viennent des pages produit Amazon et ont été capturés en novembre 2026.",
+  es: "Las valoraciones y el número de reseñas provienen de las páginas de producto de Amazon y se capturaron en noviembre de 2026.",
+  pt: "Avaliações e contagens de comentários vêm das páginas de produto da Amazon e foram capturadas em novembro de 2026.",
 };
 
 export const METHOD_AUTHOR: Localized = {
@@ -274,18 +274,18 @@ export const FAQ: FaqItem[] = [
   {
     id: "ranking",
     q: {
-      en: "How are these 84 AI books ranked?",
-      zh: "这 84 本 AI 书是怎么排序的？",
-      fr: "Comment ces 84 livres IA sont-ils classés ?",
-      es: "¿Cómo se ordenan estos 84 libros de IA?",
-      pt: "Como estes 84 livros de IA são classificados?",
+      en: "How are these 93 AI books ranked?",
+      zh: "这 93 本 AI 书是怎么排序的？",
+      fr: "Comment ces 93 livres IA sont-ils classés ?",
+      es: "¿Cómo se ordenan estos 93 libros de IA?",
+      pt: "Como estes 93 livros de IA são classificados?",
     },
     a: {
-      en: "The score is 50% review volume, 30% Bayesian-adjusted rating and 20% title clarity. We remove sponsored placements before ranking. The current snapshot uses 26,414 Amazon ratings captured in November 2026.",
-      zh: "评分由 50% 评论数量、30% 贝叶斯修正评分和 20% 书名清晰度组成。排序前会剔除付费推广位。当前快照使用 2026 年 11 月抓取的 26,414 条 Amazon 评分。",
-      fr: "Le score est composé de 50 % de volume d'avis, 30 % de note ajustée par Bayes et 20 % de clarté du titre. Les placements sponsorisés sont retirés avant le classement. Le snapshot actuel utilise 26 414 notes Amazon capturées en novembre 2026.",
-      es: "La puntuación es 50% volumen de reseñas, 30% valoración ajustada por Bayes y 20% claridad del título. Eliminamos las colocaciones patrocinadas antes de ordenar. La instantánea actual usa 26.414 valoraciones de Amazon capturadas en noviembre de 2026.",
-      pt: "A pontuação é 50% volume de avaliações, 30% nota ajustada por Bayes e 20% clareza do título. Removemos colocações patrocinadas antes de classificar. O snapshot atual usa 26.414 avaliações da Amazon capturadas em novembro de 2026.",
+      en: "The score is 50% review volume, 30% Bayesian-adjusted rating and 20% title clarity. We remove sponsored placements before ranking. The current snapshot uses 29,357 Amazon ratings captured in November 2026.",
+      zh: "评分由 50% 评论数量、30% 贝叶斯修正评分和 20% 书名清晰度组成。排序前会剔除付费推广位。当前快照使用 2026 年 11 月抓取的 29,357 条 Amazon 评分。",
+      fr: "Le score est composé de 50 % de volume d'avis, 30 % de note ajustée par Bayes et 20 % de clarté du titre. Les placements sponsorisés sont retirés avant le classement. Le snapshot actuel utilise 29 357 notes Amazon capturées en novembre 2026.",
+      es: "La puntuación es 50% volumen de reseñas, 30% valoración ajustada por Bayes y 20% claridad del título. Eliminamos las colocaciones patrocinadas antes de ordenar. La instantánea actual usa 29.357 valoraciones de Amazon capturadas en noviembre de 2026.",
+      pt: "A pontuação é 50% volume de avaliações, 30% nota ajustada por Bayes e 20% clareza do título. Removemos colocações patrocinadas antes de classificar. O snapshot atual usa 29.357 avaliações da Amazon capturadas em novembro de 2026.",
     },
   },
   {
