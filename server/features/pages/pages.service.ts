@@ -33,7 +33,6 @@ import {
   isExpiredByUploaded,
 } from "./pages.storage";
 import { injectBanner, hardenOutboundLinks, notFoundHtml, blockedHtml, burnedHtml, isLikelyCrawler, detectLangFromHeader } from "./pages.render";
-import { isIndexablePage } from "./pages.quality";
 import type { Lang } from "../../../app/lib/lang";
 import { log } from "../../lib/log";
 import { insertUploadLog, insertScanLog, getLatestBlockedScan } from "../admin/upload-log.repo";
@@ -938,10 +937,10 @@ async function servePageById(
 
   const rawHtml = await obj.text();
   const baseHref = isZip ? `/p/${urlSegment}/` : undefined;
-  // 匿名 tmp 页一律 noindex；分享到广场的页面还要过质量门槛（pages.quality.ts）。
+  // /p/* 整体已在 robots.txt 里 Disallow，搜索引擎不再抓取用户页面，
+  // 因此这里只保留匿名 tmp 页的 noindex（短生命周期、无审核，双保险）。
   const isAnonymousTmp = obj.key?.startsWith("tmp/") ?? false;
-  const sharedLowQuality = record?.isSharedToSquare === true && !isIndexablePage(record);
-  const noindex = isAnonymousTmp || sharedLowQuality;
+  const noindex = isAnonymousTmp;
   // UGC 外链统一 nofollow/ugc，避免用户页面向外传递权重
   const injected = injectBanner(hardenOutboundLinks(rawHtml), pageMeta, baseHref, noindex);
 

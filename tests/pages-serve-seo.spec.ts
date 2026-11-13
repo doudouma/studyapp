@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 /**
  * 用户页面服务的 SEO 卫生（P0）：
- *  - 只有过质量门槛的广场分享页允许被收录
- *  - 低质量分享页 / 匿名 tmp 页 → meta + X-Robots-Tag 双保险 noindex
+ *  - /p/* 整体由 robots.txt 屏蔽，因此不再按页面做收录门槛
+ *  - 匿名 tmp 页仍加 meta + X-Robots-Tag 双保险 noindex
  *  - UGC 外链服务时统一补 rel="nofollow ugc noopener"
  */
 
@@ -63,7 +63,7 @@ beforeEach(() => {
 });
 
 describe("serveUserPage - 收录门槛", () => {
-  it("达标的广场分享页：不加 noindex，外链补 rel", async () => {
+  it("广场分享页：不加 noindex，外链补 rel", async () => {
     mockGetPageRecord.mockResolvedValue(makeRecord());
     const res = await serve(
       '<html><head><title>x</title></head><body><a href="https://example.com/x">x</a></body></html>',
@@ -75,20 +75,13 @@ describe("serveUserPage - 收录门槛", () => {
     expect(body).toContain('rel="nofollow ugc noopener"');
   });
 
-  it("刚创建、未过冷却期的分享页：noindex（meta + 响应头）", async () => {
+  it("分享页不再做逐页质量判断：刚创建、标题为占位也照常返回", async () => {
     mockGetPageRecord.mockResolvedValue(
-      makeRecord({ createdAt: new Date(), sharedAt: new Date() }),
+      makeRecord({ createdAt: new Date(), sharedAt: new Date(), title: "未命名" }),
     );
     const res = await serve('<html><head><title>x</title></head><body>hi</body></html>');
     expect(res.status).toBe(200);
-    expect(res.headers.get("x-robots-tag")).toBe("noindex, nofollow");
-    expect(await res.text()).toContain('name="robots" content="noindex, nofollow"');
-  });
-
-  it("标题仍是默认占位的分享页：noindex", async () => {
-    mockGetPageRecord.mockResolvedValue(makeRecord({ title: "未命名" }));
-    const res = await serve('<html><head></head><body>hi</body></html>');
-    expect(res.headers.get("x-robots-tag")).toBe("noindex, nofollow");
+    expect(res.headers.get("x-robots-tag")).toBeNull();
   });
 
   it("匿名 tmp 页面：noindex", async () => {

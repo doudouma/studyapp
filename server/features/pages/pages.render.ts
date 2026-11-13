@@ -22,10 +22,9 @@ export function injectBanner(
   noindex = false
 ): string {
   const baseTag = baseHref ? `<base href="${escapeHtml(baseHref)}">` : "";
-  // Anonymous tmp uploads are ephemeral (auto-destroyed after 7 days) and are
-  // never shared to the Square, so they are excluded from the sitemap. Keep them
-  // out of the index too, otherwise a stream of thin, short-lived pages drags
-  // down site-wide quality signals. Indexed pages are the curated, shared ones.
+  // Anonymous tmp uploads are ephemeral (auto-destroyed after 7 days) and never
+  // reviewed, so they get a meta noindex on top of the robots.txt block on /p/*.
+  // Shared pages need no per-page gate any more: /p/ as a whole is Disallowed.
   const robotsTag = noindex
     ? `<meta name="robots" content="noindex, nofollow">`
     : "";
