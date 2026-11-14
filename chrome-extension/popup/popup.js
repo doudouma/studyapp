@@ -211,6 +211,10 @@ function renderAuthState() {
     $('#authOptions').classList.add('hidden');
     $('#anonymousInfo').classList.remove('hidden');
   }
+  // "My Pages" only exists for signed-in users: anonymous uploads disappear
+  // after 7 days and are not listed anywhere.
+  const myPagesTab = $('.tab[data-tab="pages"]');
+  if (myPagesTab) myPagesTab.classList.toggle('hidden', !(loggedIn && currentUser));
   updateUploadState();
 }
 

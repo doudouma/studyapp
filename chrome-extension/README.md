@@ -45,7 +45,7 @@ The extension declares **no** optional permissions and **no** host access beyond
 
 | Declared | Used by | Why it's required |
 |---|---|---|
-| `host_permissions: https://100mini.com/*` | `popup/popup.js` (`fetch` to `/api/me` and `/api/upload`) | Sign-in check and upload. The server only sets CORS on `/api/auth/*`, so this host permission is what lets the popup call the rest of the API. “My Pages” opens `100mini.com/links` in a normal tab, which needs no permission |
+| `host_permissions: https://100mini.com/*` | `popup/popup.js` (`fetch` to `/api/me` and `/api/upload`) | Sign-in check and upload. The server only sets CORS on `/api/auth/*`, so this host permission is what lets the popup call the rest of the API. “My Pages” is only shown to signed-in users and opens `100mini.com/links` in a normal tab, which needs no permission |
 
 Notes on what is intentionally **not** declared:
 
