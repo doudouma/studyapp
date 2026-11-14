@@ -3,6 +3,8 @@ import {
   insertUploadLog,
   queryUploadLogs,
   deleteOldUploadLogs,
+  deleteOldScanLogs,
+  deleteOldRateLogs,
   type UploadLogEntry,
   type UploadLogRow,
 } from "../server/features/admin/upload-log.repo";
@@ -521,6 +523,47 @@ describe("deleteOldUploadLogs", () => {
     const result = await deleteOldUploadLogs(d1 as any, 1700000000000);
 
     expect(result).toBe(99999);
+  });
+});
+
+
+// ───────────────────────────────────────────────
+// deleteOldScanLogs / deleteOldRateLogs
+// ───────────────────────────────────────────────
+
+describe("deleteOldScanLogs", () => {
+  it("deletes from scan_log with the given cutoff", async () => {
+    const d1 = createMockD1({ deleteResult: { meta: { changes: 3 } } });
+    const cutoff = 1700000000000;
+    const result = await deleteOldScanLogs(d1 as any, cutoff);
+
+    expect(result).toBe(3);
+    const inserted = d1.getInserted();
+    expect(inserted[0].sql).toBe("DELETE FROM scan_log WHERE created_at < ?");
+    expect(inserted[0].binds[0]).toBe(cutoff);
+  });
+
+  it("returns 0 when meta.changes is undefined", async () => {
+    const d1 = createMockD1({ deleteResult: { meta: { changes: undefined as any } } });
+    expect(await deleteOldScanLogs(d1 as any, 1)).toBe(0);
+  });
+});
+
+describe("deleteOldRateLogs", () => {
+  it("deletes from upload_rate_log with the given cutoff", async () => {
+    const d1 = createMockD1({ deleteResult: { meta: { changes: 7 } } });
+    const cutoff = 1700000000000;
+    const result = await deleteOldRateLogs(d1 as any, cutoff);
+
+    expect(result).toBe(7);
+    const inserted = d1.getInserted();
+    expect(inserted[0].sql).toBe("DELETE FROM upload_rate_log WHERE created_at < ?");
+    expect(inserted[0].binds[0]).toBe(cutoff);
+  });
+
+  it("returns 0 when meta.changes is undefined", async () => {
+    const d1 = createMockD1({ deleteResult: { meta: { changes: undefined as any } } });
+    expect(await deleteOldRateLogs(d1 as any, 1)).toBe(0);
   });
 });
 

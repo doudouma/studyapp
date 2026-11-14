@@ -297,17 +297,33 @@ export async function scheduled(_event: ScheduledEvent, env: Bindings, _ctx: Exe
     }
   }
 
-  // Cleanup old logs (90 days)
+  // Cleanup old logs (90 days). 三张表互相独立：任何一张失败都不该让另外两张
+  // 跳过当天的清理，所以各自一个 try，出错时也能从日志看出是哪张表。
   if (env.D1) {
+    const cutoff = Date.now() - 90 * 24 * 60 * 60 * 1000;
+    const { deleteOldUploadLogs, deleteOldScanLogs, deleteOldRateLogs } = await import(
+      "./../server/features/admin/upload-log.repo"
+    );
+
     try {
-      const { deleteOldUploadLogs, deleteOldScanLogs, deleteOldRateLogs } = await import("./../server/features/admin/upload-log.repo");
-      const cutoff = Date.now() - 90 * 24 * 60 * 60 * 1000;
-      const uploadCount = await deleteOldUploadLogs(env.D1, cutoff);
-      const scanCount = await deleteOldScanLogs(env.D1, cutoff);
-      const rateCount = await deleteOldRateLogs(env.D1, cutoff);
-      console.log(`[cron] cleaned up ${uploadCount} upload log(s), ${scanCount} scan log(s), ${rateCount} rate log(s)`);
+      const count = await deleteOldUploadLogs(env.D1, cutoff);
+      console.log(`[cron] cleaned up ${count} upload log(s)`);
     } catch (err) {
-      console.error("[cron] log cleanup failed:", err);
+      console.error("[cron] upload log cleanup failed:", err);
+    }
+
+    try {
+      const count = await deleteOldScanLogs(env.D1, cutoff);
+      console.log(`[cron] cleaned up ${count} scan log(s)`);
+    } catch (err) {
+      console.error("[cron] scan log cleanup failed:", err);
+    }
+
+    try {
+      const count = await deleteOldRateLogs(env.D1, cutoff);
+      console.log(`[cron] cleaned up ${count} rate log(s)`);
+    } catch (err) {
+      console.error("[cron] rate log cleanup failed:", err);
     }
 
     // Cleanup old Delivery Rush rank records (90 days)
