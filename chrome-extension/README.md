@@ -39,6 +39,34 @@ Think of it as **instant hosting for AI output**: your AI writes the HTML, 100mi
 - **Code sharing** — demos, playgrounds, single-page tools
 - **Social content** — create interactive posts, landing pages, and micro-sites with AI
 
+## Permissions
+
+Keep this list in sync with `manifest.json` — Chrome Web Store review rejects any permission that isn't actually used (violation code "Purple Potassium").
+
+| Permission / match | Used by | Why it's required |
+|---|---|---|
+| `contextMenus` | `background.js` | Creates the right-click item "Host this page on 100mini" |
+| `storage` | `background.js` (`chrome.storage.session`) | Hands the captured page HTML from the context-menu flow to the popup |
+| `host_permissions: https://100mini.com/*` | `popup/popup.js` (`fetch` to `/api/me`, `/api/upload`, `/api/pages`) | Upload and account calls to the 100mini API |
+| `content_scripts: <all_urls>` | `content.js` | Reads `document.documentElement.outerHTML` of the page the user right-clicks, so it can be hosted |
+
+Do **not** add `activeTab` back: it was declared in 1.0.5 but never used, which caused the store rejection. `chrome.tabs.create()` and `chrome.tabs.sendMessage()` need no permission, so tab opening and messaging are already covered.
+
+### Local development
+
+`popup/popup.js` hardcodes `API_BASE = 'https://100mini.com'`, and `host_permissions` only covers that origin. The server mounts CORS on `/api/auth/*` alone (`app/server.tsx`), so every other API call depends on the extension having a host permission for that origin — without it the request fails as an opaque CORS error, `checkAuth()` silently falls back to "logged out", and uploads only surface `Upload failed`.
+
+To test against a local server, change `API_BASE` **and** temporarily add the matching host permission:
+
+```json
+"host_permissions": [
+  "https://100mini.com/*",
+  "http://localhost:3000/*"
+]
+```
+
+Revert both before committing. Keep `localhost` entries out of the published manifest — they are unused by the shipped code and count as excessive permissions at review time.
+
 ## Links
 
 - **Website**: https://100mini.com
