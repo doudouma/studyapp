@@ -51,14 +51,18 @@ function renderExpiryState() {
 
 // --- Init ---
 document.addEventListener('DOMContentLoaded', async () => {
-  // Start this before checkAuth(): it must not depend on the network round trip.
-  tryGetPendingHtml();
-
   await checkAuth();
 
-  // Tab switching
+  // Tab switching. "My Pages" leaves the popup: the real dashboard (page list,
+  // stats, per-page actions, API keys) is /links, and mirroring it in a 396px
+  // popup only ever duplicated it badly.
   $$('.tab').forEach((tab) => {
     tab.addEventListener('click', () => {
+      if (tab.dataset.tab === 'pages') {
+        openMyPages();
+        return;
+      }
+
       $$('.tab').forEach((t) => {
         t.classList.remove('active');
         t.setAttribute('aria-selected', 'false');
@@ -69,10 +73,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       $$('.tab-content').forEach((tc) => tc.classList.remove('active'));
       const target = document.getElementById(`tab-${tab.dataset.tab}`);
       if (target) target.classList.add('active');
-
-      if (tab.dataset.tab === 'pages') {
-        loadPages();
-      }
     });
   });
 
@@ -138,7 +138,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Login button
   $('#loginBtn').addEventListener('click', openLoginPage);
-  $('#pagesLoginBtn').addEventListener('click', openLoginPage);
 
   // Upload button
   $('#uploadBtn').addEventListener('click', handleUpload);
@@ -147,9 +146,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   $('#copyUrlBtn').addEventListener('click', copyUrl);
   $('#openUrlBtn').addEventListener('click', openUrl);
   $('#resetBtn').addEventListener('click', resetUpload);
-
-  // Refresh pages
-  $('#refreshPagesBtn').addEventListener('click', loadPages);
 
   // Title input
   $('#titleInput').addEventListener('input', updateUploadState);
@@ -173,42 +169,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderExpiryState();
   });
   renderExpiryState();
-
-  // Listen for messages from content script
-  chrome.runtime.onMessage.addListener((message) => {
-    if (message.action === 'fillHtml') {
-      fillHtmlContent(message.html);
-    }
-  });
 });
-
-function tryGetPendingHtml() {
-  chrome.runtime.sendMessage({ action: 'getPendingHtml' }, (response) => {
-    if (chrome.runtime.lastError) {
-      console.warn('Background unavailable:', chrome.runtime.lastError.message);
-      return;
-    }
-    if (!response) return;
-    if (response.html) {
-      fillHtmlContent(response.html);
-    } else if (response.error) {
-      // Surface it instead of failing silently — this is now the only signal
-      // the user gets when the page could not be read.
-      showError(response.error);
-    }
-  });
-}
-
-function fillHtmlContent(html) {
-  // Switch to paste mode
-  $$('.mode-btn').forEach((b) => b.classList.remove('active'));
-  document.querySelector('[data-mode="paste"]').classList.add('active');
-  $$('.upload-panel').forEach((p) => p.classList.remove('active'));
-  $('#upload-paste').classList.add('active');
-  $('#htmlInput').value = html;
-  updateSize();
-  updateUploadState();
-}
 
 async function checkAuth() {
   const apiBase = await getApiBase();
@@ -433,136 +394,14 @@ function openLoginPage() {
 }
 
 // --- My Pages ---
-async function loadPages() {
-  if (!loggedIn) return;
+// The popup used to render the page list itself but never un-hid the list
+// container, so a signed-in user only ever saw the "log in" prompt. /links is
+// the real dashboard (list, stats, per-page actions, API keys), so hand off.
+const MY_PAGES_PATH = '/links';
 
-  const container = $('#pagesContainer');
-  const loading = $('#pagesLoading');
-  const errorEl = $('#pagesError');
-  const emptyEl = $('#pagesEmpty');
-
-  container.innerHTML = '';
-  errorEl.classList.add('hidden');
-  emptyEl.classList.add('hidden');
-  loading.classList.remove('hidden');
-
-  const apiBase = await getApiBase();
-  try {
-    const res = await fetch(`${apiBase}/api/pages`, {
-      credentials: 'include',
-    });
-    if (!res.ok) throw new Error('Failed to load pages');
-    const data = await res.json();
-
-    loading.classList.add('hidden');
-
-    if (!data.pages || data.pages.length === 0) {
-      emptyEl.classList.remove('hidden');
-      $('#pagesCount').textContent = '0 pages';
-      return;
-    }
-
-    $('#pagesCount').textContent = `${data.total} pages`;
-
-    data.pages.forEach((pg) => {
-      const item = document.createElement('div');
-      item.className = 'page-item';
-      item.dataset.id = pg.id;
-
-      const created = new Date(pg.createdAt);
-      const dateStr = `${created.getFullYear()}/${String(created.getMonth() + 1).padStart(2, '0')}/${String(created.getDate()).padStart(2, '0')}`;
-
-      item.innerHTML = `
-        <div class="page-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-          </svg>
-        </div>
-        <div class="page-info">
-          <div class="page-title">${escapeHtml(pg.title || 'Untitled')}</div>
-          <div class="page-meta">${dateStr} · ${pg.viewCount} views</div>
-        </div>
-        <div class="page-actions">
-          <button class="btn-icon-small page-copy" title="Copy link">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-            </svg>
-          </button>
-          <button class="btn-icon-small page-open" title="Open in new tab">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-              <polyline points="15 3 21 3 21 9"/>
-              <line x1="10" y1="14" x2="21" y2="3"/>
-            </svg>
-          </button>
-          <button class="btn-icon-small page-delete" title="Delete">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="3 6 5 6 21 6"/>
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-            </svg>
-          </button>
-        </div>
-      `;
-
-      // Copy
-      item.querySelector('.page-copy').addEventListener('click', async (e) => {
-        e.stopPropagation();
-        const url = `${apiBase}/p/${pg.id}`;
-        try {
-          await navigator.clipboard.writeText(url);
-          const btn = e.currentTarget;
-          btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111214" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
-          setTimeout(() => {
-            btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
-          }, 1500);
-        } catch {
-          const input = document.createElement('input');
-          input.value = url;
-          document.body.appendChild(input);
-          input.select();
-          document.execCommand('copy');
-          document.body.removeChild(input);
-        }
-      });
-
-      // Open
-      item.querySelector('.page-open').addEventListener('click', (e) => {
-        e.stopPropagation();
-        chrome.tabs.create({ url: `${apiBase}/p/${pg.id}` });
-      });
-
-      // Delete
-      item.querySelector('.page-delete').addEventListener('click', async (e) => {
-        e.stopPropagation();
-        if (!confirm(`Delete "${pg.title || 'Untitled'}"?`)) return;
-
-        const btn = e.currentTarget;
-        item.classList.add('page-deleting');
-        try {
-          const res = await fetch(`${apiBase}/api/pages/${pg.id}`, {
-            method: 'DELETE',
-            credentials: 'include',
-          });
-          if (!res.ok) throw new Error('Delete failed');
-          item.remove();
-          const count = container.querySelectorAll('.page-item').length;
-          $('#pagesCount').textContent = `${count} pages`;
-          if (count === 0) {
-            $('#pagesEmpty').classList.remove('hidden');
-          }
-        } catch (err) {
-          item.classList.remove('page-deleting');
-          showError(err.message);
-        }
-      });
-
-      container.appendChild(item);
-    });
-  } catch (err) {
-    loading.classList.add('hidden');
-    errorEl.textContent = err.message;
-    errorEl.classList.remove('hidden');
-  }
+function openMyPages() {
+  chrome.tabs.create({ url: `${API_BASE}${MY_PAGES_PATH}` }, () => {
+    // Close the popup so the new tab is not left behind it.
+    window.close();
+  });
 }

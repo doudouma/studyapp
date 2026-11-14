@@ -21,15 +21,13 @@ Think of it as **instant hosting for AI output**: your AI writes the HTML, 100mi
 | **Share to Square** | Publish to the 100mini learning community |
 | **Category & tags** | Organize pages by subject (Math, English, Science, etc.) |
 | **5 MB limit** | Supports single HTML files and ZIP archives |
-| **Context menu** | Right-click any page → "Host this page on 100mini" |
 
 ## How It Works
 
 1. **Generate** — Ask any AI (ChatGPT, Cursor, Claude, Gemini) to create an HTML page
-2. **Copy** the code, or right-click the page → "Host this page on 100mini"
-3. **Paste or drag** into the 100mini extension popup
-4. Click **Upload & Host**
-5. **Share** the link instantly — in your class group chat, on social media, or embed anywhere
+2. **Copy** the code into the 100mini extension popup, or drag the `.html` / `.zip` file in
+3. Click **Upload & Host**
+4. **Share** the link instantly — in your class group chat, on social media, or embed anywhere
 
 ## Perfect For
 
@@ -43,14 +41,16 @@ Think of it as **instant hosting for AI output**: your AI writes the HTML, 100mi
 
 Keep this list in sync with `manifest.json` — Chrome Web Store review rejects any permission that isn't actually used (violation code "Purple Potassium").
 
-| Permission / match | Used by | Why it's required |
-|---|---|---|
-| `contextMenus` | `background.js` | Creates the right-click item "Host this page on 100mini" |
-| `storage` | `background.js` (`chrome.storage.session`) | Remembers which tab the right-click targeted so the popup can read that page when it opens |
-| `host_permissions: https://100mini.com/*` | `popup/popup.js` (`fetch` to `/api/me`, `/api/upload`, `/api/pages`) | Upload and account calls to the 100mini API |
-| `content_scripts: <all_urls>` | `content.js` | Reads `document.documentElement.outerHTML` of the page the user right-clicks, so it can be hosted |
+The extension declares **no** optional permissions and **no** host access beyond its own API. Everything happens in the popup.
 
-Do **not** add `activeTab` back: it was declared in 1.0.5 but never used, which caused the store rejection. `chrome.tabs.create()` and `chrome.tabs.sendMessage()` need no permission, so tab opening and messaging are already covered.
+| Declared | Used by | Why it's required |
+|---|---|---|
+| `host_permissions: https://100mini.com/*` | `popup/popup.js` (`fetch` to `/api/me` and `/api/upload`) | Sign-in check and upload. The server only sets CORS on `/api/auth/*`, so this host permission is what lets the popup call the rest of the API. “My Pages” opens `100mini.com/links` in a normal tab, which needs no permission |
+
+Notes on what is intentionally **not** declared:
+
+- `activeTab` was declared in 1.0.5 but never used, which caused the store rejection. Nothing here consumes it: `chrome.tabs.create()` needs no permission.
+- `contextMenus`, `storage` and the `<all_urls>` content script were removed with the "host this page" right-click feature. Do not bring them back unless that feature returns with real code behind it.
 
 ### Local development
 

@@ -18,20 +18,6 @@
       "128": "icons/icon128.png"
     }
   },
-  "background": {
-    "service_worker": "background.js",
-    "type": "module"
-  },
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"]
-    }
-  ],
-  "permissions": [
-    "contextMenus",
-    "storage"
-  ],
   "host_permissions": [
     "https://100mini.com/*"
   ]
