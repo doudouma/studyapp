@@ -46,7 +46,7 @@ Keep this list in sync with `manifest.json` — Chrome Web Store review rejects 
 | Permission / match | Used by | Why it's required |
 |---|---|---|
 | `contextMenus` | `background.js` | Creates the right-click item "Host this page on 100mini" |
-| `storage` | `background.js` (`chrome.storage.session`) | Hands the captured page HTML from the context-menu flow to the popup |
+| `storage` | `background.js` (`chrome.storage.session`) | Remembers which tab the right-click targeted so the popup can read that page when it opens |
 | `host_permissions: https://100mini.com/*` | `popup/popup.js` (`fetch` to `/api/me`, `/api/upload`, `/api/pages`) | Upload and account calls to the 100mini API |
 | `content_scripts: <all_urls>` | `content.js` | Reads `document.documentElement.outerHTML` of the page the user right-clicks, so it can be hosted |
 

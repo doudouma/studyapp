@@ -51,6 +51,9 @@ function renderExpiryState() {
 
 // --- Init ---
 document.addEventListener('DOMContentLoaded', async () => {
+  // Start this before checkAuth(): it must not depend on the network round trip.
+  tryGetPendingHtml();
+
   await checkAuth();
 
   // Tab switching
@@ -171,10 +174,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   renderExpiryState();
 
-  // Check for pending HTML from context menu (retry a few times since background
-  // may still be fetching it from the content script)
-  tryGetPendingHtml(0);
-
   // Listen for messages from content script
   chrome.runtime.onMessage.addListener((message) => {
     if (message.action === 'fillHtml') {
@@ -183,12 +182,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 });
 
-function tryGetPendingHtml(retry) {
+function tryGetPendingHtml() {
   chrome.runtime.sendMessage({ action: 'getPendingHtml' }, (response) => {
-    if (response?.html) {
+    if (chrome.runtime.lastError) {
+      console.warn('Background unavailable:', chrome.runtime.lastError.message);
+      return;
+    }
+    if (!response) return;
+    if (response.html) {
       fillHtmlContent(response.html);
-    } else if (retry < 10) {
-      setTimeout(() => tryGetPendingHtml(retry + 1), 200);
+    } else if (response.error) {
+      // Surface it instead of failing silently — this is now the only signal
+      // the user gets when the page could not be read.
+      showError(response.error);
     }
   });
 }
