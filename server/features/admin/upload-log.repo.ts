@@ -220,3 +220,46 @@ export async function deleteOldRateLogs(
     .run();
   return result.meta.changes ?? 0;
 }
+
+export type LogTable = "upload_log" | "scan_log" | "upload_rate_log";
+
+export interface LogCleanupOutcome {
+  /** 各表删除的行数；该表失败时为 0 */
+  deleted: Record<LogTable, number>;
+  /** 失败的表及其错误，交给调用方决定怎么记日志 */
+  failures: { table: LogTable; error: unknown }[];
+}
+
+/**
+ * 清理三张日志表。三张表互相独立：任何一张失败都只记进 failures，
+ * 不会中断另外两张，也不会把异常抛给 cron 里后续的清理步骤。
+ */
+export async function cleanupOldLogs(
+  d1: D1Database,
+  cutoffMs: number
+): Promise<LogCleanupOutcome> {
+  const tasks: { table: LogTable; run: () => Promise<number> }[] = [
+    { table: "upload_log", run: () => deleteOldUploadLogs(d1, cutoffMs) },
+    { table: "scan_log", run: () => deleteOldScanLogs(d1, cutoffMs) },
+    { table: "upload_rate_log", run: () => deleteOldRateLogs(d1, cutoffMs) },
+  ];
+
+  const deleted: Record<LogTable, number> = {
+    upload_log: 0,
+    scan_log: 0,
+    upload_rate_log: 0,
+  };
+  const failures: LogCleanupOutcome["failures"] = [];
+
+  await Promise.all(
+    tasks.map(async ({ table, run }) => {
+      try {
+        deleted[table] = await run();
+      } catch (error) {
+        failures.push({ table, error });
+      }
+    })
+  );
+
+  return { deleted, failures };
+}

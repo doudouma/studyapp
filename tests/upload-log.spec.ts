@@ -5,6 +5,9 @@ import {
   deleteOldUploadLogs,
   deleteOldScanLogs,
   deleteOldRateLogs,
+  cleanupOldLogs,
+  insertScanLog,
+  getLatestBlockedScan,
   type UploadLogEntry,
   type UploadLogRow,
 } from "../server/features/admin/upload-log.repo";
@@ -564,6 +567,256 @@ describe("deleteOldRateLogs", () => {
   it("returns 0 when meta.changes is undefined", async () => {
     const d1 = createMockD1({ deleteResult: { meta: { changes: undefined as any } } });
     expect(await deleteOldRateLogs(d1 as any, 1)).toBe(0);
+  });
+});
+
+
+// ───────────────────────────────────────────────
+// cleanupOldLogs（编排层：单表失败不影响其它表）
+// ───────────────────────────────────────────────
+
+/** 只实现 DELETE 所需的最小 D1 替身；可指定某张表抛错 */
+function createTableAwareD1(failOn: string | null, counts: Record<string, number>) {
+  const calls: string[] = [];
+  const d1 = {
+    prepare(sql: string) {
+      return {
+        bind: () => ({
+          run: async () => {
+            calls.push(sql);
+            if (failOn && sql.includes(`FROM ${failOn} `)) {
+              throw new Error(`simulated failure on ${failOn}`);
+            }
+            const table = sql.match(/FROM (\w+)/)?.[1] ?? "";
+            return { meta: { changes: counts[table] ?? 0 } };
+          },
+        }),
+      };
+    },
+  };
+  return { d1, calls };
+}
+
+describe("cleanupOldLogs", () => {
+  it("runs all three tables and reports every count", async () => {
+    const { d1, calls } = createTableAwareD1(null, {
+      upload_log: 2,
+      scan_log: 3,
+      upload_rate_log: 4,
+    });
+
+    const out = await cleanupOldLogs(d1 as any, 1700000000000);
+
+    expect(out.deleted).toEqual({ upload_log: 2, scan_log: 3, upload_rate_log: 4 });
+    expect(out.failures).toEqual([]);
+    expect(calls).toHaveLength(3);
+  });
+
+  it("still cleans the other two tables when one fails", async () => {
+    const { d1, calls } = createTableAwareD1("upload_log", {
+      scan_log: 3,
+      upload_rate_log: 4,
+    });
+
+    const out = await cleanupOldLogs(d1 as any, 1700000000000);
+
+    expect(out.deleted).toEqual({ upload_log: 0, scan_log: 3, upload_rate_log: 4 });
+    expect(out.failures).toHaveLength(1);
+    expect(out.failures[0].table).toBe("upload_log");
+    expect(calls).toHaveLength(3);
+  });
+
+  it("does not throw when every table fails", async () => {
+    const { d1 } = createTableAwareD1("", {});
+    d1.prepare = () => ({
+      bind: () => ({
+        run: async () => {
+          throw new Error("all down");
+        },
+      }),
+    }) as any;
+
+    const out = await cleanupOldLogs(d1 as any, 1700000000000);
+
+    expect(out.deleted).toEqual({ upload_log: 0, scan_log: 0, upload_rate_log: 0 });
+    expect(out.failures).toHaveLength(3);
+  });
+});
+
+
+// ───────────────────────────────────────────────
+// insertScanLog
+// ───────────────────────────────────────────────
+
+describe("insertScanLog", () => {
+  it("writes the expected columns with defaults filled in", async () => {
+    const d1 = createMockD1();
+    await insertScanLog(d1 as any, { pageId: "p1", status: "approved", isAnonymous: true });
+
+    const inserted = d1.getInserted();
+    expect(inserted[0].sql).toContain("INSERT INTO scan_log");
+    expect(inserted[0].binds.slice(0, 6)).toEqual(["p1", "approved", null, null, null, 1]);
+    expect(typeof inserted[0].binds[6]).toBe("number");
+  });
+
+  it("passes through optional fields and encodes anonymous as 0", async () => {
+    const d1 = createMockD1();
+    await insertScanLog(d1 as any, {
+      pageId: "p2",
+      status: "blocked",
+      reason: "regex",
+      threats: '[{"label":"iframe"}]',
+      htmlLength: 1234,
+      isAnonymous: false,
+    });
+
+    const binds = d1.getInserted()[0].binds;
+    expect(binds.slice(0, 6)).toEqual([
+      "p2",
+      "blocked",
+      "regex",
+      '[{"label":"iframe"}]',
+      1234,
+      0,
+    ]);
+  });
+
+  it("swallows write errors instead of rejecting", async () => {
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const d1 = createMockD1({ insertError: new Error("boom") });
+
+    await expect(
+      insertScanLog(d1 as any, { pageId: "p3", status: "error", isAnonymous: false })
+    ).resolves.toBeUndefined();
+
+    spy.mockRestore();
+  });
+});
+
+// ───────────────────────────────────────────────
+// getLatestBlockedScan
+// ───────────────────────────────────────────────
+
+describe("getLatestBlockedScan", () => {
+  const scanRow = (reason: string | null, threats: string | null) => ({ reason, threats });
+
+  it("returns null when the page has no blocked scan", async () => {
+    const d1 = createMockD1({ queryResults: [] });
+    expect(await getLatestBlockedScan(d1 as any, "p1")).toBeNull();
+  });
+
+  it("returns null when the row carries no reason", async () => {
+    const d1 = createMockD1({ queryResults: [scanRow(null, null)] as any });
+    expect(await getLatestBlockedScan(d1 as any, "p1")).toBeNull();
+  });
+
+  it("extracts labels for regex blocks, skipping entries without a string label", async () => {
+    const threats = JSON.stringify([{ label: "iframe" }, { label: "script" }, { nope: 1 }]);
+    const d1 = createMockD1({ queryResults: [scanRow("regex", threats)] as any });
+
+    expect(await getLatestBlockedScan(d1 as any, "p1")).toEqual({
+      reason: "regex",
+      labels: ["iframe", "script"],
+    });
+  });
+
+  it("returns the reason with no labels when threats JSON is malformed", async () => {
+    const d1 = createMockD1({ queryResults: [scanRow("regex", "{not json")] as any });
+    expect(await getLatestBlockedScan(d1 as any, "p1")).toEqual({ reason: "regex", labels: [] });
+  });
+
+  it("returns the reason with no labels when threats is null", async () => {
+    const d1 = createMockD1({ queryResults: [scanRow("regex", null)] as any });
+    expect(await getLatestBlockedScan(d1 as any, "p1")).toEqual({ reason: "regex", labels: [] });
+  });
+
+  it("does not parse threats for non-regex reasons", async () => {
+    const d1 = createMockD1({
+      queryResults: [scanRow("phishing", '[{"label":"iframe"}]')] as any,
+    });
+    expect(await getLatestBlockedScan(d1 as any, "p1")).toEqual({
+      reason: "phishing",
+      labels: [],
+    });
+  });
+});
+
+
+// ───────────────────────────────────────────────
+// queryUploadLogs：D1 返回结构不完整时的分支
+// ───────────────────────────────────────────────
+
+describe("queryUploadLogs edge branches", () => {
+  /** 直接控制 all()/first() 返回值，用来覆盖 results/countRow 缺失的分支 */
+  function createRawD1(allResult: unknown, firstResult: unknown) {
+    return {
+      prepare: () => ({
+        bind: () => ({
+          all: async () => allResult,
+          first: async () => firstResult,
+        }),
+      }),
+    };
+  }
+
+  it("treats a missing results array and missing count row as empty", async () => {
+    const d1 = createRawD1({}, null);
+    const result = await queryUploadLogs(d1 as any, {});
+
+    expect(result.logs).toEqual([]);
+    expect(result.total).toBe(0);
+  });
+
+  it("maps rows that omit optional columns to null", async () => {
+    const d1 = createRawD1(
+      { results: [{ id: 9, page_id: "p9", event: "upload", is_anonymous: 1, created_at: 1 }] },
+      { cnt: 1 }
+    );
+    const [row] = (await queryUploadLogs(d1 as any, {})).logs;
+
+    expect(row).toEqual({
+      id: 9,
+      userId: null,
+      userName: null,
+      pageId: "p9",
+      event: "upload",
+      contentType: null,
+      isAnonymous: 1,
+      ip: null,
+      fileSize: null,
+      status: null,
+      createdAt: 1,
+    });
+  });
+
+  it("keeps optional columns when D1 does return them", async () => {
+    const d1 = createRawD1(
+      {
+        results: [
+          {
+            id: 10,
+            user_id: "u10",
+            user_name: "Ada",
+            page_id: "p10",
+            event: "delete",
+            content_type: "zip",
+            is_anonymous: 0,
+            ip: "1.1.1.1",
+            file_size: 2048,
+            status: "success",
+            created_at: 2,
+          },
+        ],
+      },
+      { cnt: 1 }
+    );
+    const [row] = (await queryUploadLogs(d1 as any, {})).logs;
+
+    expect(row.userName).toBe("Ada");
+    expect(row.contentType).toBe("zip");
+    expect(row.ip).toBe("1.1.1.1");
+    expect(row.fileSize).toBe(2048);
+    expect(row.status).toBe("success");
   });
 });
 

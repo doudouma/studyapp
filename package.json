@@ -13,7 +13,8 @@
     "test:unit": "vitest run",
     "test:coverage": "vitest run tests/points.spec.ts tests/pages-repo.spec.ts --coverage",
     "test:e2e": "vitest run --config vitest.e2e.config.ts",
-    "test:ui": "npx playwright test --ui"
+    "test:ui": "npx playwright test --ui",
+    "test:coverage:logs": "vitest run tests/upload-log.spec.ts --coverage --coverage.include=server/features/admin/upload-log.repo.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.800.0",
