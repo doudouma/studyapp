@@ -405,18 +405,6 @@ export async function detectWithAi(ai: Ai, html: string): Promise<AiScanResult> 
             ].join("\n"),
           },
         ],
-        response_format: {
-          type: "json_schema",
-          json_schema: {
-            type: "object",
-            properties: {
-              verdict: { type: "string", enum: ["safe", "phishing", "malware", "scam"] },
-              confidence: { type: "integer", minimum: 0, maximum: 100 },
-              reason: { type: "string" },
-            },
-            required: ["verdict", "confidence", "reason"],
-          },
-        },
         max_tokens: 160,
         temperature: 0,
       }),
