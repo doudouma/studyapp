@@ -199,7 +199,7 @@ function stripTags(html: string): string {
     .replace(/<svg\b[\s\S]*?<\/svg>/gi, " ")
     .replace(/<!--[\s\S]*?-->/g, " ")
     .replace(/<[^>]+>/g, " ")
-    .replace(/&(nbsp|amp|lt|gt|quot|#39);/g, (m) => ENTITY_MAP[m] ?? " ")
+    .replace(/&(nbsp|amp|lt|gt|quot|#39);/g, (m) => ENTITY_MAP[m])
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -217,12 +217,15 @@ function isInternalUrl(raw: string): boolean {
 
 function findJsRedirects(html: string): string[] {
   const out = new Set<string>();
-  const re =
-    /(?:window|document)\s*\.\s*location\s*=\s*["']([^"']+)["']|location\s*\.\s*(?:href|replace|assign)\s*(?:\(\s*)?(?:=\s*)?["']([^"']+)["']/gi;
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(html)) !== null) {
-    const url = (m[1] ?? m[2] ?? "").trim();
-    if (url) out.add(url);
+  // window.location = "..." / document.location = "..."
+  const assignment = /(?:window|document)\s*\.\s*location\s*=\s*["']([^"']+)["']/gi;
+  // location.href = "..." / location.replace("...") / location.assign("...")
+  const method = /location\s*\.\s*(?:href|replace|assign)\s*(?:\(\s*)?(?:=\s*)?["']([^"']+)["']/gi;
+  for (const re of [assignment, method]) {
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(html)) !== null) {
+      out.add(m[1].trim());
+    }
   }
   return [...out];
 }
@@ -243,7 +246,7 @@ export function analyzeHtml(html: string): { signals: PhishingSignals; text: str
   const formRe = /<form\b([^>]*)>/gi;
   let formMatch: RegExpExecArray | null;
   while ((formMatch = formRe.exec(html)) !== null) {
-    const attrs = formMatch[1] ?? "";
+    const attrs = formMatch[1];
     const action = /action\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i.exec(attrs);
     const raw = action?.[1] ?? action?.[2] ?? action?.[3];
     if (raw && !isInternalUrl(raw)) externalFormActions.add(raw.trim());
@@ -304,10 +307,7 @@ export function parseAiVerdict(raw: string): { verdict: string; confidence: numb
   let obj: Record<string, unknown> | null = null;
   if (start >= 0 && end > start) {
     try {
-      const parsed = JSON.parse(text.slice(start, end + 1));
-      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-        obj = parsed as Record<string, unknown>;
-      }
+      obj = JSON.parse(text.slice(start, end + 1)) as Record<string, unknown>;
     } catch {
       // 落到下面：视为无结论
     }

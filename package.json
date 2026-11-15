@@ -12,6 +12,7 @@
     "test": "npx playwright test",
     "test:unit": "vitest run",
     "test:coverage": "vitest run tests/points.spec.ts tests/pages-repo.spec.ts --coverage",
+    "test:coverage:guard": "vitest run tests/ai-moderation.spec.ts tests/html-guard.spec.ts tests/html-guard-extra.spec.ts tests/scan-html-bg.spec.ts --coverage --coverage.include=server/features/pages/html-guard.ts",
     "test:e2e": "vitest run --config vitest.e2e.config.ts",
     "test:ui": "npx playwright test --ui",
     "test:coverage:logs": "vitest run tests/upload-log.spec.ts --coverage --coverage.include=server/features/admin/upload-log.repo.ts"

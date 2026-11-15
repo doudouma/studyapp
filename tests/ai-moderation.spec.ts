@@ -1,5 +1,10 @@
-import { describe, it, expect, vi } from "vitest";
-import { analyzeHtml, detectWithAi, parseAiVerdict } from "../server/features/pages/html-guard";
+import { describe, it, expect, vi, afterEach } from "vitest";
+import {
+  analyzeHtml,
+  checkDomainsWithPhishDestroy,
+  detectWithAi,
+  parseAiVerdict,
+} from "../server/features/pages/html-guard";
 
 type AiStub = Parameters<typeof detectWithAi>[0];
 
@@ -63,6 +68,65 @@ describe("analyzeHtml", () => {
     const { signals } = analyzeHtml(`<img src="data:image/png;base64,${"A".repeat(400)}">`);
     expect(signals.obfuscatedJs).toBe(false);
   });
+
+  it("parses single-quoted and unquoted form actions", () => {
+    expect(analyzeHtml(`<form action='https://a.example/x'>`).signals.externalFormActions).toEqual([
+      "https://a.example/x",
+    ]);
+    expect(analyzeHtml(`<form action=https://b.example/y>`).signals.externalFormActions).toEqual([
+      "https://b.example/y",
+    ]);
+  });
+
+  it("ignores forms without action, non-http actions and malformed URLs", () => {
+    const { signals } = analyzeHtml(`
+      <form><input type="password"></form>
+      <form action="mailto:a@b.c"></form>
+      <form action="http://["></form>
+    `);
+    expect(signals.externalFormActions).toEqual([]);
+  });
+
+  it("captures external meta refresh only", () => {
+    expect(
+      analyzeHtml(`<meta http-equiv="refresh" content="0;url=https://evil.example/x">`).signals
+        .externalRedirects,
+    ).toEqual(["https://evil.example/x"]);
+    expect(
+      analyzeHtml(`<meta http-equiv="refresh" content="0;url=/home">`).signals.externalRedirects,
+    ).toEqual([]);
+    expect(
+      analyzeHtml(`<meta http-equiv="refresh" content="0">`).signals.externalRedirects,
+    ).toEqual([]);
+    expect(
+      analyzeHtml(`<meta http-equiv="refresh" content="0;url=https://100mini.com/x">`).signals
+        .externalRedirects,
+    ).toEqual([]);
+  });
+
+  it("captures JS location redirects and skips internal ones", () => {
+    const { signals } = analyzeHtml(
+      `<script>window.location.href="https://100mini.com/x"; location.replace("https://evil.example/y")</script>`,
+    );
+    expect(signals.externalRedirects).toEqual(["https://evil.example/y"]);
+  });
+
+  it("flags eval(atob(...)) as obfuscated code", () => {
+    expect(analyzeHtml(`<script>eval(atob("YWJj"))</script>`).signals.obfuscatedJs).toBe(true);
+  });
+
+  it("handles a page that is only a form (no text)", () => {
+    const { text, signals } = analyzeHtml(`<form action="/x"><input type="password"></form>`);
+    expect(text).toBe("");
+    expect(signals.score).toBeGreaterThan(0);
+  });
+
+  it("decodes the supported HTML entities", () => {
+    const { text } = analyzeHtml(
+      `<p>&nbsp;Tom &amp; Jerry &lt;3 &gt;. &quot;hi&quot; &#39;x&#39;</p>`,
+    );
+    expect(text).toBe(`Tom & Jerry <3 >. "hi" 'x'`);
+  });
 });
 
 describe("parseAiVerdict", () => {
@@ -94,6 +158,23 @@ describe("parseAiVerdict", () => {
     expect(parseAiVerdict('{"verdict":"hacking","confidence":1000}')).toMatchObject({
       verdict: "unknown",
       confidence: 100,
+    });
+  });
+
+  it("returns no verdict when the input is missing", () => {
+    expect(parseAiVerdict(undefined as unknown as string)).toEqual({
+      verdict: "unknown",
+      confidence: 0,
+      reason: "",
+    });
+  });
+
+  it("tolerates missing fields", () => {
+    expect(parseAiVerdict('{"foo":1}')).toEqual({ verdict: "unknown", confidence: 0, reason: "" });
+    expect(parseAiVerdict('{"verdict":"safe"}')).toEqual({
+      verdict: "safe",
+      confidence: 0,
+      reason: "",
     });
   });
 });
@@ -166,5 +247,106 @@ describe("detectWithAi", () => {
     const result = await detectWithAi(ai, "");
     expect(result.safe).toBe(true);
     expect(run).not.toHaveBeenCalled();
+  });
+
+  it("asks the model when there is a signal but no visible text", async () => {
+    const { ai, run } = stubAi({ response: '{"verdict":"safe","confidence":90}' });
+    const result = await detectWithAi(ai, `<form action="/x"><input type="password"></form>`);
+    expect(run).toHaveBeenCalledTimes(1);
+    expect(result.safe).toBe(true);
+  });
+
+  it("ignores low-confidence phishing verdicts", async () => {
+    const { ai } = stubAi({ response: '{"verdict":"phishing","confidence":79,"reason":"unsure"}' });
+    const result = await detectWithAi(ai, BRAND_LOGIN);
+    expect(result.safe).toBe(true);
+    expect(result.action).toBe("flagged");
+  });
+
+  it("handles model responses without a `response` field", async () => {
+    const { ai } = stubAi({ result: { verdict: "safe" } });
+    expect((await detectWithAi(ai, BENIGN_PAGE)).safe).toBe(true);
+
+    const { ai: aiNull } = stubAi(null);
+    expect((await detectWithAi(aiNull, BENIGN_PAGE)).safe).toBe(true);
+  });
+
+  it("parses an object response", async () => {
+    const { ai } = stubAi({ response: { verdict: "phishing", confidence: 95, reason: "fake apple" } });
+    const result = await detectWithAi(ai, BRAND_LOGIN);
+    expect(result.safe).toBe(false);
+    expect(result.blockedBy).toBe("ai");
+  });
+
+  it("fails open when inference hangs past the timeout", async () => {
+    vi.useFakeTimers();
+    try {
+      const ai = { run: () => new Promise(() => {}) } as unknown as AiStub;
+      const pending = detectWithAi(ai, BENIGN_PAGE);
+      await vi.advanceTimersByTimeAsync(8000);
+      const result = await pending;
+      expect(result.safe).toBe(true);
+      expect(result.verdict).toBe("unavailable");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
+describe("checkDomainsWithPhishDestroy", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("collects domains above the risk threshold", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({
+        ok: true,
+        json: async () => ({
+          threat: true,
+          risk_score: 80,
+          severity: "high",
+          matched_keywords: ["login"],
+        }),
+      })),
+    );
+    const result = await checkDomainsWithPhishDestroy(["evil.com"]);
+    expect(result.safe).toBe(false);
+    expect(result.threats).toEqual([
+      { domain: "evil.com", severity: "high", score: 80, keywords: ["login"] },
+    ]);
+  });
+
+  it("defaults keywords to an empty array", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({
+        ok: true,
+        json: async () => ({ threat: true, risk_score: 60, severity: "medium" }),
+      })),
+    );
+    const result = await checkDomainsWithPhishDestroy(["y.com"]);
+    expect(result.threats[0].keywords).toEqual([]);
+  });
+
+  it("ignores low-risk domains and non-200 responses", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ threat: true, risk_score: 10 }) })
+      .mockResolvedValueOnce({ ok: false, json: async () => ({}) });
+    vi.stubGlobal("fetch", fetchMock);
+    const result = await checkDomainsWithPhishDestroy(["a.com", "b.com"]);
+    expect(result.safe).toBe(true);
+    expect(result.threats).toEqual([]);
+  });
+
+  it("treats network failures as safe", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => {
+        throw new Error("network down");
+      }),
+    );
+    const result = await checkDomainsWithPhishDestroy(["x.com"]);
+    expect(result.safe).toBe(true);
   });
 });
