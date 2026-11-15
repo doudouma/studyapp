@@ -705,6 +705,14 @@ export async function scanHtmlInBackground(
     let aiResult: Awaited<ReturnType<typeof detectWithAi>> | undefined;
     if (ctx.ai) {
       aiResult = await detectWithAi(ctx.ai, html);
+      log.info("AI 审核结果", {
+        pageId,
+        verdict: aiResult.verdict,
+        confidence: aiResult.confidence,
+        action: aiResult.action,
+        score: aiResult.signals.score,
+        model: aiResult.model,
+      });
       if (!aiResult.safe) {
         const reason = aiResult.blockedBy === "heuristic" ? "phishing" : "ai";
         log.warn("审核不通过", {
@@ -735,8 +743,8 @@ export async function scanHtmlInBackground(
         status: "approved",
         htmlLength: html.length,
         isAnonymous,
-        // 放行但模型给了负面结论：留档供人工抽查，不删页
-        threats: aiResult?.action === "flagged" ? JSON.stringify(aiResult) : undefined,
+        // 放行也留档：模型判定 / 置信度 / 证据分，便于事后抽查与调阈值
+        threats: aiResult ? JSON.stringify(aiResult) : undefined,
       });
     }
   } catch (e) {

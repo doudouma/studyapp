@@ -19,8 +19,9 @@
  *   - 解析失败 / 超时 / 模型不可用一律放行（fail-open），避免误杀
  */
 
-const PHISH_DESTROY_API = "https://api.destroy.tools/v1/check";
+import { log } from "../../lib/log";
 
+const PHISH_DESTROY_API = "https://api.destroy.tools/v1/check";
 /** 小模型：指令跟随 + JSON 输出，比 Llama Guard 的对话分类更贴合「页面审核」 */
 const AI_SCAN_MODEL = "@cf/meta/llama-3.1-8b-instruct-fp8";
 
@@ -426,8 +427,10 @@ export async function detectWithAi(ai: Ai, html: string): Promise<AiScanResult> 
 
     const raw = (response as any)?.response ?? JSON.stringify(response);
     parsed = parseAiVerdict(typeof raw === "string" ? raw : JSON.stringify(raw));
-  } catch {
-    parsed = { verdict: "unavailable", confidence: 0, reason: "ai error" };
+  } catch (e) {
+    const message = String(e).slice(0, 200);
+    log.warn("AI 审核调用失败（已放行）", { error: message });
+    parsed = { verdict: "unavailable", confidence: 0, reason: `ai error: ${message}` };
   }
 
   if (shouldBlock(signals, parsed.verdict, parsed.confidence)) {
