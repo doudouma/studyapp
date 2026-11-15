@@ -701,16 +701,26 @@ export async function scanHtmlInBackground(
       }
     }
 
-    // 3. AI 辅助检测
+    // 3. 结构化证据 + AI 复核（AI 单独判 unsafe 不下架，见 html-guard 注释）
+    let aiResult: Awaited<ReturnType<typeof detectWithAi>> | undefined;
     if (ctx.ai) {
-      const aiResult = await detectWithAi(ctx.ai, html);
+      aiResult = await detectWithAi(ctx.ai, html);
       if (!aiResult.safe) {
-        log.warn("审核不通过", { pageId, status: "blocked", reason: "ai", verdict: aiResult.verdict });
+        const reason = aiResult.blockedBy === "heuristic" ? "phishing" : "ai";
+        log.warn("审核不通过", {
+          pageId,
+          status: "blocked",
+          reason,
+          verdict: aiResult.verdict,
+          confidence: aiResult.confidence,
+          blockedBy: aiResult.blockedBy,
+          score: aiResult.signals?.score ?? 0,
+        });
         if (ctx.d1) {
           await insertUploadLog(ctx.d1, { pageId, event: "upload", isAnonymous, status: "blocked" });
           await insertScanLog(ctx.d1, {
-            pageId, status: "blocked", reason: "ai",
-            threats: JSON.stringify({ verdict: aiResult.verdict }), htmlLength: html.length, isAnonymous,
+            pageId, status: "blocked", reason,
+            threats: JSON.stringify(aiResult), htmlLength: html.length, isAnonymous,
           });
         }
         await deletePageById(ctx, pageId, isAnonymous);
@@ -720,7 +730,14 @@ export async function scanHtmlInBackground(
 
     log.info("审核通过", { pageId, status: "approved" });
     if (ctx.d1) {
-      await insertScanLog(ctx.d1, { pageId, status: "approved", htmlLength: html.length, isAnonymous });
+      await insertScanLog(ctx.d1, {
+        pageId,
+        status: "approved",
+        htmlLength: html.length,
+        isAnonymous,
+        // 放行但模型给了负面结论：留档供人工抽查，不删页
+        threats: aiResult?.action === "flagged" ? JSON.stringify(aiResult) : undefined,
+      });
     }
   } catch (e) {
     // 后台扫描失败不影响已上传的页面

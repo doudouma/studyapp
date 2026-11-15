@@ -30,6 +30,7 @@ vi.mock("../server/features/admin/upload-log.repo", () => ({
 }));
 
 import { scanHtmlInBackground, serveUserPage } from "../server/features/pages/pages.service";
+import type { AiScanResult } from "../server/features/pages/html-guard";
 import { detectAndSanitizeHtml, extractDomains, checkDomainsWithPhishDestroy, detectWithAi } from "../server/features/pages/html-guard";
 import { deletePageObjects, deleteTmpByBucketId } from "../server/features/pages/pages.storage";
 import { deletePageRecord } from "../server/features/pages/pages.repo";
@@ -44,6 +45,26 @@ const mockDeleteTmp = vi.mocked(deleteTmpByBucketId);
 const mockDeleteRecord = vi.mocked(deletePageRecord);
 const mockInsertScanLog = vi.mocked(insertScanLog);
 const mockGetBlocked = vi.mocked(getLatestBlockedScan);
+
+const AI_BLOCK: AiScanResult = {
+  safe: false,
+  verdict: "phishing",
+  confidence: 92,
+  reason: "fake brand login",
+  action: "blocked",
+  blockedBy: "ai",
+  model: "test-model",
+  signals: {
+    passwordFields: 1,
+    externalFormActions: [],
+    externalRedirects: [],
+    brands: ["apple"],
+    loginPhrases: ["verify your account"],
+    obfuscatedJs: false,
+    promptInjection: false,
+    score: 4,
+  },
+};
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -136,7 +157,7 @@ describe("scanHtmlInBackground", () => {
     it("AI 不通过时写入 blocked 记录（reason=ai + verdict）", async () => {
       mockDetect.mockReturnValue({ safe: true, threats: [], sanitizedHtml: "<p>ok</p>" });
       mockExtract.mockReturnValue([]);
-      mockAi.mockResolvedValue({ safe: false, verdict: "unsafe: phishing page" });
+      mockAi.mockResolvedValue(AI_BLOCK);
 
       await scanHtmlInBackground({ bucket, d1, ai }, "abc1234", "<p>suspicious</p>", false);
 
@@ -146,8 +167,36 @@ describe("scanHtmlInBackground", () => {
           pageId: "abc1234",
           status: "blocked",
           reason: "ai",
-          threats: JSON.stringify({ verdict: "unsafe: phishing page" }),
+          threats: JSON.stringify(AI_BLOCK),
         })
+      );
+    });
+
+    it("启发式证据命中时按 phishing 记录，而不是笼统的 ai", async () => {
+      mockDetect.mockReturnValue({ safe: true, threats: [], sanitizedHtml: "<p>ok</p>" });
+      mockExtract.mockReturnValue([]);
+      mockAi.mockResolvedValue({ ...AI_BLOCK, blockedBy: "heuristic", model: "heuristic", confidence: 100 });
+
+      await scanHtmlInBackground({ bucket, d1, ai }, "abc1234", "<p>suspicious</p>", false);
+
+      expect(mockInsertScanLog).toHaveBeenCalledWith(
+        d1,
+        expect.objectContaining({ status: "blocked", reason: "phishing" })
+      );
+    });
+
+    it("模型给了负面结论但证据不足时放行，并把结论留在 approved 记录里", async () => {
+      mockDetect.mockReturnValue({ safe: true, threats: [], sanitizedHtml: "<p>ok</p>" });
+      mockExtract.mockReturnValue([]);
+      const flagged = { ...AI_BLOCK, safe: true, action: "flagged" as const };
+      mockAi.mockResolvedValue(flagged);
+
+      await scanHtmlInBackground({ bucket, d1, ai }, "abc1234", "<p>essay</p>", false);
+
+      expect(mockDeletePageObjects).not.toHaveBeenCalled();
+      expect(mockInsertScanLog).toHaveBeenCalledWith(
+        d1,
+        expect.objectContaining({ status: "approved", threats: JSON.stringify(flagged) })
       );
     });
 
@@ -222,7 +271,7 @@ describe("scanHtmlInBackground", () => {
     it("AI 检测不通过时删除页面", async () => {
       mockDetect.mockReturnValue({ safe: true, threats: [], sanitizedHtml: "<p>ok</p>" });
       mockExtract.mockReturnValue([]);
-      mockAi.mockResolvedValue({ safe: false, verdict: "unsafe: phishing page" });
+      mockAi.mockResolvedValue(AI_BLOCK);
 
       await scanHtmlInBackground({ bucket, d1, ai }, "abc1234", "<p>suspicious</p>", false);
 
