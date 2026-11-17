@@ -29,6 +29,7 @@ export const SHOWCASE_IMAGE_SIZES: Record<string, ImageSize> = {
   "/showcase/fable52-fps.jpg": { w: 1280, h: 720 },
   "/showcase/fable52-materials.jpg": { w: 1280, h: 800 },
   "/showcase/fable52-models.jpg": { w: 1280, h: 800 },
+  "/showcase/forge-fighter.jpg": { w: 1280, h: 800 },
   "/showcase/friendr-explainer-animation.jpg": { w: 1200, h: 630 },
   "/showcase/hallmark.png": { w: 1200, h: 630 },
   "/showcase/interactive-3d-slime.png": { w: 1298, h: 816 },
