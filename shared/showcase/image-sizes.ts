@@ -71,6 +71,7 @@ export const SHOWCASE_IMAGE_SIZES: Record<string, ImageSize> = {
   "/showcase/motion-prompt-pick.jpg": { w: 1440, h: 1012 },
   "/showcase/motion-prompt-ui.jpg": { w: 1440, h: 1012 },
   "/showcase/page-rage.jpg": { w: 1200, h: 630 },
+  "/showcase/papertrails.jpg": { w: 1200, h: 630 },
   "/showcase/photon.jpg": { w: 1200, h: 630 },
   "/showcase/plant-smart.jpg": { w: 1200, h: 630 },
   "/showcase/pokemon-battle-demo.jpg": { w: 1200, h: 630 },
